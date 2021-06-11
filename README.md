@@ -1,2 +1,0 @@
-# Thermobar
-Python thermobarometry tool
