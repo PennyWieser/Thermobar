@@ -1292,6 +1292,35 @@ Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
 def calculate_Cpx_only_Temp(*, Cpx_Comps=None, equationT=None, P=None):
+    '''
+    Clinopyroxene only thermometer. Enter a panda dataframe with Cpx compositions,
+    returns a temperature in Kelvin.
+
+   Parameters
+    -------
+
+    Cpx_Comps: DataFrame
+        clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
+
+    equationT: str
+        | T_Put2008_eq32d (P-dependent)
+        | T_Put2008_eq32d_subsol (P-dependent)
+
+
+
+    P: float, int, series, str  ("Solve")
+        Pressure in kbar
+        Only needed for P-sensitive thermometers.
+        If enter P="Solve", returns a partial function
+        Else, enter an integer, float, or panda series
+
+    Returns
+    -------
+    pandas series
+       Temperature in Kelvin
+    '''
+
+
     try:
         func = Cpx_only_T_funcs_by_name[equationT]
     except KeyError:
