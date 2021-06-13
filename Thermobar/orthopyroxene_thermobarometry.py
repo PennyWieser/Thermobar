@@ -133,14 +133,14 @@ def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, MgO_Liq_cat_frac, CaO_Liq_cat_frac, K
 ##  Opx-Only barometry function
 
 
-def calculate_opx_only_press(*, Opx_Comps, equationP, T=None):
+def calculate_opx_only_press(*, opx_comps, equationP, T=None):
     '''
     Orthopyroxene only barometry. Enter a panda dataframe with orthopyroxene compositions, returns a pressure in kbar.
 
    Parameters
     -------
 
-    Opx_Comps: DataFrame
+    opx_comps: DataFrame
         orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
     equationP: str
@@ -159,17 +159,17 @@ def calculate_opx_only_press(*, Opx_Comps, equationP, T=None):
 
 
     '''
-    Opx_Comps = calculate_orthopyroxene_components(Opx_Comps=Opx_Comps)
+    opx_comps = calculate_orthopyroxene_components(opx_comps=opx_comps)
     if equationP != "P_Put2008_eq29c":
         raise ValueError('Equation not recognised, at the moment the only choice is P_Put2008_eq29c')
 
     P_func = P_Put2008_eq29c
-    if any(Opx_Comps['Cr2O3_Opx_cat_6ox'] == 0):
+    if any(opx_comps['Cr2O3_Opx_cat_6ox'] == 0):
         w.warn('The selected barometer uses the log of Cr2O3 component of '
         'Opx, which is zero for some of your compositions. '
          'This means the function will return infinity.')
 
-    kwargs = {name: Opx_Comps[name] for name, p in inspect.signature(
+    kwargs = {name: opx_comps[name] for name, p in inspect.signature(
         P_func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
 
     if isinstance(T, str) or T is None:
@@ -177,7 +177,7 @@ def calculate_opx_only_press(*, Opx_Comps, equationP, T=None):
             P_kbar = partial(P_func, **kwargs)
 
         if T == "input":
-            T = Liq_Comps['T_K']
+            T = liq_comps['T_K']
             P_kbar = P_func(T, **kwargs)
     else:
         T = T
@@ -195,8 +195,8 @@ Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Fel
 
 Opx_Liq_P_funcs_by_name = {p.__name__: p for p in Opx_Liq_P_funcs}
 
-def calculate_opx_liq_press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMatch=None,
-                            T=None, Eq_Tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
+def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, MeltMatch=None,
+                            T=None, eq_tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
     '''
     Orthopyroxene-Liquid barometer, user specifies equation, and calculates pressure in kbar.
     Also has option to calculate equilibrium tests.
@@ -204,10 +204,10 @@ def calculate_opx_liq_press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMa
    Parameters
     -------
 
-    Opx_Comps: DataFrame
+    opx_comps: DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     Or:
@@ -231,16 +231,16 @@ def calculate_opx_liq_press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMa
         If enter T="Solve", returns a partial function
         Else, enter an integer, float, or panda series
 
-    Eq_Tests: bool
+    eq_tests: bool
         If False, just returns pressure (default) as a panda series
         If True, returns pressure, Values of Eq tests,
         as well as user-entered cpx and liq comps and components.
 
     Returns
     -------
-    If Eq_Tests=False
-        pandas.series: Pressure in kbar (if Eq_Tests=False)
-    If Eq_Tests=True
+    If eq_tests=False
+        pandas.series: Pressure in kbar (if eq_tests=False)
+    If eq_tests=True
         panda.dataframe: Pressure in kbar + Kd-Fe-Mg + opx+liq comp
 
     '''
@@ -259,28 +259,28 @@ def calculate_opx_liq_press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMa
             w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
 
     if isinstance(T, pd.Series):
-        if Liq_Comps is not None:
-            if len(T) != len(Liq_Comps):
+        if liq_comps is not None:
+            if len(T) != len(liq_comps):
                 raise ValueError('The panda series entered for Temperature isnt the same length as the dataframe of liquid compositions')
 
 
 
 
 # This replaces H2O and Fe3FeT_Liq in the input
-    if Liq_Comps is not None:
-        Liq_Comps_c = Liq_Comps.copy()
+    if liq_comps is not None:
+        liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None and not isinstance(H2O_Liq, str):
-            Liq_Comps_c['H2O_Liq'] = H2O_Liq
+            liq_comps_c['H2O_Liq'] = H2O_Liq
         if Fe3FeT_Liq is not None:
-            Liq_Comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
 
 
 
     if MeltMatch is not None:
         Combo_liq_opxs = MeltMatch
-    if Liq_Comps is not None:
+    if liq_comps is not None:
         Combo_liq_opxs = calculate_orthopyroxene_liquid_components(
-            Liq_Comps=Liq_Comps_c, Opx_Comps=Opx_Comps)
+            liq_comps=liq_comps_c, opx_comps=opx_comps)
 
     kwargs = {name: Combo_liq_opxs[name] for name, p in sig.parameters.items() \
     if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -306,14 +306,14 @@ def calculate_opx_liq_press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMa
         P_kbar=func(T, **kwargs)
 
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         if isinstance(P_kbar, partial):
             return P_kbar
         else:
             P_kbar.replace([np.inf, -np.inf], np.nan,inplace=True)
             return P_kbar
 
-    if Eq_Tests is True:
+    if eq_tests is True:
         P_kbar.replace([np.inf, -np.inf], np.nan, inplace=True)
         Combo_liq_opxs.insert(1, "P_kbar_calc", P_kbar)
         Combo_liq_opxs.insert(2, "Eq_Test_Kd_Fe_Mg_Fet",
@@ -330,8 +330,8 @@ def calculate_opx_liq_press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMa
 Opx_Liq_T_funcs = {T_Opx_Beatt1993, T_Put2008_eq28a, T_Put2008_eq28b_opx_sat}
 
 Opx_Liq_T_funcs_by_name = {p.__name__: p for p in Opx_Liq_T_funcs}
-def calculate_opx_liq_temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMatch=None,
-                           P=None, Eq_Tests=False, Fe3FeT_Liq=None, H2O_Liq=None):
+def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, MeltMatch=None,
+                           P=None, eq_tests=False, Fe3FeT_Liq=None, H2O_Liq=None):
     '''
     Orthopyroxene-Liquid thermometer, user specifies equation,
     and calculates temperature in Kelvin.  Also has option to calculate equilibrium tests.
@@ -339,10 +339,10 @@ def calculate_opx_liq_temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMat
    Parameters
     -------
 
-    Opx_Comps: DataFrame
+    opx_comps: DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     MeltMatch: DataFrame
@@ -361,16 +361,16 @@ def calculate_opx_liq_temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMat
         If enter P="Solve", returns a partial function
         Else, enter an integer, float, or panda series
 
-    Eq_Tests: bool
+    eq_tests: bool
         If False (default), returns temperature as a panda series
         If True, returns prsesure, Kd Fe-Mg for liq-opx,
         as well as user-entered opx and liq comps as a panda dataframe.
 
     Returns
     -------
-    If Eq_Tests=False
-        pandas.series: Pressure in kbar (if Eq_Tests=False)
-    If Eq_Tests=True
+    If eq_tests=False
+        pandas.series: Pressure in kbar (if eq_tests=False)
+    If eq_tests=True
         panda.dataframe: Pressure in kbar + Kd-Fe-Mg + opx+liq comps
 
 
@@ -389,8 +389,8 @@ def calculate_opx_liq_temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMat
             w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
 
     if isinstance(P, pd.Series):
-        if Liq_Comps is not None:
-            if len(P) != len(Liq_Comps):
+        if liq_comps is not None:
+            if len(P) != len(liq_comps):
                 raise ValueError('The panda series entered for Pressure isnt the same length as the dataframe of liquid compositions')
 
 
@@ -398,14 +398,14 @@ def calculate_opx_liq_temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMat
     if MeltMatch is not None:
         Combo_liq_opxs = MeltMatch
 
-    if Liq_Comps is not None:
-        Liq_Comps_c = Liq_Comps.copy()
+    if liq_comps is not None:
+        liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None and not isinstance(H2O_Liq, str):
-            Liq_Comps_c['H2O_Liq'] = H2O_Liq
+            liq_comps_c['H2O_Liq'] = H2O_Liq
         if Fe3FeT_Liq is not None:
-            Liq_Comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
         Combo_liq_opxs = calculate_orthopyroxene_liquid_components(
-            Liq_Comps=Liq_Comps_c, Opx_Comps=Opx_Comps)
+            liq_comps=liq_comps_c, opx_comps=opx_comps)
 
 
     kwargs = {name: Combo_liq_opxs[name] for name, p in sig.parameters.items()
@@ -422,7 +422,7 @@ def calculate_opx_liq_temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMat
         T_K=func(P, **kwargs)
 
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         if isinstance(T_K, partial):
             return T_K
         else:
@@ -431,7 +431,7 @@ def calculate_opx_liq_temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMat
             return T_K
 
 
-    if Eq_Tests is True:
+    if eq_tests is True:
 
         Combo_liq_opxs.insert(0, "T_K_calc", T_K)
         Combo_liq_opxs.insert(1, "Eq_Test_Kd_Fe_Mg_Fet",
@@ -445,8 +445,8 @@ def calculate_opx_liq_temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMat
     return T_K
 
 ## Iterating P and T when you don't know either
-def calculate_opx_liq_pt(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None, equationP=None, equationT=None,
-                              iterations=30, T_K_Guess=1300, Eq_Tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
+def calculate_opx_liq_pt(*, liq_comps=None, opx_comps=None, MeltMatch=None, equationP=None, equationT=None,
+                              iterations=30, T_K_Guess=1300, eq_tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
     '''
     Solves simultaneous equations for temperature and pressure using
     orthopyroxene-liquid thermometers and barometers.
@@ -454,10 +454,10 @@ def calculate_opx_liq_pt(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None, equa
    Parameters
     -------
 
-    Opx_Comps: DataFrame
+    opx_comps: DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     Or:
@@ -489,7 +489,7 @@ def calculate_opx_liq_pt(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None, equa
     T_K_guess: int or float  (default=1300K)
          Initial guess of temperature. Default is 1300K
 
-    Eq_Tests: bool
+    eq_tests: bool
         If False, just returns pressure in Kbar, temp in Kelvin as a dataframe
         If True, returns pressure, temperature, Values of Eq tests,
         as well as user-entered opx and liq comps and components.
@@ -497,9 +497,9 @@ def calculate_opx_liq_pt(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None, equa
 
     Returns
     -------
-    If Eq_Tests=False
+    If eq_tests=False
         pandas.DataFrame: Temperature in Kelvin, pressure in Kbar
-    If Eq_Tests=True
+    If eq_tests=True
         panda.dataframe: Temperature in Kelvin, pressure in Kbar
         Eq Tests + opx+liq comps + components
 
@@ -516,18 +516,18 @@ def calculate_opx_liq_pt(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None, equa
         T_K_guess = 1300
 
     if MeltMatch is None:
-        Liq_Comps_c = Liq_Comps.copy()
+        liq_comps_c = liq_comps.copy()
 
         if Fe3FeT_Liq is not None:
-            Liq_Comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
 
         if H2O_Liq is not None:
-            Liq_Comps_c['H2O_Liq'] = H2O_Liq
+            liq_comps_c['H2O_Liq'] = H2O_Liq
 
         T_func = calculate_opx_liq_temp(
-            Opx_Comps=Opx_Comps, Liq_Comps=Liq_Comps_c, equationT=equationT, P="Solve")
+            opx_comps=opx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
         P_func = calculate_opx_liq_press(
-            Opx_Comps=Opx_Comps, Liq_Comps=Liq_Comps_c, equationP=equationP, T="Solve")
+            opx_comps=opx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
 
     if MeltMatch is not None:
 
@@ -558,22 +558,22 @@ def calculate_opx_liq_pt(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None, equa
     T_K_guess[T_K_guess_is_bad] = np.nan
     P_guess[T_K_guess_is_bad] = np.nan
 
-    # calculates Kd Fe-Mg if Eq_Tests="True"
-    if Eq_Tests is False:
+    # calculates Kd Fe-Mg if eq_tests="True"
+    if eq_tests is False:
         PT_out = pd.DataFrame(
             data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
 
         return PT_out
-    if Eq_Tests is True and MeltMatch is None:
+    if eq_tests is True and MeltMatch is None:
         Combo_liq_cpxs = calculate_orthopyroxene_liquid_components(
-            Opx_Comps=Opx_Comps, Liq_Comps=Liq_Comps_c)
+            opx_comps=opx_comps, liq_comps=liq_comps_c)
         Combo_liq_cpxs.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_cpxs.insert(1, "T_K_calc", T_K_guess)
         Combo_liq_cpxs.insert(3, "Eq_Test_Kd_Fe_Mg_Fet",
                               Combo_liq_cpxs['Kd_Fe_Mg_Fet'])
         Combo_liq_cpxs.insert(4, "Eq_Test_Kd_Fe_Mg_Fe2",
                               Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
-    if Eq_Tests is True and MeltMatch is not None:
+    if eq_tests is True and MeltMatch is not None:
         Combo_liq_cpxs = MeltMatch.copy()
         Combo_liq_cpxs.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_cpxs.insert(1, "T_K_calc", T_K_guess)
@@ -586,7 +586,7 @@ def calculate_opx_liq_pt(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None, equa
 
 ## Considering all possible Orthopyroxene-melt pairs, and iterating P and T
 
-def calculate_opx_liq_pt_matching(*, Liq_Comps, Opx_Comps, equationT=None,
+def calculate_opx_liq_pt_matching(*, liq_comps, opx_comps, equationT=None,
 equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
  KdMatch=None, KdErr=None, Opx_Quality=False, Return_All_Matches=False):
 
@@ -597,10 +597,10 @@ equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
    Parameters
     -------
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Panda DataFrame of liquid compositions with column headings SiO2_Liq etc.
 
-    Opx_Comps: DataFrame
+    opx_comps: DataFrame
         Panda DataFrame of opx compositions with column headings SiO2_Opx etc.
 
     EquationP: str
@@ -647,7 +647,7 @@ equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
 
    Fe3FeT_Liq: int or float, optional
         Fe3FeT ratio used to assess Kd Fe-Mg equilibrium between opx and melt.
-        If users don't specify, uses Fe3FeT_Liq from Liq_Comps.
+        If users don't specify, uses Fe3FeT_Liq from liq_comps.
         If specified, overwrites the Fe3FeT_Liq column in the liquid input.
 
 
@@ -669,25 +669,25 @@ equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
         'The code doesnt know what you want it to do. Either enter an equation, or choose a temperature.  ')
 
     # This over-writes inputted Fe3Fet_Liq and H2O_Liq inputs.
-    Liq_Comps_c = Liq_Comps.copy()
+    liq_comps_c = liq_comps.copy()
     if Fe3FeT_Liq is not None:
-        Liq_Comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+        liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
     if H2O_Liq is not None and not isinstance(H2O_Liq, str):
-        Liq_Comps_c['H2O_Liq'] = H2O_Liq
-    if "Fe3FeT_Liq" not in Liq_Comps:
-        Liq_Comps_c['Fe3FeT_Liq'] = 0
+        liq_comps_c['H2O_Liq'] = H2O_Liq
+    if "Fe3FeT_Liq" not in liq_comps:
+        liq_comps_c['Fe3FeT_Liq'] = 0
 
     # Adding sample names if there aren't any
-    if "Sample_ID_Liq" not in Liq_Comps:
-        Liq_Comps_c['Sample_ID_Liq'] = Liq_Comps_c.index
-    if "Sample_ID_Opx" not in Opx_Comps:
-        Opx_Comps['Sample_ID_Opx'] = Opx_Comps.index
+    if "Sample_ID_Liq" not in liq_comps:
+        liq_comps_c['Sample_ID_Liq'] = liq_comps_c.index
+    if "Sample_ID_Opx" not in opx_comps:
+        opx_comps['Sample_ID_Opx'] = opx_comps.index
 
     # Calculating Opx and liq components. Do before duplication to save
     # computation time
-    myOPXs1_concat = calculate_orthopyroxene_components(Opx_Comps=Opx_Comps)
+    myOPXs1_concat = calculate_orthopyroxene_components(opx_comps=opx_comps)
     myLiquids1_concat = calculate_anhydrous_cat_fractions_liquid(
-        Liq_Comps=Liq_Comps_c)
+        liq_comps=liq_comps_c)
 
     # Adding an ID label to help with melt-opx rematching later
     myOPXs1_concat['ID_OPX'] = myOPXs1_concat.index

@@ -77,8 +77,8 @@ Kspar_Liq_T_funcs = {T_Put2008_eq24b}
 Kspar_Liq_T_funcs_by_name = {p.__name__: p for p in Kspar_Liq_T_funcs}
 
 
-def calculate_fspar_liq_temp(*, Plag_Comps=None, Kspar_Comps=None,
-    Liq_Comps=None, equationT=None, P=None, H2O_Liq=None, Eq_Tests=False):
+def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
+    liq_comps=None, equationT=None, P=None, H2O_Liq=None, eq_tests=False):
     '''
     Liquid-Feldspar thermometery (same function for Plag and Kspar),
     returns temperature in Kelvin.
@@ -86,12 +86,12 @@ def calculate_fspar_liq_temp(*, Plag_Comps=None, Kspar_Comps=None,
     Parameters
     -------
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    Kspar_Comps or Plag_Comps (DataFrame)
-        Specify Kspar_Comps=... for Kspar-Liquid thermometry (with column headings SiO2_Kspar, MgO_Kspar) etc
-        Specify Plag_Comps=... for Plag-Liquid thermometry (with column headings SiO2_Plag, MgO_Plag) etc
+    kspar_comps or plag_comps (DataFrame)
+        Specify kspar_comps=... for Kspar-Liquid thermometry (with column headings SiO2_Kspar, MgO_Kspar) etc
+        Specify plag_comps=... for Plag-Liquid thermometry (with column headings SiO2_Plag, MgO_Plag) etc
 
     EquationT: str
         Equation choices:
@@ -116,20 +116,20 @@ def calculate_fspar_liq_temp(*, Plag_Comps=None, Kspar_Comps=None,
         Temperatures in Kelvin
 
     '''
-    Liq_Comps_c = Liq_Comps.copy()
+    liq_comps_c = liq_comps.copy()
     if H2O_Liq is not None:
-        Liq_Comps_c['H2O_Liq'] = H2O_Liq
+        liq_comps_c['H2O_Liq'] = H2O_Liq
 
 
-    if Plag_Comps is not None:
+    if plag_comps is not None:
         try:
             func = plag_liq_T_funcs_by_name[equationT]
         except KeyError:
             raise ValueError(f'{equationT} is not a valid equation for Plag-Liquid') from None
         sig=inspect.signature(func)
 
-        cat_plags = calculate_cat_fractions_plagioclase(Plag_Comps=Plag_Comps)
-        cat_liqs = calculate_anhydrous_cat_fractions_liquid(Liq_Comps_c)
+        cat_plags = calculate_cat_fractions_plagioclase(plag_comps=plag_comps)
+        cat_liqs = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
         combo_fspar_Liq = pd.concat([cat_plags, cat_liqs], axis=1)
 
         Kd_Ab_An = (combo_fspar_Liq['Ab_Plag'] * combo_fspar_Liq['Al2O3_Liq_cat_frac'] * combo_fspar_Liq['CaO_Liq_cat_frac'] /
@@ -140,15 +140,15 @@ def calculate_fspar_liq_temp(*, Plag_Comps=None, Kspar_Comps=None,
             w.warn('Some inputted feldspars have An<0.05, but you have selected a plagioclase-liquid thermometer'
             '. If these are actually alkali felspars, please use T_P2008_eq24b or T_P2008_24c instead', stacklevel=2)
 
-    if Kspar_Comps is not None:
+    if kspar_comps is not None:
         try:
             func = Kspar_Liq_T_funcs_by_name[equationT]
         except KeyError:
             raise ValueError(f'{equationT} is not a valid equation for Kspar-Liquid') from None
         sig=inspect.signature(func)
 
-        cat_kspars = calculate_cat_fractions_kspar(Kspar_Comps=Kspar_Comps)
-        cat_liqs = calculate_anhydrous_cat_fractions_liquid(Liq_Comps_c)
+        cat_kspars = calculate_cat_fractions_kspar(kspar_comps=kspar_comps)
+        cat_liqs = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
         combo_fspar_Liq = pd.concat([cat_kspars, cat_liqs], axis=1)
 
         Kd_Ab_An = (combo_fspar_Liq['Ab_Kspar'] * combo_fspar_Liq['Al2O3_Liq_cat_frac'] * combo_fspar_Liq['CaO_Liq_cat_frac'] /
@@ -179,17 +179,17 @@ def calculate_fspar_liq_temp(*, Plag_Comps=None, Kspar_Comps=None,
     else:
         T_K=func(P, **kwargs)
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         return T_K
-    if Eq_Tests is True:
-        if Kspar_Comps is not None:
+    if eq_tests is True:
+        if kspar_comps is not None:
             print('Sorry, no equilibrium tests implemented for Kspar-Liquid')
             return T_K
-        if Plag_Comps is not None:
-            Eq_Tests=calculate_plagioclase_liquid_components(Liq_Comps=Liq_Comps,
-            Plag_Comps=Plag_Comps, P=P, T=T_K)
-            Eq_Tests.insert(1, "T_K_calc", T_K)
-            return Eq_Tests
+        if plag_comps is not None:
+            eq_tests=calculate_plagioclase_liquid_components(liq_comps=liq_comps,
+            plag_comps=plag_comps, P=P, T=T_K)
+            eq_tests.insert(1, "T_K_calc", T_K)
+            return eq_tests
 
 
 ## Function: Fspar-Liq pressure
@@ -199,8 +199,8 @@ plag_liq_P_funcs_by_name = {p.__name__: p for p in plag_liq_P_funcs}
 Kspar_Liq_P_funcs = {}
 Kspar_Liq_P_funcs_by_name = {p.__name__: p for p in Kspar_Liq_P_funcs}
 
-def calculate_fspar_liq_press(*, Plag_Comps=None, Kspar_Comps=None, Liq_Comps=None, equationP=None,
-                              T=None, H2O_Liq=None, Eq_Tests=False):
+def calculate_fspar_liq_press(*, plag_comps=None, kspar_comps=None, liq_comps=None, equationP=None,
+                              T=None, H2O_Liq=None, eq_tests=False):
 
     '''
     Liquid-Feldspar barometer (at the moment, only options for Plag).
@@ -210,11 +210,11 @@ def calculate_fspar_liq_press(*, Plag_Comps=None, Kspar_Comps=None, Liq_Comps=No
     Parameters
     -------
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    Plag_Comps (DataFrame)
-        Specify Plag_Comps=... (with column headings SiO2_Plag, MgO_Plag) etc
+    plag_comps (DataFrame)
+        Specify plag_comps=... (with column headings SiO2_Plag, MgO_Plag) etc
 
     EquationP: str
         Equation choices:
@@ -236,7 +236,7 @@ def calculate_fspar_liq_press(*, Plag_Comps=None, Kspar_Comps=None, Liq_Comps=No
         Temperature in Kelvin
 
     '''
-    if Kspar_Comps is not None:
+    if kspar_comps is not None:
         raise TypeError('Sorry, this tool doesnt contain any alkali-fspar-liquid barometers,'
         ' this option is here as a place holder incase a great one comes along!')
 
@@ -248,13 +248,13 @@ def calculate_fspar_liq_press(*, Plag_Comps=None, Kspar_Comps=None, Liq_Comps=No
 
 
 
-    Liq_Comps_c = Liq_Comps.copy()
+    liq_comps_c = liq_comps.copy()
     if H2O_Liq is not None:
-        Liq_Comps_c['H2O_Liq'] = H2O_Liq
+        liq_comps_c['H2O_Liq'] = H2O_Liq
 
 
-    cat_plags = calculate_cat_fractions_plagioclase(Plag_Comps=Plag_Comps)
-    cat_liqs = calculate_anhydrous_cat_fractions_liquid(Liq_Comps)
+    cat_plags = calculate_cat_fractions_plagioclase(plag_comps=plag_comps)
+    cat_liqs = calculate_anhydrous_cat_fractions_liquid(liq_comps)
     combo_plag_liq = pd.concat([cat_plags, cat_liqs], axis=1)
 
     Kd_Ab_An = (combo_plag_liq['Ab_Plag'] * combo_plag_liq['Al2O3_Liq_cat_frac'] * combo_plag_liq['CaO_Liq_cat_frac'] /
@@ -284,19 +284,19 @@ def calculate_fspar_liq_press(*, Plag_Comps=None, Kspar_Comps=None, Liq_Comps=No
     else:
         P_kbar=func(T, **kwargs)
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         return P_kbar
-    if Eq_Tests is True:
+    if eq_tests is True:
 
-        Eq_Tests=calculate_plagioclase_liquid_components(Liq_Comps=Liq_Comps,
-        Plag_Comps=Plag_Comps, P=P_kbar, T=T)
-        Eq_Tests.insert(1, "P_kbar_calc", P_kbar)
-        return Eq_Tests
+        eq_tests=calculate_plagioclase_liquid_components(liq_comps=liq_comps,
+        plag_comps=plag_comps, P=P_kbar, T=T)
+        eq_tests.insert(1, "P_kbar_calc", P_kbar)
+        return eq_tests
     return P_kbar
 
 ## Function for iterating pressure and temperature - (probably not recomended)
 
-def calculate_fspar_Liq_pt(*, Liq_Comps=None, Plag_Comps=None, Kspar_Comps=None,
+def calculate_fspar_Liq_pt(*, liq_comps=None, plag_comps=None, kspar_comps=None,
                                 MeltMatch=None, equationP=None, equationT=None, iterations=30, T_K_guess=1300,
                                 H2O_Liq=None):
     '''
@@ -306,10 +306,10 @@ def calculate_fspar_Liq_pt(*, Liq_Comps=None, Plag_Comps=None, Kspar_Comps=None,
    Parameters
     -------
 
-    Plag_Comps: DataFrame
+    plag_comps: DataFrame
         Feldspar compositions with column headings SiO2_Fspar, MgO_Fspar etc.
 
-    Liq_Comps: DataFrame (not required for P_Put2008_eq29c)
+    liq_comps: DataFrame (not required for P_Put2008_eq29c)
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     Or:
@@ -337,24 +337,24 @@ def calculate_fspar_Liq_pt(*, Liq_Comps=None, Plag_Comps=None, Kspar_Comps=None,
 
     Returns:
     -------
-    panda.dataframe: Pressure in kbar, Temperature in K + fspar+liq comps (if Eq_Tests=True)
+    panda.dataframe: Pressure in kbar, Temperature in K + fspar+liq comps (if eq_tests=True)
 
 
     '''
     # Gives users flexibility to reduce or increase iterations
-    Liq_Comps_c=Liq_Comps.copy()
+    liq_comps_c=liq_comps.copy()
     if H2O_Liq is not None:
-        Liq_Comps_c['H2O_Liq']=H2O_Liq
-    if Kspar_Comps is not None:
+        liq_comps_c['H2O_Liq']=H2O_Liq
+    if kspar_comps is not None:
         raise Exception(
             'Sorry, we currently dont have any kspar barometers coded up, so you cant iteratively solve for Kspars')
 
 
     if MeltMatch is None:
         T_func = calculate_fspar_liq_temp(
-            Plag_Comps=Plag_Comps, Liq_Comps=Liq_Comps_c, equationT=equationT, P="Solve")
+            plag_comps=plag_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
         P_func = calculate_fspar_liq_press(
-            Plag_Comps=Plag_Comps, Liq_Comps=Liq_Comps_c, equationP=equationP,  T="Solve")
+            plag_comps=plag_comps, liq_comps=liq_comps_c, equationP=equationP,  T="Solve")
     if MeltMatch is not None:
         T_func = calculate_fspar_liq_temp(
             MeltMatch=MeltMatch, equationT=equationT)
@@ -384,7 +384,7 @@ def calculate_fspar_Liq_pt(*, Liq_Comps=None, Plag_Comps=None, Kspar_Comps=None,
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
 
-    # calculates Kd Fe-Mg if Eq_Tests="True"
+    # calculates Kd Fe-Mg if eq_tests="True"
 
     PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
     return PT_out
@@ -413,7 +413,7 @@ def H_Put2005_eqH(T, *, An_Plag, SiO2_Liq_cat_frac, Al2O3_Liq_cat_frac, Na2O_Liq
             - 3.847 * Pred_Ab_EqF + 1.927 * Pred_An_EqE / (CaO_Liq_cat_frac / (CaO_Liq_cat_frac + Na2O_Liq_cat_frac)))
 
 
-def H_Waters2015(T, *, Liq_Comps=None, Plag_Comps=None,
+def H_Waters2015(T, *, liq_comps=None, plag_comps=None,
                  P, XAn=None, XAb=None):
     '''
     Plagioclase-Hygrometer of  Waters and Lange (2015)
@@ -422,7 +422,7 @@ def H_Waters2015(T, *, Liq_Comps=None, Plag_Comps=None,
     '''
     # 1st bit calculates mole fractions in the same way as Waters and Lange.
     # Note, to match excel, all Fe is considered as FeOT.
-    mol_prop = calculate_anhydrous_mol_proportions_liquid(Liq_Comps=Liq_Comps)
+    mol_prop = calculate_anhydrous_mol_proportions_liquid(liq_comps=liq_comps)
     mol_prop['Al2O3_Liq_mol_prop_v2'] = mol_prop['Al2O3_Liq_mol_prop'] - \
         mol_prop['K2O_Liq_mol_prop']
     # These are set to zero, so the sum of molar proportions is the same as in
@@ -441,9 +441,9 @@ def H_Waters2015(T, *, Liq_Comps=None, Plag_Comps=None,
     if XAn is not None and XAb is not None:
         XAn_Plag = XAn
         XAb_Plag = XAb
-    if isinstance(Plag_Comps, pd.DataFrame):
+    if isinstance(plag_comps, pd.DataFrame):
         feld_cat_frac = calculate_cat_fractions_plagioclase(
-            Plag_Comps=Plag_Comps)
+            plag_comps=plag_comps)
         XAn_Plag = feld_cat_frac['An_Plag']
         XAb_Plag = feld_cat_frac['Ab_Plag']
 
@@ -587,13 +587,13 @@ def H_Waters2015(T, *, Liq_Comps=None, Plag_Comps=None,
      - (15.9003801663855 * negCaO_Liq_mol_frac) + (18.6326909831708 * negNa2O_Liq_mol_frac)
      + (24.0180473651546 * negK2O_Liq_mol_frac))
 
-    if XAn is not None and XAb is not None and Plag_Comps is None:
+    if XAn is not None and XAb is not None and plag_comps is None:
         Combo_Out = pd.DataFrame(
             data={'H2O_calc': wtH2Ocalc, 'An': XAn, 'Ab': XAb})
         return Combo_Out
     else:
         Combo_Out = pd.concat(
-            [feld_cat_frac, Liq_Comps, Liq_anhyd_mol_frac], axis=1)
+            [feld_cat_frac, liq_comps, Liq_anhyd_mol_frac], axis=1)
         cols_to_move = ['An_Plag', 'Ab_Plag']
         Combo_Out = Combo_Out[cols_to_move +
                               [col for col in Combo_Out.columns if col not in cols_to_move]]
@@ -607,7 +607,7 @@ plag_liq_H_funcs_by_name = {p.__name__: p for p in plag_liq_H_funcs}
 
 
 
-def calculate_plag_liq_Hygr(*, Liq_Comps, Plag_Comps=None,
+def calculate_plag_liq_Hygr(*, liq_comps, plag_comps=None,
                             equationH=None, P=None, T=None, XAn=None, XAb=None, XOr=0):
 
     '''Calculates H2O content (wt%) from composition of equilibrium plagioclase
@@ -615,17 +615,17 @@ def calculate_plag_liq_Hygr(*, Liq_Comps, Plag_Comps=None,
 
    Parameters
     -------
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         liquids compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     One of:
 
-    1) Plag_Comps: DataFrame (optional)
+    1) plag_comps: DataFrame (optional)
         Plag compositions with column headings SiO2_Plag, MgO_Plag etc.
 
 
     2) XAn, XAb, XOr, float, int, series
-        If Plag_Comps is None, enter XAn and XAb for plagioclases instead.
+        If plag_comps is None, enter XAn and XAb for plagioclases instead.
         XOr is set to zero by default, but can be overwritten for equilibrium tests
 
     equation: str
@@ -640,7 +640,7 @@ def calculate_plag_liq_Hygr(*, Liq_Comps, Plag_Comps=None,
     T: float, int, series
         Temperature (K)
 
-    Eq_Tests: bool
+    eq_tests: bool
         If True, also calculatse equilibrum tests of Putirka (2008).
 
     Returns:
@@ -669,55 +669,55 @@ def calculate_plag_liq_Hygr(*, Liq_Comps, Plag_Comps=None,
 
 
     # Then, warn if enter contradicting inputs;
-    if Plag_Comps is not None and XAn is not None:
+    if plag_comps is not None and XAn is not None:
         raise Exception(
             'You have entered both a plag composition, and an XAn value'
             ', so the code doesnt know which to use. Either enter a full feld composition,'
             ' OR XAn and XAb values')
-    if Plag_Comps is not None and XAb is not None:
+    if plag_comps is not None and XAb is not None:
         raise Exception(
             'You have entered both a feld composition, and an XAb value,'
             ' so the code doesnt know what to use. Either enter a full feld composition,'
             ' OR XAn and XAb values')
 
-    if Plag_Comps is None and XAb is None:
-        raise Exception('You must enter either Plag_Comps=, or an XAb and XAn content')
+    if plag_comps is None and XAb is None:
+        raise Exception('You must enter either plag_comps=, or an XAb and XAn content')
 
     if equationH == "H_Waters2015":
-        if XAn is not None and XAb is not None and Plag_Comps is None:
+        if XAn is not None and XAb is not None and plag_comps is None:
             Combo_Out = H_Waters2015(
-                Liq_Comps=Liq_Comps, P=P, T=T, XAn=XAn, XAb=XAb)
-            Eq_Tests=calculate_plagioclase_liquid_components(Liq_Comps=Liq_Comps, XAn=XAn, XAb=XAb,
+                liq_comps=liq_comps, P=P, T=T, XAn=XAn, XAb=XAb)
+            eq_tests=calculate_plagioclase_liquid_components(liq_comps=liq_comps, XAn=XAn, XAb=XAb,
                 P=P, T=T)
 
 
 
-        if Plag_Comps is not None:
+        if plag_comps is not None:
 
             Combo_Out = H_Waters2015(
-                Liq_Comps=Liq_Comps, Plag_Comps=Plag_Comps, P=P, T=T)
-            Eq_Tests=calculate_plagioclase_liquid_components(Plag_Comps=Plag_Comps,
-                Liq_Comps=Liq_Comps, P=P, T=T)
+                liq_comps=liq_comps, plag_comps=plag_comps, P=P, T=T)
+            eq_tests=calculate_plagioclase_liquid_components(plag_comps=plag_comps,
+                liq_comps=liq_comps, P=P, T=T)
 
-        Combo_Out.insert(0, "Pass An-Ab Eq Test Put2008?", Eq_Tests['Pass An-Ab Eq Test Put2008?'])
+        Combo_Out.insert(0, "Pass An-Ab Eq Test Put2008?", eq_tests['Pass An-Ab Eq Test Put2008?'])
 
-        Combo_Out.insert(2, 'Delta_An', Eq_Tests['Delta_An'])
-        Combo_Out.insert(3, 'Delta_Ab', Eq_Tests['Delta_Ab'])
-        Combo_Out.insert(4, 'Delta_Or', Eq_Tests['Delta_Or'])
-        Combo_Out.insert(5, 'Pred_An_EqE', Eq_Tests['Pred_An_EqE'])
-        Combo_Out.insert(6, 'Pred_Ab_EqF', Eq_Tests['Pred_Ab_EqF'])
-        Combo_Out.insert(7, 'Pred_Or_EqG', Eq_Tests['Pred_Or_EqG'])
-        Combo_Out.insert(8, 'Obs_Kd_Ab_An', Eq_Tests['Obs_Kd_Ab_An'])
+        Combo_Out.insert(2, 'Delta_An', eq_tests['Delta_An'])
+        Combo_Out.insert(3, 'Delta_Ab', eq_tests['Delta_Ab'])
+        Combo_Out.insert(4, 'Delta_Or', eq_tests['Delta_Or'])
+        Combo_Out.insert(5, 'Pred_An_EqE', eq_tests['Pred_An_EqE'])
+        Combo_Out.insert(6, 'Pred_Ab_EqF', eq_tests['Pred_Ab_EqF'])
+        Combo_Out.insert(7, 'Pred_Or_EqG', eq_tests['Pred_Or_EqG'])
+        Combo_Out.insert(8, 'Obs_Kd_Ab_An', eq_tests['Obs_Kd_Ab_An'])
         return Combo_Out
 
 
     if equationH == "H_Put2008_eq25b" or equationH == "H_Put2005_eqH":
-        if Plag_Comps is not None:
+        if plag_comps is not None:
             combo_plag_liq = calculate_plagioclase_liquid_components(
-                Liq_Comps=Liq_Comps, Plag_Comps=Plag_Comps, T=T, P=P)
-        if Plag_Comps is None:
+                liq_comps=liq_comps, plag_comps=plag_comps, T=T, P=P)
+        if plag_comps is None:
             combo_plag_liq = calculate_plagioclase_liquid_components(
-                Liq_Comps=Liq_Comps, T=T, P=P)
+                liq_comps=liq_comps, T=T, P=P)
             combo_plag_liq['An_Plag'] = XAn
             combo_plag_liq['Ab_Plag'] = XAb
 
@@ -779,7 +779,7 @@ Plag_Kspar_T_funcs = {T_Put2008_eq27a, T_Put2008_eq27b, T_Put_Global_2Fspar}
 Plag_Kspar_T_funcs_by_name = {p.__name__: p for p in Plag_Kspar_T_funcs}
 
 
-def calculate_plag_kspar_temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Match=None, equationT=None, P=None, Eq_Tests=False):
+def calculate_plag_kspar_temp(*, plag_comps=None, kspar_comps=None, Two_Fspar_Match=None, equationT=None, P=None, eq_tests=False):
     '''
     Two feldspar thermometer (Kspar-Plag)
     Returns temperature in Kelvin
@@ -787,10 +787,10 @@ def calculate_plag_kspar_temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Ma
     Parameters
     -------
 
-    Plag_Comps: DataFrame
+    plag_comps: DataFrame
         Plag compositions with column headings SiO2_Plag, MgO_Plag etc.
 
-    Kspar_Comps: DataFrame
+    kspar_comps: DataFrame
         Kspar compositions with column headings SiO2_Kspar, MgO_Kspar etc.
 
     or:
@@ -825,16 +825,16 @@ def calculate_plag_kspar_temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Ma
 
     if Two_Fspar_Match is None:
         if isinstance(P, pd.Series):
-            if len(P) != len(Plag_Comps):
+            if len(P) != len(plag_comps):
                 raise ValueError('The panda series entered for pressure isnt the same length '
                 'as the dataframe of Plag compositions')
-            if len(Plag_Comps) != len(Kspar_Comps):
+            if len(plag_comps) != len(kspar_comps):
                 raise ValueError('The panda series entered for Plag isnt the same length as for KSpar')
 
 
 
-        cat_plag = calculate_cat_fractions_plagioclase(Plag_Comps=Plag_Comps)
-        cat_kspar = calculate_cat_fractions_kspar(Kspar_Comps=Kspar_Comps)
+        cat_plag = calculate_cat_fractions_plagioclase(plag_comps=plag_comps)
+        cat_kspar = calculate_cat_fractions_kspar(kspar_comps=kspar_comps)
         combo_fspars = pd.concat([cat_plag, cat_kspar], axis=1)
         combo_fspars['K_Barth'] = combo_fspars['Ab_Kspar'] / \
         combo_fspars['Ab_Plag']
@@ -860,9 +860,9 @@ def calculate_plag_kspar_temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Ma
     else:
         T_K=func(P, **kwargs)
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         return T_K
-    if Eq_Tests is True:
+    if eq_tests is True:
         func=calculate_fspar_activity_components
         combo_fspars['T']=T_K
         combo_fspars['P']=P
@@ -876,7 +876,7 @@ def calculate_plag_kspar_temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Ma
 
 ## Plag Kspar matching
 
-def calculate_plag_kspar_temp_matching(*, Kspar_Comps, Plag_Comps, equationT=None,
+def calculate_plag_kspar_temp_matching(*, kspar_comps, plag_comps, equationT=None,
                                  P=None):
     '''Evaluates all possible Plag-Kspar pairs,
     returns T (K) and equilibrium tests
@@ -884,10 +884,10 @@ def calculate_plag_kspar_temp_matching(*, Kspar_Comps, Plag_Comps, equationT=Non
    Parameters
     -------
 
-    Plag_Comps: DataFrame
+    plag_comps: DataFrame
         Panda DataFrame of plag compositions with column headings SiO2_Plag, CaO_Plag etc.
 
-    Kspar_Comps: DataFrame
+    kspar_comps: DataFrame
         Panda DataFrame of kspar compositions with column headings SiO2_Kspar etc.
 
     EquationT: str
@@ -914,8 +914,8 @@ def calculate_plag_kspar_temp_matching(*, Kspar_Comps, Plag_Comps, equationT=Non
 
     # Calculating Plag and plag components. Do before duplication to save
     # computation time
-    cat_plag = calculate_cat_fractions_plagioclase(Plag_Comps=Plag_Comps)
-    cat_kspar = calculate_cat_fractions_kspar(Kspar_Comps=Kspar_Comps)
+    cat_plag = calculate_cat_fractions_plagioclase(plag_comps=plag_comps)
+    cat_kspar = calculate_cat_fractions_kspar(kspar_comps=kspar_comps)
 
     # Adding an ID label to help with melt-kspar rematching later
     cat_plag['ID_Plag'] = cat_plag.index

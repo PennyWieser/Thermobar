@@ -279,8 +279,8 @@ P_Mas2013_Palk2012, P_Wieser2021_H2O_indep, P_Neave2017} # put on outside
 Cpx_Liq_P_funcs_by_name = {p.__name__: p for p in Cpx_Liq_P_funcs}
 
 
-def calculate_cpx_liq_press(*, equationP, Cpx_Comps=None, Liq_Comps=None, MeltMatch=None,
-                            T=None, Eq_Tests=False, Fe3FeT_Liq=None, H2O_Liq=None,
+def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, MeltMatch=None,
+                            T=None, eq_tests=False, Fe3FeT_Liq=None, H2O_Liq=None,
                            sigma=1, KdErr=0.03):
     '''
     Clinopyroxene-Liquid barometer, calculates pressure in kbar
@@ -290,10 +290,10 @@ def calculate_cpx_liq_press(*, equationP, Cpx_Comps=None, Liq_Comps=None, MeltMa
    Parameters
     -------
 
-    Cpx_Comps: DataFrame
+    cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     Or:
@@ -322,7 +322,7 @@ def calculate_cpx_liq_press(*, equationP, Cpx_Comps=None, Liq_Comps=None, MeltMa
         If enter T="Solve", returns a partial function
         Else, enter an integer, float, or panda series
 
-    Eq_Tests: bool
+    eq_tests: bool
         If False, just returns pressure (default) as a panda series
         If True, returns pressure, Values of Eq tests,
         as well as user-entered cpx and liq comps and components.
@@ -330,9 +330,9 @@ def calculate_cpx_liq_press(*, equationP, Cpx_Comps=None, Liq_Comps=None, MeltMa
 
     Returns
     -------
-    If Eq_Tests=False
+    If eq_tests=False
         pandas.series: Pressure in kbar
-    If Eq_Tests=True
+    If eq_tests=True
         panda.dataframe: Temperature in Kelvin +
         Eq Tests + cpx+liq comps + components
 
@@ -353,23 +353,23 @@ def calculate_cpx_liq_press(*, equationP, Cpx_Comps=None, Liq_Comps=None, MeltMa
             w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
 
     if isinstance(T, pd.Series):
-        if Liq_Comps is not None:
-            if len(T) != len(Liq_Comps):
+        if liq_comps is not None:
+            if len(T) != len(liq_comps):
                 raise ValueError('The panda series entered for Temperature isnt the same length as the dataframe of liquid compositions')
 
 
 
 # This replaces H2O and Fe3FeT_Liq in the input
-    if Liq_Comps is not None:
-        Liq_Comps_c = Liq_Comps.copy()
+    if liq_comps is not None:
+        liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None and not isinstance(H2O_Liq, str):
-            Liq_Comps_c['H2O_Liq'] = H2O_Liq
+            liq_comps_c['H2O_Liq'] = H2O_Liq
         if Fe3FeT_Liq is not None:
-            Liq_Comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
 
 
     if equationP == "P_Mas2013_eqalk32c" or equationP == "P_Mas2013_eqPalk2" or equationP == "P_Mas2013_eqPalk1":
-        if Liq_Comps is not None and np.max(Liq_Comps_c['Fe3FeT_Liq']) > 0:
+        if liq_comps is not None and np.max(liq_comps_c['Fe3FeT_Liq']) > 0:
             w.warn('Some Fe3FeT_Liq are greater than 0. Masotta et al. (2013)'
             ' calibrate their equations assuming all Fe is Fe2+. '
             'You should set Fe3FeT_Liq=0 in the function for consistency. ')
@@ -383,9 +383,9 @@ def calculate_cpx_liq_press(*, equationP, Cpx_Comps=None, Liq_Comps=None, MeltMa
 
     if MeltMatch is not None:
         Combo_liq_cpxs = MeltMatch
-    if Liq_Comps is not None:
+    if liq_comps is not None:
         Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(
-            Liq_Comps=Liq_Comps_c, Cpx_Comps=Cpx_Comps)
+            liq_comps=liq_comps_c, cpx_comps=cpx_comps)
 
     kwargs = {name: Combo_liq_cpxs[name] for name, p in sig.parameters.items() \
     if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -408,7 +408,7 @@ def calculate_cpx_liq_press(*, equationP, Cpx_Comps=None, Liq_Comps=None, MeltMa
         P_kbar=func(T, **kwargs)
 
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         if isinstance(P_kbar, partial):
             return P_kbar
         else:
@@ -418,18 +418,18 @@ def calculate_cpx_liq_press(*, equationP, Cpx_Comps=None, Liq_Comps=None, MeltMa
 
 
 
-    if Eq_Tests is True:
+    if eq_tests is True:
         if isinstance(P_kbar, partial):
             raise TypeError('cant calculate equilibrium tests if P_kbar isnt numerical'
             'e.g., if you havent specified a T for a T-dependent thermometer')
         if MeltMatch is None:
-            Eq_Tests = calculate_cpx_eq_tests(Cpx_Comps=Cpx_Comps,
-            Liq_Comps=Liq_Comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P_kbar, T=T, sigma=sigma, KdErr=KdErr)
+            eq_tests = calculate_cpx_eq_tests(cpx_comps=cpx_comps,
+            liq_comps=liq_comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P_kbar, T=T, sigma=sigma, KdErr=KdErr)
         if MeltMatch is not None:
-            Eq_Tests = calculate_cpx_eq_tests(MeltMatch=MeltMatch,
+            eq_tests = calculate_cpx_eq_tests(MeltMatch=MeltMatch,
             Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
-        Eq_Tests.replace([np.inf, -np.inf], np.nan, inplace=True)
-        return Eq_Tests
+        eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
+        return eq_tests
 
 
 ## Function for calculation Cpx-Liquid temperatures
@@ -439,8 +439,8 @@ T_Mas2013_Talk2012, T_Brug2019} # put on outside
 
 Cpx_Liq_T_funcs_by_name = {p.__name__: p for p in Cpx_Liq_T_funcs}
 
-def calculate_cpx_liq_temp(*, equationT, Cpx_Comps=None, Liq_Comps=None, MeltMatch=None,
-                           P=None, Eq_Tests=False, H2O_Liq=None, Fe3FeT_Liq=None,
+def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, MeltMatch=None,
+                           P=None, eq_tests=False, H2O_Liq=None, Fe3FeT_Liq=None,
                            sigma=1, KdErr=0.03):
     '''
     Clinopyroxene-Liquid thermometry, calculates temperature in Kelvin
@@ -448,10 +448,10 @@ def calculate_cpx_liq_temp(*, equationT, Cpx_Comps=None, Liq_Comps=None, MeltMat
 
    Parameters
     -------
-    Cpx_Comps: DataFrame
+    cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
     Or:
 
@@ -482,7 +482,7 @@ def calculate_cpx_liq_temp(*, equationT, Cpx_Comps=None, Liq_Comps=None, MeltMat
         Else, enter an integer, float, or panda series
 
 
-    Eq_Tests: bool
+    eq_tests: bool
         If False, just returns pressure (default) as a panda series
         If True, returns pressure, Values of Eq tests,
         Values of Eq tests (Kd, EnFs, DiHd, CaTs, CrCaTs),
@@ -491,9 +491,9 @@ def calculate_cpx_liq_temp(*, equationT, Cpx_Comps=None, Liq_Comps=None, MeltMat
 
     Returns
     -------
-    If Eq_Tests=False
+    If eq_tests=False
         pandas.series: Temperature in Kelvin
-    If Eq_Tests=True
+    If eq_tests=True
         panda.dataframe: Temperature in Kelvin +
         Eq Tests + cpx+liq comps + components
 
@@ -513,8 +513,8 @@ def calculate_cpx_liq_temp(*, equationT, Cpx_Comps=None, Liq_Comps=None, MeltMat
             w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
 
     if isinstance(P, pd.Series):
-        if Liq_Comps is not None:
-            if len(P) != len(Liq_Comps):
+        if liq_comps is not None:
+            if len(P) != len(liq_comps):
                 raise ValueError('The panda series entered for Pressure isnt the same length as the dataframe of liquid compositions')
 
 
@@ -523,19 +523,19 @@ def calculate_cpx_liq_temp(*, equationT, Cpx_Comps=None, Liq_Comps=None, MeltMat
     if MeltMatch is not None:
         Combo_liq_cpxs = MeltMatch
 
-    if Liq_Comps is not None:
-        Liq_Comps_c = Liq_Comps.copy()
+    if liq_comps is not None:
+        liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None:
-            Liq_Comps_c['H2O_Liq'] = H2O_Liq
+            liq_comps_c['H2O_Liq'] = H2O_Liq
         if Fe3FeT_Liq is not None:
-            Liq_Comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
 
         if equationT == "T_Mas2013_Palk2012" or equationT == "T_Mas2013_eqalk33" or equationT == "T_Mas2013_eqTalk2" or equationT == "T_Mas2013_eqTalk1":
-            if np.max(Liq_Comps_c['Fe3FeT_Liq']) > 0:
+            if np.max(liq_comps_c['Fe3FeT_Liq']) > 0:
                 w.warn('Some Fe3FeT_Liq are greater than 0. Masotta et al. (2013) calibrate their equations assuming all Fe is Fe2+. You should set Fe3FeT_Liq=0 in the function for consistency. ')
 
-        Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(Liq_Comps=Liq_Comps_c,
-        Cpx_Comps=Cpx_Comps)
+        Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(liq_comps=liq_comps_c,
+        cpx_comps=cpx_comps)
 
 
     if equationT == "T_Brug2019":
@@ -567,7 +567,7 @@ def calculate_cpx_liq_temp(*, equationT, Cpx_Comps=None, Liq_Comps=None, MeltMat
     else:
         T_K=func(P, **kwargs)
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         if isinstance(T_K, partial):
             return T_K
         else:
@@ -576,24 +576,24 @@ def calculate_cpx_liq_temp(*, equationT, Cpx_Comps=None, Liq_Comps=None, MeltMat
             return T_K
 
 
-    if Eq_Tests is True:
+    if eq_tests is True:
         if isinstance(T_K, partial):
             raise TypeError('cant calculate equilibrium tests if T_K isnt numerical'
             'e.g., if you havent specified a P for a P-dependent thermometer')
         if MeltMatch is None:
-            Eq_Tests = calculate_cpx_eq_tests(Cpx_Comps=Cpx_Comps,
-            Liq_Comps=Liq_Comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
+            eq_tests = calculate_cpx_eq_tests(cpx_comps=cpx_comps,
+            liq_comps=liq_comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
         if MeltMatch is not None:
-            Eq_Tests = calculate_cpx_eq_tests(MeltMatch=MeltMatch,
+            eq_tests = calculate_cpx_eq_tests(MeltMatch=MeltMatch,
             Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
-        Eq_Tests.replace([np.inf, -np.inf], np.nan, inplace=True)
-        return Eq_Tests
+        eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
+        return eq_tests
 
 
 ## Function for iterating P and T
 
-def calculate_cpx_liq_pt(*, Liq_Comps=None, Cpx_Comps=None, MeltMatch=None, equationP=None, equationT=None,
-                              T=None, P=None, iterations=None, Fe3FeT_Liq=None, H2O_Liq=None, T_K_guess=1300, Eq_Tests=False):
+def calculate_cpx_liq_pt(*, liq_comps=None, cpx_comps=None, MeltMatch=None, equationP=None, equationT=None,
+                              T=None, P=None, iterations=None, Fe3FeT_Liq=None, H2O_Liq=None, T_K_guess=1300, eq_tests=False):
     '''
     Solves simultaneous equations for temperature and pressure
     using clinopyroxene-liquid thermometers and barometers.
@@ -602,10 +602,10 @@ def calculate_cpx_liq_pt(*, Liq_Comps=None, Cpx_Comps=None, MeltMatch=None, equa
    Parameters
     -------
 
-     Cpx_Comps: DataFrame (opt, either specify Cpx_Comps AND Liq_Comps or MeltMatch)
+     cpx_comps: DataFrame (opt, either specify cpx_comps AND liq_comps or MeltMatch)
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     Or
@@ -654,14 +654,14 @@ def calculate_cpx_liq_pt(*, Liq_Comps=None, Cpx_Comps=None, MeltMatch=None, equa
 
     Fe3FeT_Liq: float, int, series,
         Fe3FeT ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
-        If users don't specify, uses Fe3FeT_Liq from Liq_Comps.
+        If users don't specify, uses Fe3FeT_Liq from liq_comps.
         If specified, overwrites the Fe3FeT_Liq column in the liquid input.
 
     H2O_Liq: float, int, series, optional
-        If users don't specify, uses H2O_Liq from Liq_Comps,
+        If users don't specify, uses H2O_Liq from liq_comps,
         if specified overwrites this.
 
-    Eq_Tests: bool
+    eq_tests: bool
         If False, just returns pressure in kbar, tempeature in Kelvin as a dataframe
         If True, returns pressure and temperature, Eq tests (Kd, EnFs, DiHd, CaTs, CrCaTs),
         as well as user-entered cpx and liq comps and components.
@@ -669,16 +669,16 @@ def calculate_cpx_liq_pt(*, Liq_Comps=None, Cpx_Comps=None, MeltMatch=None, equa
 
     Returns
     -------
-    If Eq_Tests=False
+    If eq_tests=False
         pandas.DataFrame: Temperature in Kelvin, pressure in Kbar
-    If Eq_Tests=True
+    If eq_tests=True
         panda.dataframe: Temperature in Kelvin, pressure in Kbar
         Eq Tests + cpx+liq comps + components
 
 
     Returns:
     -------
-    panda.dataframe: Pressure in Kbar, Temperature in K + Kd-Fe-Mg + cpx+liq comps (if Eq_Tests=True)
+    panda.dataframe: Pressure in Kbar, Temperature in K + Kd-Fe-Mg + cpx+liq comps (if eq_tests=True)
 
     '''
 
@@ -689,28 +689,28 @@ def calculate_cpx_liq_pt(*, Liq_Comps=None, Cpx_Comps=None, MeltMatch=None, equa
         iterations = 30
 
     if MeltMatch is None:
-        Liq_Comps_c = Liq_Comps.copy()
+        liq_comps_c = liq_comps.copy()
         # This overwrites the Fe3FeT in their inputted dataframe
         if Fe3FeT_Liq is not None:
-            Liq_Comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
-        if "Fe3FeT_Liq" not in Liq_Comps:
-            Liq_Comps_c['Fe3FeT_Liq'] = 0
-        if "Sample_ID_Liq" not in Liq_Comps:
-            Liq_Comps_c['Sample_ID_Liq'] = Liq_Comps_c.index
+            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+        if "Fe3FeT_Liq" not in liq_comps:
+            liq_comps_c['Fe3FeT_Liq'] = 0
+        if "Sample_ID_Liq" not in liq_comps:
+            liq_comps_c['Sample_ID_Liq'] = liq_comps_c.index
         # This overwites H2O_Liq in the input
         if H2O_Liq is not None:
-            Liq_Comps_c['H2O_Liq'] = H2O_Liq
+            liq_comps_c['H2O_Liq'] = H2O_Liq
 
         T_func = calculate_cpx_liq_temp(
-            Cpx_Comps=Cpx_Comps, Liq_Comps=Liq_Comps_c, equationT=equationT, P="Solve")
+            cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
         P_func = calculate_cpx_liq_press(
-            Cpx_Comps=Cpx_Comps, Liq_Comps=Liq_Comps_c, equationP=equationP, T="Solve")
+            cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
 
     if MeltMatch is not None:
         T_func = calculate_cpx_liq_temp(
-            MeltMatch=MeltMatch, equationT=equationT, Eq_Tests=False, P="Solve")
+            MeltMatch=MeltMatch, equationT=equationT, eq_tests=False, P="Solve")
         P_func = calculate_cpx_liq_press(
-            MeltMatch=MeltMatch, equationP=equationP, Eq_Tests=False, T="Solve")
+            MeltMatch=MeltMatch, equationP=equationP, eq_tests=False, T="Solve")
 
     if isinstance(P_func, pd.Series) and isinstance(T_func, partial):
         P_guess = P_func
@@ -732,23 +732,23 @@ def calculate_cpx_liq_pt(*, Liq_Comps=None, Cpx_Comps=None, MeltMatch=None, equa
     P_guess[T_K_guess_is_bad] = np.nan
 
 
-    # calculates equilibrium tests of Neave and Putirka if Eq_Tests="True"
-    if Eq_Tests is False:
+    # calculates equilibrium tests of Neave and Putirka if eq_tests="True"
+    if eq_tests is False:
         PT_out = pd.DataFrame(
             data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
         return PT_out
-    if Eq_Tests is True:
+    if eq_tests is True:
         if MeltMatch is not None:
-            Eq_Tests = calculate_cpx_eq_tests(
+            eq_tests = calculate_cpx_eq_tests(
             MeltMatch=MeltMatch, P=P_guess, T=T_K_guess)
         if MeltMatch is None:
-            Eq_Tests = calculate_cpx_eq_tests(Cpx_Comps=Cpx_Comps,
-            Liq_Comps=Liq_Comps, P=P_guess, T=T_K_guess)
-        return Eq_Tests
+            eq_tests = calculate_cpx_eq_tests(cpx_comps=cpx_comps,
+            liq_comps=liq_comps, P=P_guess, T=T_K_guess)
+        return eq_tests
 
 ## Clinopyroxene melt-matching algorithm
 
-def calculate_cpx_liq_pt_matching(*, Liq_Comps, Cpx_Comps, equationT=None,
+def calculate_cpx_liq_pt_matching(*, liq_comps, cpx_comps, equationT=None,
 equationP=None, P=None, T=None, Eq_Crit="All", PMax=30, sigma=1,
 Fe3FeT_Liq=None, KdErr=0.03, KdMatch=None, Cpx_Quality=False,
 H2O_Liq=None, Return_All_Matches=False):
@@ -761,10 +761,10 @@ H2O_Liq=None, Return_All_Matches=False):
    Parameters
     -------
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Panda DataFrame of liquid compositions with column headings SiO2_Liq etc.
 
-    Cpx_Comps: DataFrame
+    cpx_comps: DataFrame
         Panda DataFrame of cpx compositions with column headings SiO2_Cpx etc.
 
     equationT: str
@@ -831,11 +831,11 @@ H2O_Liq=None, Return_All_Matches=False):
 
     Fe3FeT_Liq: float, int, series, optional
         Fe3FeT ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
-        If users don't specify, uses Fe3FeT_Liq from Liq_Comps.
+        If users don't specify, uses Fe3FeT_Liq from liq_comps.
         If specified, overwrites the Fe3FeT_Liq column in the liquid input.
 
     H2O_Liq: float, int, series, optional
-        If users don't specify, uses H2O_Liq from Liq_Comps, if specified overwrites this.
+        If users don't specify, uses H2O_Liq from liq_comps, if specified overwrites this.
 
     Cpx Quality: bool, optional
         Default False. If True, filters out clinopyroxenes with cation sums outside of 4.02-3.99 (after Neave et al. 2017)
@@ -867,23 +867,23 @@ H2O_Liq=None, Return_All_Matches=False):
         'Either enter a T equation, or choose a temperature, not both  ')
 
     # This allows users to overwrite H2O and Fe3FeT
-    Liq_Comps_c = Liq_Comps.copy()
+    liq_comps_c = liq_comps.copy()
     if Fe3FeT_Liq is not None:
-        Liq_Comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
-    if "Fe3FeT_Liq" not in Liq_Comps:
-        Liq_Comps_c['Fe3FeT_Liq'] = 0
-    if "Sample_ID_Liq" not in Liq_Comps:
-        Liq_Comps_c['Sample_ID_Liq'] = Liq_Comps.index
+        liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+    if "Fe3FeT_Liq" not in liq_comps:
+        liq_comps_c['Fe3FeT_Liq'] = 0
+    if "Sample_ID_Liq" not in liq_comps:
+        liq_comps_c['Sample_ID_Liq'] = liq_comps.index
     if H2O_Liq is not None:
-        Liq_Comps_c['H2O_Liq'] = H2O_Liq
+        liq_comps_c['H2O_Liq'] = H2O_Liq
 
     if sigma is not None:
         sigma = sigma
 
     # Calculating Cpx and liq components.
-    myCPXs1_concat = calculate_clinopyroxene_components(Cpx_Comps=Cpx_Comps)
+    myCPXs1_concat = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
     myLiquids1_concat = calculate_anhydrous_cat_fractions_liquid(
-        Liq_Comps=Liq_Comps_c)
+        liq_comps=liq_comps_c)
 
     # Adding an ID label to help with melt-cpx rematching later
     myCPXs1_concat['ID_CPX'] = myCPXs1_concat.index
@@ -1210,7 +1210,7 @@ Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b}
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
-def calculate_cpx_only_press(*, Cpx_Comps, equationP, T=None, H2O_Liq=0):
+def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=0):
     '''
     Clinopyroxene only barometry. Enter a panda dataframe with Cpx compositions,
     returns a pressure in kbar.
@@ -1218,7 +1218,7 @@ def calculate_cpx_only_press(*, Cpx_Comps, equationP, T=None, H2O_Liq=0):
    Parameters
     -------
 
-    Cpx_Comps: DataFrame
+    cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     equationP: str
@@ -1259,14 +1259,14 @@ def calculate_cpx_only_press(*, Cpx_Comps, equationP, T=None, H2O_Liq=0):
             w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
 
     if isinstance(T, pd.Series):
-        if len(T) != len(Cpx_Comps):
+        if len(T) != len(cpx_comps):
             raise ValueError('The panda series entered for temperature isnt the same '
             'length as the dataframe of Cpx compositions')
 
 
     H2O_Liq = H2O_Liq
 
-    cpx_comps = calculate_clinopyroxene_components(Cpx_Comps=Cpx_Comps)
+    cpx_comps = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
     cpx_comps['H2O_Liq'] = H2O_Liq
 
 
@@ -1291,7 +1291,7 @@ Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol}
 Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
-def calculate_cpx_only_temp(*, Cpx_Comps=None, equationT=None, P=None):
+def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None):
     '''
     Clinopyroxene only thermometer. Enter a panda dataframe with Cpx compositions,
     returns a temperature in Kelvin.
@@ -1299,7 +1299,7 @@ def calculate_cpx_only_temp(*, Cpx_Comps=None, equationT=None, P=None):
    Parameters
     -------
 
-    Cpx_Comps: DataFrame
+    cpx_comps: DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     equationT: str
@@ -1335,12 +1335,12 @@ def calculate_cpx_only_temp(*, Cpx_Comps=None, equationT=None, P=None):
             w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
 
     if isinstance(P, pd.Series):
-        if len(P) != len(Cpx_Comps):
+        if len(P) != len(cpx_comps):
             raise ValueError('The panda series entered for Pressure isnt the same '
             'length as the dataframe of Cpx compositions')
 
 
-    cpx_comps = calculate_clinopyroxene_components(Cpx_Comps=Cpx_Comps)
+    cpx_comps = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
 
 
     kwargs = {name: cpx_comps[name] for name, p in sig.parameters.items()
@@ -1361,7 +1361,7 @@ def calculate_cpx_only_temp(*, Cpx_Comps=None, equationT=None, P=None):
     return T_K
 
 ## Iterating PT- Cpx only
-def calculate_cpx_only_pt(*, Cpx_Comps=None, equationP=None,
+def calculate_cpx_only_pt(*, cpx_comps=None, equationP=None,
                                equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None):
 
 
@@ -1373,7 +1373,7 @@ def calculate_cpx_only_pt(*, Cpx_Comps=None, equationP=None,
    Parameters
     -------
 
-    Cpx_Comps: DataFrame
+    cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     equationP: str
@@ -1404,13 +1404,13 @@ def calculate_cpx_only_pt(*, Cpx_Comps=None, equationP=None,
 
 
 
-    T_func = calculate_cpx_only_temp(Cpx_Comps=Cpx_Comps, equationT=equationT, P="Solve")
+    T_func = calculate_cpx_only_temp(cpx_comps=cpx_comps, equationT=equationT, P="Solve")
     if H2O_Liq is None:
         P_func = calculate_cpx_only_press(
-            Cpx_Comps=Cpx_Comps, equationP=equationP, T="Solve")
+            cpx_comps=cpx_comps, equationP=equationP, T="Solve")
     else:
         P_func = calculate_cpx_only_press(
-            Cpx_Comps=Cpx_Comps, equationP=equationP, H2O_Liq=H2O_Liq, T="Solve")
+            cpx_comps=cpx_comps, equationP=equationP, H2O_Liq=H2O_Liq, T="Solve")
 
     for _ in range(iterations):
         P_guess = P_func(T_K_guess)

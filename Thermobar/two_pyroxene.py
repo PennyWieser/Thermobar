@@ -209,18 +209,18 @@ Cpx_Opx_P_funcs = {P_Put2008_eq38, P_Put2008_eq39} # put on outside
 
 Cpx_Opx_P_funcs_by_name = {p.__name__: p for p in Cpx_Opx_P_funcs}
 
-def calculate_cpx_opx_press(*, Cpx_Comps=None, Opx_Comps=None,
-Two_Px_Match=None, equationP=None, Eq_Tests=False, T=None):
+def calculate_cpx_opx_press(*, cpx_comps=None, opx_comps=None,
+Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     '''
     Calculates pressure in kbar for Opx-Cpx pairs
 
     Parameters
     -------
 
-    Cpx_Comps: DataFrame
+    cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    Opx_Comps: DataFrame
+    opx_comps: DataFrame
        Opx compositions with column headings SiO2_Opx, MgO_Opx etc.
 
     Or:
@@ -240,7 +240,7 @@ Two_Px_Match=None, equationP=None, Eq_Tests=False, T=None):
         If enter T="Solve", returns a partial function
         Else, enter an integer, float, or panda series
 
-    Eq_Tests: bool
+    eq_tests: bool
         If False, just returns temperature in K (default) as a panda series
         If True, returns pressure in kbar, Kd Fe-Mg for opx-cpx,
         and the user-entered cpx and opx comps as a panda dataframe.
@@ -248,9 +248,9 @@ Two_Px_Match=None, equationP=None, Eq_Tests=False, T=None):
 
     Returns
     -------
-    If Eq_Tests=False
-        pandas.series: Pressure in kbar (if Eq_Tests=False)
-    If Eq_Tests=True
+    If eq_tests=False
+        pandas.series: Pressure in kbar (if eq_tests=False)
+    If eq_tests=True
         panda.dataframe: Pressure in kbar + Kd-Fe-Mg + cpx+opx comps
 
     '''
@@ -268,8 +268,8 @@ Two_Px_Match=None, equationP=None, Eq_Tests=False, T=None):
             w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
 
     if isinstance(T, pd.Series):
-        if Cpx_Comps is not None:
-            if len(T) != len(Cpx_Comps):
+        if cpx_comps is not None:
+            if len(T) != len(cpx_comps):
                 raise ValueError('The panda series entered for temperature isnt the'
                 ' same length as the dataframe of Cpx compositions')
 
@@ -277,9 +277,9 @@ Two_Px_Match=None, equationP=None, Eq_Tests=False, T=None):
 
     if Two_Px_Match is not None:
         two_pyx = Two_Px_Match
-    if Cpx_Comps is not None:
-        cpx_components = calculate_clinopyroxene_components(Cpx_Comps=Cpx_Comps)
-        opx_components = calculate_orthopyroxene_components(Opx_Comps=Opx_Comps)
+    if cpx_comps is not None:
+        cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
+        opx_components = calculate_orthopyroxene_components(opx_comps=opx_comps)
         two_pyx = pd.concat([cpx_components, opx_components], axis=1)
 
 
@@ -294,11 +294,11 @@ Two_Px_Match=None, equationP=None, Eq_Tests=False, T=None):
     else:
         P_kbar=func(T, **kwargs)
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         return P_kbar
     else:
         two_pyx = calculate_cpx_opx_equilibrium_tests(
-            Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps)
+            cpx_comps=cpx_comps, opx_comps=opx_comps)
         two_pyx.insert(0, "P_kbar_calc", P_kbar)
         two_pyx.insert(2, "Equation Choice (P)", str(equationP))
         two_pyx.replace([np.inf, -np.inf], np.nan, inplace=True)
@@ -312,18 +312,18 @@ Cpx_Opx_T_funcs = {T_Put2008_eq36, T_Brey1990, T_Put2008_eq37, T_Wood1973, T_Wel
 Cpx_Opx_T_funcs_by_name = {p.__name__: p for p in Cpx_Opx_T_funcs}
 
 
-def calculate_cpx_opx_temp(*, Cpx_Comps=None, Opx_Comps=None,
-                           Two_Px_Match=None, equationT=None, P=None, Eq_Tests=False):
+def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
+                           Two_Px_Match=None, equationT=None, P=None, eq_tests=False):
     '''
     Calculates Temperature in K for Opx-Cpx pairs
 
    Parameters
     -------
 
-    Cpx_Comps: DataFrame
+    cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    Opx_Comps: DataFrame
+    opx_comps: DataFrame
        Opx compositions with column headings SiO2_Opx, MgO_Opx etc.
 
     Or:
@@ -344,7 +344,7 @@ def calculate_cpx_opx_temp(*, Cpx_Comps=None, Opx_Comps=None,
         Can enter float or int to use same P for all calculations
         If "Solve", returns partial if function is P-dependent
 
-    Eq_Tests: bool
+    eq_tests: bool
         If False, just returns pressure in kbar (default) as a panda series
         If True, returns pressure in kbar, Kd Fe-Mg for opx-cpx, and the user-entered cpx and opx comps as a panda dataframe.
 
@@ -364,17 +364,17 @@ def calculate_cpx_opx_temp(*, Cpx_Comps=None, Opx_Comps=None,
             w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
 
     if isinstance(P, pd.Series):
-        if Cpx_Comps is not None:
-            if len(P) != len(Cpx_Comps):
+        if cpx_comps is not None:
+            if len(P) != len(cpx_comps):
                 raise ValueError('The panda series entered for Pressure isnt the same length as the dataframe of liquid compositions')
 
 
 
     if Two_Px_Match is not None:
         two_pyx = Two_Px_Match
-    if Cpx_Comps is not None:
-        cpx_components = calculate_clinopyroxene_components(Cpx_Comps=Cpx_Comps)
-        opx_components = calculate_orthopyroxene_components(Opx_Comps=Opx_Comps)
+    if cpx_comps is not None:
+        cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
+        opx_components = calculate_orthopyroxene_components(opx_comps=opx_comps)
         two_pyx = pd.concat([cpx_components, opx_components], axis=1)
 
     kwargs = {name: two_pyx[name] for name, p in sig.parameters.items()
@@ -391,7 +391,7 @@ def calculate_cpx_opx_temp(*, Cpx_Comps=None, Opx_Comps=None,
         T_K=func(P, **kwargs)
 
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         if isinstance(T_K, partial):
             return T_K
         else:
@@ -401,7 +401,7 @@ def calculate_cpx_opx_temp(*, Cpx_Comps=None, Opx_Comps=None,
 
     else:
         two_pyx = calculate_cpx_opx_equilibrium_tests(
-            Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps)
+            cpx_comps=cpx_comps, opx_comps=opx_comps)
         two_pyx.insert(0, "T_K_calc", T_K)
         two_pyx.insert(2, "Equation Choice (T)", str(equationT))
 
@@ -410,8 +410,8 @@ def calculate_cpx_opx_temp(*, Cpx_Comps=None, Opx_Comps=None,
 ## Iterative calculations of P and T
 
 
-def calculate_cpx_opx_pt(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=None,
-                              equationP=None, equationT=None, iterations=30, T_K_guess=1300, Eq_Tests=False):
+def calculate_cpx_opx_pt(*, cpx_comps=None, opx_comps=None, Two_Px_Match=None,
+                              equationP=None, equationT=None, iterations=30, T_K_guess=1300, eq_tests=False):
     '''
     Solves simultaneous equations for temperature and pressure using orthopyroxene-liquid thermometers and barometers.
 
@@ -419,10 +419,10 @@ def calculate_cpx_opx_pt(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=None,
    Parameters
     -------
 
-    Opx_Comps: DataFrame (opt, either specify Opx_Comps AND Cpx_Comps or MeltMatch)
+    opx_comps: DataFrame (opt, either specify opx_comps AND cpx_comps or MeltMatch)
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    Cpx_Comps: DataFrame (not required for P_Put2008_eq29c)
+    cpx_comps: DataFrame (not required for P_Put2008_eq29c)
         Cpxuid compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     MeltMatch: DataFrame
@@ -452,7 +452,7 @@ def calculate_cpx_opx_pt(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=None,
          Initial guess of temperature.
 
 
-    Eq_Tests: bool
+    eq_tests: bool
         If False, just returns pressure (default) as a panda series
         If True, returns pressure, Values of Eq tests,
         as well as user-entered opx and liq comps and components.
@@ -461,9 +461,9 @@ def calculate_cpx_opx_pt(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=None,
 
     Returns
     -------
-    If Eq_Tests=False
+    If eq_tests=False
         pandas.DataFrame: Temperature in Kelvin, pressure in Kbar
-    If Eq_Tests=True
+    If eq_tests=True
         panda.dataframe: Temperature in Kelvin, pressure in Kbar
         Eq Tests + opx+cpx comps + components
 
@@ -473,9 +473,9 @@ def calculate_cpx_opx_pt(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=None,
 
     if Two_Px_Match is None:
         T_func = calculate_cpx_opx_temp(
-            Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps, equationT=equationT, P="Solve")
+            cpx_comps=cpx_comps, opx_comps=opx_comps, equationT=equationT, P="Solve")
         P_func = calculate_cpx_opx_press(
-            Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps, equationP=equationP, T="Solve")
+            cpx_comps=cpx_comps, opx_comps=opx_comps, equationP=equationP, T="Solve")
     if Two_Px_Match is not None:
         T_func = calculate_cpx_opx_temp(
             Two_Px_Match=Two_Px_Match, equationT=equationT, P="Solve")
@@ -509,14 +509,14 @@ def calculate_cpx_opx_pt(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=None,
     P_guess[T_K_guess_is_bad] = np.nan
 
 
-    if Eq_Tests is False:
+    if eq_tests is False:
         PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
                                     'T_K_calc': T_K_guess})
 
         return PT_out
-    if Eq_Tests is True:
+    if eq_tests is True:
         two_pyx = calculate_cpx_opx_equilibrium_tests(
-            Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps)
+            cpx_comps=cpx_comps, opx_comps=opx_comps)
 
         two_pyx.insert(0, "T_K_calc", T_K_guess)
         two_pyx.insert(1, "P_kbar_calc", P_guess)
@@ -528,7 +528,7 @@ def calculate_cpx_opx_pt(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=None,
 
 ## Two pyroxene matching
 
-def calculate_cpx_opx_pt_matching(*, Opx_Comps, Cpx_Comps, equationT=None, equationP=None,
+def calculate_cpx_opx_pt_matching(*, opx_comps, cpx_comps, equationT=None, equationP=None,
                                   KdMatch=None, KdErr=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None):
     '''
     Evaluates all possible Cpx-Opx pairs,
@@ -538,11 +538,11 @@ def calculate_cpx_opx_pt_matching(*, Opx_Comps, Cpx_Comps, equationT=None, equat
    Parameters
     -------
 
-    Opx_Comps: DataFrame
+    opx_comps: DataFrame
         Panda DataFrame of opx compositions with column headings SiO2_Opx etc.
 
 
-    Cpx_Comps: DataFrame
+    cpx_comps: DataFrame
         Panda DataFrame of cpx compositions with column headings SiO2_Cpx etc.
 
     EquationP: str
@@ -597,8 +597,8 @@ def calculate_cpx_opx_pt_matching(*, Opx_Comps, Cpx_Comps, equationT=None, equat
 
     # Calculating Cpx and opx components. Do before duplication to save
     # computation time
-    myCPXs1_concat = calculate_clinopyroxene_components(Cpx_Comps=Cpx_Comps)
-    myOPXs1_concat = calculate_orthopyroxene_components(Opx_Comps=Opx_Comps)
+    myCPXs1_concat = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
+    myOPXs1_concat = calculate_orthopyroxene_components(opx_comps=opx_comps)
 
     # Adding an ID label to help with melt-cpx rematching later
     myCPXs1_concat['ID_CPX'] = myCPXs1_concat.index

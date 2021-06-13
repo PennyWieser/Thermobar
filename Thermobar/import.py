@@ -637,13 +637,13 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
 # Gets liquid dataframe into a format that can be used in VESical. Have to
 # have VESIcal installed for the final step, which we do in the script for
 # simplicity
-def convert_to_vesical(Liq_Comps, T1):
+def convert_to_vesical(liq_comps, T1):
     ''' Takes liquid dataframe in the format used for PyMME, and strips the _Liq string so that it can be input into VESical. Also removes the Fe3FeTcolumn, and appends temperature (converted from Kevlin to celcius)
 
 
    Parameters
     -------
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         DataFrame of liquid compositions.
 
     T1: Panda series, int, float
@@ -654,7 +654,7 @@ def convert_to_vesical(Liq_Comps, T1):
     DataFrame formatted so that it can be inputted into VESIcal.
 
     '''
-    df = Liq_Comps.copy()
+    df = liq_comps.copy()
     df['Temp'] = T1 - 273.15
     df.drop('Fe3FeT_Liq', inplace=True, axis=1)
     df.columns = [str(col).replace('_Liq', '') for col in df.columns]

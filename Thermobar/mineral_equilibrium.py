@@ -15,12 +15,12 @@ def calculate_eq_olivine(Kd, *, Liq_Mgno):
      '''
     return 1 / ((Kd / Liq_Mgno) + (1 - Kd))
 
-def calculate_ol_fo(Ol_Comps):
-    Fo=(Ol_Comps['MgO_Ol']/40.3044)/((Ol_Comps['MgO_Ol']/40.3044)+(Ol_Comps['FeOt_Ol']/71.844))
+def calculate_ol_fo(ol_comps):
+    Fo=(ol_comps['MgO_Ol']/40.3044)/((ol_comps['MgO_Ol']/40.3044)+(ol_comps['FeOt_Ol']/71.844))
     return Fo
 
-def calculate_liq_mgno(Ol_Comps):
-    Fo=(Ol_Comps['MgO_Ol']/40.3044)/((Ol_Comps['MgO_Ol']/40.3044)+(Ol_Comps['FeOt_Ol']/71.844))
+def calculate_liq_mgno(ol_comps):
+    Fo=(ol_comps['MgO_Ol']/40.3044)/((ol_comps['MgO_Ol']/40.3044)+(ol_comps['FeOt_Ol']/71.844))
     return Fo
 
 def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
@@ -63,7 +63,7 @@ def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
     return Kd_Toplis
 
 
-def calculate_eq_ol_content(Liq_Comps, Kdmodel, Ol_Comps=None, T=None, P=None,
+def calculate_eq_ol_content(liq_comps, Kdmodel, ol_comps=None, T=None, P=None,
 Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
     '''Calculates equilibrium forsterite contents based on inputtted liquid compositions.
 
@@ -71,7 +71,7 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
    Parameters
     -------
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Ol, MgO_Ol etc.
 
 
@@ -87,7 +87,7 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
         "All": Returns outputs for all models
 
     Fe3FeT: optional, float or int.
-        overwrites Fe3FeT_Liq in Liq_Comps DataFrame
+        overwrites Fe3FeT_Liq in liq_comps DataFrame
 
     Additional required inputs for Toplis, 2005:
         P: Pressure in kbar
@@ -104,14 +104,14 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
         For Toplis, returns Kd-Ol Fo pair if an olivine-forsterite content wasn't specified
 
     '''
-    if Ol_Comps is not None:
-        Ol_Comps['Fo_meas']=calculate_ol_fo(Ol_Comps)
+    if ol_comps is not None:
+        ol_comps['Fo_meas']=calculate_ol_fo(ol_comps)
     if Fe3FeT_Liq is not None:
-        Liq_Comps['Fe3FeT_Liq'] = Fe3FeT_Liq
+        liq_comps['Fe3FeT_Liq'] = Fe3FeT_Liq
     if H2O_Liq is not None:
-        Liq_Comps['H2O_Liq'] = H2O_Liq
+        liq_comps['H2O_Liq'] = H2O_Liq
 
-    liq = calculate_anhydrous_cat_fractions_liquid(Liq_Comps)
+    liq = calculate_anhydrous_cat_fractions_liquid(liq_comps)
     Mgno = liq['Mg_Number_Liq_Fe3']
     if Kdmodel == "Roeder1970" or Kdmodel == "All":
         Eq_ol_03 = 1 / ((0.3 / Mgno) + (1 - 0.3))
@@ -136,19 +136,19 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
             raise Exception(
                 'The Toplis Kd model is T-dependent, please enter T in Kelvin into the function')
 
-        mol_perc = calculate_anhydrous_mol_fractions_liquid(Liq_Comps)
+        mol_perc = calculate_anhydrous_mol_fractions_liquid(liq_comps)
         SiO2_mol = mol_perc['SiO2_Liq_mol_frac']
         Na2O_mol = mol_perc['Na2O_Liq_mol_frac']
         K2O_mol = mol_perc['K2O_Liq_mol_frac']
-        H2O_Liq = Liq_Comps['H2O_Liq']
+        H2O_Liq = liq_comps['H2O_Liq']
         Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=SiO2_mol,
                           Na2O_mol=Na2O_mol, K2O_mol=K2O_mol, P=P, H2O=H2O_Liq, T=T)
-        if ol_fo is not None or Ol_Comps is not None:
-            if ol_fo is not None and Ol_Comps is None:
+        if ol_fo is not None or ol_comps is not None:
+            if ol_fo is not None and ol_comps is None:
                 Kd_calc = Kd_func(ol_fo)
                 Ol_calc = 1 / ((Kd_calc / Mgno) + (1 - Kd_calc))
-            if Ol_Comps is not None:
-                Kd_calc = Kd_func(Ol_Comps['Fo_meas'])
+            if ol_comps is not None:
+                Kd_calc = Kd_func(ol_comps['Fo_meas'])
                 Ol_calc = 1 / ((Kd_calc / Mgno) + (1 - Kd_calc))
 
             Kd_out_top = pd.DataFrame(
@@ -173,8 +173,8 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
     if Kdmodel == "Toplis2005":
         Kd_out=Kd_out_top
 
-    if Ol_Comps is not None:
-        Kd_out['Fo_meas']=Ol_Comps['Fo_meas']
+    if ol_comps is not None:
+        Kd_out['Fo_meas']=ol_comps['Fo_meas']
 
     return Kd_out
 
@@ -235,7 +235,7 @@ def calculate_ol_rhodes_diagram_lines(
 ## Equilibrium things for Pyroxene
 
 def calculate_opx_rhodes_diagram_lines(
-        Min_Mgno, Max_Mgno, simple=False, T=None, KdMin=None, KdMax=None, Liq_Comps=None):
+        Min_Mgno, Max_Mgno, simple=False, T=None, KdMin=None, KdMax=None, liq_comps=None):
     '''
     Input minimum and maximum liquid Mg#, calculates lines for equilibrium Opx Mg# content using a variety of choices for Kd Fe-Mg.
 
@@ -257,7 +257,7 @@ def calculate_opx_rhodes_diagram_lines(
     KdMax: float
             Optional. Also returns line for a user-specified Maximum Kd.
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         Optional Uses average cation fraction of XSi in the liquid to calculate Kd Fe-Mg using the expression = 0.4805 âˆ’ 0.3733 XSi (Putirka, 2008)
 
 Returns
@@ -284,8 +284,8 @@ Returns
         else:
             Kd_out_mat = Kd_out_mat_MM
 
-    if Liq_Comps is not None:
-        cat_frac = calculate_anhydrous_cat_fractions_liquid(Liq_Comps)
+    if liq_comps is not None:
+        cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps)
         Si_mean_frac = np.nanmean(cat_frac['SiO2_Liq_cat_frac'])
         Ideal_Kd_Si = 0.4805 - 0.3733 * Si_mean_frac
         Eq_Cpx_Si = 1 / ((Ideal_Kd_Si / Mgno) + (1 - Ideal_Kd_Si))

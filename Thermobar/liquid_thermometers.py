@@ -314,7 +314,7 @@ T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq
 Liquid_only_funcs_by_name = {p.__name__: p for p in Liquid_only_funcs}
 
 
-def calculate_liq_temp(*, Liq_Comps, equationT, P=None, H2O_Liq=None):
+def calculate_liq_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
 
     '''
     Liquid-only thermometery. Returns a temperature in Kelvin.
@@ -322,7 +322,7 @@ def calculate_liq_temp(*, Liq_Comps, equationT, P=None, H2O_Liq=None):
    Parameters
     -------
 
-    Liq_Comps: DataFrame
+    liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     equationT: str
@@ -396,21 +396,21 @@ def calculate_liq_temp(*, Liq_Comps, equationT, P=None, H2O_Liq=None):
 
 
     if isinstance(P, pd.Series):
-        if len(P) != len(Liq_Comps):
+        if len(P) != len(liq_comps):
             raise ValueError('The panda series entered for pressure isnt the same length as the dataframe of liquid compositions')
 
 
-    Liq_Comps_c = Liq_Comps.copy()
+    liq_comps_c = liq_comps.copy()
 
     if H2O_Liq is not None:
-        Liq_Comps_c['H2O_Liq']=H2O_Liq
+        liq_comps_c['H2O_Liq']=H2O_Liq
         print('Water content replaced with that from H2O_Liq')
 
 # Keiths Liq-only spreadsheet doesn't use Cr2O3 and P2O5 to calc cat. frac. So have set this to zero.
     if equationT != "T_Put2008_eq26_plag_sat" and equationT != "T_Put2008_eq24c_kspar_sat" \
     and equationT !="T_Put2005_eqD_plag_sat" and equationT != "T_Molina2015_amp_sat" and equationT != "T_Put2016_eq3_amp_sat":
-        Liq_Comps_c['Cr2O3_Liq']=0
-        Liq_Comps_c['P2O5_Liq']=0
+        liq_comps_c['Cr2O3_Liq']=0
+        liq_comps_c['P2O5_Liq']=0
 
 
 
@@ -418,9 +418,9 @@ def calculate_liq_temp(*, Liq_Comps, equationT, P=None, H2O_Liq=None):
 
 # Now calculate cation fractions - if using putirka, uses hydrous cat fracs.
     if equationT == "T_Put2016_eq3_amp_sat":
-        anhyd_cat_frac = calculate_hydrous_mol_fractions_liquid(Liq_Comps=Liq_Comps_c)
+        anhyd_cat_frac = calculate_hydrous_mol_fractions_liquid(liq_comps=liq_comps_c)
     else:
-        anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(Liq_Comps=Liq_Comps_c)
+        anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
 
 
 # This performs extra calculation steps for Beattie equations
