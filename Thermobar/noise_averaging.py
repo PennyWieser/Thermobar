@@ -7,7 +7,7 @@ import numbers
 import pandas as pd
 from Thermobar.core import *
 
-def Av_Noise_Samples_series(Calc, SampleID):
+def av_noise_samples_series(Calc, SampleID):
     '''
     This function calculates the mean, median, standard devation, maximum and
     minimum value of rows specified by "calc" based on values in "Sample ID" where both inputs are panda series.
@@ -51,7 +51,7 @@ def Av_Noise_Samples_series(Calc, SampleID):
     return Err_out
 
 
-def Av_Noise_Samples_df(dataframe, calc_heading, ID_heading):
+def av_noise_samples_df(dataframe, calc_heading, ID_heading):
     '''
     This function calculates the mean, median, standard devation, maximum and
     minimum value of rows in a datarame with column heading "calc_heading"
@@ -96,7 +96,7 @@ def Av_Noise_Samples_df(dataframe, calc_heading, ID_heading):
     return Err_out
 
 
-def Add_Sample_Noise_1Phase(Phase_Comp, Phase_Err=None, Phase_Err_type="Abs",
+def add_noise_sample_1phase(Phase_Comp, Phase_Err=None, Phase_Err_type="Abs",
 Variable=None, Variable_Err=None, Variable_Err_type="Abs", duplicates=10,
 noise_percent=None, Err_dist="normal", Positive=True,
 filter_q=None, append=False):
@@ -110,7 +110,7 @@ filter_q=None, append=False):
 
     Phase Comps: pandas dataframe
         Pandas dataframe of phase compositions. This can be generated
-        from the import_Excel function, or any dataframe with the
+        from the import_excel function, or any dataframe with the
         headings _Liq for liquids, _Cpx for clinopyroxenes etc.
 
     Phase_Err_type: "Abs" (default) or "Perc"
@@ -149,7 +149,7 @@ filter_q=None, append=False):
             Pandas dataframe with headings for the error of the oxide in each
             phase (e.g., SiO2_Liq_Err, or SiO2_Cpx_Err).
             This dataframe can be generated from a user-inputted spreadsheet
-            with these column headings using the function import_Excel_Errors.
+            with these column headings using the function import_excel_errors.
             Errors can be absolute, or percentage errors.
             the default is absolute errors (in wt%), but users can overwrite
             this using Phase_Err_Type="Perc".

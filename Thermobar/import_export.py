@@ -10,7 +10,7 @@ import pandas as pd
 
 from Thermobar.core import *
 
-def import_LEPR_File(filename):
+def import_lepr_file(filename):
     """
     Reads in data from the outputs from the Caltech LEPR site (where oxides are followed by the word "value")
     Splits the data into phases, as for the read_excel function.
@@ -200,7 +200,7 @@ def import_LEPR_File(filename):
 
 
 # Loading Excel, returns a disctionry
-def import_Excel(filename, sheet_name, GEOROC=False):
+def import_excel(filename, sheet_name, GEOROC=False):
     '''
     Import excel sheet of oxides in wt%, headings should be of the form SiO2_Liq (for the melt/liquid), SiO2_Ol (for olivine comps), SiO2_Cpx (for clinopyroxene compositions). Order doesn't matter
 
@@ -426,7 +426,7 @@ def import_Excel(filename, sheet_name, GEOROC=False):
             'Plags': myPlags1, 'Kspars': myKspars1, 'Amps': myAmphs1, 'Ols': myOls1, 'Sps': mySps1}  # , 'y1': y1 ,'y2': y2}
 
 
-def import_Excel_Errors(filename, sheet_name, GEOROC=False):
+def import_excel_errors(filename, sheet_name, GEOROC=False):
     '''
     Import excel sheet of oxide errors in wt%, headings should be of the form SiO2_Liq_Err (for the melt/liquid), SiO2_Ol_Err (for olivine comps), SiO2_Cpx_Err (for clinopyroxene compositions).
 
@@ -444,7 +444,7 @@ def import_Excel_Errors(filename, sheet_name, GEOROC=False):
     -------
     pandas DataFrames stored in a dictionary. E.g., Access Cpxs using output.Cpxs
         my_input_Err = pandas dataframe of the entire spreadsheet
-        Experimental_PT_Err = User-entered PT errors.
+        Experimental_pt_Err = User-entered PT errors.
         Liqs_Err=pandas dataframe of liquid oxide errors
         Ols_Err=pandas dataframe of olivine oxide errors
         Cpxs_Err=pandas dataframe of cpx oxide  errors
@@ -627,14 +627,14 @@ def import_Excel_Errors(filename, sheet_name, GEOROC=False):
         mySps1['T_K_Err'] = my_input['T_K_Err']
         myLiquids1['T_K_Err'] = my_input['T_K_Err']
 
-    return {'my_input_Err': my_input, 'Experimental_PT_Err': Experimental_PT1, 'Cpxs_Err': myCPXs1,
+    return {'my_input_Err': my_input, 'Experimental_pt_Err': Experimental_PT1, 'Cpxs_Err': myCPXs1,
             'Opxs_Err': myOPXs1, 'Liqs_Err': myLiquids1, 'Plags_Err': myPlags1, 'Kspars_Err': myKspars1, 'Amps_Err': myAmphs1, 'Ols_Err': myOls1, 'Sps_Err': mySps1}
 
 
 # Gets liquid dataframe into a format that can be used in VESical. Have to
 # have VESIcal installed for the final step, which we do in the script for
 # simplicity
-def convert_To_VESIcal(Liq_Comps, T1):
+def convert_to_vesical(Liq_Comps, T1):
     ''' Takes liquid dataframe in the format used for PyMME, and strips the _Liq string so that it can be input into VESical. Also removes the Fe3FeTcolumn, and appends temperature (converted from Kevlin to celcius)
 
 
@@ -658,7 +658,7 @@ def convert_To_VESIcal(Liq_Comps, T1):
     return df
 
 
-def convert_From_VESIcal(data):
+def convert_from_vesical(data):
     '''
     Takes liquid compositions from VESIcal, and converts it into a panda dataframe that can be inputted into the thermobaromety functions in PyMME
 

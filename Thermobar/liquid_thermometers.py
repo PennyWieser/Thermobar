@@ -314,7 +314,7 @@ T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq
 Liquid_only_funcs_by_name = {p.__name__: p for p in Liquid_only_funcs}
 
 
-def calculate_Liq_Temp(*, Liq_Comps, equationT, P=None, H2O_Liq=None):
+def calculate_liq_temp(*, Liq_Comps, equationT, P=None, H2O_Liq=None):
 
     '''
     Liquid-only thermometery. Returns a temperature in Kelvin.
@@ -417,8 +417,8 @@ def calculate_Liq_Temp(*, Liq_Comps, equationT, P=None, H2O_Liq=None):
 
 
 # Now calculate cation fractions - if using putirka, uses hydrous cat fracs.
-    if equationT == T_Put2016_eq3_amp_sat:
-        anhyd_cat_frac = calculate_hydrous_cat_fractions_liquid(Liq_Comps=Liq_Comps_c)
+    if equationT == "T_Put2016_eq3_amp_sat":
+        anhyd_cat_frac = calculate_hydrous_mol_fractions_liquid(Liq_Comps=Liq_Comps_c)
     else:
         anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(Liq_Comps=Liq_Comps_c)
 

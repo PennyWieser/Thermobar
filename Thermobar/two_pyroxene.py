@@ -209,7 +209,7 @@ Cpx_Opx_P_funcs = {P_Put2008_eq38, P_Put2008_eq39} # put on outside
 
 Cpx_Opx_P_funcs_by_name = {p.__name__: p for p in Cpx_Opx_P_funcs}
 
-def calculate_Cpx_Opx_Press(*, Cpx_Comps=None, Opx_Comps=None,
+def calculate_cpx_opx_press(*, Cpx_Comps=None, Opx_Comps=None,
 Two_Px_Match=None, equationP=None, Eq_Tests=False, T=None):
     '''
     Calculates pressure in kbar for Opx-Cpx pairs
@@ -227,7 +227,7 @@ Two_Px_Match=None, equationP=None, Eq_Tests=False, T=None):
 
     Two_Px_Match: DataFrame
         Combined Cpx-Opx compositions.
-        Used for calculate Cpx_Opx_PT_matching function.
+        Used for calculate Cpx_Opx_pt_matching function.
 
     EquationP: str
         Choice of equation:
@@ -297,7 +297,7 @@ Two_Px_Match=None, equationP=None, Eq_Tests=False, T=None):
     if Eq_Tests is False:
         return P_kbar
     else:
-        two_pyx = calculate_Cpx_Opx_Equilibrium_Tests(
+        two_pyx = calculate_cpx_opx_equilibrium_tests(
             Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps)
         two_pyx.insert(0, "P_kbar_calc", P_kbar)
         two_pyx.insert(2, "Equation Choice (P)", str(equationP))
@@ -312,7 +312,7 @@ Cpx_Opx_T_funcs = {T_Put2008_eq36, T_Brey1990, T_Put2008_eq37, T_Wood1973, T_Wel
 Cpx_Opx_T_funcs_by_name = {p.__name__: p for p in Cpx_Opx_T_funcs}
 
 
-def calculate_Cpx_Opx_Temp(*, Cpx_Comps=None, Opx_Comps=None,
+def calculate_cpx_opx_temp(*, Cpx_Comps=None, Opx_Comps=None,
                            Two_Px_Match=None, equationT=None, P=None, Eq_Tests=False):
     '''
     Calculates Temperature in K for Opx-Cpx pairs
@@ -400,7 +400,7 @@ def calculate_Cpx_Opx_Temp(*, Cpx_Comps=None, Opx_Comps=None,
             return T_K
 
     else:
-        two_pyx = calculate_Cpx_Opx_Equilibrium_Tests(
+        two_pyx = calculate_cpx_opx_equilibrium_tests(
             Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps)
         two_pyx.insert(0, "T_K_calc", T_K)
         two_pyx.insert(2, "Equation Choice (T)", str(equationT))
@@ -410,7 +410,7 @@ def calculate_Cpx_Opx_Temp(*, Cpx_Comps=None, Opx_Comps=None,
 ## Iterative calculations of P and T
 
 
-def calculate_Cpx_Opx_PT_Iter(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=None,
+def calculate_cpx_opx_pt(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=None,
                               equationP=None, equationT=None, iterations=30, T_K_guess=1300, Eq_Tests=False):
     '''
     Solves simultaneous equations for temperature and pressure using orthopyroxene-liquid thermometers and barometers.
@@ -427,7 +427,7 @@ def calculate_Cpx_Opx_PT_Iter(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=No
 
     MeltMatch: DataFrame
         Combined dataframe of Opx-Cpx compositions (headings SiO2_Cpx, SiO2_Opx etc.). S
-        Used for calculate Cpx_Opx_PT_matching function.
+        Used for calculate Cpx_Opx_pt_matching function.
 
 
     EquationP: str
@@ -472,14 +472,14 @@ def calculate_Cpx_Opx_PT_Iter(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=No
 
 
     if Two_Px_Match is None:
-        T_func = calculate_Cpx_Opx_Temp(
+        T_func = calculate_cpx_opx_temp(
             Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps, equationT=equationT, P="Solve")
-        P_func = calculate_Cpx_Opx_Press(
+        P_func = calculate_cpx_opx_press(
             Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps, equationP=equationP, T="Solve")
     if Two_Px_Match is not None:
-        T_func = calculate_Cpx_Opx_Temp(
+        T_func = calculate_cpx_opx_temp(
             Two_Px_Match=Two_Px_Match, equationT=equationT, P="Solve")
-        P_func = calculate_Cpx_Opx_Press(
+        P_func = calculate_cpx_opx_press(
             Two_Px_Match=Two_Px_Match, equationP=equationP, T="Solve")
 
  # This bit checks if temperature is already a series - e.g., equations
@@ -515,7 +515,7 @@ def calculate_Cpx_Opx_PT_Iter(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=No
 
         return PT_out
     if Eq_Tests is True:
-        two_pyx = calculate_Cpx_Opx_Equilibrium_Tests(
+        two_pyx = calculate_cpx_opx_equilibrium_tests(
             Cpx_Comps=Cpx_Comps, Opx_Comps=Opx_Comps)
 
         two_pyx.insert(0, "T_K_calc", T_K_guess)
@@ -528,7 +528,7 @@ def calculate_Cpx_Opx_PT_Iter(*, Cpx_Comps=None, Opx_Comps=None, Two_Px_Match=No
 
 ## Two pyroxene matching
 
-def calculate_Cpx_Opx_PT_matching(*, Opx_Comps, Cpx_Comps, equationT=None, equationP=None,
+def calculate_cpx_opx_pt_matching(*, Opx_Comps, Cpx_Comps, equationT=None, equationP=None,
                                   KdMatch=None, KdErr=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None):
     '''
     Evaluates all possible Cpx-Opx pairs,
@@ -688,20 +688,20 @@ def calculate_Cpx_Opx_PT_matching(*, Opx_Comps, Cpx_Comps, equationT=None, equat
         raise ValueError('You have entered an equation for T and specified a temperature. '
         'The code doesnt know what you want it to do. Either enter an equation, or choose a temperature.')
     if equationP is not None and equationT is not None:
-        PT_out = calculate_Cpx_Opx_PT_Iter(
+        PT_out = calculate_cpx_opx_pt(
             Two_Px_Match=Combo_opxs_cpxs_2, equationP=equationP, equationT=equationT)
         Combo_opxs_cpxs_2.insert(0, "P_kbar_calc", PT_out['P_kbar_calc'])
         Combo_opxs_cpxs_2.insert(1, "T_K_calc", PT_out['T_K_calc'])
         Combo_opxs_cpxs_2.insert(2, "Equation Choice (T)", str(equationT))
         Combo_opxs_cpxs_2.insert(3, "Equation Choice (P)", str(equationP))
     if P is not None:
-        T_K_calc = calculate_Cpx_Opx_Temp(
+        T_K_calc = calculate_cpx_opx_temp(
             Two_Px_Match=Combo_opxs_cpxs_2, equationT=equationT, P=P)
         Combo_opxs_cpxs_2.insert(0, "P_kbar_input", P)
         Combo_opxs_cpxs_2.insert(1, "T_K_calc", T_K_calc)
         Combo_opxs_cpxs_2.insert(2, "Equation Choice (T)", str(equationT))
     if T is not None:
-        P_kbar_calc = calculate_Cpx_Opx_Press(
+        P_kbar_calc = calculate_cpx_opx_press(
             Two_Px_Match=Combo_opxs_cpxs_2, equationP=equationP, T=T)
         Combo_opxs_cpxs_2.insert(0, "P_kbar_calc", P_kbar_calc)
         Combo_opxs_cpxs_2.insert(1, "T_K_input", T)

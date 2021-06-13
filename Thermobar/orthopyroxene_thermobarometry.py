@@ -89,7 +89,8 @@ def P_Put2008_eq29c(T, *, Al2O3_Opx_cat_6ox,
 def T_Opx_Beatt1993(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
                     MnO_Liq_cat_frac, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac):
     '''
-    Opx-Liquid thermometer of Beattie (1993). Putirka (2008) warn that overpredicts for hydrous compositions at <1200Â°C, and anhydrous compositions at <1100Â°C
+    Opx-Liquid thermometer of Beattie (1993). Only uses liquid composition.
+    Putirka (2008) warn that overpredicts for hydrous compositions at <1200Â°C, and anhydrous compositions at <1100Â°C
     '''
     Num_B1993 = 125.9 * 1000 / 8.3144 + \
         ((0.1 * P) * 10**9 - 10**5) * 6.5 * (10**(-6)) / 8.3144
@@ -132,7 +133,7 @@ def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, MgO_Liq_cat_frac, CaO_Liq_cat_frac, K
 ##  Opx-Only barometry function
 
 
-def calculate_Opx_only_Press(*, Opx_Comps, equationP, T=None):
+def calculate_opx_only_press(*, Opx_Comps, equationP, T=None):
     '''
     Orthopyroxene only barometry. Enter a panda dataframe with orthopyroxene compositions, returns a pressure in kbar.
 
@@ -194,7 +195,7 @@ Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Fel
 
 Opx_Liq_P_funcs_by_name = {p.__name__: p for p in Opx_Liq_P_funcs}
 
-def calculate_Opx_Liq_Press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMatch=None,
+def calculate_opx_liq_press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMatch=None,
                             T=None, Eq_Tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
     '''
     Orthopyroxene-Liquid barometer, user specifies equation, and calculates pressure in kbar.
@@ -213,7 +214,7 @@ def calculate_Opx_Liq_Press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMa
 
     MeltMatch: DataFrame
         Combined Opx-Liquid compositions.
-        Used for calculate_Opx_Liq_PT_melt_matching.
+        Used for calculate_opx_liq_pt_matching.
 
     EquationP: str
         Choice of equation:
@@ -329,7 +330,7 @@ def calculate_Opx_Liq_Press(*, equationP, Opx_Comps=None, Liq_Comps=None, MeltMa
 Opx_Liq_T_funcs = {T_Opx_Beatt1993, T_Put2008_eq28a, T_Put2008_eq28b_opx_sat}
 
 Opx_Liq_T_funcs_by_name = {p.__name__: p for p in Opx_Liq_T_funcs}
-def calculate_Opx_Liq_Temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMatch=None,
+def calculate_opx_liq_temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMatch=None,
                            P=None, Eq_Tests=False, Fe3FeT_Liq=None, H2O_Liq=None):
     '''
     Orthopyroxene-Liquid thermometer, user specifies equation,
@@ -444,7 +445,7 @@ def calculate_Opx_Liq_Temp(*, equationT, Opx_Comps=None, Liq_Comps=None, MeltMat
     return T_K
 
 ## Iterating P and T when you don't know either
-def calculate_Opx_Liq_PT_Iter(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None, equationP=None, equationT=None,
+def calculate_opx_liq_pt(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None, equationP=None, equationT=None,
                               iterations=30, T_K_Guess=1300, Eq_Tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
     '''
     Solves simultaneous equations for temperature and pressure using
@@ -463,7 +464,7 @@ def calculate_Opx_Liq_PT_Iter(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None,
 
     MeltMatch: DataFrame
         Combined dataframe of opx-Liquid compositions (headings SiO2_Liq, SiO2_Opx etc.).
-        Used for calculate_Opx_Liq_PT_melt_matching.
+        Used for calculate_opx_liq_pt_matching.
 
     EquationP: str
         Barometer
@@ -523,16 +524,16 @@ def calculate_Opx_Liq_PT_Iter(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None,
         if H2O_Liq is not None:
             Liq_Comps_c['H2O_Liq'] = H2O_Liq
 
-        T_func = calculate_Opx_Liq_Temp(
+        T_func = calculate_opx_liq_temp(
             Opx_Comps=Opx_Comps, Liq_Comps=Liq_Comps_c, equationT=equationT, P="Solve")
-        P_func = calculate_Opx_Liq_Press(
+        P_func = calculate_opx_liq_press(
             Opx_Comps=Opx_Comps, Liq_Comps=Liq_Comps_c, equationP=equationP, T="Solve")
 
     if MeltMatch is not None:
 
-        T_func = calculate_Opx_Liq_Temp(
+        T_func = calculate_opx_liq_temp(
             MeltMatch=MeltMatch, equationT=equationT, P="Solve")
-        P_func = calculate_Opx_Liq_Press(
+        P_func = calculate_opx_liq_press(
             MeltMatch=MeltMatch, equationP=equationP, T="Solve")
 
         # Gives users flexibility to add a different guess temperature
@@ -585,7 +586,7 @@ def calculate_Opx_Liq_PT_Iter(*, Liq_Comps=None, Opx_Comps=None, MeltMatch=None,
 
 ## Considering all possible Orthopyroxene-melt pairs, and iterating P and T
 
-def calculate_Opx_Liq_PT_melt_matching(*, Liq_Comps, Opx_Comps, equationT=None,
+def calculate_opx_liq_pt_matching(*, Liq_Comps, Opx_Comps, equationT=None,
 equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
  KdMatch=None, KdErr=None, Opx_Quality=False, Return_All_Matches=False):
 
@@ -751,19 +752,19 @@ equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
 
         # If users want to melt match specifying an equation for both T and P
         if equationP is not None and equationT is not None:
-            PT_out = calculate_Opx_Liq_PT_Iter(MeltMatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
+            PT_out = calculate_opx_liq_pt(MeltMatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
             P_guess = PT_out['P_kbar_calc'].astype('float64')
             T_K_guess = PT_out['T_K_calc'].astype('float64')
 
         # Users may already know their pressure, rather than choosing an equation.
         if P is not None:
             P_guess = P
-            T_K_guess = calculate_Opx_Liq_Temp(MeltMatch=Combo_liq_opx_fur_filt, equationT=equationT, P=P_guess)
+            T_K_guess = calculate_opx_liq_temp(MeltMatch=Combo_liq_opx_fur_filt, equationT=equationT, P=P_guess)
 
     # Users may already know their temperature, rather than using an equation
         if T is not None:
             T_K_guess = T
-            P_guess = calculate_Opx_Liq_Press(MeltMatch=Combo_liq_opx_fur_filt, equationP=equationP, T=T_K_guess)
+            P_guess = calculate_opx_liq_press(MeltMatch=Combo_liq_opx_fur_filt, equationP=equationP, T=T_K_guess)
 
         Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess)

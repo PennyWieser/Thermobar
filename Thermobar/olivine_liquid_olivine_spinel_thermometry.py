@@ -98,7 +98,7 @@ Liquid_olivine_funcs_by_name = {p.__name__: p for p in Liquid_olivine_funcs}
 
 ## Function for calculating olivine-liquid temperature using various equations.
 
-def calculate_Ol_Liq_Temp(*, Liq_Comps, equationT, Ol_Comps=None, P=None,
+def calculate_ol_liq_temp(*, Liq_Comps, equationT, Ol_Comps=None, P=None,
                           NiO_Ol_Mol=None, H2O_Liq=None, Fe3FeT_Liq=None, Eq_Tests=False):
     '''
     Olivine-liquid thermometers. Returns the temperature in Kelvin,
@@ -169,7 +169,7 @@ def calculate_Ol_Liq_Temp(*, Liq_Comps, equationT, Ol_Comps=None, P=None,
         anhyd_mol_frac_Ni = calculate_anhydrous_mol_fractions_liquid_Ni(
             Liq_Comps=Liq_Comps_c)
         if NiO_Ol_Mol is None:
-            ol_mol_frac_Ni = calculate_mol_fractions_olivine_Ni(
+            ol_mol_frac_Ni = calculate_mol_fractions_olivine_ni(
                 Ol_Comps=Ol_Comps_c)
             Liq_Ols_Ni = pd.concat([anhyd_mol_frac_Ni, ol_mol_frac_Ni], axis=1)
             if Eq_Tests is True:
@@ -267,16 +267,16 @@ def calculate_Ol_Liq_Temp(*, Liq_Comps, equationT, Ol_Comps=None, P=None,
             P = 1
             print(
                 'You have not selected a pressure, so we have calculated Toplis Kd at 1kbar')
-        Ol_Fo = (Ol_Comps_c['MgO_Ol'] / 40.3044) / \
+        ol_fo = (Ol_Comps_c['MgO_Ol'] / 40.3044) / \
             ((Ol_Comps_c['MgO_Ol'] / 40.3044) + Ol_Comps_c['FeOt_Ol'] / 71.844)
         KdFeMg_Meas = (
             ((Ol_Comps_c['FeOt_Ol'] / 71.844) / (Ol_Comps_c['MgO_Ol'] / 40.3044)) /
             ((Liq_Comps_c['FeOt_Liq'] * (1 - Liq_Comps_c['Fe3FeT_Liq']
                                          ) / 71.844) / (Liq_Comps_c['MgO_Liq'] / 40.3044))
         )
-        Kd_func = partial(calculate_Toplis2005_Kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'], Na2O_mol=Liq_Ols[
+        Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'], Na2O_mol=Liq_Ols[
                           'Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], P=P, H2O=Liq_Ols['H2O_Liq'], T=T_K)
-        Kd_Toplis_Calc = Kd_func(Ol_Fo)
+        Kd_Toplis_Calc = Kd_func(ol_fo)
 
         DeltaKd_Toplis = abs(KdFeMg_Meas - Kd_Toplis_Calc)
         DeltaKd_Roeder = abs(KdFeMg_Meas - 0.3)
@@ -310,7 +310,7 @@ def T_Wan2008(P=None, *, Cr_No_sp, Al2O3_Ol, Al2O3_Sp):
 
 ##  Olivine-spinel thermometry function
 
-def calculate_Ol_Sp_Temp(Ol_Comps, Sp_Comps, equationT):
+def calculate_ol_sp_temp(Ol_Comps, Sp_Comps, equationT):
     ''' Calculates temperatures from olivine-spinel pairs.
 
 

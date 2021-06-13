@@ -70,14 +70,14 @@ def T_Put2008_eq24b(P, *, Ab_Kspar, Al2O3_Liq_cat_frac, Na2O_Liq_cat_frac,
 
 ## Function: Fspar-Liquid temperature (works for alkali and plag feldspars)
 
-Plag_Liq_T_funcs = {T_Put2008_eq23, T_Put2008_eq24a}
-Plag_Liq_T_funcs_by_name = {p.__name__: p for p in Plag_Liq_T_funcs}
+plag_liq_T_funcs = {T_Put2008_eq23, T_Put2008_eq24a}
+plag_liq_T_funcs_by_name = {p.__name__: p for p in plag_liq_T_funcs}
 
 Kspar_Liq_T_funcs = {T_Put2008_eq24b}
 Kspar_Liq_T_funcs_by_name = {p.__name__: p for p in Kspar_Liq_T_funcs}
 
 
-def calculate_Fspar_Liq_Temp(*, Plag_Comps=None, Kspar_Comps=None,
+def calculate_fspar_liq_temp(*, Plag_Comps=None, Kspar_Comps=None,
     Liq_Comps=None, equationT=None, P=None, H2O_Liq=None, Eq_Tests=False):
     '''
     Liquid-Feldspar thermometery (same function for Plag and Kspar),
@@ -123,20 +123,20 @@ def calculate_Fspar_Liq_Temp(*, Plag_Comps=None, Kspar_Comps=None,
 
     if Plag_Comps is not None:
         try:
-            func = Plag_Liq_T_funcs_by_name[equationT]
+            func = plag_liq_T_funcs_by_name[equationT]
         except KeyError:
             raise ValueError(f'{equationT} is not a valid equation for Plag-Liquid') from None
         sig=inspect.signature(func)
 
         cat_plags = calculate_cat_fractions_plagioclase(Plag_Comps=Plag_Comps)
         cat_liqs = calculate_anhydrous_cat_fractions_liquid(Liq_Comps_c)
-        combo_fspar_liq = pd.concat([cat_plags, cat_liqs], axis=1)
+        combo_fspar_Liq = pd.concat([cat_plags, cat_liqs], axis=1)
 
-        Kd_Ab_An = (combo_fspar_liq['Ab_Plag'] * combo_fspar_liq['Al2O3_Liq_cat_frac'] * combo_fspar_liq['CaO_Liq_cat_frac'] /
-                    (combo_fspar_liq['An_Plag'] * combo_fspar_liq['Na2O_Liq_cat_frac'] * combo_fspar_liq['SiO2_Liq_cat_frac']))
-        combo_fspar_liq['Kd_Ab_An'] = Kd_Ab_An
+        Kd_Ab_An = (combo_fspar_Liq['Ab_Plag'] * combo_fspar_Liq['Al2O3_Liq_cat_frac'] * combo_fspar_Liq['CaO_Liq_cat_frac'] /
+                    (combo_fspar_Liq['An_Plag'] * combo_fspar_Liq['Na2O_Liq_cat_frac'] * combo_fspar_Liq['SiO2_Liq_cat_frac']))
+        combo_fspar_Liq['Kd_Ab_An'] = Kd_Ab_An
 
-        if np.min(combo_fspar_liq['An_Plag'] < 0.05):
+        if np.min(combo_fspar_Liq['An_Plag'] < 0.05):
             w.warn('Some inputted feldspars have An<0.05, but you have selected a plagioclase-liquid thermometer'
             '. If these are actually alkali felspars, please use T_P2008_eq24b or T_P2008_24c instead', stacklevel=2)
 
@@ -147,15 +147,15 @@ def calculate_Fspar_Liq_Temp(*, Plag_Comps=None, Kspar_Comps=None,
             raise ValueError(f'{equationT} is not a valid equation for Kspar-Liquid') from None
         sig=inspect.signature(func)
 
-        cat_kspars = calculate_cat_fractions_Kspar(Kspar_Comps=Kspar_Comps)
+        cat_kspars = calculate_cat_fractions_kspar(Kspar_Comps=Kspar_Comps)
         cat_liqs = calculate_anhydrous_cat_fractions_liquid(Liq_Comps_c)
-        combo_fspar_liq = pd.concat([cat_kspars, cat_liqs], axis=1)
+        combo_fspar_Liq = pd.concat([cat_kspars, cat_liqs], axis=1)
 
-        Kd_Ab_An = (combo_fspar_liq['Ab_Kspar'] * combo_fspar_liq['Al2O3_Liq_cat_frac'] * combo_fspar_liq['CaO_Liq_cat_frac'] /
-                    (combo_fspar_liq['An_Kspar'] * combo_fspar_liq['Na2O_Liq_cat_frac'] * combo_fspar_liq['SiO2_Liq_cat_frac']))
-        combo_fspar_liq['Kd_Ab_An'] = Kd_Ab_An
+        Kd_Ab_An = (combo_fspar_Liq['Ab_Kspar'] * combo_fspar_Liq['Al2O3_Liq_cat_frac'] * combo_fspar_Liq['CaO_Liq_cat_frac'] /
+                    (combo_fspar_Liq['An_Kspar'] * combo_fspar_Liq['Na2O_Liq_cat_frac'] * combo_fspar_Liq['SiO2_Liq_cat_frac']))
+        combo_fspar_Liq['Kd_Ab_An'] = Kd_Ab_An
 
-        if np.min(combo_fspar_liq['An_Kspar'] > 0.05):
+        if np.min(combo_fspar_Liq['An_Kspar'] > 0.05):
             w.warn('Some inputted feldspars have An>0.05, but you have selected a Kspar-liquid thermometer'
             '. If these are actually Plagioclase feldspars, please use T_P2008_eq23 or _eq24a instead', stacklevel=2)
 
@@ -168,7 +168,7 @@ def calculate_Fspar_Liq_Temp(*, Plag_Comps=None, Kspar_Comps=None,
 
 
 
-    kwargs = {name: combo_fspar_liq[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
+    kwargs = {name: combo_fspar_Liq[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
 
     if isinstance(P, str) or P is None:
         if P == "Solve":
@@ -193,13 +193,13 @@ def calculate_Fspar_Liq_Temp(*, Plag_Comps=None, Kspar_Comps=None,
 
 
 ## Function: Fspar-Liq pressure
-Plag_Liq_P_funcs = {P_Put2008_eq25}
-Plag_Liq_P_funcs_by_name = {p.__name__: p for p in Plag_Liq_P_funcs}
+plag_liq_P_funcs = {P_Put2008_eq25}
+plag_liq_P_funcs_by_name = {p.__name__: p for p in plag_liq_P_funcs}
 
 Kspar_Liq_P_funcs = {}
 Kspar_Liq_P_funcs_by_name = {p.__name__: p for p in Kspar_Liq_P_funcs}
 
-def calculate_Fspar_Liq_Press(*, Plag_Comps=None, Kspar_Comps=None, Liq_Comps=None, equationP=None,
+def calculate_fspar_liq_press(*, Plag_Comps=None, Kspar_Comps=None, Liq_Comps=None, equationP=None,
                               T=None, H2O_Liq=None, Eq_Tests=False):
 
     '''
@@ -241,7 +241,7 @@ def calculate_Fspar_Liq_Press(*, Plag_Comps=None, Kspar_Comps=None, Liq_Comps=No
         ' this option is here as a place holder incase a great one comes along!')
 
     try:
-        func = Plag_Liq_P_funcs_by_name[equationP]
+        func = plag_liq_P_funcs_by_name[equationP]
     except KeyError:
         raise ValueError(f'{equationP} is not a valid equation') from None
     sig=inspect.signature(func)
@@ -296,7 +296,7 @@ def calculate_Fspar_Liq_Press(*, Plag_Comps=None, Kspar_Comps=None, Liq_Comps=No
 
 ## Function for iterating pressure and temperature - (probably not recomended)
 
-def calculate_Fspar_Liq_PT_Iter(*, Liq_Comps=None, Plag_Comps=None, Kspar_Comps=None,
+def calculate_fspar_Liq_pt(*, Liq_Comps=None, Plag_Comps=None, Kspar_Comps=None,
                                 MeltMatch=None, equationP=None, equationT=None, iterations=30, T_K_guess=1300,
                                 H2O_Liq=None):
     '''
@@ -351,14 +351,14 @@ def calculate_Fspar_Liq_PT_Iter(*, Liq_Comps=None, Plag_Comps=None, Kspar_Comps=
 
 
     if MeltMatch is None:
-        T_func = calculate_Fspar_Liq_Temp(
+        T_func = calculate_fspar_liq_temp(
             Plag_Comps=Plag_Comps, Liq_Comps=Liq_Comps_c, equationT=equationT, P="Solve")
-        P_func = calculate_Fspar_Liq_Press(
+        P_func = calculate_fspar_liq_press(
             Plag_Comps=Plag_Comps, Liq_Comps=Liq_Comps_c, equationP=equationP,  T="Solve")
     if MeltMatch is not None:
-        T_func = calculate_Fspar_Liq_Temp(
+        T_func = calculate_fspar_liq_temp(
             MeltMatch=MeltMatch, equationT=equationT)
-        P_func = calculate_Fspar_Liq_Press(
+        P_func = calculate_fspar_liq_press(
             MeltMatch=MeltMatch, equationP=equationP)
 
  # This bit checks if temperature is already a series - e.g., equations
@@ -602,12 +602,12 @@ def H_Waters2015(T, *, Liq_Comps=None, Plag_Comps=None,
 
 ## Function for Plag-Liq hygrometry
 
-Plag_Liq_H_funcs = {H_Put2008_eq25b, H_Put2005_eqH, H_Waters2015}
-Plag_Liq_H_funcs_by_name = {p.__name__: p for p in Plag_Liq_H_funcs}
+plag_liq_H_funcs = {H_Put2008_eq25b, H_Put2005_eqH, H_Waters2015}
+plag_liq_H_funcs_by_name = {p.__name__: p for p in plag_liq_H_funcs}
 
 
 
-def calculate_Plag_Liq_Hygr(*, Liq_Comps, Plag_Comps=None,
+def calculate_plag_liq_Hygr(*, Liq_Comps, Plag_Comps=None,
                             equationH=None, P=None, T=None, XAn=None, XAb=None, XOr=0):
 
     '''Calculates H2O content (wt%) from composition of equilibrium plagioclase
@@ -650,7 +650,7 @@ def calculate_Plag_Liq_Hygr(*, Liq_Comps, Plag_Comps=None,
 
     '''
     try:
-        func = Plag_Liq_H_funcs_by_name[equationH]
+        func = plag_liq_H_funcs_by_name[equationH]
     except KeyError:
         raise ValueError(f'{equationH} is not a valid equation') from None
     sig=inspect.signature(func)
@@ -779,7 +779,7 @@ Plag_Kspar_T_funcs = {T_Put2008_eq27a, T_Put2008_eq27b, T_Put_Global_2Fspar}
 Plag_Kspar_T_funcs_by_name = {p.__name__: p for p in Plag_Kspar_T_funcs}
 
 
-def calculate_Plag_Kspar_Temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Match=None, equationT=None, P=None, Eq_Tests=False):
+def calculate_plag_kspar_temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Match=None, equationT=None, P=None, Eq_Tests=False):
     '''
     Two feldspar thermometer (Kspar-Plag)
     Returns temperature in Kelvin
@@ -834,7 +834,7 @@ def calculate_Plag_Kspar_Temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Ma
 
 
         cat_plag = calculate_cat_fractions_plagioclase(Plag_Comps=Plag_Comps)
-        cat_kspar = calculate_cat_fractions_Kspar(Kspar_Comps=Kspar_Comps)
+        cat_kspar = calculate_cat_fractions_kspar(Kspar_Comps=Kspar_Comps)
         combo_fspars = pd.concat([cat_plag, cat_kspar], axis=1)
         combo_fspars['K_Barth'] = combo_fspars['Ab_Kspar'] / \
         combo_fspars['Ab_Plag']
@@ -863,7 +863,7 @@ def calculate_Plag_Kspar_Temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Ma
     if Eq_Tests is False:
         return T_K
     if Eq_Tests is True:
-        func=calculate_Fspar_activity_components
+        func=calculate_fspar_activity_components
         combo_fspars['T']=T_K
         combo_fspars['P']=P
         kwargs = {name: combo_fspars[name] for name, p in inspect.signature(func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -876,7 +876,7 @@ def calculate_Plag_Kspar_Temp(*, Plag_Comps=None, Kspar_Comps=None, Two_Fspar_Ma
 
 ## Plag Kspar matching
 
-def calculate_Plag_Kspar_Temp_matching(*, Kspar_Comps, Plag_Comps, equationT=None,
+def calculate_plag_kspar_temp_matching(*, Kspar_Comps, Plag_Comps, equationT=None,
                                  P=None):
     '''Evaluates all possible Plag-Kspar pairs,
     returns T (K) and equilibrium tests
@@ -915,7 +915,7 @@ def calculate_Plag_Kspar_Temp_matching(*, Kspar_Comps, Plag_Comps, equationT=Non
     # Calculating Plag and plag components. Do before duplication to save
     # computation time
     cat_plag = calculate_cat_fractions_plagioclase(Plag_Comps=Plag_Comps)
-    cat_kspar = calculate_cat_fractions_Kspar(Kspar_Comps=Kspar_Comps)
+    cat_kspar = calculate_cat_fractions_kspar(Kspar_Comps=Kspar_Comps)
 
     # Adding an ID label to help with melt-kspar rematching later
     cat_plag['ID_Plag'] = cat_plag.index
@@ -945,11 +945,11 @@ def calculate_Plag_Kspar_Temp_matching(*, Kspar_Comps, Plag_Comps, equationT=Non
     print("Considering " + LenCombo +
           " Kspar-Plag pairs, be patient if this is >>1 million!")
 
-    T_K_calc=calculate_Plag_Kspar_Temp(Two_Fspar_Match=Combo_plags_kspars_1.astype(float),
+    T_K_calc=calculate_plag_kspar_temp(Two_Fspar_Match=Combo_plags_kspars_1.astype(float),
     equationT=equationT, P=P)
     Combo_plags_kspars_1.insert(0, "T_K_calc", T_K_calc)
 
-    func=calculate_Fspar_activity_components
+    func=calculate_fspar_activity_components
     Combo_plags_kspars_1['T']=T_K_calc
     Combo_plags_kspars_1['P']=P
     kwargs = {name: Combo_plags_kspars_1[name].astype('float64') for name, p in inspect.signature(func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}

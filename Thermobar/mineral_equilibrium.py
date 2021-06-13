@@ -15,15 +15,15 @@ def calculate_eq_olivine(Kd, *, Liq_Mgno):
      '''
     return 1 / ((Kd / Liq_Mgno) + (1 - Kd))
 
-def calculate_Ol_Fo(Ol_Comps):
+def calculate_ol_fo(Ol_Comps):
     Fo=(Ol_Comps['MgO_Ol']/40.3044)/((Ol_Comps['MgO_Ol']/40.3044)+(Ol_Comps['FeOt_Ol']/71.844))
     return Fo
 
-def calculate_Liq_Mgno(Ol_Comps):
+def calculate_liq_mgno(Ol_Comps):
     Fo=(Ol_Comps['MgO_Ol']/40.3044)/((Ol_Comps['MgO_Ol']/40.3044)+(Ol_Comps['FeOt_Ol']/71.844))
     return Fo
 
-def calculate_Toplis2005_Kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
+def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
     '''
     Calculates olivine-liq Kd Fe-Mg using the expression of Toplis, 2005.
     '''
@@ -64,7 +64,7 @@ def calculate_Toplis2005_Kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
 
 
 def calculate_eq_ol_content(Liq_Comps, Kdmodel, Ol_Comps=None, T=None, P=None,
-Fe3FeT_Liq=None, Ol_Fo=None, H2O_Liq=None):
+Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
     '''Calculates equilibrium forsterite contents based on inputtted liquid compositions.
 
 
@@ -82,7 +82,7 @@ Fe3FeT_Liq=None, Ol_Fo=None, H2O_Liq=None):
         "Matzen2011": uses Kd=0.34+0.012 (Not sensitive to P, T, or Ol Fo content)
 
         "Toplis2005": Calculates Kd based on melt SiO2, Na2O, K2O, P, T, H2O, Ol Fo content.
-        Users can specify a Ol_Fo content, or the function iterates Kd and Fo and returns both.
+        Users can specify a ol_fo content, or the function iterates Kd and Fo and returns both.
 
         "All": Returns outputs for all models
 
@@ -94,7 +94,7 @@ Fe3FeT_Liq=None, Ol_Fo=None, H2O_Liq=None):
         T: Temperature in Kelvin
         H2O: melt H2O content
         Optional:
-            Ol_Fo: If specify Fo content (decimal, 0-1), calculates Kd
+            ol_fo: If specify Fo content (decimal, 0-1), calculates Kd
             Else, will iterate to find equilibrium Ol content and Kd.
 
     Returns
@@ -105,7 +105,7 @@ Fe3FeT_Liq=None, Ol_Fo=None, H2O_Liq=None):
 
     '''
     if Ol_Comps is not None:
-        Ol_Comps['Fo_meas']=calculate_Ol_Fo(Ol_Comps)
+        Ol_Comps['Fo_meas']=calculate_ol_fo(Ol_Comps)
     if Fe3FeT_Liq is not None:
         Liq_Comps['Fe3FeT_Liq'] = Fe3FeT_Liq
     if H2O_Liq is not None:
@@ -141,11 +141,11 @@ Fe3FeT_Liq=None, Ol_Fo=None, H2O_Liq=None):
         Na2O_mol = mol_perc['Na2O_Liq_mol_frac']
         K2O_mol = mol_perc['K2O_Liq_mol_frac']
         H2O_Liq = Liq_Comps['H2O_Liq']
-        Kd_func = partial(calculate_Toplis2005_Kd, SiO2_mol=SiO2_mol,
+        Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=SiO2_mol,
                           Na2O_mol=Na2O_mol, K2O_mol=K2O_mol, P=P, H2O=H2O_Liq, T=T)
-        if Ol_Fo is not None or Ol_Comps is not None:
-            if Ol_Fo is not None and Ol_Comps is None:
-                Kd_calc = Kd_func(Ol_Fo)
+        if ol_fo is not None or Ol_Comps is not None:
+            if ol_fo is not None and Ol_Comps is None:
+                Kd_calc = Kd_func(ol_fo)
                 Ol_calc = 1 / ((Kd_calc / Mgno) + (1 - Kd_calc))
             if Ol_Comps is not None:
                 Kd_calc = Kd_func(Ol_Comps['Fo_meas'])
@@ -179,7 +179,7 @@ Fe3FeT_Liq=None, Ol_Fo=None, H2O_Liq=None):
     return Kd_out
 
 
-def calculate_Olivine_Rhodes_Diagram_Lines(
+def calculate_ol_rhodes_diagram_lines(
         Min_Mgno, Max_Mgno, KdMin=None, KdMax=None):
     '''
     Input minimum and maximum liquid Mg#, calculates lines for equilibrium Fo content using Roeder and Emslie (1970) and Matzen (2011) Kd values.
@@ -220,21 +220,21 @@ def calculate_Olivine_Rhodes_Diagram_Lines(
     Eq_ol_034 = 1 / ((0.34 / Mgno) + (1 - 0.34))
     Eq_ol_032 = 1 / ((0.328 / Mgno) + (1 - 0.328))
     Eq_ol_035 = 1 / ((0.352 / Mgno) + (1 - 0.352))
-    Kd_out_mat = pd.DataFrame(data={'Mg#_Liq': Mgno, 'Eq_Ol_Fo_Roeder (Kd=0.3)': Eq_Roeder_03,
-                                    'Eq_Ol_Fo_Roeder (Kd=0.27)': Eq_Roeder_027, 'Eq_Ol_Fo_Roeder (Kd=0.33)': Eq_Roeder_033,
-                                    'Eq_Ol_Fo_Matzen (Kd=0.34)': Eq_ol_034, 'Eq_Ol_Fo_Matzen (Kd=0.328)': Eq_ol_032, 'Eq_Ol_Fo_Matzen (Kd=0.352)': Eq_ol_035})
+    Kd_out_mat = pd.DataFrame(data={'Mg#_Liq': Mgno, 'Eq_ol_fo_Roeder (Kd=0.3)': Eq_Roeder_03,
+                                    'Eq_ol_fo_Roeder (Kd=0.27)': Eq_Roeder_027, 'Eq_ol_fo_Roeder (Kd=0.33)': Eq_Roeder_033,
+                                    'Eq_ol_fo_Matzen (Kd=0.34)': Eq_ol_034, 'Eq_ol_fo_Matzen (Kd=0.328)': Eq_ol_032, 'Eq_ol_fo_Matzen (Kd=0.352)': Eq_ol_035})
     if KdMin is not None and KdMax is not None:
         Eq_ol_KdMin = 1 / ((KdMin / Mgno) + (1 - KdMin))
         Eq_ol_KdMax = 1 / ((KdMax / Mgno) + (1 - KdMax))
-        Kd_out_mat2 = pd.DataFrame(data={'Eq_Ol_Fo (KdMin=' + str(
-            KdMin) + ')': Eq_ol_KdMin, 'Eq_Ol_Fo (KdMax=' + str(KdMax) + ')': Eq_ol_KdMax})
+        Kd_out_mat2 = pd.DataFrame(data={'Eq_ol_fo (KdMin=' + str(
+            KdMin) + ')': Eq_ol_KdMin, 'Eq_ol_fo (KdMax=' + str(KdMax) + ')': Eq_ol_KdMax})
         Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat2], axis=1)
 
     return Kd_out_mat
 
 ## Equilibrium things for Pyroxene
 
-def calculate_Orthopyroxene_Rhodes_Diagram_Lines(
+def calculate_opx_rhodes_diagram_lines(
         Min_Mgno, Max_Mgno, simple=False, T=None, KdMin=None, KdMax=None, Liq_Comps=None):
     '''
     Input minimum and maximum liquid Mg#, calculates lines for equilibrium Opx Mg# content using a variety of choices for Kd Fe-Mg.
@@ -296,7 +296,7 @@ Returns
     return Kd_out_mat
 
 
-def calculate_Clinopyroxene_Rhodes_Diagram_Lines(
+def calculate_cpx_rhodes_diagram_lines(
         Min_Mgno, Max_Mgno, simple=False, T=None, KdMin=None, KdMax=None):
     '''
     Input minimum and maximum liquid Mg#, calculates lines for equilibrium Cpx Mg# contents based on user-specified Kd Fe-Mg options.

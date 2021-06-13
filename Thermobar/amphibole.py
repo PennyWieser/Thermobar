@@ -13,13 +13,13 @@ from Thermobar.core import *
 def get_amp_sites(amp_apfu_df):
     """
     get_amp_sites takes generalized atom per formula unit calculations from
-    calculate_amphibole_23oxygens and puts them in the proper cation sites
+    calculate_23oxygens_amphibole and puts them in the proper cation sites
     according to Leake et al., 1997.
 
     Parameters
     ----------
     amp_apfu_df : pandas DataFrame
-        This is the dataframe output from calculate_amphibole_23oxygens. You should
+        This is the dataframe output from calculate_23oxygens_amphibole. You should
         not have to modify this dataframe at all.
 
 
@@ -134,7 +134,7 @@ def amp_components_ferric_ferrous(sites_df, norm_cations):
     sites_df : pandas DataFrame
         output from the get_amp_sites function. you do not need to modify this at all
     norm_cations : pandas DataFrame
-        This is the dataframe output from calculate_amphibole_23oxygens. You should
+        This is the dataframe output from calculate_23oxygens_amphibole. You should
         not have to modify this dataframe at all.
 
 
@@ -285,16 +285,16 @@ def get_amp_sites_ferric_ferrous(amp_apfu_df):
     return sites_df
 
 
-def get_amp_sites_Mutch(amp_apfu_df):
+def get_amp_sites_mutch(amp_apfu_df):
     """
     get_amp_sites takes generalized atom per formula unit calculations from
-    calculate_amphibole_23oxygens and puts them in the proper cation sites
+    calculate_23oxygens_amphibole and puts them in the proper cation sites
     according to the spreasheet of Mutch et al. Gives negative numbers for Na. .
 
     Parameters
     ----------
     amp_apfu_df : pandas DataFrame
-        This is the dataframe output from calculate_amphibole_23oxygens. You should
+        This is the dataframe output from calculate_23oxygens_amphibole. You should
         not have to modify this dataframe at all.
 
 
@@ -397,7 +397,7 @@ def get_amp_sites_Mutch(amp_apfu_df):
     return sites_df
 
 
-def amp_components_ferric_ferrous_Mutch(sites_df, norm_cations):
+def amp_components_ferric_ferrous_mutch(sites_df, norm_cations):
     """
     amp_components_ferric_ferrous calculates the Fe3+ and Fe2+ apfu values of
     amphibole and adjusts the generic stoichiometry such that charge balance is
@@ -409,7 +409,7 @@ def amp_components_ferric_ferrous_Mutch(sites_df, norm_cations):
     sites_df : pandas DataFrame
         output from the get_amp_sites function. you do not need to modify this at all
     norm_cations : pandas DataFrame
-        This is the dataframe output from calculate_amphibole_23oxygens. You should
+        This is the dataframe output from calculate_23oxygens_amphibole. You should
         not have to modify this dataframe at all.
 
 
@@ -467,7 +467,7 @@ def amp_components_ferric_ferrous_Mutch(sites_df, norm_cations):
 ##
 
 
-def get_amp_sites_ferric_ferrous_Mutch(amp_apfu_df):
+def get_amp_sites_ferric_ferrous_mutch(amp_apfu_df):
     """
     get_amp_sites_ferric_ferrous is very similar to get_amp_sites, however it now
     incorporates the newly calculated Fe2O3 and FeO apfu values such that all
@@ -710,7 +710,7 @@ P_Hollister1987, P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995} # p
 
 Amp_only_P_funcs_by_name_sim = {p.__name__: p for p in Amp_only_P_funcs_sim}
 
-def calculate_Amp_only_Press(Amp_Comps=None, equationP=None, T=None):
+def calculate_amp_only_press(Amp_Comps=None, equationP=None, T=None):
     """
     Amphibole-only barometry, returns pressure in kbar.
 
@@ -774,10 +774,10 @@ def calculate_Amp_only_Press(Amp_Comps=None, equationP=None, T=None):
         Amp_Comps['Sample_ID_Amp'] = Amp_Comps.index
 
     if equationP == "P_Mutch2016":
-        ox23 = calculate_amphibole_23oxygens(Amp_Comps)
-        Amp_sites_initial = get_amp_sites_Mutch(ox23)
-        norm_cat = amp_components_ferric_ferrous_Mutch(Amp_sites_initial, ox23)
-        final_cat = get_amp_sites_ferric_ferrous_Mutch(norm_cat)
+        ox23 = calculate_23oxygens_amphibole(Amp_Comps)
+        Amp_sites_initial = get_amp_sites_mutch(ox23)
+        norm_cat = amp_components_ferric_ferrous_mutch(Amp_sites_initial, ox23)
+        final_cat = get_amp_sites_ferric_ferrous_mutch(norm_cat)
         final_cat['Al_tot'] = final_cat['Al_T'] + final_cat['Al_C']
         P_kbar = 0.5 + 0.331 * \
             final_cat['Al_tot'] + 0.995 * (final_cat['Al_tot'])**2
@@ -785,7 +785,7 @@ def calculate_Amp_only_Press(Amp_Comps=None, equationP=None, T=None):
         return final_cat
 
     if 'Ridolfi2012' in equationP or equationP == "P_Ridolfi2021":
-        cat13 = calculate_amphibole_13cations_Ridolfi(Amp_Comps)
+        cat13 = calculate_13cations_amphibole_ridolfi(Amp_Comps)
         myAmps1_label = Amp_Comps.drop(['Sample_ID_Amp'], axis='columns')
         Sum_input = myAmps1_label.sum(axis='columns')
 
@@ -873,7 +873,7 @@ def calculate_Amp_only_Press(Amp_Comps=None, equationP=None, T=None):
         return P_kbar
 
     if equationP != "Mutch2016" and 'Ridolfi2012' not in equationP and equationP != "P_Ridolfi2021":
-        ox23_amp = calculate_amphibole_23oxygens(Amp_Comps=Amp_Comps)
+        ox23_amp = calculate_23oxygens_amphibole(Amp_Comps=Amp_Comps)
 
     kwargs = {name: ox23_amp[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
     if isinstance(T, str) or T is None:
@@ -1028,7 +1028,7 @@ Amp_only_T_funcs_by_name= {p.__name__: p for p in Amp_only_T_funcs}
 
 
 
-def calculate_Amp_only_Temp(Amp_Comps, equationT, P=None):
+def calculate_amp_only_temp(Amp_Comps, equationT, P=None):
     '''
     Amphibole-only thermometry, calculates temperature in Kelvin.
 
@@ -1074,7 +1074,7 @@ def calculate_Amp_only_Temp(Amp_Comps, equationT, P=None):
         if P is None:
             raise Exception(
                 'You have selected a P-dependent thermometer, please enter an option for P')
-        cat13 = calculate_amphibole_13cations_Ridolfi(Amp_Comps)
+        cat13 = calculate_13cations_amphibole_ridolfi(Amp_Comps)
         myAmps1_label = Amp_Comps.drop(['Sample_ID_Amp'], axis='columns')
         Sum_input = myAmps1_label.sum(axis='columns')
 
@@ -1082,7 +1082,7 @@ def calculate_Amp_only_Temp(Amp_Comps, equationT, P=None):
             T_Ridolfi2012).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
 
     else:
-        amp_comps =calculate_amphibole_23oxygens(Amp_Comps=Amp_Comps)
+        amp_comps =calculate_23oxygens_amphibole(Amp_Comps=Amp_Comps)
         kwargs = {name: amp_comps[name] for name, p in sig.parameters.items()
         if p.kind == inspect.Parameter.KEYWORD_ONLY}
 
@@ -1101,7 +1101,7 @@ def calculate_Amp_only_Temp(Amp_Comps, equationT, P=None):
 
 ## Function: PT Iterate Amphibole - only
 
-def calculate_Amp_only_PT_Iter(Amp_Comps, equationT, equationP, iterations=30, T_K_guess=1300):
+def calculate_amp_only_pt(Amp_Comps, equationT, equationP, iterations=30, T_K_guess=1300):
     '''
     Solves simultaneous equations for temperature and pressure using
     amphibole only thermometers and barometers.
@@ -1157,11 +1157,11 @@ def calculate_Amp_only_PT_Iter(Amp_Comps, equationT, equationP, iterations=30, T
     -------
     panda.dataframe: Pressure in Kbar, Temperature in K
     '''
-    T_func = calculate_Amp_only_Temp(Amp_Comps=Amp_Comps, equationT=equationT, P="Solve")
+    T_func = calculate_amp_only_temp(Amp_Comps=Amp_Comps, equationT=equationT, P="Solve")
     if equationP !="P_Ridolfi2021" and equationP != "P_Mutch2016":
-        P_func = calculate_Amp_only_Press(Amp_Comps=Amp_Comps, equationP=equationP, T="Solve")
+        P_func = calculate_amp_only_press(Amp_Comps=Amp_Comps, equationP=equationP, T="Solve")
     else:
-        P_func = calculate_Amp_only_Press(Amp_Comps=Amp_Comps, equationP=equationP, T="Solve").P_kbar_calc
+        P_func = calculate_amp_only_press(Amp_Comps=Amp_Comps, equationP=equationP, T="Solve").P_kbar_calc
     if isinstance(T_func, pd.Series) and isinstance(P_func, pd.Series):
         P_guess = P_func
         T_K_guess = T_func
@@ -1190,7 +1190,7 @@ Amp_Liq_P_funcs = {P_Put2016_eq7a, P_Put2016_eq7b, P_Put2016_eq7c}
 Amp_Liq_P_funcs_by_name = {p.__name__: p for p in Amp_Liq_P_funcs}
 
 
-def calculate_Amp_Liq_Press(*, Amp_Comps=None, Liq_Comps=None,
+def calculate_amp_liq_press(*, Amp_Comps=None, Liq_Comps=None,
                             MeltMatch=None, equationP=None, T=None,
                              Eq_Tests=False, H2O_Liq=None):
     '''
@@ -1255,7 +1255,7 @@ def calculate_Amp_Liq_Press(*, Amp_Comps=None, Liq_Comps=None,
         if H2O_Liq is not None:
             Liq_Comps_c['H2O_Liq'] = H2O_Liq
 
-        amp_comps = calculate_amphibole_23oxygens(Amp_Comps=Amp_Comps)
+        amp_comps = calculate_23oxygens_amphibole(Amp_Comps=Amp_Comps)
         liq_comps_hy = calculate_hydrous_cat_fractions_liquid(
             Liq_Comps=Liq_Comps_c)
         liq_comps_an = calculate_anhydrous_cat_fractions_liquid(
@@ -1295,7 +1295,7 @@ Amp_Liq_T_funcs = {T_Put2016_eq4b,  T_Put2016_eq4a_amp_sat, T_Put2016_eq9}
 
 Amp_Liq_T_funcs_by_name = {p.__name__: p for p in Amp_Liq_T_funcs}
 
-def calculate_Amp_Liq_Temp(*, Amp_Comps=None, Liq_Comps=None, equationT=None,
+def calculate_amp_liq_temp(*, Amp_Comps=None, Liq_Comps=None, equationT=None,
 P=None, H2O_Liq=None, Eq_Tests=False):
     '''
     Amphibole-liquid thermometers. Returns temperature in Kelvin.
@@ -1353,7 +1353,7 @@ P=None, H2O_Liq=None, Eq_Tests=False):
         if H2O_Liq is not None:
             Liq_Comps_c['H2O_Liq'] = H2O_Liq
 
-    amp_comps = calculate_amphibole_23oxygens(Amp_Comps=Amp_Comps)
+    amp_comps = calculate_23oxygens_amphibole(Amp_Comps=Amp_Comps)
     liq_comps_hy = calculate_hydrous_cat_fractions_liquid(Liq_Comps=Liq_Comps_c)
     liq_comps_an = calculate_anhydrous_cat_fractions_liquid(Liq_Comps=Liq_Comps_c)
     Combo_liq_amps = pd.concat([amp_comps, liq_comps_hy, liq_comps_an], axis=1)
@@ -1391,7 +1391,7 @@ P=None, H2O_Liq=None, Eq_Tests=False):
 ## Function for amphibole-liquid PT iter (although technically not needed)
 
 
-def calculate_Amp_Liq_PT_Iter(Liq_Comps, Amp_Comps, equationT, equationP, iterations=30,
+def calculate_amp_liq_pt(Liq_Comps, Amp_Comps, equationT, equationP, iterations=30,
 T_K_guess=1300, H2O_Liq=None, Eq_Tests=False):
     '''
     Solves simultaneous equations for temperature and pressure using
@@ -1440,10 +1440,10 @@ T_K_guess=1300, H2O_Liq=None, Eq_Tests=False):
     if H2O_Liq is not None:
         Liq_Comps_c['H2O_Liq']=H2O_Liq
 
-    T_func = calculate_Amp_Liq_Temp(Liq_Comps=Liq_Comps_c,
+    T_func = calculate_amp_liq_temp(Liq_Comps=Liq_Comps_c,
     Amp_Comps=Amp_Comps, equationT=equationT, P="Solve")
 
-    P_func = calculate_Amp_Liq_Press(Liq_Comps=Liq_Comps_c,
+    P_func = calculate_amp_liq_press(Liq_Comps=Liq_Comps_c,
     Amp_Comps=Amp_Comps, equationP=equationP, T="Solve")
 
     if isinstance(T_func, pd.Series) and isinstance(P_func, pd.Series):

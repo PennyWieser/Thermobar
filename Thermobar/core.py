@@ -424,7 +424,7 @@ def calculate_anhydrous_cat_fractions_liquid(Liq_Comps):
 
 # Liquid Mgno function
 
-def calculate_Liq_Mgno(Liq_Comps, Fe3FeT_Liq=None):
+def calculate_liq_mgno(Liq_Comps, Fe3FeT_Liq=None):
     '''
     Calculates Liquid Mg#
 
@@ -578,7 +578,6 @@ def calculate_hydrous_cat_fractions_liquid(Liq_Comps):
 
     return cat_frac_hyd
 
-    return cat_frac_anhyd
 # Calculating Liquid mole and cation fractions including Ni for Pu et al.
 # 2017 and 2019
 
@@ -637,7 +636,7 @@ def calculate_anhydrous_mol_fractions_liquid_Ni(Liq_Comps):
     return mol_frac_anhyd
 
 
-def calculate_mol_proportions_olivine_Ni(Ol_Comps):
+def calculate_mol_proportions_olivine_ni(Ol_Comps):
     '''Import Olivine compositions using Ol_Comps=My_Olivines, returns mole proportions
 
    Parameters
@@ -664,7 +663,7 @@ def calculate_mol_proportions_olivine_Ni(Ol_Comps):
     return mol_prop_anhyd
 
 
-def calculate_mol_fractions_olivine_Ni(Ol_Comps):
+def calculate_mol_fractions_olivine_ni(Ol_Comps):
     '''Import Olivine compositions using Ol_Comps=My_Olivines, returns mole fractions
 
    Parameters
@@ -679,7 +678,7 @@ def calculate_mol_fractions_olivine_Ni(Ol_Comps):
         mole fractions for olivines with column headings of the form SiO2_Ol_mol_frac
 
     '''
-    mol_prop = calculate_mol_proportions_olivine_Ni(Ol_Comps=Ol_Comps)
+    mol_prop = calculate_mol_proportions_olivine_ni(Ol_Comps=Ol_Comps)
     mol_prop['sum'] = mol_prop.sum(axis='columns')
     mol_frac_anhyd = mol_prop.div(mol_prop['sum'], axis='rows')
     mol_frac_anhyd.drop(['sum'], axis='columns', inplace=True)
@@ -856,7 +855,7 @@ def calculate_oxygens_orthopyroxene(Opx_Comps):
     return oxygens_anhyd
 
 
-def calculate_orthopyroxene_6oxygens(Opx_Comps):
+def calculate_6oxygens_orthopyroxene(Opx_Comps):
     '''Import orthopyroxene compositions using Opx_Comps=My_Opxs, returns cations on the basis of 6 oxygens.
 
    Parameters
@@ -919,7 +918,7 @@ def calculate_orthopyroxene_components(Opx_Comps):
 
     '''
 
-    opx_calc = calculate_orthopyroxene_6oxygens(Opx_Comps=Opx_Comps)
+    opx_calc = calculate_6oxygens_orthopyroxene(Opx_Comps=Opx_Comps)
     # Sum of cations, used to filter bad analyses
     opx_calc['Cation_Sum_Opx'] = (opx_calc['SiO2_Opx_cat_6ox'] + opx_calc['TiO2_Opx_cat_6ox'] + opx_calc['Al2O3_Opx_cat_6ox'] + opx_calc['FeOt_Opx_cat_6ox']
                                   + opx_calc['MnO_Opx_cat_6ox'] + opx_calc['MgO_Opx_cat_6ox'] +
@@ -1069,7 +1068,7 @@ def calculate_oxygens_clinopyroxene(Cpx_Comps):
     return oxygens_anhyd
 
 
-def calculate_clinopyroxene_6oxygens(Cpx_Comps):
+def calculate_6oxygens_clinopyroxene(Cpx_Comps):
     '''Import clinopyroxene compositions using Cpx_Comps=My_Cpxs, returns cations on the basis of 6 oxygens.
 
    Parameters
@@ -1128,7 +1127,7 @@ def calculate_clinopyroxene_components(Cpx_Comps):
         Clinopyroxene components (column headings: Cation_Sum, CrCaTs, a_cpx_En, Mgno_CPX, Jd, CaTs, CaTi, DiHd_1996, DiHd_2003, En_Fs), cations on bases of 6 oxygens (column headings of form  Cr2O3_Cpx_cat_6ox), as well as inputted Cpx compositions (column headings of form MgO_Cpx)
 
     '''
-    cpx_calc = calculate_clinopyroxene_6oxygens(Cpx_Comps=Cpx_Comps)
+    cpx_calc = calculate_6oxygens_clinopyroxene(Cpx_Comps=Cpx_Comps)
 
     # Sum of cations, used by Neave and Putirka (2017) to filter out bad
     # clinopyroxene analyses
@@ -1503,7 +1502,7 @@ def calculate_cat_proportions_kspar(*, Kspar_Comps=None):
     return cation_prop_anhyd
 
 
-def calculate_cat_fractions_Kspar(*, Kspar_Comps=None):
+def calculate_cat_fractions_kspar(*, Kspar_Comps=None):
     '''Import AlkaliFspar compositions using Kspar_Comps=My_kspars, returns cation fractions
 
    Parameters
@@ -1647,7 +1646,7 @@ def calculate_oxygens_amphibole(Amp_Comps):
     return oxygens_anhyd
 
 
-def calculate_amphibole_23oxygens(Amp_Comps):
+def calculate_23oxygens_amphibole(Amp_Comps):
     '''Import amphibole compositions using Amp_Comps=My_Amps, returns cations on the basis of 23 oxygens.
 
    Parameters
@@ -1693,7 +1692,7 @@ def calculate_amphibole_23oxygens(Amp_Comps):
 # Ridolfi Amphiboles, using Cl and F, does on 13 cations.
 
 
-def calculate_mol_proportions_amphibole_Ridolfi(Amp_Comps):
+def calculate_mol_proportions_amphibole_ridolfi(Amp_Comps):
     '''Import amphibole compositions using Amp_Comps=My_amphiboles, returns mole proportions
 
    Parameters
@@ -1722,7 +1721,7 @@ def calculate_mol_proportions_amphibole_Ridolfi(Amp_Comps):
     return mol_prop_anhyd
 
 
-def calculate_cat_proportions_amphibole_Ridolfi(*, Amp_Comps=None):
+def calculate_cat_proportions_amphibole_ridolfi(*, Amp_Comps=None):
     '''Import amphibole compositions using Amp_Comps=My_amphiboles, returns cation proportions
 
    Parameters
@@ -1740,7 +1739,7 @@ def calculate_cat_proportions_amphibole_Ridolfi(*, Amp_Comps=None):
 
     '''
 
-    amp_prop_no_cat_num = calculate_mol_proportions_amphibole_Ridolfi(
+    amp_prop_no_cat_num = calculate_mol_proportions_amphibole_ridolfi(
         Amp_Comps=Amp_Comps)
     amp_prop_no_cat_num.columns = [str(col).replace(
         '_mol_prop', '') for col in amp_prop_no_cat_num.columns]
@@ -1754,7 +1753,7 @@ def calculate_cat_proportions_amphibole_Ridolfi(*, Amp_Comps=None):
     return cation_prop_anhyd
 
 
-def calculate_amphibole_13cations_Ridolfi(Amp_Comps):
+def calculate_13cations_amphibole_ridolfi(Amp_Comps):
     '''Import amphibole compositions using Amp_Comps=My_amphiboles, returns
     components calculated on basis of 13 cations following Ridolfi supporting information
 
@@ -1770,7 +1769,7 @@ def calculate_amphibole_13cations_Ridolfi(Amp_Comps):
         cation fractions for amphiboles with column headings of the form SiO2_Amp_13_cat...
 
     '''
-    cats = calculate_cat_proportions_amphibole_Ridolfi(Amp_Comps=Amp_Comps)
+    cats = calculate_cat_proportions_amphibole_ridolfi(Amp_Comps=Amp_Comps)
     cats['cation_sum_Si_Mg'] = (cats['SiO2_Amp_cat_prop'] + cats['TiO2_Amp_cat_prop'] + cats['Al2O3_Amp_cat_prop'] +
                                 cats['Cr2O3_Amp_cat_prop'] + cats['FeOt_Amp_cat_prop'] + cats['MnO_Amp_cat_prop'] + cats['MgO_Amp_cat_prop'])
     sum_SiMg = cats['cation_sum_Si_Mg']
@@ -1784,7 +1783,7 @@ def calculate_amphibole_13cations_Ridolfi(Amp_Comps):
 
 ## Equilibrium tests clinopyroxene
 
-def calculate_Cpx_Eq_Tests(*, MeltMatch=None, Liq_Comps=None, Cpx_Comps=None,
+def calculate_cpx_eq_tests(*, MeltMatch=None, Liq_Comps=None, Cpx_Comps=None,
                            Fe3FeT_Liq=None, P=None, T=None, sigma=1, KdErr=0.03):
     '''
     Calculates Kd Fe-Mg, EnFs, DiHd, CaTs for cpx-liquid pairs
@@ -1901,7 +1900,7 @@ def calculate_Cpx_Eq_Tests(*, MeltMatch=None, Liq_Comps=None, Cpx_Comps=None,
     return Combo_liq_cpxs
 
 
-def calculate_Cpx_Opx_Equilibrium_Tests(Cpx_Comps, Opx_Comps):
+def calculate_cpx_opx_equilibrium_tests(Cpx_Comps, Opx_Comps):
     '''
     Import Cpx and Opx compositions, assesses degree of Fe-Mg disequilibrium.
     Parameters
@@ -2080,7 +2079,7 @@ P, T):
 
 ## Feldspar compnents of Elkins and Grove, adapted directly from Putirka (2008) supplementay spreadsheet
 
-def calculate_Fspar_activity_components(*, Ab_Plag, Or_Plag, An_Plag, Ab_Kspar, Or_Kspar, An_Kspar, T, P):
+def calculate_fspar_activity_components(*, Ab_Plag, Or_Plag, An_Plag, Ab_Kspar, Or_Kspar, An_Kspar, T, P):
 
     E_G_1990_Kspar_aAb1=(22820-T*6.3+0.461*1000*P)*(2*Ab_Kspar*Or_Kspar*(1-Ab_Kspar)+Or_Kspar*An_Kspar*(0.5-Ab_Kspar))
     E_G_1990_Kspar_aAb2=(19550-T*10.5+0.327*1000*P)*(Or_Kspar**2*(1-2*Ab_Kspar)+Or_Kspar*An_Kspar*(0.5-Ab_Kspar))
@@ -2157,7 +2156,7 @@ def calculate_Fspar_activity_components(*, Ab_Plag, Or_Plag, An_Plag, Ab_Kspar, 
     return Components
 
 
-def calculate_Plag_Components(*, CaO_Liq_cat_frac, H2O_Liq, Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac,
+def calculate_plag_components(*, CaO_Liq_cat_frac, H2O_Liq, Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac,
     SiO2_Liq_cat_frac, K2O_Liq_cat_frac, T, P, An_Plag, Ab_Plag, Mg_Number_Liq_NoFe3, MgO_Liq_cat_frac):
 
     An_Pred=np.exp(-3.485+22.93*CaO_Liq_cat_frac+0.0805*H2O_Liq+1.0925*CaO_Liq_cat_frac/(CaO_Liq_cat_frac+Na2O_Liq_cat_frac)
