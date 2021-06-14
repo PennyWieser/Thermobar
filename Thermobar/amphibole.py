@@ -1101,7 +1101,7 @@ def calculate_amp_only_temp(amp_comps, equationT, P=None):
 
 ## Function: PT Iterate Amphibole - only
 
-def calculate_amp_only_pt(amp_comps, equationT, equationP, iterations=30, T_K_guess=1300):
+def calculate_amp_only_press_temp(amp_comps, equationT, equationP, iterations=30, T_K_guess=1300):
     '''
     Solves simultaneous equations for temperature and pressure using
     amphibole only thermometers and barometers.
@@ -1191,7 +1191,7 @@ Amp_Liq_P_funcs_by_name = {p.__name__: p for p in Amp_Liq_P_funcs}
 
 
 def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
-                            MeltMatch=None, equationP=None, T=None,
+                            meltmatch=None, equationP=None, T=None,
                              eq_tests=False, H2O_Liq=None):
     '''
     Amphibole-liquid barometer. Returns pressure in kbar
@@ -1248,20 +1248,20 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
                 raise ValueError('The panda series entered for Temperature isnt the same length as the dataframe of liquid compositions')
 
 
-    if MeltMatch is not None:
-        Combo_liq_amps = MeltMatch
+    if meltmatch is not None:
+        Combo_liq_amps = meltmatch
     if liq_comps is not None and amp_comps is not None:
         liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
 
-        amp_comps = calculate_23oxygens_amphibole(amp_comps=amp_comps)
+        amp_comps_23 = calculate_23oxygens_amphibole(amp_comps=amp_comps)
         liq_comps_hy = calculate_hydrous_cat_fractions_liquid(
             liq_comps=liq_comps_c)
         liq_comps_an = calculate_anhydrous_cat_fractions_liquid(
             liq_comps=liq_comps_c)
         Combo_liq_amps = pd.concat(
-            [amp_comps, liq_comps_hy, liq_comps_an], axis=1)
+            [amp_comps_23, liq_comps_hy, liq_comps_an], axis=1)
 
 
     kwargs = {name: Combo_liq_amps[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -1353,10 +1353,10 @@ P=None, H2O_Liq=None, eq_tests=False):
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
 
-    amp_comps = calculate_23oxygens_amphibole(amp_comps=amp_comps)
+    amp_comps_23 = calculate_23oxygens_amphibole(amp_comps=amp_comps)
     liq_comps_hy = calculate_hydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
     liq_comps_an = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
-    Combo_liq_amps = pd.concat([amp_comps, liq_comps_hy, liq_comps_an], axis=1)
+    Combo_liq_amps = pd.concat([amp_comps_23, liq_comps_hy, liq_comps_an], axis=1)
     kwargs = {name: Combo_liq_amps[name] for name, p in sig.parameters.items()
     if p.kind == inspect.Parameter.KEYWORD_ONLY}
 
@@ -1375,8 +1375,8 @@ P=None, H2O_Liq=None, eq_tests=False):
         return T_K
     if eq_tests is True:
         MolProp=calculate_mol_proportions_amphibole(amp_comps=amp_comps)
-        Kd=(MolProp['FeOt_Amp_mol_prop']/MolProp['MgO_Amp_mol_prop'])/(liq_comps_hy['FeOt_Liq_mol_frac_hyd']/liq_comps_hy['MgO_Liq_mol_frac_hyd'])
-
+        Kd=((MolProp['FeOt_Amp_mol_prop']/MolProp['MgO_Amp_mol_prop'])/
+        (liq_comps_hy['FeOt_Liq_mol_frac_hyd']/liq_comps_hy['MgO_Liq_mol_frac_hyd']))
 
         b = np.empty(len(MolProp), dtype=str)
         for i in range(0, len(MolProp)):
@@ -1391,7 +1391,7 @@ P=None, H2O_Liq=None, eq_tests=False):
 ## Function for amphibole-liquid PT iter (although technically not needed)
 
 
-def calculate_amp_liq_pt(liq_comps, amp_comps, equationT, equationP, iterations=30,
+def calculate_amp_liq_press_temp(liq_comps, amp_comps, equationT, equationP, iterations=30,
 T_K_guess=1300, H2O_Liq=None, eq_tests=False):
     '''
     Solves simultaneous equations for temperature and pressure using

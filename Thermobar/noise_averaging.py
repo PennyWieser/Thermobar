@@ -7,7 +7,7 @@ import numbers
 import pandas as pd
 from Thermobar.core import *
 
-def av_noise_samples_series(Calc, SampleID):
+def av_noise_samples_series(calc, sampleID):
     '''
     This function calculates the mean, median, standard devation, maximum and
     minimum value of rows specified by "calc" based on values in "Sample ID" where both inputs are panda series.
@@ -25,24 +25,24 @@ def av_noise_samples_series(Calc, SampleID):
     Returns
     -------
 
-    Dataframe with headings "Sample", "Mean_Calc", "Median_Calc",
-    "St_dev_calc", "Max_calc", "Min_Calc"
+    Dataframe with headings "Sample", "Mean_calc", "Median_calc",
+    "St_dev_calc", "Max_calc", "Min_calc"
 
     '''
 
-    if isinstance(Calc, pd.Series):
-        N = SampleID.unique()
+    if isinstance(calc, pd.Series):
+        N = sampleID.unique()
         Av_mean = np.empty(len(N), dtype=float)
         Av_median = np.empty(len(N), dtype=float)
         Max = np.empty(len(N), dtype=float)
         Min = np.empty(len(N), dtype=float)
         Std = np.empty(len(N), dtype=float)
         for i in range(0, len(N)):
-            Av_mean[i] = np.nanmean(Calc[SampleID == i])
-            Av_median[i] = np.nanmedian(Calc[SampleID == i])
-            Std[i] = np.nanstd(Calc[SampleID == i])
-            Min[i] = np.nanmin(Calc[SampleID == i])
-            Max[i] = np.nanmax(Calc[SampleID == i])
+            Av_mean[i] = np.nanmean(calc[sampleID == i])
+            Av_median[i] = np.nanmedian(calc[sampleID == i])
+            Std[i] = np.nanstd(calc[sampleID == i])
+            Min[i] = np.nanmin(calc[sampleID == i])
+            Max[i] = np.nanmax(calc[sampleID == i])
 
     Err_out = pd.DataFrame(data={'Sample': N, 'Mean_calc': Av_mean,
     'Median_calc': Av_median, 'St_dev_calc': Std,
@@ -69,25 +69,25 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
     Returns
     -------
 
-    Dataframe with headings "Sample", "Mean_Calc", "Median_Calc",
-    "St_dev_calc", "Max_calc", "Min_Calc"
+    Dataframe with headings "Sample", "Mean_calc", "Median_calc",
+    "St_dev_calc", "Max_calc", "Min_calc"
 
     '''
-    Calc=dataframe['calc_heading']
-    SampleID=dataframe['ID_heading']
-    if isinstance(Calc, pd.Series):
-        N = SampleID.unique()
+    calc=dataframe['calc_heading']
+    sampleID=dataframe['ID_heading']
+    if isinstance(calc, pd.Series):
+        N = sampleID.unique()
         Av_mean = np.empty(len(N), dtype=float)
         Av_median = np.empty(len(N), dtype=float)
         Max = np.empty(len(N), dtype=float)
         Min = np.empty(len(N), dtype=float)
         Std = np.empty(len(N), dtype=float)
         for i in range(0, len(N)):
-            Av_mean[i] = np.nanmean(Calc[SampleID == i])
-            Av_median[i] = np.nanmedian(Calc[SampleID == i])
-            Std[i] = np.nanstd(Calc[SampleID == i])
-            Min[i] = np.nanmin(Calc[SampleID == i])
-            Max[i] = np.nanmax(Calc[SampleID == i])
+            Av_mean[i] = np.nanmean(calc[sampleID == i])
+            Av_median[i] = np.nanmedian(calc[sampleID == i])
+            Std[i] = np.nanstd(calc[sampleID == i])
+            Min[i] = np.nanmin(calc[sampleID == i])
+            Max[i] = np.nanmax(calc[sampleID == i])
 
     Err_out = pd.DataFrame(data={'Sample': N, 'Mean_calc': Av_mean,
     'Median_calc': Av_median, 'St_dev_calc': Std,
@@ -96,13 +96,13 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
     return Err_out
 
 
-def add_noise_sample_1phase(Phase_Comp, Phase_Err=None, Phase_Err_type="Abs",
-Variable=None, Variable_Err=None, Variable_Err_type="Abs", duplicates=10,
-noise_percent=None, Err_dist="normal", Positive=True,
+def add_noise_sample_1phase(phase_comp, phase_err=None, phase_err_type="Abs",
+variable=None, variable_err=None, variable_err_type="Abs", duplicates=10,
+noise_percent=None, err_dist="normal", positive=True,
 filter_q=None, append=False):
     '''
     This function generates N duplicates containing random noise from the
-    compositions in the dataframe specified by Phase_Comp.
+    compositions in the dataframe specified by phase_comp.
 
 
     Parameters
@@ -113,7 +113,7 @@ filter_q=None, append=False):
         from the import_excel function, or any dataframe with the
         headings _Liq for liquids, _Cpx for clinopyroxenes etc.
 
-    Phase_Err_type: "Abs" (default) or "Perc"
+    phase_err_type: "Abs" (default) or "Perc"
         Determins if specified errors are absolute (Abs) or percentage errors.
 
     duplicates: flt, int (Default: 10)
@@ -123,12 +123,12 @@ filter_q=None, append=False):
         If append=True, the original dataframe is appended onto the end of the
         returned dataframe
 
-    Err_dist: "normal" (default) or "uniform"
+    err_dist: "normal" (default) or "uniform"
         determins whether added error is normally distributed with
         1 sigma = entered value.
         Or uniformly distributed between +noise value and - noise value.
 
-    Positive: True (default) or False
+    positive: True (default) or False
         If True, doesn't allow negative values of oxide species,
         temperature or pressure. Can result in a non-normally distributed
         error distribution. If False, negative values are allowed.
@@ -145,22 +145,22 @@ filter_q=None, append=False):
 
     1) If you want to specifying an error for >1 variable:
 
-        Phase_Err: pandas dataframe
+        phase_err: pandas dataframe
             Pandas dataframe with headings for the error of the oxide in each
             phase (e.g., SiO2_Liq_Err, or SiO2_Cpx_Err).
             This dataframe can be generated from a user-inputted spreadsheet
             with these column headings using the function import_excel_errors.
             Errors can be absolute, or percentage errors.
             the default is absolute errors (in wt%), but users can overwrite
-            this using Phase_Err_Type="Perc".
+            this using phase_err_Type="Perc".
 
 
     2) If you want to specify error for a single variable:
 
-        Variable: str
+        variable: str
             Name of column you wish to add error to (e.g. Na2O_Liq)
 
-        Variable_Err: flt, int
+        variable_err: flt, int
             Specifies how much error to add
 
     3) If you want to add a fixed percent of noise to all variables.
@@ -181,19 +181,19 @@ filter_q=None, append=False):
 
     '''
 
-    if Variable is not None and noise_percent is not None:
+    if variable is not None and noise_percent is not None:
         raise Exception('noise_percent is an arguement on its own '
-        'it adds noise to all variables. Either specify Variable or '
+        'it adds noise to all variables. Either specify variable or '
         'noise_percent not both')
-    if Variable_Err is not None and noise_percent is not None:
+    if variable_err is not None and noise_percent is not None:
         raise Exception('noise_percent adds noise to all variables' \
-        'while Variable_Err adds noise to a single variable'\
+        'while variable_err adds noise to a single variable'\
         'specify only one of these arguements')
     if filter_q is not None:
-        Sample_c = Phase_Comp.query(filter_q)
+        Sample_c = phase_comp.query(filter_q)
     else:
-        Sample_c = Phase_Comp.copy()
-    if Phase_Err is not None and noise_percent is not None:
+        Sample_c = phase_comp.copy()
+    if phase_err is not None and noise_percent is not None:
         raise Exception('You have entered both a dataframe of noise and '\
         'specified a percent noise. Select only 1 of these options')
 
@@ -214,7 +214,7 @@ filter_q=None, append=False):
         elx = 'Liq'
     if any(Sample_c.columns.str.contains("_Ol")):
         elx = 'Ol'
-    if Phase_Err is None or (Phase_Err is not None and Err_dist == "uniform"):
+    if phase_err is None or (phase_err is not None and err_dist == "uniform"):
 
         Sample_c.loc[:, 'Sample_ID_{}_Num'.format(elx)] = Sample_c.index
 
@@ -228,75 +228,75 @@ filter_q=None, append=False):
         Sample_name_num = Dup_Sample['Sample_ID_{}_Num'.format(elx)]
         Dup_Sample.drop('Sample_ID_{}_Num'.format(elx), axis=1, inplace=True)
 
-        if Variable is not None:
+        if variable is not None:
 
-            ely = Variable
-            if Variable == "P_kbar" or Variable == "T_K":
-                if Variable_Err_type == "Abs":
-                    if Err_dist == "normal":
-                        Noise = np.random.normal(0, Variable_Err,
+            ely = variable
+            if variable == "P_kbar" or variable == "T_K":
+                if variable_err_type == "Abs":
+                    if err_dist == "normal":
+                        Noise = np.random.normal(0, variable_err,
                         Dup_Sample.shape[0])
-                    if Err_dist == "uniform":
-                        Noise = np.random.uniform(- Variable_Err, +
-                        Variable_Err, Dup_Sample.shape[0])
-                if Variable_Err_type == "Perc":
-                    Variable_Err_abs = Dup_Sample['{}'.format(
-                        ely)] * (Variable_Err / 100)
-                    if Err_dist == "normal":
+                    if err_dist == "uniform":
+                        Noise = np.random.uniform(- variable_err, +
+                        variable_err, Dup_Sample.shape[0])
+                if variable_err_type == "Perc":
+                    variable_err_abs = Dup_Sample['{}'.format(
+                        ely)] * (variable_err / 100)
+                    if err_dist == "normal":
                         Noise = np.random.normal(
-                        0, Variable_Err_abs, Dup_Sample.shape[0])
-                    if Err_dist == "uniform":
-                        Noise = np.random.uniform(- Variable_Err_abs, +
-                        Variable_Err_abs, Dup_Sample.shape[0])
+                        0, variable_err_abs, Dup_Sample.shape[0])
+                    if err_dist == "uniform":
+                        Noise = np.random.uniform(- variable_err_abs, +
+                        variable_err_abs, Dup_Sample.shape[0])
 
                 mynoisedDataframe = Dup_Sample.copy()
                 mynoisedDataframe['{}'.format(
                     ely, elx)] = mynoisedDataframe['{}'.format(ely)] + Noise
 
             else:
-                if Variable_Err_type == "Abs":
-                    if Err_dist == "normal":
+                if variable_err_type == "Abs":
+                    if err_dist == "normal":
                         Noise = np.random.normal(
-                            0, Variable_Err, Dup_Sample.shape[0])
-                    if Err_dist == "uniform":
-                        Noise = np.random.uniform(- Variable_Err, +
-                                                  Variable_Err, Dup_Sample.shape[0])
-                if Variable_Err_type == "Perc":
-                    Variable_Err_abs = Dup_Sample['{}_{}'.format(
-                        ely, elx)] * (Variable_Err / 100)
-                    if Err_dist == "normal":
+                            0, variable_err, Dup_Sample.shape[0])
+                    if err_dist == "uniform":
+                        Noise = np.random.uniform(- variable_err, +
+                                                  variable_err, Dup_Sample.shape[0])
+                if variable_err_type == "Perc":
+                    variable_err_abs = Dup_Sample['{}_{}'.format(
+                        ely, elx)] * (variable_err / 100)
+                    if err_dist == "normal":
                         Noise = np.random.normal(
-                            0, Variable_Err_abs, Dup_Sample.shape[0])
-                    if Err_dist == "uniform":
-                        Noise = np.random.uniform(- Variable_Err_abs, +
-                                                  Variable_Err_abs, Dup_Sample.shape[0])
+                            0, variable_err_abs, Dup_Sample.shape[0])
+                    if err_dist == "uniform":
+                        Noise = np.random.uniform(- variable_err_abs, +
+                                                  variable_err_abs, Dup_Sample.shape[0])
                 mynoisedDataframe = Dup_Sample.copy()
                 mynoisedDataframe['{}_{}'.format(
                     ely, elx)] = mynoisedDataframe['{}_{}'.format(ely, elx)] + Noise
 
-        if noise_percent is not None and Err_dist == "uniform":
+        if noise_percent is not None and err_dist == "uniform":
             noise = np.random.uniform(- noise_percent /
                                       100, + noise_percent / 100, Dup_Sample.shape)
             mynoisedDataframe = Dup_Sample + Dup_Sample * noise
-        if noise_percent is not None and Err_dist == "normal":
+        if noise_percent is not None and err_dist == "normal":
             noise = np.random.normal(0, noise_percent / 100, Dup_Sample.shape)
             mynoisedDataframe = Dup_Sample + Dup_Sample * noise
 
         mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
 
-        if Phase_Err is not None and Err_dist == "uniform":
-            Sample_Err = Phase_Err.copy()
+        if phase_err is not None and err_dist == "uniform":
+            Sample_Err = phase_err.copy()
             Dup_Noise = pd.DataFrame(
                 np.repeat(Sample_Err.values, duplicates, axis=0))
             Dup_Noise.columns = Sample_Err.columns
             noise = np.random.uniform(1, -1, Dup_Noise.shape)
             mynoisedDataframe = (Dup_Noise * noise).to_numpy() + Dup_Sample
 
-    if Phase_Err is not None and Err_dist == "normal":
+    if phase_err is not None and err_dist == "normal":
 
         # This is for when users enter 2 dataframes, 1 of measurements, 1 of 1
         # sigma errors
-        Data = Phase_Comp
+        Data = phase_comp
 
         SiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
         TiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
@@ -315,10 +315,10 @@ filter_q=None, append=False):
         T_K_Err = np.empty((duplicates * len(Data)), dtype=float)
         Sample_name_num = np.empty((duplicates * len(Data)), dtype=float)
 
-        if Phase_Err_type == "Abs":
-            Err = Phase_Err
-        if Phase_Err_type == "Perc":
-            Err_perc = Phase_Err.copy()
+        if phase_err_type == "Abs":
+            Err = phase_err
+        if phase_err_type == "Perc":
+            Err_perc = phase_err.copy()
             # removing headings so can multiply 2 pandas
             Err_perc.columns = Err_perc.columns.str.replace('_Err', '')
             Err = Data * (Err_perc / 100)
@@ -417,10 +417,10 @@ filter_q=None, append=False):
         mynoisedDataframe['T_K'] = T_K_Err
 
         mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
-        if Positive is True:
+        if positive is True:
             mynoisedDataframe[mynoisedDataframe < 0] = 0
             print('All negative numbers replaced with zeros. '\
-             'If you wish to keep these, set Positive=False')
+             'If you wish to keep these, set positive=False')
     if append is True:
         mynoisedDataframe2 = pd.concat([Sample_c, mynoisedDataframe], axis=0)
         return mynoisedDataframe2

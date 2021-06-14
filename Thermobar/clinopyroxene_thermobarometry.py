@@ -279,7 +279,7 @@ P_Mas2013_Palk2012, P_Wieser2021_H2O_indep, P_Neave2017} # put on outside
 Cpx_Liq_P_funcs_by_name = {p.__name__: p for p in Cpx_Liq_P_funcs}
 
 
-def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, MeltMatch=None,
+def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltmatch=None,
                             T=None, eq_tests=False, Fe3FeT_Liq=None, H2O_Liq=None,
                            sigma=1, KdErr=0.03):
     '''
@@ -298,9 +298,9 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, MeltMa
 
     Or:
 
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Combined dataframe of cpx-Liquid compositions
-        Used for calculate_cpx_liq_pt_matching function.
+        Used for calculate_cpx_liq_press_temp_matching function.
 
     EquationP: str
         Cpx-Liquid
@@ -373,7 +373,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, MeltMa
             w.warn('Some Fe3FeT_Liq are greater than 0. Masotta et al. (2013)'
             ' calibrate their equations assuming all Fe is Fe2+. '
             'You should set Fe3FeT_Liq=0 in the function for consistency. ')
-        if MeltMatch is not None and np.max(MeltMatch['Fe3FeT_Liq']) > 0:
+        if meltmatch is not None and np.max(meltmatch['Fe3FeT_Liq']) > 0:
             w.warn('Some Fe3FeT_Liq are greater than 0. Masotta et al. (2013)'
             ' calibrate their equations assuming all Fe is Fe2+. '
             'You should set Fe3FeT_Liq=0 in the function for consistency. ')
@@ -381,8 +381,8 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, MeltMa
 
 
 
-    if MeltMatch is not None:
-        Combo_liq_cpxs = MeltMatch
+    if meltmatch is not None:
+        Combo_liq_cpxs = meltmatch
     if liq_comps is not None:
         Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(
             liq_comps=liq_comps_c, cpx_comps=cpx_comps)
@@ -422,11 +422,11 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, MeltMa
         if isinstance(P_kbar, partial):
             raise TypeError('cant calculate equilibrium tests if P_kbar isnt numerical'
             'e.g., if you havent specified a T for a T-dependent thermometer')
-        if MeltMatch is None:
+        if meltmatch is None:
             eq_tests = calculate_cpx_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P_kbar, T=T, sigma=sigma, KdErr=KdErr)
-        if MeltMatch is not None:
-            eq_tests = calculate_cpx_eq_tests(MeltMatch=MeltMatch,
+        if meltmatch is not None:
+            eq_tests = calculate_cpx_eq_tests(meltmatch=meltmatch,
             Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
         eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
         return eq_tests
@@ -439,7 +439,7 @@ T_Mas2013_Talk2012, T_Brug2019} # put on outside
 
 Cpx_Liq_T_funcs_by_name = {p.__name__: p for p in Cpx_Liq_T_funcs}
 
-def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, MeltMatch=None,
+def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmatch=None,
                            P=None, eq_tests=False, H2O_Liq=None, Fe3FeT_Liq=None,
                            sigma=1, KdErr=0.03):
     '''
@@ -455,9 +455,9 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, MeltMat
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
     Or:
 
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Combined dataframe of cpx-Liquid compositions
-        Used for calculate_cpx_liq_pt_matching function.
+        Used for calculate_cpx_liq_press_temp_matching function.
 
     EquationT: str
         Choice of equation:
@@ -520,8 +520,8 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, MeltMat
 
 
 
-    if MeltMatch is not None:
-        Combo_liq_cpxs = MeltMatch
+    if meltmatch is not None:
+        Combo_liq_cpxs = meltmatch
 
     if liq_comps is not None:
         liq_comps_c = liq_comps.copy()
@@ -580,11 +580,11 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, MeltMat
         if isinstance(T_K, partial):
             raise TypeError('cant calculate equilibrium tests if T_K isnt numerical'
             'e.g., if you havent specified a P for a P-dependent thermometer')
-        if MeltMatch is None:
+        if meltmatch is None:
             eq_tests = calculate_cpx_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
-        if MeltMatch is not None:
-            eq_tests = calculate_cpx_eq_tests(MeltMatch=MeltMatch,
+        if meltmatch is not None:
+            eq_tests = calculate_cpx_eq_tests(meltmatch=meltmatch,
             Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
         eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
         return eq_tests
@@ -592,7 +592,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, MeltMat
 
 ## Function for iterating P and T
 
-def calculate_cpx_liq_pt(*, liq_comps=None, cpx_comps=None, MeltMatch=None, equationP=None, equationT=None,
+def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=None, equationP=None, equationT=None,
                               T=None, P=None, iterations=None, Fe3FeT_Liq=None, H2O_Liq=None, T_K_guess=1300, eq_tests=False):
     '''
     Solves simultaneous equations for temperature and pressure
@@ -602,7 +602,7 @@ def calculate_cpx_liq_pt(*, liq_comps=None, cpx_comps=None, MeltMatch=None, equa
    Parameters
     -------
 
-     cpx_comps: DataFrame (opt, either specify cpx_comps AND liq_comps or MeltMatch)
+     cpx_comps: DataFrame (opt, either specify cpx_comps AND liq_comps or meltmatch)
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     liq_comps: DataFrame
@@ -610,9 +610,9 @@ def calculate_cpx_liq_pt(*, liq_comps=None, cpx_comps=None, MeltMatch=None, equa
 
     Or
 
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Combined dataframe of cpx-Liquid compositions
-        Used for calculate_cpx_liq_pt_matching function.
+        Used for calculate_cpx_liq_press_temp_matching function.
 
     EquationP: str
         Barometer
@@ -688,7 +688,7 @@ def calculate_cpx_liq_pt(*, liq_comps=None, cpx_comps=None, MeltMatch=None, equa
     else:
         iterations = 30
 
-    if MeltMatch is None:
+    if meltmatch is None:
         liq_comps_c = liq_comps.copy()
         # This overwrites the Fe3FeT in their inputted dataframe
         if Fe3FeT_Liq is not None:
@@ -706,11 +706,11 @@ def calculate_cpx_liq_pt(*, liq_comps=None, cpx_comps=None, MeltMatch=None, equa
         P_func = calculate_cpx_liq_press(
             cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
 
-    if MeltMatch is not None:
+    if meltmatch is not None:
         T_func = calculate_cpx_liq_temp(
-            MeltMatch=MeltMatch, equationT=equationT, eq_tests=False, P="Solve")
+            meltmatch=meltmatch, equationT=equationT, eq_tests=False, P="Solve")
         P_func = calculate_cpx_liq_press(
-            MeltMatch=MeltMatch, equationP=equationP, eq_tests=False, T="Solve")
+            meltmatch=meltmatch, equationP=equationP, eq_tests=False, T="Solve")
 
     if isinstance(P_func, pd.Series) and isinstance(T_func, partial):
         P_guess = P_func
@@ -738,18 +738,18 @@ def calculate_cpx_liq_pt(*, liq_comps=None, cpx_comps=None, MeltMatch=None, equa
             data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
         return PT_out
     if eq_tests is True:
-        if MeltMatch is not None:
+        if meltmatch is not None:
             eq_tests = calculate_cpx_eq_tests(
-            MeltMatch=MeltMatch, P=P_guess, T=T_K_guess)
-        if MeltMatch is None:
+            meltmatch=meltmatch, P=P_guess, T=T_K_guess)
+        if meltmatch is None:
             eq_tests = calculate_cpx_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps, P=P_guess, T=T_K_guess)
         return eq_tests
 
 ## Clinopyroxene melt-matching algorithm
 
-def calculate_cpx_liq_pt_matching(*, liq_comps, cpx_comps, equationT=None,
-equationP=None, P=None, T=None, Eq_Crit="All", PMax=30, sigma=1,
+def calculate_cpx_liq_press_temp_matching(*, liq_comps, cpx_comps, equationT=None,
+equationP=None, P=None, T=None, eq_crit="All", PMax=30, sigma=1,
 Fe3FeT_Liq=None, KdErr=0.03, KdMatch=None, Cpx_Quality=False,
 H2O_Liq=None, Return_All_Matches=False):
 
@@ -799,7 +799,7 @@ H2O_Liq=None, Return_All_Matches=False):
 
     Optional:
 
-    Eq_Crit: str, optional
+    eq_crit: str, optional
 
         If None (default): Doesn't apply any filters
         If "All": applies the 4 equilibrium tests of Neave et al: KdFe-Mg, DiHd, EnFs, CaTs. Kd Fe-Mg calculated based on what you specify in KdMatch
@@ -843,7 +843,7 @@ H2O_Liq=None, Return_All_Matches=False):
 
     Returns: dict
 
-        Averaged_PTs: Average P and T for each cpx.
+        Av_PTs: Average P and T for each cpx.
         E.g., if cpx1 matches Liq1, Liq4, Liq6, Liq10, averages outputs for all 4 of those liquids.
         Returns mean and 1 sigma of these averaged parameters for each Cpx.
 
@@ -880,7 +880,7 @@ H2O_Liq=None, Return_All_Matches=False):
     if sigma is not None:
         sigma = sigma
 
-    # Calculating Cpx and liq components.
+    # calculating Cpx and liq components.
     myCPXs1_concat = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
     myLiquids1_concat = calculate_anhydrous_cat_fractions_liquid(
         liq_comps=liq_comps_c)
@@ -908,8 +908,8 @@ H2O_Liq=None, Return_All_Matches=False):
     print("Considering " + LenCombo +
           " Liq-Cpx pairs, be patient if this is >>1 million!")
 
-    # Calculate clinopyroxene-liquid components for this merged dataframe
-    Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(MeltMatch=Combo_liq_cpxs)
+    # calculate clinopyroxene-liquid components for this merged dataframe
+    Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(meltmatch=Combo_liq_cpxs)
 
     # This returns the stiched dataframe of cpx-liq, no P or T yet.
     if Return_All_Matches is True:
@@ -923,13 +923,13 @@ H2O_Liq=None, Return_All_Matches=False):
 
         if P is not None:
             Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
-            T_K_calc = calculate_cpx_liq_temp(MeltMatch=Combo_liq_cpxs,
+            T_K_calc = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs,
             equationT=equationT, P=P)
             P_guess = P
             T_K_guess = T_K_calc
         if T is not None:
             Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
-            P_kbar_calc = calculate_cpx_opx_temp(MeltMatch=Combo_liq_cpxs,
+            P_kbar_calc = calculate_cpx_opx_temp(meltmatch=Combo_liq_cpxs,
             equationP=equationP, T=T)
             P_guess = P_kbar_calc
             T_K_guess = T
@@ -951,14 +951,14 @@ H2O_Liq=None, Return_All_Matches=False):
             if Cpx_Quality is False:
                 Combo_liq_cpxs_2 = Combo_liq_cpxs.copy()
 
-            if Eq_Crit is None:
+            if eq_crit is None:
                 Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs_2.copy()
             else:
                 Combo_liq_cpxs_2['T_Liq_MinP'] = calculate_cpx_liq_temp(
-                    MeltMatch=Combo_liq_cpxs_2, equationT=equationT, P=PMin)
+                    meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMin)
                 Combo_liq_cpxs_2['T_Liq_MaxP'] = calculate_cpx_liq_temp(
-                    MeltMatch=Combo_liq_cpxs_2, equationT=equationT, P=PMax)
-                # Calculating Delta Kd-Fe-Mg using equation 35 of Putirka 2008
+                    meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMax)
+                # calculating Delta Kd-Fe-Mg using equation 35 of Putirka 2008
                 if KdMatch is None or KdMatch == "Putirka":
                     Combo_liq_cpxs_2['Kd_MinP'] = np.exp(
                         -0.107 - 1719 / Combo_liq_cpxs_2['T_Liq_MinP'])
@@ -1001,7 +1001,7 @@ H2O_Liq=None, Return_All_Matches=False):
             # Now we have reduced down the number of calculations, we solve for
             # P and T iteratively
 
-            PT_out = calculate_cpx_liq_pt(MeltMatch=Combo_liq_cpxs_FeMgMatch,
+            PT_out = calculate_cpx_liq_press_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
             equationP=equationP, equationT=equationT)
             P_guess = PT_out['P_kbar_calc']
             T_K_guess = PT_out['T_K_calc']
@@ -1009,7 +1009,7 @@ H2O_Liq=None, Return_All_Matches=False):
         # Now, we use calculated pressures and temperatures, regardless of
         # whether we iterated or not, to calculate the other CPX components
         Combo_liq_cpxs_eq_comp = calculate_cpx_eq_tests(
-            MeltMatch=Combo_liq_cpxs_FeMgMatch, P=P_guess, T=T_K_guess)
+            meltmatch=Combo_liq_cpxs_FeMgMatch, P=P_guess, T=T_K_guess)
 
         combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.copy()
 
@@ -1024,20 +1024,20 @@ H2O_Liq=None, Return_All_Matches=False):
             if KdMatch == "Masotta":
                 filtKd = (Combo_liq_cpxs_eq_comp['Delta_Kd_Mas2013'] < KdErr)
 
-        if Eq_Crit is None:
+        if eq_crit is None:
             combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.copy()
-        if Eq_Crit == "All":
+        if eq_crit == "All":
             combo_liq_cpx_fur_filt = (Combo_liq_cpxs_eq_comp.loc[filtKd & (Combo_liq_cpxs_eq_comp['Delta_DiHd'] < 0.06 * sigma) & (
                 Combo_liq_cpxs_eq_comp['Delta_EnFs'] < 0.05 * sigma) & (Combo_liq_cpxs_eq_comp['Delta_CaTs'] < 0.03 * sigma)])
-        if Eq_Crit == "Kd":
+        if eq_crit == "Kd":
             combo_liq_cpx_fur_filt = (Combo_liq_cpxs_eq_comp.loc[filtKd])
-        if Eq_Crit == "Kd_DiHd":
+        if eq_crit == "Kd_DiHd":
             combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.loc[filtKd & (
                 Combo_liq_cpxs_eq_comp['Delta_DiHd'] < 0.06 * sigma)]
-        if Eq_Crit == "Kd_EnFs":
+        if eq_crit == "Kd_EnFs":
             combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.loc[filtKd & (
                 Combo_liq_cpxs_eq_comp['Delta_EnFs'] < 0.05 * sigma)]
-        if Eq_Crit == "Kd_CaTs":
+        if eq_crit == "Kd_CaTs":
             combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.loc[filtKd & (
                 Combo_liq_cpxs_eq_comp['Delta_CaTs'] < 0.03 * sigma)]
 
@@ -1115,7 +1115,7 @@ H2O_Liq=None, Return_All_Matches=False):
 
         else:
             raise Exception(
-                'No Matches - to set less strict filters, change perhaps change sigma to a value greater than one, or specify Eq_Crit for only a subset of the values in Neave and Putirka')
+                'No Matches - to set less strict filters, change perhaps change sigma to a value greater than one, or specify eq_crit for only a subset of the values in Neave and Putirka')
 
         if P is not None:
             combo_liq_cpx_fur_filt = combo_liq_cpx_fur_filt.rename(
@@ -1125,7 +1125,7 @@ H2O_Liq=None, Return_All_Matches=False):
                 columns={'T_K_calc': 'T_K_input'})
 
         print('Done!')
-        return {'Averaged_PTs': df1_M, 'All_PTs': combo_liq_cpx_fur_filt}
+        return {'Av_PTs': df1_M, 'All_PTs': combo_liq_cpx_fur_filt}
 
 ## Clinopyroxene-only pressure equations
 
@@ -1361,7 +1361,7 @@ def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None):
     return T_K
 
 ## Iterating PT- Cpx only
-def calculate_cpx_only_pt(*, cpx_comps=None, equationP=None,
+def calculate_cpx_only_press_temp(*, cpx_comps=None, equationP=None,
                                equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None):
 
 

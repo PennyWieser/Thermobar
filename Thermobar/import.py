@@ -28,7 +28,7 @@ def import_lepr_file(filename):
     pandas DataFrames stored in a dictionary. E.g., Access Cpxs using output.Cpxs
         my_input = pandas dataframe of the entire spreadsheet
         mylabels = sample labels
-        Experimental_PT = User-entered PT
+        Experimental_press_temp = User-entered PT
         Fluid=pandas dataframe of fluid compositions
         Liqs=pandas dataframe of liquid oxides
         Ols=pandas dataframe of olivine oxides
@@ -197,9 +197,9 @@ def import_lepr_file(filename):
         myOl = pd.DataFrame()
         myOl_Exp = pd.DataFrame()
 
-    return {'Experimental_PT': myExp, 'Liquids': myLiq, 'Liqs_Exp': myLiq_Exp, 'Fluids': myFluid, 'Fluids_Exp': myFluid_Exp, 'Plags': myPlag, 'Plags_Exp': myPlag_Exp,
+    return {'Experimental_press_temp': myExp, 'Liquids': myLiq, 'Liqs_Exp': myLiq_Exp, 'Fluids': myFluid, 'Fluids_Exp': myFluid_Exp, 'Plags': myPlag, 'Plags_Exp': myPlag_Exp,
             'Cpxs': myCpx, 'Cpxs_Exp': myCpx_Exp, 'Opxs': myOpx, 'Opxs_Exp': myOpx_Exp, 'Amps': myAmp, 'Amps_Exp': myAmp_Exp, 'Ols_Exp': myOl_Exp}
-    # 'Experimental_PT':Experimental_PT1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs':myLiquids1, 'Plags': myPlags1, 'Kspars': myKspars1,'Amps': myAmphs1, 'Ols': myOls1, 'Sps': mySps1}#,
+    # 'Experimental_press_temp':Experimental_press_temp1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs':myLiquids1, 'Plags': myPlags1, 'Kspars': myKspars1,'Amps': myAmphs1, 'Ols': myOls1, 'Sps': mySps1}#,
 
 
 # Loading Excel, returns a disctionry
@@ -222,7 +222,7 @@ def import_excel(filename, sheet_name, GEOROC=False):
     pandas DataFrames stored in a dictionary. E.g., Access Cpxs using output.Cpxs
         my_input = pandas dataframe of the entire spreadsheet
         mylabels = sample labels
-        Experimental_PT = User-entered PT
+        Experimental_press_temp = User-entered PT
         Liqs=pandas dataframe of liquid oxides
         Ols=pandas dataframe of olivine oxides
         Cpxs=pandas dataframe of cpx oxides
@@ -247,7 +247,7 @@ def import_excel(filename, sheet_name, GEOROC=False):
 
  #   myLabels=my_input.Sample_ID
 
-    Experimental_PT1 = my_input.reindex(df_ideal_exp.columns, axis=1)
+    Experimental_press_temp1 = my_input.reindex(df_ideal_exp.columns, axis=1)
 # This deals with the fact almost everyone will enter as FeO, but the code uses FeOt for these minerals.
 # E.g., if users only enter FeO (not FeOt and Fe2O3), allocates a FeOt
 # column. If enter FeO and Fe2O3, put a FeOt column
@@ -425,7 +425,7 @@ def import_excel(filename, sheet_name, GEOROC=False):
         mySps1['T_K'] = my_input['T_K']
         myLiquids1['T_K'] = my_input['T_K']
 
-    return {'my_input': my_input, 'Experimental_PT': Experimental_PT1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs': myLiquids1,
+    return {'my_input': my_input, 'Experimental_press_temp': Experimental_press_temp1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs': myLiquids1,
             'Plags': myPlags1, 'Kspars': myKspars1, 'Amps': myAmphs1, 'Ols': myOls1, 'Sps': mySps1}  # , 'y1': y1 ,'y2': y2}
 
 
@@ -447,7 +447,7 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
     -------
     pandas DataFrames stored in a dictionary. E.g., Access Cpxs using output.Cpxs
         my_input_Err = pandas dataframe of the entire spreadsheet
-        Experimental_pt_Err = User-entered PT errors.
+        Experimental_press_temp_Err = User-entered PT errors.
         Liqs_Err=pandas dataframe of liquid oxide errors
         Ols_Err=pandas dataframe of olivine oxide errors
         Cpxs_Err=pandas dataframe of cpx oxide  errors
@@ -472,7 +472,7 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
 
  #   myLabels=my_input.Sample_ID
     my_input.fillna(0)
-    Experimental_PT1 = my_input.reindex(df_ideal_exp_Err.columns)
+    Experimental_press_temp1 = my_input.reindex(df_ideal_exp_Err.columns)
 # This deals with the fact almost everyone will enter as FeO, but the code uses FeOt for these minerals.
 # E.g., if users only enter FeO (not FeOt and Fe2O3), allocates a FeOt
 # column. If enter FeO and Fe2O3, put a FeOt column
@@ -630,7 +630,7 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
         mySps1['T_K_Err'] = my_input['T_K_Err']
         myLiquids1['T_K_Err'] = my_input['T_K_Err']
 
-    return {'my_input_Err': my_input, 'Experimental_pt_Err': Experimental_PT1, 'Cpxs_Err': myCPXs1,
+    return {'my_input_Err': my_input, 'Experimental_press_temp_Err': Experimental_press_temp1, 'Cpxs_Err': myCPXs1,
             'Opxs_Err': myOPXs1, 'Liqs_Err': myLiquids1, 'Plags_Err': myPlags1, 'Kspars_Err': myKspars1, 'Amps_Err': myAmphs1, 'Ols_Err': myOls1, 'Sps_Err': mySps1}
 
 

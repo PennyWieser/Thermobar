@@ -212,7 +212,7 @@ Cpx_Opx_P_funcs_by_name = {p.__name__: p for p in Cpx_Opx_P_funcs}
 def calculate_cpx_opx_press(*, cpx_comps=None, opx_comps=None,
 Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     '''
-    Calculates pressure in kbar for Opx-Cpx pairs
+    calculates pressure in kbar for Opx-Cpx pairs
 
     Parameters
     -------
@@ -227,7 +227,7 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
 
     Two_Px_Match: DataFrame
         Combined Cpx-Opx compositions.
-        Used for calculate Cpx_Opx_pt_matching function.
+        Used for calculate Cpx_Opx_press_temp_matching function.
 
     EquationP: str
         Choice of equation:
@@ -315,7 +315,7 @@ Cpx_Opx_T_funcs_by_name = {p.__name__: p for p in Cpx_Opx_T_funcs}
 def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
                            Two_Px_Match=None, equationT=None, P=None, eq_tests=False):
     '''
-    Calculates Temperature in K for Opx-Cpx pairs
+    calculates Temperature in K for Opx-Cpx pairs
 
    Parameters
     -------
@@ -410,7 +410,7 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
 ## Iterative calculations of P and T
 
 
-def calculate_cpx_opx_pt(*, cpx_comps=None, opx_comps=None, Two_Px_Match=None,
+def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match=None,
                               equationP=None, equationT=None, iterations=30, T_K_guess=1300, eq_tests=False):
     '''
     Solves simultaneous equations for temperature and pressure using orthopyroxene-liquid thermometers and barometers.
@@ -419,15 +419,15 @@ def calculate_cpx_opx_pt(*, cpx_comps=None, opx_comps=None, Two_Px_Match=None,
    Parameters
     -------
 
-    opx_comps: DataFrame (opt, either specify opx_comps AND cpx_comps or MeltMatch)
+    opx_comps: DataFrame (opt, either specify opx_comps AND cpx_comps or meltmatch)
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
     cpx_comps: DataFrame (not required for P_Put2008_eq29c)
         Cpxuid compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Combined dataframe of Opx-Cpx compositions (headings SiO2_Cpx, SiO2_Opx etc.). S
-        Used for calculate Cpx_Opx_pt_matching function.
+        Used for calculate Cpx_Opx_press_temp_matching function.
 
 
     EquationP: str
@@ -528,7 +528,7 @@ def calculate_cpx_opx_pt(*, cpx_comps=None, opx_comps=None, Two_Px_Match=None,
 
 ## Two pyroxene matching
 
-def calculate_cpx_opx_pt_matching(*, opx_comps, cpx_comps, equationT=None, equationP=None,
+def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=None, equationP=None,
                                   KdMatch=None, KdErr=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None):
     '''
     Evaluates all possible Cpx-Opx pairs,
@@ -584,7 +584,7 @@ def calculate_cpx_opx_pt_matching(*, opx_comps, cpx_comps, equationT=None, equat
     -------
         dict
 
-        Averaged_PTs_perCpx: Average P and T for each cpx.
+        Av_PTs_perCpx: Average P and T for each cpx.
         E.g., if cpx1 matches Opx1, Opx4, Opx6, Opx10, averages outputs for all 4 of those liquids.
         Returns mean and 1 sigma of these averaged parameters for each Cpx.
 
@@ -595,7 +595,7 @@ def calculate_cpx_opx_pt_matching(*, opx_comps, cpx_comps, equationT=None, equat
         raise Exception(
             'You have entered a numerical value for KdMatch, but have not specified a KdErr to accept matches within KdMatch+-KdErr')
 
-    # Calculating Cpx and opx components. Do before duplication to save
+    # calculating Cpx and opx components. Do before duplication to save
     # computation time
     myCPXs1_concat = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
     myOPXs1_concat = calculate_orthopyroxene_components(opx_comps=opx_comps)
@@ -626,7 +626,7 @@ def calculate_cpx_opx_pt_matching(*, opx_comps, cpx_comps, equationT=None, equat
     print("Considering " + LenCombo +
           " Liq-Cpx pairs, be patient if this is >>1 million!")
 
-    # Calculate Kd for these pairs
+    # calculate Kd for these pairs
     En = (Combo_opxs_cpxs.Fm2Si2O6 * (Combo_opxs_cpxs.MgO_Opx_cat_6ox /
     (Combo_opxs_cpxs.MgO_Opx_cat_6ox +Combo_opxs_cpxs.FeOt_Cpx_cat_6ox + Combo_opxs_cpxs.MnO_Cpx_cat_6ox)))
     Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'] = ((Combo_opxs_cpxs['FeOt_Cpx_cat_6ox']
@@ -688,7 +688,7 @@ def calculate_cpx_opx_pt_matching(*, opx_comps, cpx_comps, equationT=None, equat
         raise ValueError('You have entered an equation for T and specified a temperature. '
         'The code doesnt know what you want it to do. Either enter an equation, or choose a temperature.')
     if equationP is not None and equationT is not None:
-        PT_out = calculate_cpx_opx_pt(
+        PT_out = calculate_cpx_opx_press_temp(
             Two_Px_Match=Combo_opxs_cpxs_2, equationP=equationP, equationT=equationT)
         Combo_opxs_cpxs_2.insert(0, "P_kbar_calc", PT_out['P_kbar_calc'])
         Combo_opxs_cpxs_2.insert(1, "T_K_calc", PT_out['T_K_calc'])
@@ -783,4 +783,4 @@ def calculate_cpx_opx_pt_matching(*, opx_comps, cpx_comps, equationT=None, equat
             'No Matches - to set less strict filters, e.g., could edit KdMatch is None and KdErr to get more matches')
 
     print('Done!')
-    return {'Averaged_PTs_perCPX': df1_M, 'All_PTs': Combo_opxs_cpxs_2}
+    return {'Av_PTs_perCPX': df1_M, 'All_PTs': Combo_opxs_cpxs_2}

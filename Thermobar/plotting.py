@@ -70,7 +70,7 @@ def Tukey_Plot_np(x,y, name, xlower=-1, xupper=13, yupper=17, ylower=-3):
     with w.catch_warnings():
         w.simplefilter('ignore')
         fig, (ax1) = plt.subplots(1,1, figsize = (6,5)) # adjust dimensions of figure here
-        ax1.set_ylabel('Calculated Press')
+        ax1.set_ylabel('calculated Press')
         ax1.set_xlabel('Experimental P')
         vals=np.array([3.1, 6.2, 9.3, 13])
         X_Av=np.empty(len(vals), dtype=float)
@@ -152,18 +152,18 @@ def Tukey_Plot_np(x,y, name, xlower=-1, xupper=13, yupper=17, ylower=-3):
         strname=str(name)
         ax1.set_title(strname)
 
-def Experimental_av_values(LEPRin, Calc):
+def Experimental_av_values(LEPRin, calc):
 
     ExperimentNumbers=LEPRin['Experiment_P_Name_y'].unique()
 
     for exp in ExperimentNumbers:
-        dff_M=pd.DataFrame(Calc.loc[LEPRin['Experiment_P_Name_y']==exp].mean(axis=0)).T
-        dff_Med=pd.DataFrame(Calc.loc[LEPRin['Experiment_P_Name_y']==exp].median(axis=0)).T
-        dff_M['Median_P_kbar_Calc']=dff_Med['P_kbar_calc']
+        dff_M=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].mean(axis=0)).T
+        dff_Med=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].median(axis=0)).T
+        dff_M['Median_P_kbar_calc']=dff_Med['P_kbar_calc']
         if "T_K_calc" in dff_M:
-            dff_M['Median_T_K_Calc']=dff_Med['T_K_calc']
+            dff_M['Median_T_K_calc']=dff_Med['T_K_calc']
 
-        dff_S=pd.DataFrame(Calc.loc[LEPRin['Experiment_P_Name_y']==exp].std(axis=0)).T
+        dff_S=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].std(axis=0)).T
 
         dff_M['Sample_ID']=LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, "Experiment_y"].iloc[0]
         dff_M['Pressure_Exp']=np.nanmean(LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, 'P_kbar_x'])
@@ -179,7 +179,7 @@ def Experimental_av_values(LEPRin, Calc):
                     dff_S['N']=1
         else:
             dff_S=dff_S
-            dff_S['N']=np.shape(Calc.loc[LEPRin['Experiment_P_Name_y']==exp])[0]
+            dff_S['N']=np.shape(calc.loc[LEPRin['Experiment_P_Name_y']==exp])[0]
         if exp==ExperimentNumbers[0]:
             df1_S=dff_S
         else:
@@ -190,17 +190,17 @@ def Experimental_av_values(LEPRin, Calc):
     df1_M.insert(0, "No. of Exp. averaged",  df1_S['st_dev_N'])
     df1_M.insert(1, "std_P_kbar_calc",  df1_S['st_dev_P_kbar_calc'])
     return df1_M
-def Experimental_av_plot(LEPRin, Calc):
+def Experimental_av_plot(LEPRin, calc):
 
     ExperimentNumbers=LEPRin['Experiment_P_Name_y'].unique()
 
     for exp in ExperimentNumbers:
-        dff_M=pd.DataFrame(Calc.loc[LEPRin['Experiment_P_Name_y']==exp].mean(axis=0)).T
-        dff_Med=pd.DataFrame(Calc.loc[LEPRin['Experiment_P_Name_y']==exp].median(axis=0)).T
-        dff_M['Median_P_kbar_Calc']=dff_Med['P_kbar_calc']
-        dff_M['Median_T_K_Calc']=dff_Med['T_K_calc']
+        dff_M=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].mean(axis=0)).T
+        dff_Med=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].median(axis=0)).T
+        dff_M['Median_P_kbar_calc']=dff_Med['P_kbar_calc']
+        dff_M['Median_T_K_calc']=dff_Med['T_K_calc']
 
-        dff_S=pd.DataFrame(Calc.loc[LEPRin['Experiment_P_Name_y']==exp].std(axis=0)).T
+        dff_S=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].std(axis=0)).T
 
         dff_M['Sample_ID']=LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, "Experiment_y"].iloc[0]
         dff_M['Pressure_Exp']=np.nanmean(LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, 'P_kbar_x'])
@@ -216,7 +216,7 @@ def Experimental_av_plot(LEPRin, Calc):
                     dff_S['N']=1
         else:
             dff_S=dff_S
-            dff_S['N']=np.shape(Calc.loc[LEPRin['Experiment_P_Name_y']==exp])[0]
+            dff_S['N']=np.shape(calc.loc[LEPRin['Experiment_P_Name_y']==exp])[0]
         if exp==ExperimentNumbers[0]:
             df1_S=dff_S
         else:
@@ -228,28 +228,28 @@ def Experimental_av_plot(LEPRin, Calc):
     df1_M.insert(1, "std_P_kbar_calc",  df1_S['st_dev_P_kbar_calc'])
 
     fig, (ax1, ax2) = plt.subplots(1,2, figsize = (12,5)) # adjust dimensions of figure here
-    ax1.plot(LEPRin['P_kbar_x'], Calc['P_kbar_calc'], 'ok', alpha=0.05, zorder=0, markersize=3)
-    ax1.set_ylabel('Calculated Press')
+    ax1.plot(LEPRin['P_kbar_x'], calc['P_kbar_calc'], 'ok', alpha=0.05, zorder=0, markersize=3)
+    ax1.set_ylabel('calculated Press')
     ax1.set_xlabel('Experimental P')
     #ax1.plot(df1_M['Mean_Pressure_Exp'], df1_M['Mean_P_kbar_calc'], 'ok')
-    Stats=calculate_R2(df1_M['Mean_Pressure_Exp'], df1_M['Mean_Median_P_kbar_Calc'])
+    Stats=calculate_R2(df1_M['Mean_Pressure_Exp'], df1_M['Mean_Median_P_kbar_calc'])
     ax1.annotate(Stats['R2'], xy=(0.1, 0.88), xycoords="axes fraction", fontsize=9)
     ax1.annotate(Stats['RMSE'], xy=(0.1, 0.72), xycoords="axes fraction", fontsize=9)
     ax1.annotate(Stats['Mean'], xy=(0.1, 0.83), xycoords="axes fraction", fontsize=9)
     ax1.annotate(Stats['Median'], xy=(0.1, 0.78), xycoords="axes fraction", fontsize=9)
-    ax1.plot([min(df1_M['Mean_Median_P_kbar_Calc']), max(df1_M['Mean_Median_P_kbar_Calc'])],
+    ax1.plot([min(df1_M['Mean_Median_P_kbar_calc']), max(df1_M['Mean_Median_P_kbar_calc'])],
 
-            [min(df1_M['Mean_Median_P_kbar_Calc']), max(df1_M['Mean_Median_P_kbar_Calc'])], '-k')
+            [min(df1_M['Mean_Median_P_kbar_calc']), max(df1_M['Mean_Median_P_kbar_calc'])], '-k')
     ax1.plot(Stats['x_pred'], Stats['y_pred'], '--r', lw=0.1)
-    ax1.errorbar(df1_M['Mean_Pressure_Exp'], df1_M['Mean_Median_P_kbar_Calc'],  yerr= df1_M['std_P_kbar_calc'],
+    ax1.errorbar(df1_M['Mean_Pressure_Exp'], df1_M['Mean_Median_P_kbar_calc'],  yerr= df1_M['std_P_kbar_calc'],
                      fmt='d', ecolor='k', elinewidth=0.1, mfc='red', markeredgewidth=0.1, ms=5, mec='k')
 
 
-    ax1.plot(df1_M['Mean_Pressure_Exp'], df1_M['Mean_Median_P_kbar_Calc'], 'ok', mfc='r')
+    ax1.plot(df1_M['Mean_Pressure_Exp'], df1_M['Mean_Median_P_kbar_calc'], 'ok', mfc='r')
 
     ax2.plot(df1_M['No. of Exp. averaged'], abs(df1_M['Mean_Pressure_Exp']-df1_M['Mean_P_kbar_calc']), 'ok', mfc='r')
     ax2.set_xlabel('# of experiments averaged')
-    ax2.set_ylabel('ABS (Mean Exp Pressure - Mean Calc Pressure)')
+    ax2.set_ylabel('ABS (Mean Exp Pressure - Mean calc Pressure)')
     #ax2.set_xscale('log',base=2)
     return df1_M
 

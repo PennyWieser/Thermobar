@@ -97,13 +97,13 @@ def T_Beatt93_NoOl_HerzCorr(P, *, Den_Beat93):
             (10**(-6)) / 8.3144) / Den_Beat93) + 54 * (0.1 * P) + 2 * (0.1 * P)**2)
 
 
-def T_Put2008_eq19_BeattDMg(P, *, CalcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_NF):
+def T_Put2008_eq19_BeattDMg(P, *, calcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_NF):
     '''
     Liquid-only thermometer. Combining terms from Beattie et al. (1993) by Putirka (2008).
     This function uses calculated DMg from Beattie, so you don't need a measured olivine composition.
     '''
     return ((13603) + (4.943 * 10**(-7)) * ((0.1 * P) - 10**(-5))) / (6.26 + 2 *
-            np.log(CalcDMg_Beat93) + 2 * np.log(1.5 * Beat_CNML) + 2 * np.log(3 * Beat_CSiO2L) - Beat_NF)
+            np.log(calcDMg_Beat93) + 2 * np.log(1.5 * Beat_CNML) + 2 * np.log(3 * Beat_CSiO2L) - Beat_NF)
 
 
 def T_Sug2000_eq1(P=None, *, MgO_Liq_mol_frac):
@@ -205,23 +205,23 @@ def T_Put2008_eq22_DMgIter(DMg, *, P, MgO_Liq_cat_frac, FeOt_Liq_cat_frac, CaO_L
 # Equation 21 and 22 - Using DMg Beattie
 
 
-def T_Put2008_eq21_BeattDMg(P, *, CalcDMg_Beat93, Na2O_Liq, K2O_Liq, H2O_Liq):
+def T_Put2008_eq21_BeattDMg(P, *, calcDMg_Beat93, Na2O_Liq, K2O_Liq, H2O_Liq):
     '''
     Liquid-only thermometer (adapted from ol-liq thermometer using calc DMg from Beattie) Putirka (2008),
     equation 21 (originally Putirka et al., 2007,  Eq 2). Recalibration of Beattie (1993) to account for the
     pressure sensitivity noted by Herzberg and O'Hara (2002), and eliminates the systematic error of Beattie (1993) for hydrous compositions.
     '''
-    return (1 / ((np.log(CalcDMg_Beat93) + 2.158 - 5.115 * 10**(-2) * (Na2O_Liq +
+    return (1 / ((np.log(calcDMg_Beat93) + 2.158 - 5.115 * 10**(-2) * (Na2O_Liq +
             K2O_Liq) + 6.213 * 10**(-2) * H2O_Liq) / (55.09 * 0.1 * P + 4430)) + 273.15)
 
 
-def T_Put2008_eq22_BeattDMg(P, *, CalcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_NF, H2O_Liq):
+def T_Put2008_eq22_BeattDMg(P, *, calcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_NF, H2O_Liq):
     '''
     Liquid-only thermometer (adapted from ol-liq thermometer using calc DMg from Beattie): Putirka (2008),
     equation 22 (originally Putirka et al., 2007,  Eq 4). Recalibration of Beattie (1993) to account for the pressure
     sensitivity noted by Herzberg and O'Hara (2002), and eliminates the systematic error of Beattie (1993) for hydrous compositions.
     '''
-    return ((15294.6 + 1318.8 * 0.1 * P + 2.48348 * ((0.1 * P)**2)) / (8.048 + 2.8352 * np.log(CalcDMg_Beat93) + 2.097 *
+    return ((15294.6 + 1318.8 * 0.1 * P + 2.48348 * ((0.1 * P)**2)) / (8.048 + 2.8352 * np.log(calcDMg_Beat93) + 2.097 *
             np.log(1.5 * Beat_CNML) + 2.575 * np.log(3 * Beat_CSiO2L) - 1.41 * Beat_NF + 0.222 * H2O_Liq + 0.5 * (0.1 * P)) + 273.15)
 
 ## Functions for saturation surfaces of minerals based just on liquids
@@ -426,7 +426,7 @@ def calculate_liq_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
 # This performs extra calculation steps for Beattie equations
     if equationT == "T_Beatt93_NoOl" or equationT == "T_Beatt93_NoOl_HerzCorr" or equationT == "T_Put2008_eq19_BeattDMg" \
     or equationT == "T_Put2008_eq21_BeattDMg" or equationT == "T_Put2008_eq22_BeattDMg":
-        anhyd_cat_frac['CalcDMg_Beat93'] = (0.666 - (-0.049 * anhyd_cat_frac['MnO_Liq_cat_frac']
+        anhyd_cat_frac['calcDMg_Beat93'] = (0.666 - (-0.049 * anhyd_cat_frac['MnO_Liq_cat_frac']
         + 0.027 * anhyd_cat_frac['FeOt_Liq_cat_frac'])) / (
         1 * anhyd_cat_frac['MgO_Liq_cat_frac'] + 0.259 * anhyd_cat_frac['MnO_Liq_cat_frac']
         + 0.299 * anhyd_cat_frac['FeOt_Liq_cat_frac'])
@@ -435,7 +435,7 @@ def calculate_liq_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
             anhyd_cat_frac['CaO_Liq_cat_frac'] + anhyd_cat_frac['MnO_Liq_cat_frac'])
         anhyd_cat_frac['Beat_CSiO2L'] = anhyd_cat_frac['SiO2_Liq_cat_frac']
         anhyd_cat_frac['Beat_NF'] = ( 7 / 2) * np.log(1 - anhyd_cat_frac['Al2O3_Liq_cat_frac']) + 7 * np.log(1 - anhyd_cat_frac['TiO2_Liq_cat_frac'])
-        anhyd_cat_frac['Den_Beat93'] = 52.05 / 8.3144 + 2 * np.log(anhyd_cat_frac['CalcDMg_Beat93']) + 2 * np.log(
+        anhyd_cat_frac['Den_Beat93'] = 52.05 / 8.3144 + 2 * np.log(anhyd_cat_frac['calcDMg_Beat93']) + 2 * np.log(
             1.5 * anhyd_cat_frac['Beat_CNML']) + 2 * np.log(3 * anhyd_cat_frac['Beat_CSiO2L']) - anhyd_cat_frac['Beat_NF']
 
 # Checks if P-dependent function you have entered a P

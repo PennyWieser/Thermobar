@@ -296,8 +296,8 @@ def calculate_fspar_liq_press(*, plag_comps=None, kspar_comps=None, liq_comps=No
 
 ## Function for iterating pressure and temperature - (probably not recomended)
 
-def calculate_fspar_Liq_pt(*, liq_comps=None, plag_comps=None, kspar_comps=None,
-                                MeltMatch=None, equationP=None, equationT=None, iterations=30, T_K_guess=1300,
+def calculate_fspar_Liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_comps=None,
+                                meltmatch=None, equationP=None, equationT=None, iterations=30, T_K_guess=1300,
                                 H2O_Liq=None):
     '''
     Solves simultaneous equations for temperature and pressure using
@@ -314,7 +314,7 @@ def calculate_fspar_Liq_pt(*, liq_comps=None, plag_comps=None, kspar_comps=None,
 
     Or:
 
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Combined dataframe of fspar-Liquid compositions (headings SiO2_Liq, SiO2_Plag etc.).
         means a plag-liq matching algorithm could be added (not implemented currently due
         to lack of equilibrium test consensus).
@@ -350,16 +350,16 @@ def calculate_fspar_Liq_pt(*, liq_comps=None, plag_comps=None, kspar_comps=None,
             'Sorry, we currently dont have any kspar barometers coded up, so you cant iteratively solve for Kspars')
 
 
-    if MeltMatch is None:
+    if meltmatch is None:
         T_func = calculate_fspar_liq_temp(
             plag_comps=plag_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
         P_func = calculate_fspar_liq_press(
             plag_comps=plag_comps, liq_comps=liq_comps_c, equationP=equationP,  T="Solve")
-    if MeltMatch is not None:
+    if meltmatch is not None:
         T_func = calculate_fspar_liq_temp(
-            MeltMatch=MeltMatch, equationT=equationT)
+            meltmatch=meltmatch, equationT=equationT)
         P_func = calculate_fspar_liq_press(
-            MeltMatch=MeltMatch, equationP=equationP)
+            meltmatch=meltmatch, equationP=equationP)
 
  # This bit checks if temperature is already a series - e.g., equations
  # with no pressure dependence
@@ -607,10 +607,10 @@ plag_liq_H_funcs_by_name = {p.__name__: p for p in plag_liq_H_funcs}
 
 
 
-def calculate_plag_liq_Hygr(*, liq_comps, plag_comps=None,
+def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
                             equationH=None, P=None, T=None, XAn=None, XAb=None, XOr=0):
 
-    '''Calculates H2O content (wt%) from composition of equilibrium plagioclase
+    '''calculates H2O content (wt%) from composition of equilibrium plagioclase
      and liquid.
 
    Parameters
@@ -649,6 +649,8 @@ def calculate_plag_liq_Hygr(*, liq_comps, plag_comps=None,
 
 
     '''
+    if kspar_comps is not None:
+        raise ValueError('Sorry, no k-fspar hygrometers implemented in this tool. You must enter plag_comps=')
     try:
         func = plag_liq_H_funcs_by_name[equationH]
     except KeyError:
@@ -912,7 +914,7 @@ def calculate_plag_kspar_temp_matching(*, kspar_comps, plag_comps, equationT=Non
     '''
 
 
-    # Calculating Plag and plag components. Do before duplication to save
+    # calculating Plag and plag components. Do before duplication to save
     # computation time
     cat_plag = calculate_cat_fractions_plagioclase(plag_comps=plag_comps)
     cat_kspar = calculate_cat_fractions_kspar(kspar_comps=kspar_comps)

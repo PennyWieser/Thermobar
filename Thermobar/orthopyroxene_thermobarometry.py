@@ -195,7 +195,7 @@ Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Fel
 
 Opx_Liq_P_funcs_by_name = {p.__name__: p for p in Opx_Liq_P_funcs}
 
-def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, MeltMatch=None,
+def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltmatch=None,
                             T=None, eq_tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
     '''
     Orthopyroxene-Liquid barometer, user specifies equation, and calculates pressure in kbar.
@@ -212,9 +212,9 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, MeltMa
 
     Or:
 
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Combined Opx-Liquid compositions.
-        Used for calculate_opx_liq_pt_matching.
+        Used for calculate_opx_liq_press_temp_matching.
 
     EquationP: str
         Choice of equation:
@@ -276,8 +276,8 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, MeltMa
 
 
 
-    if MeltMatch is not None:
-        Combo_liq_opxs = MeltMatch
+    if meltmatch is not None:
+        Combo_liq_opxs = meltmatch
     if liq_comps is not None:
         Combo_liq_opxs = calculate_orthopyroxene_liquid_components(
             liq_comps=liq_comps_c, opx_comps=opx_comps)
@@ -330,7 +330,7 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, MeltMa
 Opx_Liq_T_funcs = {T_Opx_Beatt1993, T_Put2008_eq28a, T_Put2008_eq28b_opx_sat}
 
 Opx_Liq_T_funcs_by_name = {p.__name__: p for p in Opx_Liq_T_funcs}
-def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, MeltMatch=None,
+def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmatch=None,
                            P=None, eq_tests=False, Fe3FeT_Liq=None, H2O_Liq=None):
     '''
     Orthopyroxene-Liquid thermometer, user specifies equation,
@@ -345,7 +345,7 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, MeltMat
     liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Combined Opx-Liquid compositions. Used for "melt match" functionality.
 
     EquationT: str
@@ -395,8 +395,8 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, MeltMat
 
 
 
-    if MeltMatch is not None:
-        Combo_liq_opxs = MeltMatch
+    if meltmatch is not None:
+        Combo_liq_opxs = meltmatch
 
     if liq_comps is not None:
         liq_comps_c = liq_comps.copy()
@@ -445,7 +445,7 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, MeltMat
     return T_K
 
 ## Iterating P and T when you don't know either
-def calculate_opx_liq_pt(*, liq_comps=None, opx_comps=None, MeltMatch=None, equationP=None, equationT=None,
+def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=None, equationP=None, equationT=None,
                               iterations=30, T_K_Guess=1300, eq_tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
     '''
     Solves simultaneous equations for temperature and pressure using
@@ -462,9 +462,9 @@ def calculate_opx_liq_pt(*, liq_comps=None, opx_comps=None, MeltMatch=None, equa
 
     Or:
 
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Combined dataframe of opx-Liquid compositions (headings SiO2_Liq, SiO2_Opx etc.).
-        Used for calculate_opx_liq_pt_matching.
+        Used for calculate_opx_liq_press_temp_matching.
 
     EquationP: str
         Barometer
@@ -515,7 +515,7 @@ def calculate_opx_liq_pt(*, liq_comps=None, opx_comps=None, MeltMatch=None, equa
     else:
         T_K_guess = 1300
 
-    if MeltMatch is None:
+    if meltmatch is None:
         liq_comps_c = liq_comps.copy()
 
         if Fe3FeT_Liq is not None:
@@ -529,12 +529,12 @@ def calculate_opx_liq_pt(*, liq_comps=None, opx_comps=None, MeltMatch=None, equa
         P_func = calculate_opx_liq_press(
             opx_comps=opx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
 
-    if MeltMatch is not None:
+    if meltmatch is not None:
 
         T_func = calculate_opx_liq_temp(
-            MeltMatch=MeltMatch, equationT=equationT, P="Solve")
+            meltmatch=meltmatch, equationT=equationT, P="Solve")
         P_func = calculate_opx_liq_press(
-            MeltMatch=MeltMatch, equationP=equationP, T="Solve")
+            meltmatch=meltmatch, equationP=equationP, T="Solve")
 
         # Gives users flexibility to add a different guess temperature
 
@@ -564,7 +564,7 @@ def calculate_opx_liq_pt(*, liq_comps=None, opx_comps=None, MeltMatch=None, equa
             data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
 
         return PT_out
-    if eq_tests is True and MeltMatch is None:
+    if eq_tests is True and meltmatch is None:
         Combo_liq_cpxs = calculate_orthopyroxene_liquid_components(
             opx_comps=opx_comps, liq_comps=liq_comps_c)
         Combo_liq_cpxs.insert(0, "P_kbar_calc", P_guess)
@@ -573,21 +573,21 @@ def calculate_opx_liq_pt(*, liq_comps=None, opx_comps=None, MeltMatch=None, equa
                               Combo_liq_cpxs['Kd_Fe_Mg_Fet'])
         Combo_liq_cpxs.insert(4, "Eq_Test_Kd_Fe_Mg_Fe2",
                               Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
-    if eq_tests is True and MeltMatch is not None:
-        Combo_liq_cpxs = MeltMatch.copy()
+    if eq_tests is True and meltmatch is not None:
+        Combo_liq_cpxs = meltmatch.copy()
         Combo_liq_cpxs.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_cpxs.insert(1, "T_K_calc", T_K_guess)
         Combo_liq_cpxs.insert(3, "Eq_Test_Kd_Fe_Mg_Fet",
-                              MeltMatch['Kd_Fe_Mg_Fet'])
+                              meltmatch['Kd_Fe_Mg_Fet'])
         Combo_liq_cpxs.insert(4, "Eq_Test_Kd_Fe_Mg_Fe2",
-                              MeltMatch['Kd_Fe_Mg_Fe2'])
+                              meltmatch['Kd_Fe_Mg_Fe2'])
 
     return Combo_liq_cpxs
 
 ## Considering all possible Orthopyroxene-melt pairs, and iterating P and T
 
-def calculate_opx_liq_pt_matching(*, liq_comps, opx_comps, equationT=None,
-equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
+def calculate_opx_liq_press_temp_matching(*, liq_comps, opx_comps, equationT=None,
+equationP=None, P=None, T=None, eq_crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
  KdMatch=None, KdErr=None, Opx_Quality=False, Return_All_Matches=False):
 
     '''
@@ -653,7 +653,7 @@ equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
 
     Returns: dict
 
-        Averaged_PTs: Average P and T for each opx.
+        Av_PTs: Average P and T for each opx.
         E.g., if opx1 matches Liq1, Liq4, Liq6, Liq10, averages outputs for all 4 of those liquids.
         Returns mean and 1 sigma of these averaged parameters for each Opx.
 
@@ -683,7 +683,7 @@ equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
     if "Sample_ID_Opx" not in opx_comps:
         opx_comps['Sample_ID_Opx'] = opx_comps.index
 
-    # Calculating Opx and liq components. Do before duplication to save
+    # calculating Opx and liq components. Do before duplication to save
     # computation time
     myOPXs1_concat = calculate_orthopyroxene_components(opx_comps=opx_comps)
     myLiquids1_concat = calculate_anhydrous_cat_fractions_liquid(
@@ -705,9 +705,9 @@ equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
     # Combines these merged liquids and opx dataframes
     Combo_liq_opxs = pd.concat([DupLiqs, DupOPXs], axis=1)
 
-    # Calculate clinopyroxene-liquid components for this merged dataframe
+    # calculate clinopyroxene-liquid components for this merged dataframe
     Combo_liq_opxs = calculate_orthopyroxene_liquid_components(
-        MeltMatch=Combo_liq_opxs)
+        meltmatch=Combo_liq_opxs)
     Combo_liq_opxs.drop(['Kd Eq (Put2008+-0.06)'], axis=1, inplace=True)
 
     #Combo_liq_opxs = Combo_liq_opxs.convert_objects(convert_numeric=True)
@@ -752,19 +752,19 @@ equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
 
         # If users want to melt match specifying an equation for both T and P
         if equationP is not None and equationT is not None:
-            PT_out = calculate_opx_liq_pt(MeltMatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
+            PT_out = calculate_opx_liq_press_temp(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
             P_guess = PT_out['P_kbar_calc'].astype('float64')
             T_K_guess = PT_out['T_K_calc'].astype('float64')
 
         # Users may already know their pressure, rather than choosing an equation.
         if P is not None:
             P_guess = P
-            T_K_guess = calculate_opx_liq_temp(MeltMatch=Combo_liq_opx_fur_filt, equationT=equationT, P=P_guess)
+            T_K_guess = calculate_opx_liq_temp(meltmatch=Combo_liq_opx_fur_filt, equationT=equationT, P=P_guess)
 
     # Users may already know their temperature, rather than using an equation
         if T is not None:
             T_K_guess = T
-            P_guess = calculate_opx_liq_press(MeltMatch=Combo_liq_opx_fur_filt, equationP=equationP, T=T_K_guess)
+            P_guess = calculate_opx_liq_press(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, T=T_K_guess)
 
         Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess)
@@ -838,5 +838,5 @@ equationP=None, P=None, T=None, Eq_Crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
 
         print('Finished!')
 
-        return {'Averaged_PTs': df1_M, 'All_PTs': Combo_liq_opx_fur_filt}
+        return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_opx_fur_filt}
         # return Combo_liq_opx_fur_filt

@@ -426,7 +426,7 @@ def calculate_anhydrous_cat_fractions_liquid(liq_comps):
 
 def calculate_liq_mgno(liq_comps, Fe3FeT_Liq=None):
     '''
-    Calculates Liquid Mg#
+    calculates Liquid Mg#
 
    Parameters
     -------
@@ -578,7 +578,7 @@ def calculate_hydrous_cat_fractions_liquid(liq_comps):
 
     return cat_frac_hyd
 
-# Calculating Liquid mole and cation fractions including Ni for Pu et al.
+# calculating Liquid mole and cation fractions including Ni for Pu et al.
 # 2017 and 2019
 
 
@@ -947,7 +947,7 @@ def calculate_orthopyroxene_components(opx_comps):
 
 
 def calculate_orthopyroxene_liquid_components(
-        *, opx_comps=None, liq_comps=None, MeltMatch=None):
+        *, opx_comps=None, liq_comps=None, meltmatch=None):
     '''Import orthopyroxene compositions using opx_comps=My_Opxs and liquid compositions using liq_comps=My_Liquids,
         returns orthopyroxene and liquid components.
 
@@ -960,7 +960,7 @@ def calculate_orthopyroxene_liquid_components(
      opx_comps: DataFrame
         orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
     OR
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
        merged orthopyroxene and liquid compositions used for melt matching
 
     Returns
@@ -970,9 +970,9 @@ def calculate_orthopyroxene_liquid_components(
        inputted opx compositions, opx cations on 6 oxygen basis, opx components and opx-liquid components.
 
     '''
-    # For when users enter a combined dataframe MeltMatch=""
-    if MeltMatch is not None:
-        combo_liq_opxs = MeltMatch
+    # For when users enter a combined dataframe meltmatch=""
+    if meltmatch is not None:
+        combo_liq_opxs = meltmatch
     if liq_comps is not None and opx_comps is not None:
         if len(liq_comps) != len(opx_comps):
             raise Exception(
@@ -1109,7 +1109,7 @@ def calculate_6oxygens_clinopyroxene(cpx_comps):
 
     return cation_6
 
-# Calculating Clinopyroxene components following Putirka spreadsheet
+# calculating Clinopyroxene components following Putirka spreadsheet
 
 
 def calculate_clinopyroxene_components(cpx_comps):
@@ -1189,7 +1189,7 @@ def calculate_clinopyroxene_components(cpx_comps):
 
 
 def calculate_clinopyroxene_liquid_components(
-        *, cpx_comps=None, liq_comps=None, MeltMatch=None):
+        *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''Import clinopyroxene compositions using cpx_comps=My_Cpxs and liquid compositions using liq_comps=My_Liquids,
         returns clinopyroxene and liquid components.
 
@@ -1202,7 +1202,7 @@ def calculate_clinopyroxene_liquid_components(
      cpx_comps: DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
     OR
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Panda DataFrame of merged clinopyroxene and liquid compositions used for melt matching
 
     Returns
@@ -1212,9 +1212,9 @@ def calculate_clinopyroxene_liquid_components(
        inputted cpx compositions, cpx cations on 6 oxygen basis, cpx components and cpx-liquid components.
 
     '''
-    # For when users enter a combined dataframe MeltMatch=""
-    if MeltMatch is not None:
-        combo_liq_cpxs = MeltMatch
+    # For when users enter a combined dataframe meltmatch=""
+    if meltmatch is not None:
+        combo_liq_cpxs = meltmatch
         if "Sample_ID_Cpx" and "Sample_ID_Liq" in combo_liq_cpxs:
             combo_liq_cpxs = combo_liq_cpxs.drop(
                 ['Sample_ID_Cpx', 'Sample_ID_Liq'], axis=1).astype('float64')
@@ -1261,12 +1261,12 @@ def calculate_clinopyroxene_liquid_components(
     combo_liq_cpxs['DeltaFeMg_WB'] = abs(
         combo_liq_cpxs['Kd_Fe_Mg'] - combo_liq_cpxs['Kd_Fe_Mg_IdealWB'])
     # Adding back in sample names
-    if MeltMatch is not None and "Sample_ID_Cpx" in MeltMatch:
-        combo_liq_cpxs['Sample_ID_Cpx'] = MeltMatch['Sample_ID_Cpx']
-        combo_liq_cpxs['Sample_ID_Liq'] = MeltMatch['Sample_ID_Liq']
-    if MeltMatch is not None and "Sample_ID_Cpx" not in MeltMatch:
-        combo_liq_cpxs['Sample_ID_Cpx'] = MeltMatch.index
-        combo_liq_cpxs['Sample_ID_Liq'] = MeltMatch.index
+    if meltmatch is not None and "Sample_ID_Cpx" in meltmatch:
+        combo_liq_cpxs['Sample_ID_Cpx'] = meltmatch['Sample_ID_Cpx']
+        combo_liq_cpxs['Sample_ID_Liq'] = meltmatch['Sample_ID_Liq']
+    if meltmatch is not None and "Sample_ID_Cpx" not in meltmatch:
+        combo_liq_cpxs['Sample_ID_Cpx'] = meltmatch.index
+        combo_liq_cpxs['Sample_ID_Liq'] = meltmatch.index
     if liq_comps is not None and "Sample_ID_Liq" in liq_comps:
         combo_liq_cpxs['Sample_ID_Liq'] = liq_comps['Sample_ID_Liq']
     if liq_comps is not None and "Sample_ID_Liq" not in liq_comps:
@@ -1409,7 +1409,7 @@ def calculate_cat_fractions_plagioclase(*, plag_comps=None):
 
     return cat_frac_anhyd2
 
-# Calculating alkali feldspar components
+# calculating alkali feldspar components
 
 
 def calculate_mol_proportions_kspar(*, kspar_comps=None):
@@ -1783,10 +1783,10 @@ def calculate_13cations_amphibole_ridolfi(amp_comps):
 
 ## Equilibrium tests clinopyroxene
 
-def calculate_cpx_eq_tests(*, MeltMatch=None, liq_comps=None, cpx_comps=None,
+def calculate_cpx_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None,
                            Fe3FeT_Liq=None, P=None, T=None, sigma=1, KdErr=0.03):
     '''
-    Calculates Kd Fe-Mg, EnFs, DiHd, CaTs for cpx-liquid pairs
+    calculates Kd Fe-Mg, EnFs, DiHd, CaTs for cpx-liquid pairs
 
    Parameters
     -------
@@ -1797,7 +1797,7 @@ def calculate_cpx_eq_tests(*, MeltMatch=None, liq_comps=None, cpx_comps=None,
     liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    MeltMatch: DataFrame
+    meltmatch: DataFrame
         Combined Cpx-Liquid compositions. Used for "melt match" functionality.
 
 
@@ -1827,8 +1827,8 @@ def calculate_cpx_eq_tests(*, MeltMatch=None, liq_comps=None, cpx_comps=None,
 
     '''
 
-    if MeltMatch is not None:
-        Combo_liq_cpxs = MeltMatch
+    if meltmatch is not None:
+        Combo_liq_cpxs = meltmatch
     if liq_comps is not None and cpx_comps is not None:
         liq_comps_c = liq_comps.copy()
         if Fe3FeT_Liq is not None:
@@ -1874,7 +1874,7 @@ def calculate_cpx_eq_tests(*, MeltMatch=None, liq_comps=None, cpx_comps=None,
     Combo_liq_cpxs['CrCaTS_Pred_P1999'] = (np.exp(12.8) * Combo_liq_cpxs['CaO_Liq_cat_frac'] * (
         Combo_liq_cpxs['Cr2O3_Liq_cat_frac']**2) * Combo_liq_cpxs['SiO2_Liq_cat_frac'])
 
-    #     #Calculating deltas -e.g., absolute difference between theoreitcal and observed using Mollo and P1999
+    #     #calculating deltas -e.g., absolute difference between theoreitcal and observed using Mollo and P1999
     Combo_liq_cpxs['Delta_EnFs'] = abs(
         Combo_liq_cpxs['EnFs'] - Combo_liq_cpxs['EnFs_Pred_Mollo'])
     Combo_liq_cpxs['Delta_CaTs'] = abs(

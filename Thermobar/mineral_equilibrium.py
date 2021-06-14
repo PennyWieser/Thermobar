@@ -11,7 +11,7 @@ from Thermobar.core import *
 
 ## Equilibrium things for Olivine
 def calculate_eq_olivine(Kd, *, Liq_Mgno):
-    '''Calculates equilibrium forsterite contents based on inputtted liquid Mg# and Kd Fe-Mg
+    '''calculates equilibrium forsterite contents based on inputtted liquid Mg# and Kd Fe-Mg
      '''
     return 1 / ((Kd / Liq_Mgno) + (1 - Kd))
 
@@ -25,7 +25,7 @@ def calculate_liq_mgno(ol_comps):
 
 def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
     '''
-    Calculates olivine-liq Kd Fe-Mg using the expression of Toplis, 2005.
+    calculates olivine-liq Kd Fe-Mg using the expression of Toplis, 2005.
     '''
     SiO2_mol = 100 * SiO2_mol
     Na2O_mol = 100 * Na2O_mol
@@ -63,9 +63,9 @@ def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
     return Kd_Toplis
 
 
-def calculate_eq_ol_content(liq_comps, Kdmodel, ol_comps=None, T=None, P=None,
+def calculate_eq_ol_content(liq_comps, kd_model, ol_comps=None, T=None, P=None,
 Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
-    '''Calculates equilibrium forsterite contents based on inputtted liquid compositions.
+    '''calculates equilibrium forsterite contents based on inputtted liquid compositions.
 
 
    Parameters
@@ -75,13 +75,13 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
         Liquid compositions with column headings SiO2_Ol, MgO_Ol etc.
 
 
-    KdModel: str
+    kd_model: str
         Specify which Kd model you wish to use.
         "Roeder1970": uses Kd=0.3+0.03 (Not sensitive to P, T, or Ol Fo content)
 
         "Matzen2011": uses Kd=0.34+0.012 (Not sensitive to P, T, or Ol Fo content)
 
-        "Toplis2005": Calculates Kd based on melt SiO2, Na2O, K2O, P, T, H2O, Ol Fo content.
+        "Toplis2005": calculates Kd based on melt SiO2, Na2O, K2O, P, T, H2O, Ol Fo content.
         Users can specify a ol_fo content, or the function iterates Kd and Fo and returns both.
 
         "All": Returns outputs for all models
@@ -113,14 +113,14 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
 
     liq = calculate_anhydrous_cat_fractions_liquid(liq_comps)
     Mgno = liq['Mg_Number_Liq_Fe3']
-    if Kdmodel == "Roeder1970" or Kdmodel == "All":
+    if kd_model == "Roeder1970" or kd_model == "All":
         Eq_ol_03 = 1 / ((0.3 / Mgno) + (1 - 0.3))
         Eq_ol_027 = 1 / ((0.27 / Mgno) + (1 - 0.27))
         Eq_ol_033 = 1 / ((0.33 / Mgno) + (1 - 0.33))
         Kd_out_ro = pd.DataFrame(data={'Eq Fo (Roeder, Kd=0.3)': Eq_ol_03,
                                  'Eq Fo (Roeder, Kd=0.33)': Eq_ol_033, 'Eq Fo (Roeder, Kd=0.27)': Eq_ol_027})
 
-    if Kdmodel == "Matzen2011" or Kdmodel == "All":
+    if kd_model == "Matzen2011" or kd_model == "All":
         Eq_ol_034 = 1 / ((0.34 / Mgno) + (1 - 0.34))
         Eq_ol_032 = 1 / ((0.328 / Mgno) + (1 - 0.328))
         Eq_ol_035 = 1 / ((0.352 / Mgno) + (1 - 0.352))
@@ -128,7 +128,7 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
                                   'Eq Fo (Matzen, Kd=0.352)': Eq_ol_035, 'Eq Fo (Matzen, Kd=0.328)': Eq_ol_032})
 
 
-    if Kdmodel == "Toplis2005" or Kdmodel == "All":
+    if kd_model == "Toplis2005" or kd_model == "All":
         if P is None:
             raise Exception(
                 'The Toplis Kd model is P-dependent, please enter P in kbar into the function')
@@ -164,13 +164,13 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
                 Kd_out_top = pd.DataFrame(
                     data={'Kd (Toplis, Iter)': Kd_Guess, 'Eq Fo (Toplis, Iter)': Eq_ol_guess})
 
-    if Kdmodel == "All":
+    if kd_model == "All":
         Kd_out = pd.concat([Kd_out_ro, Kd_out_mat, Kd_out_top], axis=1)
-    if Kdmodel == "Roeder1970":
+    if kd_model == "Roeder1970":
         Kd_out=Kd_out_ro
-    if Kdmodel == "Matzen2011":
+    if kd_model == "Matzen2011":
         Kd_out=Kd_out_mat
-    if Kdmodel == "Toplis2005":
+    if kd_model == "Toplis2005":
         Kd_out=Kd_out_top
 
     if ol_comps is not None:
@@ -220,14 +220,18 @@ def calculate_ol_rhodes_diagram_lines(
     Eq_ol_034 = 1 / ((0.34 / Mgno) + (1 - 0.34))
     Eq_ol_032 = 1 / ((0.328 / Mgno) + (1 - 0.328))
     Eq_ol_035 = 1 / ((0.352 / Mgno) + (1 - 0.352))
-    Kd_out_mat = pd.DataFrame(data={'Mg#_Liq': Mgno, 'Eq_ol_fo_Roeder (Kd=0.3)': Eq_Roeder_03,
-                                    'Eq_ol_fo_Roeder (Kd=0.27)': Eq_Roeder_027, 'Eq_ol_fo_Roeder (Kd=0.33)': Eq_Roeder_033,
-                                    'Eq_ol_fo_Matzen (Kd=0.34)': Eq_ol_034, 'Eq_ol_fo_Matzen (Kd=0.328)': Eq_ol_032, 'Eq_ol_fo_Matzen (Kd=0.352)': Eq_ol_035})
+    Kd_out_mat = pd.DataFrame(data={'Mg#_Liq': Mgno, 'Eq_Ol_Fo_Roeder (Kd=0.3)': Eq_Roeder_03,
+                                    'Eq_Ol_Fo_Roeder (Kd=0.27)': Eq_Roeder_027,
+                                    'Eq_Ol_Fo_Roeder (Kd=0.33)': Eq_Roeder_033,
+                                    'Eq_Ol_Fo_Matzen (Kd=0.34)': Eq_ol_034,
+                                    'Eq_Ol_Fo_Matzen (Kd=0.328)': Eq_ol_032,
+                                    'Eq_Ol_Fo_Matzen (Kd=0.352)': Eq_ol_035})
+
     if KdMin is not None and KdMax is not None:
         Eq_ol_KdMin = 1 / ((KdMin / Mgno) + (1 - KdMin))
         Eq_ol_KdMax = 1 / ((KdMax / Mgno) + (1 - KdMax))
-        Kd_out_mat2 = pd.DataFrame(data={'Eq_ol_fo (KdMin=' + str(
-            KdMin) + ')': Eq_ol_KdMin, 'Eq_ol_fo (KdMax=' + str(KdMax) + ')': Eq_ol_KdMax})
+        Kd_out_mat2 = pd.DataFrame(data={'Eq_Ol_Fo (KdMin=' + str(
+            KdMin) + ')': Eq_ol_KdMin, 'Eq_Ol_Fo (KdMax=' + str(KdMax) + ')': Eq_ol_KdMax})
         Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat2], axis=1)
 
     return Kd_out_mat
@@ -314,9 +318,9 @@ def calculate_cpx_rhodes_diagram_lines(
         T: float or int or series (optional)
             Temperature in Kelvin. returns lines calculated using Kd from T-sensitive eq 35 of Putirka (2008) (as well as +-0.08 error bounds)
         KdMin: float (optional)
-            Calculates equilibrium line for a user-specified Minimum Kd.
+            calculates equilibrium line for a user-specified Minimum Kd.
         KdMax: float (optional)
-            Calculates equilibrium line for a user-specified Minimum Kd
+            calculates equilibrium line for a user-specified Minimum Kd
     Returns:
     -------
         Mg#_Liq (100 points between Min_Mgno and Max_Mgno), and a variety of equilibrium Cpx Mg#s

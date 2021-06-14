@@ -276,12 +276,12 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
         )
         Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'], Na2O_mol=Liq_Ols[
                           'Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], P=P, H2O=Liq_Ols['H2O_Liq'], T=T_K)
-        Kd_Toplis_Calc = Kd_func(ol_fo)
+        Kd_Toplis_calc = Kd_func(ol_fo)
 
-        DeltaKd_Toplis = abs(KdFeMg_Meas - Kd_Toplis_Calc)
+        DeltaKd_Toplis = abs(KdFeMg_Meas - Kd_Toplis_calc)
         DeltaKd_Roeder = abs(KdFeMg_Meas - 0.3)
         DeltaKd_Matzen = abs(KdFeMg_Meas - 0.34)
-        df = pd.DataFrame(data={'T_K_calc': T_K, 'Kd Meas': KdFeMg_Meas, 'Kd calc (Toplis)': Kd_Toplis_Calc,
+        df = pd.DataFrame(data={'T_K_calc': T_K, 'Kd Meas': KdFeMg_Meas, 'Kd calc (Toplis)': Kd_Toplis_calc,
                                 'ΔKd, Toplis': DeltaKd_Toplis, 'ΔKd, Roeder': DeltaKd_Roeder, 'ΔKd, Matzen': DeltaKd_Matzen})
         df_out = pd.concat([df, Liq_Ols], axis=1)
 
@@ -311,7 +311,7 @@ def T_Wan2008(P=None, *, Cr_No_sp, Al2O3_Ol, Al2O3_Sp):
 ##  Olivine-spinel thermometry function
 
 def calculate_ol_sp_temp(ol_comps, sp_comps, equationT):
-    ''' Calculates temperatures from olivine-spinel pairs.
+    ''' calculates temperatures from olivine-spinel pairs.
 
 
    Parameters
