@@ -1781,6 +1781,20 @@ def calculate_13cations_amphibole_ridolfi(amp_comps):
     cat_13_out = pd.concat([cats, cat_13], axis=1)
     return cat_13_out
 
+
+def calculate_amp_liq_mgno_hyd(liq_comps, amp_comps):
+    liq_comps_hy = calculate_hydrous_cat_fractions_liquid(liq_comps=liq_comps)
+    MolProp=calculate_mol_proportions_amphibole(amp_comps=amp_comps)
+    Kd=((MolProp['FeOt_Amp_mol_prop']/MolProp['MgO_Amp_mol_prop'])/
+    (liq_comps_hy['FeOt_Liq_mol_frac_hyd']/liq_comps_hy['MgO_Liq_mol_frac_hyd']))
+    return Kd
+
+def calculate_amp_liq_mgno_anhyd(liq_comps, amp_comps):
+    liq_comps_hy = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps)
+    MolProp=calculate_mol_proportions_amphibole(amp_comps=amp_comps)
+    Kd=((MolProp['FeOt_Amp_mol_prop']/MolProp['MgO_Amp_mol_prop'])/
+    (liq_comps_hy['FeOt_Liq_mol_frac']/liq_comps_hy['MgO_Liq_mol_frac']))
+    return Kd
 ## Equilibrium tests clinopyroxene
 
 def calculate_cpx_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None,

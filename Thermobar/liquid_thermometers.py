@@ -75,7 +75,7 @@ def T_Helz1987_CaO(P=None, *, CaO_Liq):
     return (16.6 * CaO_Liq + 968 + 273.15)
 
 
-def T_Beatt93_NoOl(P, *, Den_Beat93):
+def T_Beatt93_BeattDMg(P, *, Den_Beat93):
     '''
     Liquid-only thermometer.
     Re-arrangement of Beattie (1993) by Putirka (2008) such that
@@ -86,10 +86,10 @@ def T_Beatt93_NoOl(P, *, Den_Beat93):
             * 4.11 * (10**(-6)) / 8.3144) / Den_Beat93)
 
 
-def T_Beatt93_NoOl_HerzCorr(P, *, Den_Beat93):
+def T_Beatt93_BeattDMg_HerzCorr(P, *, Den_Beat93):
     '''
     Liquid-only thermometer. Herzberg and O'Hara (2002) correction
-    to the olivine-free re-arrangment (T_Beatt93_NoOl) of Beattie (1993) by Putirka.
+    to the olivine-free re-arrangment (T_Beatt93_BeattDMg) of Beattie (1993) by Putirka.
     Eliminates systematic error at high pressures
 
     '''
@@ -229,6 +229,10 @@ def T_Put2008_eq22_BeattDMg(P, *, calcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_N
 
 def T_Molina2015_amp_sat(P=None, *, MgO_Liq_cat_frac,
                          CaO_Liq_cat_frac, Al2O3_Liq_cat_frac):
+    '''
+    Amphibole-saturation thermometer from Molina et al. (2015)
+    '''
+
     return (273.15 + 107 * np.log(MgO_Liq_cat_frac) - 108 *
             np.log(CaO_Liq_cat_frac / (CaO_Liq_cat_frac + Al2O3_Liq_cat_frac)) + 1184)
 
@@ -264,7 +268,24 @@ def T_Put2008_eq34_cpx_sat(P, *, H2O_Liq, CaO_Liq_cat_frac, SiO2_Liq_cat_frac, M
             - 0.386 * np.log(MgO_Liq_cat_frac) - 0.046 * P + 2.2 * (10 ** (-4)) * P**2))
 
 
-
+def T_Opx_Beatt1993_opx(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
+                    MnO_Liq_cat_frac, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac):
+    '''
+    Opx-Liquid thermometer of Beattie (1993). Only uses liquid composition.
+    Putirka (2008) warn that overpredicts for hydrous compositions at <1200Â°C, and anhydrous compositions at <1100Â°C
+    '''
+    Num_B1993 = 125.9 * 1000 / 8.3144 + \
+        ((0.1 * P) * 10**9 - 10**5) * 6.5 * (10**(-6)) / 8.3144
+    D_Mg_opx_li1 = (0.5 - (-0.089 * CaO_Liq_cat_frac - 0.025 * MnO_Liq_cat_frac + 0.129 * FeOt_Liq_cat_frac)) / \
+        (MgO_Liq_cat_frac + 0.072 * CaO_Liq_cat_frac +
+         0.352 * MnO_Liq_cat_frac + 0.264 * FeOt_Liq_cat_frac)
+    Cl_NM = MgO_Liq_cat_frac + FeOt_Liq_cat_frac + \
+        CaO_Liq_cat_frac + MnO_Liq_cat_frac
+    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac) + \
+        7 * np.log(1 - TiO2_Liq_cat_frac)
+    Den_B1993 = 67.92 / 8.3144 + 2 * \
+        np.log(D_Mg_opx_li1) + 2 * np.log(2 * Cl_NM) - NF
+    return Num_B1993 / Den_B1993
 
 
 
@@ -304,12 +325,12 @@ def T_Put2008_eq24c_kspar_sat(P, *, Al2O3_Liq_cat_frac, Na2O_Liq_cat_frac,
 ## Listing them all to check for invalid inputs- add new ones into this list so they become recognised.
 
 Liquid_only_funcs = {T_Put2008_eq13, T_Put2008_eq14, T_Put2008_eq15, T_Put2008_eq16,
-T_Helz1987_MgO, T_Montierth1995_MgO, T_Helz1987_CaO, T_Beatt93_NoOl, T_Beatt93_NoOl_HerzCorr, T_Sug2000_eq1,
+T_Helz1987_MgO, T_Montierth1995_MgO, T_Helz1987_CaO, T_Beatt93_BeattDMg, T_Beatt93_BeattDMg_HerzCorr, T_Sug2000_eq1,
 T_Sug2000_eq3_ol, T_Sug2000_eq3_opx, T_Sug2000_eq3_cpx, T_Sug2000_eq3_pig,
 T_Sug2000_eq6a, T_Sug2000_eq6b, T_Put2008_eq19_BeattDMg, T_Put2008_eq21_BeattDMg,
 T_Put2008_eq22_BeattDMg, T_Molina2015_amp_sat, T_Put2016_eq3_amp_sat,
 T_Put2008_eq34_cpx_sat,
-T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq24c_kspar_sat} # put on outside
+T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq24c_kspar_sat, T_Opx_Beatt1993_opx} # put on outside
 
 Liquid_only_funcs_by_name = {p.__name__: p for p in Liquid_only_funcs}
 
@@ -368,6 +389,9 @@ def calculate_liq_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
         Equation from Montrieth 1995
            | T_Montierth1995_MgO
 
+        Equation from Beattie (1993)
+           | T_Opx_Beatt1993_opx
+
     P: float, int, series, str  ("Solve")
         Pressure in kbar
         Only needed for P-sensitive thermometers.
@@ -424,7 +448,7 @@ def calculate_liq_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
 
 
 # This performs extra calculation steps for Beattie equations
-    if equationT == "T_Beatt93_NoOl" or equationT == "T_Beatt93_NoOl_HerzCorr" or equationT == "T_Put2008_eq19_BeattDMg" \
+    if equationT == "T_Beatt93_BeattDMg" or equationT == "T_Beatt93_BeattDMg_HerzCorr" or equationT == "T_Put2008_eq19_BeattDMg" \
     or equationT == "T_Put2008_eq21_BeattDMg" or equationT == "T_Put2008_eq22_BeattDMg":
         anhyd_cat_frac['calcDMg_Beat93'] = (0.666 - (-0.049 * anhyd_cat_frac['MnO_Liq_cat_frac']
         + 0.027 * anhyd_cat_frac['FeOt_Liq_cat_frac'])) / (

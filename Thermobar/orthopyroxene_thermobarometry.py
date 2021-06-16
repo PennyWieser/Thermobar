@@ -86,24 +86,7 @@ def P_Put2008_eq29c(T, *, Al2O3_Opx_cat_6ox,
             + 1.54 * logCr2O3)
 
 ## Opx-Liquid thermometers
-def T_Opx_Beatt1993(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
-                    MnO_Liq_cat_frac, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac):
-    '''
-    Opx-Liquid thermometer of Beattie (1993). Only uses liquid composition.
-    Putirka (2008) warn that overpredicts for hydrous compositions at <1200Â°C, and anhydrous compositions at <1100Â°C
-    '''
-    Num_B1993 = 125.9 * 1000 / 8.3144 + \
-        ((0.1 * P) * 10**9 - 10**5) * 6.5 * (10**(-6)) / 8.3144
-    D_Mg_opx_li1 = (0.5 - (-0.089 * CaO_Liq_cat_frac - 0.025 * MnO_Liq_cat_frac + 0.129 * FeOt_Liq_cat_frac)) / \
-        (MgO_Liq_cat_frac + 0.072 * CaO_Liq_cat_frac +
-         0.352 * MnO_Liq_cat_frac + 0.264 * FeOt_Liq_cat_frac)
-    Cl_NM = MgO_Liq_cat_frac + FeOt_Liq_cat_frac + \
-        CaO_Liq_cat_frac + MnO_Liq_cat_frac
-    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac) + \
-        7 * np.log(1 - TiO2_Liq_cat_frac)
-    Den_B1993 = 67.92 / 8.3144 + 2 * \
-        np.log(D_Mg_opx_li1) + 2 * np.log(2 * Cl_NM) - NF
-    return Num_B1993 / Den_B1993
+
 
 
 def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, MgO_Liq_cat_frac,
@@ -327,7 +310,7 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
 
 ## Opx-Liquid temperature
 
-Opx_Liq_T_funcs = {T_Opx_Beatt1993, T_Put2008_eq28a, T_Put2008_eq28b_opx_sat}
+Opx_Liq_T_funcs = {T_Put2008_eq28a, T_Put2008_eq28b_opx_sat}
 
 Opx_Liq_T_funcs_by_name = {p.__name__: p for p in Opx_Liq_T_funcs}
 def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmatch=None,
