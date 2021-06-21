@@ -14,13 +14,10 @@ def av_noise_samples_series(calc, sampleID):
 
     Parameters
     -------
-    dataframe: Dataframe
-        Panda datframe of inputs you want to average.
-        Must contain column headings "calc_heading" and "ID_heading".
-    calc_heading: str
-        column heading for the thing you want to average (e.g, P_kbar_calc)
-    ID_heading: str
-        column heading for the thing you want to average by (e.g., Sample_ID)
+    calc: Series
+        Panda series of inputs you want to average.
+    SampleID: str
+        column heading for the thing you want to average by (e.g., Sample_ID_Cpx)
 
     Returns
     -------

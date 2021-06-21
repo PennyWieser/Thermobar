@@ -423,10 +423,10 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
             raise TypeError('cant calculate equilibrium tests if P_kbar isnt numerical'
             'e.g., if you havent specified a T for a T-dependent thermometer')
         if meltmatch is None:
-            eq_tests = calculate_cpx_eq_tests(cpx_comps=cpx_comps,
+            eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P_kbar, T=T, sigma=sigma, KdErr=KdErr)
         if meltmatch is not None:
-            eq_tests = calculate_cpx_eq_tests(meltmatch=meltmatch,
+            eq_tests = calculate_cpx_liq_eq_tests(meltmatch=meltmatch,
             Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
         eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
         return eq_tests
@@ -581,10 +581,10 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
             raise TypeError('cant calculate equilibrium tests if T_K isnt numerical'
             'e.g., if you havent specified a P for a P-dependent thermometer')
         if meltmatch is None:
-            eq_tests = calculate_cpx_eq_tests(cpx_comps=cpx_comps,
+            eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
         if meltmatch is not None:
-            eq_tests = calculate_cpx_eq_tests(meltmatch=meltmatch,
+            eq_tests = calculate_cpx_liq_eq_tests(meltmatch=meltmatch,
             Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
         eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
         return eq_tests
@@ -739,10 +739,10 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         return PT_out
     if eq_tests is True:
         if meltmatch is not None:
-            eq_tests = calculate_cpx_eq_tests(
+            eq_tests = calculate_cpx_liq_eq_tests(
             meltmatch=meltmatch, P=P_guess, T=T_K_guess)
         if meltmatch is None:
-            eq_tests = calculate_cpx_eq_tests(cpx_comps=cpx_comps,
+            eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps, P=P_guess, T=T_K_guess)
         return eq_tests
 
@@ -915,24 +915,34 @@ H2O_Liq=None, Return_All_Matches=False):
     if Return_All_Matches is True:
         return Combo_liq_cpxs
 
+
     else:
 
+        if Cpx_Quality is True:
+            Combo_liq_cpxs_2 = Combo_liq_cpxs.loc[(Combo_liq_cpxs['Cation_Sum_Cpx'] < 4.02) & (
+                Combo_liq_cpxs['Cation_Sum_Cpx'] > 3.99) & (Combo_liq_cpxs['Jd'] > 0.01)]
+
+        if Cpx_Quality is False:
+            Combo_liq_cpxs_2 = Combo_liq_cpxs.copy()
         # This section of code is for when users specify a presssure or
         # temperature, its much faster to not have to iterate, so we don't need
         # the preliminary Kd filter
 
         if P is not None:
-            Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
-            T_K_calc = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs,
+            Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs2.copy()
+            T_K_calc = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
             equationT=equationT, P=P)
             P_guess = P
             T_K_guess = T_K_calc
         if T is not None:
             Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
-            P_kbar_calc = calculate_cpx_opx_temp(meltmatch=Combo_liq_cpxs,
+            P_kbar_calc = calculate_cpx_opx_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
             equationP=equationP, T=T)
             P_guess = P_kbar_calc
             T_K_guess = T
+
+
+
 
         if equationP is not None and equationT is not None:
 
@@ -944,12 +954,7 @@ H2O_Liq=None, Return_All_Matches=False):
 
         # Filter out bad analysis first off
 
-            if Cpx_Quality is True:
-                Combo_liq_cpxs_2 = Combo_liq_cpxs.loc[(Combo_liq_cpxs['Cation_Sum_Cpx'] < 4.02) & (
-                    Combo_liq_cpxs['Cation_Sum_Cpx'] > 3.99) & (Combo_liq_cpxs['Jd'] > 0.01)]
 
-            if Cpx_Quality is False:
-                Combo_liq_cpxs_2 = Combo_liq_cpxs.copy()
 
             if eq_crit is None:
                 Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs_2.copy()
@@ -1008,7 +1013,7 @@ H2O_Liq=None, Return_All_Matches=False):
 
         # Now, we use calculated pressures and temperatures, regardless of
         # whether we iterated or not, to calculate the other CPX components
-        Combo_liq_cpxs_eq_comp = calculate_cpx_eq_tests(
+        Combo_liq_cpxs_eq_comp = calculate_cpx_liq_eq_tests(
             meltmatch=Combo_liq_cpxs_FeMgMatch, P=P_guess, T=T_K_guess)
 
         combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.copy()

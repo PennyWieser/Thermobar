@@ -19,8 +19,11 @@ def calculate_ol_fo(ol_comps):
     Fo=(ol_comps['MgO_Ol']/40.3044)/((ol_comps['MgO_Ol']/40.3044)+(ol_comps['FeOt_Ol']/71.844))
     return Fo
 
-def calculate_liq_mgno(ol_comps):
-    Fo=(ol_comps['MgO_Ol']/40.3044)/((ol_comps['MgO_Ol']/40.3044)+(ol_comps['FeOt_Ol']/71.844))
+def calculate_liq_mgno(liq_comps, Fe3FeT_Liq=None):
+    liq_comps_c=liq_comps.copy()
+    if Fe3FeT_Liq is not None:
+        liq_comps_c['Fe3FeT_Liq']=Fe3FeT_Liq
+    Mgno=(liq_comps['MgO_Ol']/40.3044)/((liq_comps['MgO_Ol']/40.3044)+(liq_comps_c['Fe3FeT_Liq']*liq_comps['FeOt_Ol']/71.844))
     return Fo
 
 def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
@@ -63,7 +66,7 @@ def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
     return Kd_Toplis
 
 
-def calculate_eq_ol_content(liq_comps, kd_model, ol_comps=None, T=None, P=None,
+def calculate_eq_ol_content(liq_comps, Kd_model, ol_comps=None, T=None, P=None,
 Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
     '''calculates equilibrium forsterite contents based on inputtted liquid compositions.
 
@@ -75,7 +78,7 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
         Liquid compositions with column headings SiO2_Ol, MgO_Ol etc.
 
 
-    kd_model: str
+    Kd_model: str
         Specify which Kd model you wish to use.
         "Roeder1970": uses Kd=0.3+0.03 (Not sensitive to P, T, or Ol Fo content)
 
@@ -113,14 +116,14 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
 
     liq = calculate_anhydrous_cat_fractions_liquid(liq_comps)
     Mgno = liq['Mg_Number_Liq_Fe3']
-    if kd_model == "Roeder1970" or kd_model == "All":
+    if Kd_model == "Roeder1970" or Kd_model == "All":
         Eq_ol_03 = 1 / ((0.3 / Mgno) + (1 - 0.3))
         Eq_ol_027 = 1 / ((0.27 / Mgno) + (1 - 0.27))
         Eq_ol_033 = 1 / ((0.33 / Mgno) + (1 - 0.33))
         Kd_out_ro = pd.DataFrame(data={'Eq Fo (Roeder, Kd=0.3)': Eq_ol_03,
                                  'Eq Fo (Roeder, Kd=0.33)': Eq_ol_033, 'Eq Fo (Roeder, Kd=0.27)': Eq_ol_027})
 
-    if kd_model == "Matzen2011" or kd_model == "All":
+    if Kd_model == "Matzen2011" or Kd_model == "All":
         Eq_ol_034 = 1 / ((0.34 / Mgno) + (1 - 0.34))
         Eq_ol_032 = 1 / ((0.328 / Mgno) + (1 - 0.328))
         Eq_ol_035 = 1 / ((0.352 / Mgno) + (1 - 0.352))
@@ -128,7 +131,7 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
                                   'Eq Fo (Matzen, Kd=0.352)': Eq_ol_035, 'Eq Fo (Matzen, Kd=0.328)': Eq_ol_032})
 
 
-    if kd_model == "Toplis2005" or kd_model == "All":
+    if Kd_model == "Toplis2005" or Kd_model == "All":
         if P is None:
             raise Exception(
                 'The Toplis Kd model is P-dependent, please enter P in kbar into the function')
@@ -164,13 +167,13 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
                 Kd_out_top = pd.DataFrame(
                     data={'Kd (Toplis, Iter)': Kd_Guess, 'Eq Fo (Toplis, Iter)': Eq_ol_guess})
 
-    if kd_model == "All":
+    if Kd_model == "All":
         Kd_out = pd.concat([Kd_out_ro, Kd_out_mat, Kd_out_top], axis=1)
-    if kd_model == "Roeder1970":
+    if Kd_model == "Roeder1970":
         Kd_out=Kd_out_ro
-    if kd_model == "Matzen2011":
+    if Kd_model == "Matzen2011":
         Kd_out=Kd_out_mat
-    if kd_model == "Toplis2005":
+    if Kd_model == "Toplis2005":
         Kd_out=Kd_out_top
 
     if ol_comps is not None:
@@ -239,69 +242,80 @@ def calculate_ol_rhodes_diagram_lines(
 ## Equilibrium things for Pyroxene
 
 def calculate_opx_rhodes_diagram_lines(
-        Min_Mgno, Max_Mgno, simple=False, T=None, KdMin=None, KdMax=None, liq_comps=None):
+        Min_Mgno, Max_Mgno, T=None, KdMin=None, KdMax=None, liq_comps=None):
     '''
-    Input minimum and maximum liquid Mg#, calculates lines for equilibrium Opx Mg# content using a variety of choices for Kd Fe-Mg.
+    Input minimum and maximum liquid Mg#, calculates lines for equilibrium
+    Opx Mg# content using a variety of choices for Kd Fe-Mg.
 
    Parameters
     -------
-
     Min_Mgno: float or int.
         Min liquid Mg# you want equilibrium lines for
 
     Max_Mgno: float or int.
         Max liquid Mg# you want equilibrium lines for
 
-    simple: bool
-        If True, returns lines calculated using 0.29+-0.06 (Putirka, 2008).
 
-    KdMin: float
-        Optional. Also returns line for a user-specified Minimum Kd.
+    By default, returns Mg#s for 0.29+-0.06 (Putirka). Can get other outputs as
+    well using:
 
-    KdMax: float
-            Optional. Also returns line for a user-specified Maximum Kd.
+        KdMin: float. Optional.
+            Also returns line for a user-specified Minimum Kd.
 
-    liq_comps: DataFrame
-        Optional Uses average cation fraction of XSi in the liquid to calculate Kd Fe-Mg using the expression = 0.4805 âˆ’ 0.3733 XSi (Putirka, 2008)
+        KdMax: float. Optional.
+            Also returns line for a user-specified Maximum Kd.
 
-Returns
-    Mg#_Liq (100 points between Min) and equilibrium Opx compositions depending on inputs.
-    Returns headings corresponding to options selected above.
+        liq_comps: DataFrame. Optional
+            Uses average cation fraction of XSi in the liquid to
+            calculate Kd Fe-Mg using the expression = 0.4805 - 0.3733 XSi (Putirka, 2008)
+
+   Returns
+    -------
+        Mg#_Liq (100 points between Min) and equilibrium Opx compositions depending on inputs.
+        Returns headings corresponding to options selected above.
 
     '''
     Mgno = np.linspace(Min_Mgno, Max_Mgno, 100)
-    if simple is True:
-        Mgno = np.linspace(Min_Mgno, Max_Mgno, 100)
-        Eq_023 = 1 / ((0.23 / Mgno) + (1 - 0.23))
-        Eq_029 = 1 / ((0.29 / Mgno) + (1 - 0.29))
-        Eq_035 = 1 / ((0.35 / Mgno) + (1 - 0.35))
-        Kd_out_mat_s = pd.DataFrame(data={'Eq_Opx (Kd=0.23)': Eq_023,
-                                          'Eq_Opx (Kd=0.29)': Eq_029, 'Eq_Opx (Kd=0.35)': Eq_035})
-        Kd_out_mat = Kd_out_mat_s
+
+    Mgno = np.linspace(Min_Mgno, Max_Mgno, 100)
+    Eq_023 = 1 / ((0.23 / Mgno) + (1 - 0.23))
+    Eq_029 = 1 / ((0.29 / Mgno) + (1 - 0.29))
+    Eq_035 = 1 / ((0.35 / Mgno) + (1 - 0.35))
+    Kd_out_mat_s = pd.DataFrame(data={'Eq_Opx_Mg# (Kd=0.23)': Eq_023,
+                                    'Eq_Opx_Mg# (Kd=0.29)': Eq_029,
+                                    'Eq_Opx_Mg# (Kd=0.35)': Eq_035})
+    Kd_out_mat = Kd_out_mat_s
+
     if KdMin is not None and KdMax is not None:
         Eq_ol_KdMin = 1 / ((KdMin / Mgno) + (1 - KdMin))
         Eq_ol_KdMax = 1 / ((KdMax / Mgno) + (1 - KdMax))
-        Kd_out_mat_MM = pd.DataFrame(data={'Eq_Opx (KdMin=' + str(
-            KdMin) + ')': Eq_ol_KdMin, 'Eq_Opx (KdMax=' + str(KdMax) + ')': Eq_ol_KdMax})
-        if len(Kd_out_mat) > 0:
-            Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat_MM], axis=1)
-        else:
-            Kd_out_mat = Kd_out_mat_MM
+        Kd_out_mat_MM = pd.DataFrame(data={'Eq_Opx_Mg# (KdMin=' + str(
+            KdMin) + ')': Eq_ol_KdMin, 'Eq_Opx_Mg# (KdMax=' + str(KdMax) + ')': Eq_ol_KdMax})
+        Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat_MM], axis=1)
 
     if liq_comps is not None:
         cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps)
         Si_mean_frac = np.nanmean(cat_frac['SiO2_Liq_cat_frac'])
-        Ideal_Kd_Si = 0.4805 - 0.3733 * Si_mean_frac
-        Eq_Cpx_Si = 1 / ((Ideal_Kd_Si / Mgno) + (1 - Ideal_Kd_Si))
-        Kd_out_mat_Si = pd.DataFrame(
-            data={'Kd_from_Si': Ideal_Kd_Si, 'Eq_Opx (Kd_from_Si)': Eq_Cpx_Si})
-        Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat_Si], axis=1)
+        Kd = 0.4805 - 0.3733 * Si_mean_frac
+        Eq_Opx = 1 / ((Kd / Mgno) + (1 - Kd))
+        Kd_p_1_s = Kd + 0.06
+        Kd_m_1_s = Kd - 0.06
+        Eq_Opx_p1sigma = 1 / ((Kd_p_1_s / Mgno) + (1 - Kd_p_1_s))
+        Eq_Opx_m1sigma = 1 / ((Kd_m_1_s / Mgno) + (1 - Kd_m_1_s))
+        Kd_out_mat_s = pd.DataFrame(data={'Kd_XSi_P2008': Kd, 'Eq_Opx_Mg# (Kd_XSi_P2008)':
+        Eq_Opx, 'Eq_Opx_Mg# (Kd_XSi_P2008)+0.06': Eq_Opx_p1sigma,
+        'Eq_Opx_Mg# (Kd_XSi_P2008)-0.06': Eq_Opx_m1sigma})
+
+        Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat_s], axis=1)
+
+
+
     Kd_out_mat.insert(0, "Mg#_Liq", Mgno)
     return Kd_out_mat
 
 
 def calculate_cpx_rhodes_diagram_lines(
-        Min_Mgno, Max_Mgno, simple=False, T=None, KdMin=None, KdMax=None):
+        Min_Mgno, Max_Mgno, T=None, KdMin=None, KdMax=None):
     '''
     Input minimum and maximum liquid Mg#, calculates lines for equilibrium Cpx Mg# contents based on user-specified Kd Fe-Mg options.
 
@@ -313,9 +327,11 @@ def calculate_cpx_rhodes_diagram_lines(
             Min liquid Mg# you want equilibrium lines for
         Max_Mgno: float or int.
             Max liquid Mg# you want equilibrium lines for
-        simple: bool
-            If True, returns lines calculated using 0.28+-0.08 (Putirka, 2008).
-        T: float or int or series (optional)
+
+        By default, returns lines calculated using 0.28+-0.08 (Putirka, 2008).
+        Can get other outputs as well using:
+
+        T: float or int (optional)
             Temperature in Kelvin. returns lines calculated using Kd from T-sensitive eq 35 of Putirka (2008) (as well as +-0.08 error bounds)
         KdMin: float (optional)
             calculates equilibrium line for a user-specified Minimum Kd.
@@ -327,41 +343,37 @@ def calculate_cpx_rhodes_diagram_lines(
 
 
     '''
+
     Mgno = np.linspace(Min_Mgno, Max_Mgno, 100)
-    if isinstance(T, int) or isinstance(T, float) or isinstance(T, pd.Series):
+    Eq_02 = 1 / ((0.2 / Mgno) + (1 - 0.2))
+    Eq_028 = 1 / ((0.28 / Mgno) + (1 - 0.28))
+    Eq_036 = 1 / ((0.36 / Mgno) + (1 - 0.36))
+    Kd_out_mat = pd.DataFrame(data={'Eq_Cpx_Mg# (Kd=0.28)': Eq_028,
+                                        'Eq_Cpx_Mg# (Kd=0.2)': Eq_02, 'Eq_Cpx_Mg# (Kd=0.36)': Eq_036})
+
+
+    if isinstance(T, int) or isinstance(T, float):
         Kd = np.exp(-0.107 - 1719 / T)
         Eq_Cpx = 1 / ((Kd / Mgno) + (1 - Kd))
         Kd_p_1_s = Kd + 0.08
         Kd_m_1_s = Kd - 0.08
         Eq_Cpx_p1sigma = 1 / ((Kd_p_1_s / Mgno) + (1 - Kd_p_1_s))
         Eq_Cpx_m1sigma = 1 / ((Kd_m_1_s / Mgno) + (1 - Kd_m_1_s))
-        Kd_out_mat = pd.DataFrame(data={'Kd_Eq35_P2008': Kd, 'Eq_Cpx_Mg# (Kd from Eq 35 P2008)': Eq_Cpx, 'Eq_Cpx_Mg# (Eq 35 P2008)+0.08': Eq_Cpx_p1sigma,
-                                        'Eq_Cpx_Mg# (Eq 35 P2008)-0.08': Eq_Cpx_m1sigma})
+        Kd_out_mat_s = pd.DataFrame(data={'Kd_Eq35_P2008': Kd, 'Eq_Cpx_Mg# (Kd from Eq 35 P2008)':
+        Eq_Cpx, 'Eq_Cpx_Mg# (Eq 35 P2008)+0.08': Eq_Cpx_p1sigma,
+        'Eq_Cpx_Mg# (Eq 35 P2008)-0.08': Eq_Cpx_m1sigma})
+        Kd_out_mat=pd.concat([Kd_out_mat, Kd_out_mat_s], axis=1)
+
 
     if KdMin is not None and KdMax is not None:
         Eq_cpx_KdMin = 1 / ((KdMin / Mgno) + (1 - KdMin))
         Eq_cpx_KdMax = 1 / ((KdMax / Mgno) + (1 - KdMax))
         Kd_out_mat_MM = pd.DataFrame(data={'Eq_Cpx_Mg# (KdMin=' + str(
             KdMin) + ')': Eq_cpx_KdMin, 'Eq_Cpx_Mg# (KdMax=' + str(KdMax) + ')': Eq_cpx_KdMax})
-        if len(Kd_out_mat) > 0:
-            Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat_MM], axis=1)
-        else:
-            Kd_out_mat = Kd_out_mat_MM
+        Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat_MM], axis=1)
 
-    if simple is True:
-        Mgno = np.linspace(Min_Mgno, Max_Mgno, 100)
-        Eq_02 = 1 / ((0.2 / Mgno) + (1 - 0.2))
-        Eq_028 = 1 / ((0.28 / Mgno) + (1 - 0.28))
-        Eq_036 = 1 / ((0.36 / Mgno) + (1 - 0.36))
-        Kd_out_mat_s = pd.DataFrame(data={'Eq_Cpx_Mg# (Kd=0.28)': Eq_028,
-                                          'Eq_Cpx_Mg# (Kd=0.2)': Eq_02, 'Eq_Cpx_Mg# (Kd=0.36)': Eq_036})
-        if KdMin is not None and KdMax is not None or T is not None:
-            Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat_s], axis=1)
-        else:
-            Kd_out_mat = Kd_out_mat_s
-
-        Kd_out_mat.insert(0, "Mg#_Liq", Mgno)
-        return Kd_out_mat
+    Kd_out_mat.insert(0, "Mg#_Liq", Mgno)
+    return Kd_out_mat
 
 
 

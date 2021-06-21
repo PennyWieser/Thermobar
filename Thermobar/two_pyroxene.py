@@ -297,7 +297,7 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     if eq_tests is False:
         return P_kbar
     else:
-        two_pyx = calculate_cpx_opx_equilibrium_tests(
+        two_pyx = calculate_cpx_opx_eq_tests(
             cpx_comps=cpx_comps, opx_comps=opx_comps)
         two_pyx.insert(0, "P_kbar_calc", P_kbar)
         two_pyx.insert(2, "Equation Choice (P)", str(equationP))
@@ -400,7 +400,7 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
             return T_K
 
     else:
-        two_pyx = calculate_cpx_opx_equilibrium_tests(
+        two_pyx = calculate_cpx_opx_eq_tests(
             cpx_comps=cpx_comps, opx_comps=opx_comps)
         two_pyx.insert(0, "T_K_calc", T_K)
         two_pyx.insert(2, "Equation Choice (T)", str(equationT))
@@ -515,7 +515,7 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
 
         return PT_out
     if eq_tests is True:
-        two_pyx = calculate_cpx_opx_equilibrium_tests(
+        two_pyx = calculate_cpx_opx_eq_tests(
             cpx_comps=cpx_comps, opx_comps=opx_comps)
 
         two_pyx.insert(0, "T_K_calc", T_K_guess)

@@ -268,7 +268,7 @@ def T_Put2008_eq34_cpx_sat(P, *, H2O_Liq, CaO_Liq_cat_frac, SiO2_Liq_cat_frac, M
             - 0.386 * np.log(MgO_Liq_cat_frac) - 0.046 * P + 2.2 * (10 ** (-4)) * P**2))
 
 
-def T_Opx_Beatt1993_opx(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
+def T_Beatt1993_opx(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
                     MnO_Liq_cat_frac, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac):
     '''
     Opx-Liquid thermometer of Beattie (1993). Only uses liquid composition.
@@ -330,12 +330,12 @@ T_Sug2000_eq3_ol, T_Sug2000_eq3_opx, T_Sug2000_eq3_cpx, T_Sug2000_eq3_pig,
 T_Sug2000_eq6a, T_Sug2000_eq6b, T_Put2008_eq19_BeattDMg, T_Put2008_eq21_BeattDMg,
 T_Put2008_eq22_BeattDMg, T_Molina2015_amp_sat, T_Put2016_eq3_amp_sat,
 T_Put2008_eq34_cpx_sat,
-T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq24c_kspar_sat, T_Opx_Beatt1993_opx} # put on outside
+T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq24c_kspar_sat, T_Beatt1993_opx} # put on outside
 
 Liquid_only_funcs_by_name = {p.__name__: p for p in Liquid_only_funcs}
 
 
-def calculate_liq_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
+def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
 
     '''
     Liquid-only thermometery. Returns a temperature in Kelvin.
@@ -390,7 +390,7 @@ def calculate_liq_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
            | T_Montierth1995_MgO
 
         Equation from Beattie (1993)
-           | T_Opx_Beatt1993_opx
+           | T_Beatt1993_opx
 
     P: float, int, series, str  ("Solve")
         Pressure in kbar

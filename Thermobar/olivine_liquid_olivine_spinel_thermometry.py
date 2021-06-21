@@ -63,7 +63,8 @@ def T_Sisson1992(P, *, KdMg_TSG1992):
 def T_Pu2017(P=None, *, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, MgO_Liq_mol_frac,
              CaO_Liq_mol_frac, NiO_Liq_mol_frac, Al2O3_Liq_mol_frac, TiO2_Liq_mol_frac, SiO2_Liq_mol_frac):
     '''
-    Olivine-Liquid thermometer: Pu et al. (2017). Uses D Ni (ol-melt) rather than D Mg (ol-melt), meaning this thermometer has far less sensitivity to H2O or pressure at 0-1 GPa.
+    Olivine-Liquid thermometer: Pu et al. (2017). Uses D Ni (ol-melt) rather than D Mg (ol-melt),
+    meaning this thermometer has far less sensitivity to H2O or pressure at 0-1 GPa.
     SEE=±29°C
     '''
     D_Ni_Mol = NiO_Ol_mol_frac / NiO_Liq_mol_frac
@@ -78,7 +79,8 @@ def T_Pu2017(P=None, *, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, Mg
 def T_Pu2021(P, *, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, MgO_Liq_mol_frac,
              CaO_Liq_mol_frac, NiO_Liq_mol_frac, Al2O3_Liq_mol_frac, TiO2_Liq_mol_frac, SiO2_Liq_mol_frac):
     '''
-    Olivine-Liquid thermometer: Pu et al. (2017), with the pressure correction of Pu et al. (2021). Uses D Ni (ol-melt) rather than D Mg (ol-melt), meaning this thermometer has far less sensitivity to melt H2O than other olivine-liquid thermometers.
+    Olivine-Liquid thermometer: Pu et al. (2017), with the pressure correction of Pu et al. (2021).
+    Uses D Ni (ol-melt) rather than D Mg (ol-melt), meaning this thermometer has far less sensitivity to melt H2O than other olivine-liquid thermometers.
     SEE=±45°C (for the 2017 expression).
     '''
     D_Ni_Mol = NiO_Ol_mol_frac / NiO_Liq_mol_frac

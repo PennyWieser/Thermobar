@@ -296,7 +296,7 @@ def calculate_fspar_liq_press(*, plag_comps=None, kspar_comps=None, liq_comps=No
 
 ## Function for iterating pressure and temperature - (probably not recomended)
 
-def calculate_fspar_Liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_comps=None,
+def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_comps=None,
                                 meltmatch=None, equationP=None, equationT=None, iterations=30, T_K_guess=1300,
                                 H2O_Liq=None):
     '''

@@ -442,12 +442,12 @@ def calculate_liq_mgno(liq_comps, Fe3FeT_Liq=None):
     pandas Series
         Mg# of liquid
     '''
-
+    liq_comps_c=liq_comps.copy()
     if Fe3FeT_Liq is not None:
-        liq_comps['Fe3FeT_Liq'] = Fe3FeT_Liq
+        liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
 
-    Liq_Mgno = (liq_comps['MgO_Liq'] / 40.3044) / ((liq_comps['MgO_Liq'] / 40.3044) +
-                                                   (liq_comps['FeOt_Liq'] * (1 - liq_comps['Fe3FeT_Liq']) / 71.844))
+    Liq_Mgno = (liq_comps_c['MgO_Liq'] / 40.3044) / ((liq_comps_c['MgO_Liq'] / 40.3044) +
+            (liq_comps_c['FeOt_Liq'] * (1 - liq_comps_c['Fe3FeT_Liq']) / 71.844))
     return Liq_Mgno
 
 ## Hydrous mole proportions, mole fractions, cation proportions, cation fractions
@@ -947,7 +947,7 @@ def calculate_orthopyroxene_components(opx_comps):
 
 
 def calculate_orthopyroxene_liquid_components(
-        *, opx_comps=None, liq_comps=None, meltmatch=None):
+        *, opx_comps=None, liq_comps=None, meltmatch=None, Fe3FeT_Liq=None):
     '''Import orthopyroxene compositions using opx_comps=My_Opxs and liquid compositions using liq_comps=My_Liquids,
         returns orthopyroxene and liquid components.
 
@@ -974,6 +974,10 @@ def calculate_orthopyroxene_liquid_components(
     if meltmatch is not None:
         combo_liq_opxs = meltmatch
     if liq_comps is not None and opx_comps is not None:
+        liq_comps_c=liq_comps.copy()
+        if Fe3FeT_Liq is not None:
+            liq_comps_c['Fe3FeT_Liq']=Fe3FeT_Liq
+
         if len(liq_comps) != len(opx_comps):
             raise Exception(
                 "inputted dataframes for liq_comps and opx_comps need to have the same number of rows")
@@ -981,7 +985,7 @@ def calculate_orthopyroxene_liquid_components(
             myOPXs1_comp = calculate_orthopyroxene_components(
                 opx_comps=opx_comps)
             myLiquids1_comps = calculate_anhydrous_cat_fractions_liquid(
-                liq_comps=liq_comps)
+                liq_comps=liq_comps_c)
             combo_liq_opxs = pd.concat(
                 [myLiquids1_comps, myOPXs1_comp], axis=1)
 
@@ -1007,6 +1011,10 @@ def calculate_orthopyroxene_liquid_components(
         if combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'].iloc[i] < 0.06:
             b[i] = str("Yes")
     combo_liq_opxs.insert(1, "Kd Eq (Put2008+-0.06)", b)
+
+    combo_liq_opxs['Mgno_Liq_noFe3']=calculate_liq_mgno(liq_comps=liq_comps_c, Fe3FeT_Liq=0)
+    combo_liq_opxs['Mgno_Liq_Fe2']=calculate_liq_mgno(liq_comps=liq_comps_c)
+
 
     return combo_liq_opxs
 
@@ -1181,6 +1189,8 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['DiHd_1996'] = cpx_calc['DiHd_1996'].clip(lower=0)
     cpx_calc['DiHd_2003'] = cpx_calc['DiHd_2003'].clip(lower=0)
     cpx_calc['Jd'] = cpx_calc['Jd'].clip(lower=0)
+
+
     # Merging new Cpx compnoents with inputted cpx composition
     cpx_combined = pd.concat([cpx_comps, cpx_calc], axis='columns')
 
@@ -1189,7 +1199,7 @@ def calculate_clinopyroxene_components(cpx_comps):
 
 
 def calculate_clinopyroxene_liquid_components(
-        *, cpx_comps=None, liq_comps=None, meltmatch=None):
+        *, cpx_comps=None, liq_comps=None, meltmatch=None, Fe3FeT_Liq=None):
     '''Import clinopyroxene compositions using cpx_comps=My_Cpxs and liquid compositions using liq_comps=My_Liquids,
         returns clinopyroxene and liquid components.
 
@@ -1205,6 +1215,8 @@ def calculate_clinopyroxene_liquid_components(
     meltmatch: DataFrame
         Panda DataFrame of merged clinopyroxene and liquid compositions used for melt matching
 
+    Fe3FeT_Liq: opt, int, float, series
+        overwrites Fe3FeT ratio inliquid input
     Returns
     -------
     pandas DataFrame
@@ -1215,11 +1227,20 @@ def calculate_clinopyroxene_liquid_components(
     # For when users enter a combined dataframe meltmatch=""
     if meltmatch is not None:
         combo_liq_cpxs = meltmatch
-        if "Sample_ID_Cpx" and "Sample_ID_Liq" in combo_liq_cpxs:
+        if "Sample_ID_Cpx" in combo_liq_cpxs:
             combo_liq_cpxs = combo_liq_cpxs.drop(
-                ['Sample_ID_Cpx', 'Sample_ID_Liq'], axis=1).astype('float64')
+                ['Sample_ID_Cpx'], axis=1).astype('float64')
+        if  "Sample_ID_Liq" in combo_liq_cpxs:
+            combo_liq_cpxs = combo_liq_cpxs.drop(
+                ['Sample_ID_Liq'], axis=1).astype('float64')
 
     if liq_comps is not None and cpx_comps is not None:
+        liq_comps_c=liq_comps.copy()
+        if Fe3FeT_Liq is not None:
+            liq_comps_c['Fe3FeT_Liq']=Fe3FeT_Liq
+
+
+
         if len(liq_comps) != len(cpx_comps):
             raise Exception(
                 "inputted dataframes for liq_comps and cpx_comps need to have the same number of rows")
@@ -1227,13 +1248,14 @@ def calculate_clinopyroxene_liquid_components(
             myCPXs1_comp = calculate_clinopyroxene_components(
                 cpx_comps=cpx_comps).reset_index(drop=True)
             myLiquids1_comps = calculate_anhydrous_cat_fractions_liquid(
-                liq_comps=liq_comps).reset_index(drop=True)
+                liq_comps=liq_comps_c).reset_index(drop=True)
             combo_liq_cpxs = pd.concat(
                 [myLiquids1_comps, myCPXs1_comp], axis=1)
             if "Sample_ID_Cpx" in combo_liq_cpxs:
                 combo_liq_cpxs.drop(['Sample_ID_Cpx'], axis=1)
             if "Sample_ID_Liq" in combo_liq_cpxs:
                 combo_liq_cpxs.drop(['Sample_ID_Liq'], axis=1)
+
 
 
 # Measured Kd Fe-Mg (using 2+)
@@ -1254,6 +1276,9 @@ def calculate_clinopyroxene_liquid_components(
 
     combo_liq_cpxs['Kd_Fe_Mg_IdealWB'] = 0.109 + 0.186 * \
         combo_liq_cpxs['Mgno_CPX']  # equation 35 of wood and blundy
+
+    combo_liq_cpxs['Mgno_Liq_noFe3']=calculate_liq_mgno(liq_comps=liq_comps_c, Fe3FeT_Liq=0)
+    combo_liq_cpxs['Mgno_Liq_Fe2']=calculate_liq_mgno(liq_comps=liq_comps_c)
 
 
 # Different ways to calculate DeltaFeMg
@@ -1797,7 +1822,7 @@ def calculate_amp_liq_mgno_anhyd(liq_comps, amp_comps):
     return Kd
 ## Equilibrium tests clinopyroxene
 
-def calculate_cpx_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None,
+def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None,
                            Fe3FeT_Liq=None, P=None, T=None, sigma=1, KdErr=0.03):
     '''
     calculates Kd Fe-Mg, EnFs, DiHd, CaTs for cpx-liquid pairs
@@ -1914,7 +1939,7 @@ def calculate_cpx_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None,
     return Combo_liq_cpxs
 
 
-def calculate_cpx_opx_equilibrium_tests(cpx_comps, opx_comps):
+def calculate_cpx_opx_eq_tests(cpx_comps, opx_comps):
     '''
     Import Cpx and Opx compositions, assesses degree of Fe-Mg disequilibrium.
     Parameters
@@ -1979,7 +2004,7 @@ def calculate_cpx_opx_equilibrium_tests(cpx_comps, opx_comps):
     return two_pyx
 
 
-def calculate_plagioclase_liquid_components(*, plag_comps=None, liq_comps=None, XAb=None, XAn=None, XOr=0,
+def calculate_plag_liq_eq_tests(*, plag_comps=None, liq_comps=None, XAb=None, XAn=None, XOr=0,
 P, T):
 
     '''

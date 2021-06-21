@@ -8,6 +8,7 @@ import pandas as pd
 
 
 from Thermobar.core import *
+from Thermobar.liquid_thermometers import*
 
 ## Opx-Liquid barometers
 
@@ -310,7 +311,7 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
 
 ## Opx-Liquid temperature
 
-Opx_Liq_T_funcs = {T_Put2008_eq28a, T_Put2008_eq28b_opx_sat}
+Opx_Liq_T_funcs = {T_Put2008_eq28a, T_Put2008_eq28b_opx_sat, T_Beatt1993_opx}
 
 Opx_Liq_T_funcs_by_name = {p.__name__: p for p in Opx_Liq_T_funcs}
 def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmatch=None,
