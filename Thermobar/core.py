@@ -1012,9 +1012,13 @@ def calculate_orthopyroxene_liquid_components(
             b[i] = str("Yes")
     combo_liq_opxs.insert(1, "Kd Eq (Put2008+-0.06)", b)
 
-    combo_liq_opxs['Mgno_Liq_noFe3']=calculate_liq_mgno(liq_comps=liq_comps_c, Fe3FeT_Liq=0)
-    combo_liq_opxs['Mgno_Liq_Fe2']=calculate_liq_mgno(liq_comps=liq_comps_c)
 
+    combo_liq_opxs['Mgno_Liq_noFe3']= (combo_liq_opxs['MgO_Liq'] / 40.3044) / ((combo_liq_opxs['MgO_Liq'] / 40.3044) +
+            (combo_liq_opxs['FeOt_Liq']) / 71.844)
+
+
+    combo_liq_opxs['Mgno_Liq_Fe2']=(combo_liq_opxs['MgO_Liq'] / 40.3044) / ((combo_liq_opxs['MgO_Liq'] / 40.3044) +
+            (combo_liq_opxs['FeOt_Liq'] * (1 - combo_liq_opxs['Fe3FeT_Liq']) / 71.844))
 
     return combo_liq_opxs
 
@@ -1277,8 +1281,12 @@ def calculate_clinopyroxene_liquid_components(
     combo_liq_cpxs['Kd_Fe_Mg_IdealWB'] = 0.109 + 0.186 * \
         combo_liq_cpxs['Mgno_CPX']  # equation 35 of wood and blundy
 
-    combo_liq_cpxs['Mgno_Liq_noFe3']=calculate_liq_mgno(liq_comps=liq_comps_c, Fe3FeT_Liq=0)
-    combo_liq_cpxs['Mgno_Liq_Fe2']=calculate_liq_mgno(liq_comps=liq_comps_c)
+    combo_liq_cpxs['Mgno_Liq_noFe3']= (combo_liq_cpxs['MgO_Liq'] / 40.3044) / ((combo_liq_cpxs['MgO_Liq'] / 40.3044) +
+            (combo_liq_cpxs['FeOt_Liq']) / 71.844)
+
+
+    combo_liq_cpxs['Mgno_Liq_Fe2']=(combo_liq_cpxs['MgO_Liq'] / 40.3044) / ((combo_liq_cpxs['MgO_Liq'] / 40.3044) +
+            (combo_liq_cpxs['FeOt_Liq'] * (1 - combo_liq_cpxs['Fe3FeT_Liq']) / 71.844))
 
 
 # Different ways to calculate DeltaFeMg

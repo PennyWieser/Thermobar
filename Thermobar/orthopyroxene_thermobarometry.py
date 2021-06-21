@@ -23,9 +23,12 @@ def P_Put2008_eq29a(T, *, SiO2_Liq_cat_frac, MgO_Liq_cat_frac, FeOt_Opx_cat_6ox,
     |  SEE=+-2.1 kbar for hydrous data
 
     '''
+    Na_Si_Al_Na=(NaAlSi2O6 / (SiO2_Liq_cat_frac**2 * Al2O3_Liq_cat_frac * Na2O_Liq_cat_frac)).astype(float)
+    log_Na_Si_Al_Na=np.log(Na_Si_Al_Na)
     return (-13.97 + 0.0129 * (T - 273.15) - 19.64 * SiO2_Liq_cat_frac + 47.49 * MgO_Liq_cat_frac + 6.99 * FeOt_Opx_cat_6ox
             + 37.37 * FmAl2SiO6 + 0.748 * H2O_Liq + 79.67 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) +
-            0.001416 * (T - 273.15) * np.log(NaAlSi2O6 / (SiO2_Liq_cat_frac**2 * Al2O3_Liq_cat_frac * Na2O_Liq_cat_frac)))
+            0.001416 * (T - 273.15) )
+            #* np.log(NaAlSi2O6 / (SiO2_Liq_cat_frac**2 * Al2O3_Liq_cat_frac * Na2O_Liq_cat_frac)))
 
 
 def P_Put2008_eq29b(T, *, ln_FmAl2SiO6_liq, Al2O3_Liq_cat_frac, MgO_Liq_cat_frac, FeOt_Liq_cat_frac, SiO2_Opx_cat_6ox, FeOt_Opx_cat_6ox,
