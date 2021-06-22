@@ -27,8 +27,8 @@ def P_Put2008_eq29a(T, *, SiO2_Liq_cat_frac, MgO_Liq_cat_frac, FeOt_Opx_cat_6ox,
     log_Na_Si_Al_Na=np.log(Na_Si_Al_Na)
     return (-13.97 + 0.0129 * (T - 273.15) - 19.64 * SiO2_Liq_cat_frac + 47.49 * MgO_Liq_cat_frac + 6.99 * FeOt_Opx_cat_6ox
             + 37.37 * FmAl2SiO6 + 0.748 * H2O_Liq + 79.67 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) +
-            0.001416 * (T - 273.15) )
-            #* np.log(NaAlSi2O6 / (SiO2_Liq_cat_frac**2 * Al2O3_Liq_cat_frac * Na2O_Liq_cat_frac)))
+            0.001416 * (T - 273.15)*log_Na_Si_Al_Na)
+
 
 
 def P_Put2008_eq29b(T, *, ln_FmAl2SiO6_liq, Al2O3_Liq_cat_frac, MgO_Liq_cat_frac, FeOt_Liq_cat_frac, SiO2_Opx_cat_6ox, FeOt_Opx_cat_6ox,
@@ -80,7 +80,7 @@ def P_Put2008_eq29c(T, *, Al2O3_Opx_cat_6ox,
     |  SEE=+-4.1 kbar (hydrous)
 
     '''
-    logCr2O3 = np.log(Cr2O3_Opx_cat_6ox)
+    logCr2O3 = np.log(Cr2O3_Opx_cat_6ox.astype(float))
 
 
     return (2064 + 0.321 * (T - 273.15) - 343.4 * np.log((T - 273.15)) + 31.52 * Al2O3_Opx_cat_6ox - 12.28 * CaO_Opx_cat_6ox
@@ -112,9 +112,9 @@ def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, MgO_Liq_cat_frac, CaO_Liq_cat_frac, K
     '''
     Cl_NM = MgO_Liq_cat_frac + FeOt_Liq_cat_frac + \
         CaO_Liq_cat_frac + MnO_Liq_cat_frac
-    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac) + \
-        7 * np.log(1 - TiO2_Liq_cat_frac)
-    return (273.15 + (5573.8 + 587.9 * (P / 10) - 61 * (P / 10)**2) / (5.3 - 0.633 * np.log(Mg_Number_Liq_NoFe3) - 3.97 * Cl_NM +
+    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac.astype(float)) + \
+        7 * np.log(1 - TiO2_Liq_cat_frac.astype(float))
+    return (273.15 + (5573.8 + 587.9 * (P / 10) - 61 * (P / 10)**2) / (5.3 - 0.633 * np.log(Mg_Number_Liq_NoFe3.astype(float)) - 3.97 * Cl_NM +
             0.06 * NF + 24.7 * CaO_Liq_cat_frac**2 + 0.081 * H2O_Liq + 0.156 * (P / 10)))
 
 ##  Opx-Only barometry function
@@ -791,11 +791,12 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
                     Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX'] == opx].std(axis=0)).T
                 # This tells us if there is only 1, in which case std will return
                 # Nan
-                if np.shape(
-                        Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX'] == opx])[0] == 1:
+                if np.shape(Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX'] == opx])[0] == 1:
                     dff_S = dff_S.fillna(0)
+                    dff_S['N'] = 1
                 else:
                     dff_S = dff_S
+                    dff_S['N'] = np.shape(Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX'] == opx])[0]
                 if opx == OpxNumbers[0]:
                     df1_S = dff_S
                 else:
@@ -805,6 +806,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
 
             df1_M.insert(1, "st_dev_T_K_calc", df1_S['st_dev_T_K_calc'])
             df1_M.insert(3, "st_dev_P_kbar_calc", df1_S['st_dev_P_kbar_calc'])
+            df1_M.insert(0, "No. of Cpxs averaged", df1_S['st_dev_N'])
 
         else:
             raise Exception(

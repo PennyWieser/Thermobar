@@ -122,7 +122,7 @@ class test_cpx_liq_press(unittest.TestCase):
        "Calc Delta DiHd from  P_Put2008_eq32c not equal to test value")
 
 
-class test_cpx_liq_press_temp(unittest.TestCase):
+class test_cpx_liq_temp(unittest.TestCase):
     def test_put30_Put2003_press(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press_temp(cpx_comps=CpxT,
        liq_comps=LiqT, equationP="P_Put2008_eq30", equationT="T_Put2003").P_kbar_calc[0],

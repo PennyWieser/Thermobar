@@ -186,7 +186,7 @@ def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
             print('Sorry, no equilibrium tests implemented for Kspar-Liquid')
             return T_K
         if plag_comps is not None:
-            eq_tests=calculate_plagioclase_liquid_components(liq_comps=liq_comps,
+            eq_tests=calculate_plag_liq_eq_tests(liq_comps=liq_comps,
             plag_comps=plag_comps, P=P, T=T_K)
             eq_tests.insert(1, "T_K_calc", T_K)
             return eq_tests
@@ -288,7 +288,7 @@ def calculate_fspar_liq_press(*, plag_comps=None, kspar_comps=None, liq_comps=No
         return P_kbar
     if eq_tests is True:
 
-        eq_tests=calculate_plagioclase_liquid_components(liq_comps=liq_comps,
+        eq_tests=calculate_plag_liq_eq_tests(liq_comps=liq_comps,
         plag_comps=plag_comps, P=P_kbar, T=T)
         eq_tests.insert(1, "P_kbar_calc", P_kbar)
         return eq_tests
@@ -689,7 +689,7 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
         if XAn is not None and XAb is not None and plag_comps is None:
             Combo_Out = H_Waters2015(
                 liq_comps=liq_comps, P=P, T=T, XAn=XAn, XAb=XAb)
-            eq_tests=calculate_plagioclase_liquid_components(liq_comps=liq_comps, XAn=XAn, XAb=XAb,
+            eq_tests=calculate_plag_liq_eq_tests(liq_comps=liq_comps, XAn=XAn, XAb=XAb,
                 P=P, T=T)
 
 
@@ -698,7 +698,7 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
 
             Combo_Out = H_Waters2015(
                 liq_comps=liq_comps, plag_comps=plag_comps, P=P, T=T)
-            eq_tests=calculate_plagioclase_liquid_components(plag_comps=plag_comps,
+            eq_tests=calculate_plag_liq_eq_tests(plag_comps=plag_comps,
                 liq_comps=liq_comps, P=P, T=T)
 
         Combo_Out.insert(0, "Pass An-Ab Eq Test Put2008?", eq_tests['Pass An-Ab Eq Test Put2008?'])
@@ -715,10 +715,10 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
 
     if equationH == "H_Put2008_eq25b" or equationH == "H_Put2005_eqH":
         if plag_comps is not None:
-            combo_plag_liq = calculate_plagioclase_liquid_components(
+            combo_plag_liq = calculate_plag_liq_eq_tests(
                 liq_comps=liq_comps, plag_comps=plag_comps, T=T, P=P)
         if plag_comps is None:
-            combo_plag_liq = calculate_plagioclase_liquid_components(
+            combo_plag_liq = calculate_plag_liq_eq_tests(
                 liq_comps=liq_comps, T=T, P=P)
             combo_plag_liq['An_Plag'] = XAn
             combo_plag_liq['Ab_Plag'] = XAb

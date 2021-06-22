@@ -43,7 +43,7 @@ def P_Put1996_eqP2(T, *, lnK_Jd_liq, Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac):
 
     '''
     return (-50.7 + 394 * T / 10 ** 4 + 36.4 * T * lnK_Jd_liq / 10 ** 4 -
-            20 * (T / 10**4) * np.log(1 / (Na2O_Liq_cat_frac * Al2O3_Liq_cat_frac)))
+            20 * (T / 10**4) * np.log(1 / (Na2O_Liq_cat_frac.astype(float) * Al2O3_Liq_cat_frac.astype(float))))
 
 
 def P_Mas2013_eqPalk2(T, *, lnK_Jd_liq,
@@ -54,7 +54,7 @@ def P_Mas2013_eqPalk2(T, *, lnK_Jd_liq,
 
     '''
     return (-6.28332277837751 + 38.1796219610587 * T / 10 ** 4 + 9.42105316105869 * T * lnK_Jd_liq /
-            10 ** 4 + 6.15641875019196 * (T / 10**4) * np.log(1 / (Na2O_Liq_cat_frac * Al2O3_Liq_cat_frac)))
+            10 ** 4 + 6.15641875019196 * (T / 10**4) * np.log(1 / (Na2O_Liq_cat_frac.astype(float) * Al2O3_Liq_cat_frac.astype(float))))
 
 
 def P_Put2003(T, *, lnK_Jd_liq, CaO_Liq_cat_frac,
@@ -66,8 +66,8 @@ def P_Put2003(T, *, lnK_Jd_liq, CaO_Liq_cat_frac,
     | SEE=+-5.0 kbar (hydrous)
 
     '''
-    return (- 88.3 + 0.00282 * T * lnK_Jd_liq + 0.0219 * T - 25.1 * np.log(CaO_Liq_cat_frac *
-            SiO2_Liq_cat_frac) + 12.4 * np.log(CaO_Liq_cat_frac) + 7.03 * Mg_Number_Liq_NoFe3)
+    return (- 88.3 + 0.00282 * T * lnK_Jd_liq + 0.0219 * T - 25.1 * np.log(CaO_Liq_cat_frac.astype(float) *
+            SiO2_Liq_cat_frac.astype(float)) + 12.4 * np.log(CaO_Liq_cat_frac.astype(float)) + 7.03 * Mg_Number_Liq_NoFe3)
 
 
 def P_Put2008_eq30(T, *, lnK_Jd_liq, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
@@ -79,8 +79,9 @@ def P_Put2008_eq30(T, *, lnK_Jd_liq, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
     | SEE=+-1.6 kbar (calibration data)
 
     '''
-    return (-48.7 + 271.3 * (T / 10**4) + 31.96 * (T / 10**4) * lnK_Jd_liq - 8.2 * np.log(FeOt_Liq_cat_frac)
-            + 4.6 * np.log(MgO_Liq_cat_frac) - 0.96 * np.log(K2O_Liq_cat_frac) - 2.2 * np.log(DiHd_2003) - 31 * Mg_Number_Liq_NoFe3 + 56.2 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) + 0.76 * H2O_Liq)
+    return (-48.7 + 271.3 * (T / 10**4) + 31.96 * (T / 10**4) * lnK_Jd_liq - 8.2 * np.log(FeOt_Liq_cat_frac.astype(float))
+            + 4.6 * np.log(MgO_Liq_cat_frac.astype(float)) - 0.96 * np.log(K2O_Liq_cat_frac.astype(float))
+            - 2.2 * np.log(DiHd_2003.astype(float)) - 31 * Mg_Number_Liq_NoFe3 + 56.2 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) + 0.76 * H2O_Liq)
 
 
 def P_Put2008_eq31(T, *, lnK_Jd_liq, CaO_Liq_cat_frac, Na2O_Liq_cat_frac, K2O_Liq_cat_frac, SiO2_Liq_cat_frac, MgO_Liq_cat_frac,
@@ -93,8 +94,8 @@ def P_Put2008_eq31(T, *, lnK_Jd_liq, CaO_Liq_cat_frac, Na2O_Liq_cat_frac, K2O_Li
     return (-40.73 + 358 * (T / 10**4) + 21.7 * (T / 10**4) * lnK_Jd_liq - 106 * CaO_Liq_cat_frac - 166 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac)**2
             - 50.2 * SiO2_Liq_cat_frac *
             (MgO_Liq_cat_frac + FeOt_Liq_cat_frac) -
-            3.2 * np.log(DiHd_2003) - 2.2 * np.log(EnFs)
-            + 0.86 * np.log(Al2O3_Cpx_cat_6ox) + 0.4 * H2O_Liq)
+            3.2 * np.log(DiHd_2003.astype(float)) - 2.2 * np.log(EnFs.astype(float))
+            + 0.86 * np.log(Al2O3_Cpx_cat_6ox.astype(float)) + 0.4 * H2O_Liq)
 
 
 def P_Put2008_eq32c(T, *, FeOt_Liq_cat_frac, CaTs, H2O_Liq, CaO_Liq_cat_frac,
@@ -145,7 +146,7 @@ def P_Neave2017(T, *, lnK_Jd_liq, DiHd_2003, Al2O3_Liq_cat_frac,
 
     | SEE=+-1.4 kbar
     '''
-    return (-26.2712 + 39.16138 * T * lnK_Jd_liq / 10**4 - 4.21676 * np.log(DiHd_2003)
+    return (-26.2712 + 39.16138 * T * lnK_Jd_liq / 10**4 - 4.21676 * np.log(DiHd_2003.astype(float))
             + 78.43463 * Al2O3_Liq_cat_frac + 393.8126 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac)**2)
 
 ## Equations for Cpx-Liquid Thermometry written as functions
@@ -157,8 +158,8 @@ def T_Put1996_eqT1(P=None, *, lnK_Jd_DiHd_liq_1996,
     Clinopyroxene-liquid thermometer of Putirka (1996) EqT1 (pressure-independent)
 
     '''
-    return (10 ** 4 / (6.73 - 0.26 * lnK_Jd_DiHd_liq_1996 - 0.86 * np.log(Mg_Number_Liq_NoFe3)
-                       + 0.52 * np.log(CaO_Liq_cat_frac)))
+    return (10 ** 4 / (6.73 - 0.26 * lnK_Jd_DiHd_liq_1996 - 0.86 * np.log(Mg_Number_Liq_NoFe3.astype(float))
+                       + 0.52 * np.log(CaO_Liq_cat_frac.astype(float))))
 
 
 def T_Mas2013_eqTalk1(P=None, *, lnK_Jd_DiHd_liq_1996,
@@ -168,7 +169,7 @@ def T_Mas2013_eqTalk1(P=None, *, lnK_Jd_DiHd_liq_1996,
     |  SEE=+-31.6Â°C
     '''
     return (10 ** 4 / (6.7423126317975 - 0.023236627691972 * lnK_Jd_DiHd_liq_1996 -
-            0.68839419999351 * np.log(Mg_Number_Liq_NoFe3) - 0.153193056441978 * np.log(CaO_Liq_cat_frac)))
+            0.68839419999351 * np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.153193056441978 * np.log(CaO_Liq_cat_frac.astype(float))))
 
 
 def T_Put1996_eqT2(P, *, lnK_Jd_DiHd_liq_1996,
@@ -177,8 +178,8 @@ def T_Put1996_eqT2(P, *, lnK_Jd_DiHd_liq_1996,
     Clinopyroxene-liquid thermometer of Putirka (1996) EqT2 (pressure-dependent)
 
     '''
-    return (10 ** 4 / (6.59 - 0.16 * lnK_Jd_DiHd_liq_1996 - 0.65 * np.log(Mg_Number_Liq_NoFe3)
-                       + 0.23 * np.log(CaO_Liq_cat_frac) - 0.02 * P))
+    return (10 ** 4 / (6.59 - 0.16 * lnK_Jd_DiHd_liq_1996 - 0.65 * np.log(Mg_Number_Liq_NoFe3.astype(float))
+                       + 0.23 * np.log(CaO_Liq_cat_frac.astype(float)) - 0.02 * P))
 
 
 def T_Mas2013_eqTalk2(P, *, lnK_Jd_DiHd_liq_1996,
@@ -188,7 +189,7 @@ def T_Mas2013_eqTalk2(P, *, lnK_Jd_DiHd_liq_1996,
     |  SEE=+-31.2Â°C
     '''
     return (10 ** 4 / (6.52396326315485 - 0.0396542787609402 * lnK_Jd_DiHd_liq_1996 - 0.680638985726502 *
-            np.log(Mg_Number_Liq_NoFe3) - 0.145757123805013 * np.log(CaO_Liq_cat_frac) + 0.0790582631912926 * P))
+            np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.145757123805013 * np.log(CaO_Liq_cat_frac.astype(float)) + 0.0790582631912926 * P))
 
 
 def T_Put1999(P, *, MgO_Liq_cat_frac, FeOt_Liq_cat_frac,
@@ -197,12 +198,13 @@ def T_Put1999(P, *, MgO_Liq_cat_frac, FeOt_Liq_cat_frac,
     Equation in Keith's Cpx-Liquid spreadsheet labelled "Putirka 1999".
 
     '''
-    return (10 ** 4 / (3.12 - 0.0259 * P - 0.37 * np.log(MgO_Liq_cat_frac / (MgO_Liq_cat_frac + FeOt_Liq_cat_frac))
-                       + 0.47 * np.log(CaO_Liq_cat_frac * (MgO_Liq_cat_frac +
-                                                           FeOt_Liq_cat_frac) * (SiO2_Liq_cat_frac)**2)
-                       - 0.78 * np.log((MgO_Liq_cat_frac + FeOt_Liq_cat_frac)
-                                       ** 2 * (SiO2_Liq_cat_frac)**2)
-                       - 0.34 * np.log(CaO_Liq_cat_frac * (Al2O3_Liq_cat_frac)**2 * SiO2_Liq_cat_frac)))
+
+    return (10 ** 4 / (3.12 - 0.0259 * P - 0.37 * np.log(MgO_Liq_cat_frac.astype(float) / (MgO_Liq_cat_frac.astype(float) + FeOt_Liq_cat_frac.astype(float)))
+                       + 0.47 * np.log(CaO_Liq_cat_frac.astype(float) * (MgO_Liq_cat_frac.astype(float) +
+                        FeOt_Liq_cat_frac.astype(float)) * (SiO2_Liq_cat_frac.astype(float))**2)
+                       - 0.78 * np.log((MgO_Liq_cat_frac.astype(float) + FeOt_Liq_cat_frac.astype(float))
+                                       ** 2 * (SiO2_Liq_cat_frac.astype(float))**2)
+                       - 0.34 * np.log(CaO_Liq_cat_frac.astype(float) * (Al2O3_Liq_cat_frac.astype(float))**2 * SiO2_Liq_cat_frac.astype(float))))
 
 
 def T_Put2003(P, *, lnK_Jd_DiHd_liq_2003, Mg_Number_Liq_NoFe3,
@@ -224,8 +226,8 @@ def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2_Li
     '''
     return (10 ** 4 / (7.53 + 0.07 * H2O_Liq - 1.1 * Mg_Number_Liq_NoFe3
     - 14.9 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac) -
-    0.08 * np.log(TiO2_Liq_cat_frac)
-    - 3.62 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) - 0.18 * np.log(EnFs)
+    0.08 * np.log(TiO2_Liq_cat_frac.astype(float))
+    - 3.62 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) - 0.18 * np.log(EnFs.astype(float))
     - 0.14 * lnK_Jd_DiHd_liq_2003 - 0.027 * P))
 
 
@@ -237,9 +239,9 @@ def T_Mas2013_eqalk33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2
     '''
     return (10 ** 4 / (6.80728851520843 + 0.0500993963259582 * H2O_Liq - 1.91449550102791 * Mg_Number_Liq_NoFe3
     - 25.0429785936576 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac) -
-    0.304200646919069 * np.log(TiO2_Liq_cat_frac)
+    0.304200646919069 * np.log(TiO2_Liq_cat_frac.astype(float))
     + 2.25444204541222 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac)
-    - 0.021072700182831 * np.log(EnFs) + 0.00268252978603778 * lnK_Jd_DiHd_liq_2003
+    - 0.021072700182831 * np.log(EnFs.astype(float)) + 0.00268252978603778 * lnK_Jd_DiHd_liq_2003
     + 0.0614725514133312 * P))
 
 
@@ -255,7 +257,7 @@ TiO2_Liq_cat_frac, lnK_Jd_liq, CaO_Liq_cat_frac, SiO2_Liq_cat_frac):
         + 0.0375720784518263 * H2O_Liq - 1.6383282971929 *
         (Mg_Number_Liq_NoFe3 / DiHd_2003) + 1.01129776262724 *
         ((Na2O_Liq_cat_frac) / (Na2O_Liq_cat_frac + K2O_Liq_cat_frac))
-        - 0.21766733252629 * np.log(TiO2_Liq_cat_frac) + 0.466149612620683
+        - 0.21766733252629 * np.log(TiO2_Liq_cat_frac.astype(float)) + 0.466149612620683
         * lnK_Jd_liq + 1.61626798988239 * Kd_Fe_Mg_NoFe3 + 23.3855047471225 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac)))
 
 
@@ -802,21 +804,27 @@ H2O_Liq=None, Return_All_Matches=False):
     eq_crit: str, optional
 
         If None (default): Doesn't apply any filters
-        If "All": applies the 4 equilibrium tests of Neave et al: KdFe-Mg, DiHd, EnFs, CaTs. Kd Fe-Mg calculated based on what you specify in KdMatch
+        If "All": applies the 4 equilibrium tests of Neave et al: KdFe-Mg, DiHd,
+        EnFs, CaTs. Kd Fe-Mg calculated based on what you specify in KdMatch
         If "FeMg_DiHd": Filters just using KdFe-Mg and DiHd
         If "FeMg_EnFs": Filters just using KdFe-Mg and EnFs
 
 
     PMax: int or float,  optional
 
-       Default value of 30 kbar. Uses to apply a preliminary KdFe-Mg filter based on the T equation specified by the user.
-       Users can set a lower pressure to save computation time (E.g., if reasonably sure crystals are forming above 10 kbar)
+       Default value of 30 kbar. Uses to apply a preliminary KdFe-Mg filter
+       based on the T equation specified by the user.
+       Users can set a lower pressure to save computation time (E.g., if
+       reasonably sure crystals are forming above 10 kbar)
 
     sigma: int or float, optional
 
-        Determins how close to the ideal equilbrium test values for DiHd, EnFs and CaTs is accepted as a match.
-        Default (1 sigma) values from Neave et al. (2017) are: 0.03 for Kd Fe-Mg, 0.06 for DiHd, 0.05 for EnFs, 0.03 for CaTs.
-        If users specify sigma=2, will accept cpx-melt pairs within 0.12 for DiHd, 0.1 for EnFs, 0.06 for CaTs
+        Determins how close to the ideal equilbrium test values for DiHd,
+        EnFs and CaTs is accepted as a match.
+        Default (1 sigma) values from Neave et al. (2017) are: 0.03 for Kd Fe-Mg,
+        0.06 for DiHd, 0.05 for EnFs, 0.03 for CaTs.
+        If users specify sigma=2, will accept cpx-melt pairs within 0.12 for DiHd,
+        0.1 for EnFs, 0.06 for CaTs
         Doesn't appply to Kd
 
     KdErr: int or float, optional
@@ -824,10 +832,12 @@ H2O_Liq=None, Return_All_Matches=False):
 
 
     KdMatch: int, str, optional
-        allows users to override the default of calculating Kd Fe-Mg based on temperature using eq 35 of putirka
+        allows users to override the default of calculating Kd Fe-Mg based
+        on temperature using eq 35 of putirka
         Set at fixed value (e.g., KdMatch=0.27)
         OR
-        specify KdMatch=Masotta to use the Kd model fo Masotta et al. (2013), which is also a function of Na and K, for trachytic and phonolitic magmas.
+        specify KdMatch=Masotta to use the Kd model fo Masotta et al. (2013),
+        which is also a function of Na and K, for trachytic and phonolitic magmas.
 
     Fe3FeT_Liq: float, int, series, optional
         Fe3FeT ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
@@ -838,7 +848,8 @@ H2O_Liq=None, Return_All_Matches=False):
         If users don't specify, uses H2O_Liq from liq_comps, if specified overwrites this.
 
     Cpx Quality: bool, optional
-        Default False. If True, filters out clinopyroxenes with cation sums outside of 4.02-3.99 (after Neave et al. 2017)
+        Default False. If True, filters out clinopyroxenes with cation sums outside of
+        4.02-3.99 (after Neave et al. 2017)
 
 
     Returns: dict
@@ -1144,7 +1155,7 @@ def P_Put2008_eq32a(T, *, MgO_Cpx_cat_6ox, Na2O_Cpx_cat_6ox,
 
     '''
     return (3205 - 5.62 * MgO_Cpx_cat_6ox + 83.2 * Na2O_Cpx_cat_6ox + 68.2 * DiHd_2003
-    + 2.52 * np.log(Al_VI_cat_6ox) - 51.1 * DiHd_2003**2 + 34.8 * EnFs**2
+    + 2.52 * np.log(Al_VI_cat_6ox.astype(float)) - 51.1 * DiHd_2003**2 + 34.8 * EnFs**2
     + 0.384 * T - 518 * np.log(T))
 
 
@@ -1175,7 +1186,7 @@ Al2O3_Cpx_cat_6ox, K2O_Cpx_cat_6ox, Al_IV_cat_6ox, TiO2_Cpx_cat_6ox, Cr2O3_Cpx_c
     return (1458 + 0.197 * (T) - 241 * np.log(T) +
     0.453 * H2O_Liq + 55.5 * Al_VI_cat_6ox +
     8.05 * FeOt_Cpx_cat_6ox - 277 * K2O_Cpx_cat_6ox + 18 * Jd
-    + 44.1 * DiHd_1996 + 2.2 * np.log(Jd)
+    + 44.1 * DiHd_1996 + 2.2 * np.log(Jd.astype(float))
     - 27.7 * Al2O3_Cpx_cat_6ox**2 + 97.3 * Fe_M2**2
     + 30.7 * Mg_M2**2 - 27.6 * DiHd_1996**2)
 
@@ -1193,7 +1204,7 @@ def T_Put2008_eq32d(P, *, TiO2_Cpx_cat_6ox, FeOt_Cpx_cat_6ox, Al2O3_Cpx_cat_6ox,
 
     return (((93100 + 544 * P) / (61.1 + 36.6 * TiO2_Cpx_cat_6ox + 10.9 * FeOt_Cpx_cat_6ox
     - 0.95 * (Al2O3_Cpx_cat_6ox + Cr2O3_Cpx_cat_6ox - Na2O_Cpx_cat_6ox - K2O_Cpx_cat_6ox)
-     + 0.395 * (np.log(a_cpx_En))**2)))
+     + 0.395 * (np.log(a_cpx_En.astype(float)))**2)))
 
 
 # This is the version in the Putirka 2-pyroxene spreadsheet. The 544 coefficient is changed to 755, and the coefficient for the enstatie activity is
@@ -1208,7 +1219,7 @@ def T_Put2008_eq32d_subsol(P, *, TiO2_Cpx_cat_6ox, FeOt_Cpx_cat_6ox, Al2O3_Cpx_c
     '''
     return (((93100 + 755 * P) / (61.1 + 36.6 * TiO2_Cpx_cat_6ox + 10.9 * FeOt_Cpx_cat_6ox
     - 0.95 * (Al2O3_Cpx_cat_6ox + Cr2O3_Cpx_cat_6ox - Na2O_Cpx_cat_6ox - K2O_Cpx_cat_6ox)
-    + 3.5 * (np.log(a_cpx_En))**2)))
+    + 3.5 * (np.log(a_cpx_En.astype(float)))**2)))
 
 ## Function for calculationg Cpx-only pressure
 Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b}
