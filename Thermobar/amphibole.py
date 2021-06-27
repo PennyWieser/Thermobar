@@ -761,7 +761,7 @@ def calculate_amp_only_press(amp_comps=None, equationP=None, T=None):
                 raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
         else:
             if T is not None:
-                w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+                print('Youve selected a T-independent function')
 
         if isinstance(T, pd.Series):
             if amp_comps is not None:
@@ -1015,7 +1015,7 @@ K2O_Amp_cat_23ox, CaO_Amp_cat_23ox, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd)
     return (273.15+(10073.5/(9.75+0.934*SiO2_Amp_cat_23ox-1.454*TiO2_Amp_cat_23ox
     -0.882*MgO_Amp_cat_23ox-1.123*Na2O_Amp_cat_23ox-0.322*np.log(FeOt_Liq_mol_frac_hyd)
     -0.7593*np.log(Al2O3_Amp_cat_23ox/Al2O3_Liq_mol_frac_hyd)-0.15*ln_KD_Na_K)))
-#    return ln_KD_Na_K
+
 
 
 ## Function: Amphibole-only temperature
@@ -1062,7 +1062,7 @@ def calculate_amp_only_temp(amp_comps, equationT, P=None):
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
     else:
         if P is not None:
-            w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+            print('Youve selected a P-independent function')
 
     if isinstance(P, pd.Series):
         if amp_comps is not None:
@@ -1206,7 +1206,7 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
         liquid compositions (SiO2_Liq, TiO2_Liq etc.)
 
     equationP: str
-        | P_Put2016_eq7a (T-independent, H2O-dependent (as hyd frac))
+        | P_Put2016_eq7a (T-independent, H2O-dependent)
         | P_Put2016_eq7b (T-independent, H2O-dependent (as hyd frac))
         | P_Put2016_eq7c (T-independent, H2O-dependent (as hyd frac))
 
@@ -1240,7 +1240,7 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
     else:
         if T is not None:
-            w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+            print('Youve selected a T-independent function')
 
     if isinstance(T, pd.Series):
         if liq_comps is not None:
@@ -1310,7 +1310,7 @@ P=None, H2O_Liq=None, eq_tests=False):
 
     equationT: str
         T_Put2016_eq4a_amp_sat (P-independent, H2O-dep through hydrous fractions)
-        T_Put2016_eq4b (P-independent, H2O-dep through hydrous fractions)
+        T_Put2016_eq4b (P-independent, H2O-dep)
         T_Put2016_eq9 (P-independent, H2O-dep through hydrous fractions)
 
     P: float, int, series, str  ("Solve")
@@ -1340,7 +1340,7 @@ P=None, H2O_Liq=None, eq_tests=False):
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
     else:
         if P is not None:
-            w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+            print('Youve selected a P-independent function')
 
     if isinstance(P, pd.Series):
         if liq_comps is not None:

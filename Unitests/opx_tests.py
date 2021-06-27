@@ -15,7 +15,7 @@ LiqT=pd.DataFrame(data={"SiO2_Liq": 51,
                             "Cr2O3_Liq": 0.11,
                             "P2O5_Liq": 0.11,
                             "H2O_Liq": 5,
- "Fe3FeT_Liq":0.1,
+ "Fe3Fet_Liq":0.1,
 }, index=[0])
 
 OpxT=pd.DataFrame(data={"SiO2_Opx": 55,
@@ -71,7 +71,7 @@ with w.catch_warnings():
 
         def test_Global_Kdcalc2(self):
             self.assertAlmostEqual(pt.calculate_opx_liq_press(opx_comps=OpxT,
-        liq_comps=LiqT, equationP="P_Put_Global_Opx", T=1300, eq_tests=True, Fe3FeT_Liq=0.6)
+        liq_comps=LiqT, equationP="P_Put_Global_Opx", T=1300, eq_tests=True, Fe3Fet_Liq=0.6)
         .Eq_Test_Kd_Fe_Mg_Fe2[0], 0.781298,
         decimalPlace,
         "Calc Kd Fe2 not equal to test value")
@@ -152,7 +152,7 @@ with w.catch_warnings():
                                 "Cr2O3_Liq": 0,
                                 "P2O5_Liq": 0.15,
                                 "H2O_Liq": 3.8,
-                                "Fe3FeT_Liq":0}, index=[0])
+                                "Fe3Fet_Liq":0}, index=[0])
 
     Opx2=pd.DataFrame(data={"SiO2_Opx": 55.00,
                                 "TiO2_Opx": 0.34,

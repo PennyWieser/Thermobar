@@ -49,12 +49,15 @@ def P_Put1996_eqP2(T, *, lnK_Jd_liq, Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac):
 def P_Mas2013_eqPalk2(T, *, lnK_Jd_liq,
                       Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac):
     '''
-    Recalibration of the clinopyroxene-liquid barometer of Putirka (1996) EqP2 by Masotta et al. (2013) for alkaline melts
+    Recalibration of the clinopyroxene-liquid barometer of Putirka (1996)
+    EqP2 by Masotta et al. (2013) for alkaline melts
     | SEE=+-1.70 kbar
 
     '''
-    return (-6.28332277837751 + 38.1796219610587 * T / 10 ** 4 + 9.42105316105869 * T * lnK_Jd_liq /
-            10 ** 4 + 6.15641875019196 * (T / 10**4) * np.log(1 / (Na2O_Liq_cat_frac.astype(float) * Al2O3_Liq_cat_frac.astype(float))))
+    return (-6.28332277837751 + 38.1796219610587 * T / 10 ** 4
+    + 9.42105316105869 * T * lnK_Jd_liq /
+    10 ** 4 + 6.15641875019196 * (T / 10**4) * np.log(1 / (Na2O_Liq_cat_frac.astype(float)
+    * Al2O3_Liq_cat_frac.astype(float))))
 
 
 def P_Put2003(T, *, lnK_Jd_liq, CaO_Liq_cat_frac,
@@ -66,8 +69,10 @@ def P_Put2003(T, *, lnK_Jd_liq, CaO_Liq_cat_frac,
     | SEE=+-5.0 kbar (hydrous)
 
     '''
-    return (- 88.3 + 0.00282 * T * lnK_Jd_liq + 0.0219 * T - 25.1 * np.log(CaO_Liq_cat_frac.astype(float) *
-            SiO2_Liq_cat_frac.astype(float)) + 12.4 * np.log(CaO_Liq_cat_frac.astype(float)) + 7.03 * Mg_Number_Liq_NoFe3)
+    return (- 88.3 + 0.00282 * T * lnK_Jd_liq + 0.0219 * T
+    - 25.1 * np.log(CaO_Liq_cat_frac.astype(float) *
+    SiO2_Liq_cat_frac.astype(float))
+    + 12.4 * np.log(CaO_Liq_cat_frac.astype(float)) + 7.03 * Mg_Number_Liq_NoFe3)
 
 
 def P_Put2008_eq30(T, *, lnK_Jd_liq, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
@@ -116,8 +121,10 @@ def P_Mas2013_eqalk32c(T, *, FeOt_Liq_cat_frac, CaTs, H2O_Liq, CaO_Liq_cat_frac,
     Recalibration of the clinopyroxene-liquid barometer of Putirka (2008) Eq32c by Masotta et al. (2013) for alkaline melts
     | SEE=+-1.67 kbar
     '''
-    return (-16.3446543551989 + 0.0141435837038975 * (T) - 12.3909508275802 * FeOt_Liq_cat_frac - 9.19220692402416 * CaTs + 0.214041799294945 *
-            H2O_Liq + 38.734045560859 * CaO_Liq_cat_frac * SiO2_Liq_cat_frac + 1.5944198112849 * (Al2O3_Cpx_cat_6ox / Al2O3_Liq_cat_frac))
+    return (-16.3446543551989 + 0.0141435837038975 * (T)
+    - 12.3909508275802 * FeOt_Liq_cat_frac - 9.19220692402416 * CaTs
+    + 0.214041799294945 * H2O_Liq + 38.734045560859 * CaO_Liq_cat_frac * SiO2_Liq_cat_frac
+    + 1.5944198112849 * (Al2O3_Cpx_cat_6ox / Al2O3_Liq_cat_frac))
 
 
 def P_Mas2013_Palk2012(T=None, *, lnK_Jd_liq, H2O_Liq,
@@ -166,7 +173,7 @@ def T_Mas2013_eqTalk1(P=None, *, lnK_Jd_DiHd_liq_1996,
                       Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid thermometer of Putirka (1996) EqT1 by Masotta et al. (2013) for alkaline melts
-    |  SEE=+-31.6Â°C
+    |  SEE=+-31.6°C
     '''
     return (10 ** 4 / (6.7423126317975 - 0.023236627691972 * lnK_Jd_DiHd_liq_1996 -
             0.68839419999351 * np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.153193056441978 * np.log(CaO_Liq_cat_frac.astype(float))))
@@ -186,7 +193,7 @@ def T_Mas2013_eqTalk2(P, *, lnK_Jd_DiHd_liq_1996,
                       Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid thermometer of Putirka (1996) EqT2 by Masotta et al. (2013) for alkaline melts
-    |  SEE=+-31.2Â°C
+    |  SEE=+-31.2°C
     '''
     return (10 ** 4 / (6.52396326315485 - 0.0396542787609402 * lnK_Jd_DiHd_liq_1996 - 0.680638985726502 *
             np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.145757123805013 * np.log(CaO_Liq_cat_frac.astype(float)) + 0.0790582631912926 * P))
@@ -213,8 +220,9 @@ def T_Put2003(P, *, lnK_Jd_DiHd_liq_2003, Mg_Number_Liq_NoFe3,
     Clinopyroxene-liquid thermometer of Putirka (2003)
 
     '''
-    return (10 ** 4 / (4.6 - 0.437 * lnK_Jd_DiHd_liq_2003 - 0.654 * np.log(Mg_Number_Liq_NoFe3) - 0.326 * np.log(Na2O_Liq_cat_frac) -
-                       0.92 * np.log(SiO2_Liq_cat_frac) + 0.274 * np.log(Jd) - 0.00632 * P))
+    return (10 ** 4 / (4.6 - 0.437 * lnK_Jd_DiHd_liq_2003 - 0.654 * np.log(Mg_Number_Liq_NoFe3)
+    - 0.326 * np.log(Na2O_Liq_cat_frac.astype(float)) -0.92 * np.log(SiO2_Liq_cat_frac.astype(float))
+    + 0.274 * np.log(Jd.astype(float)) - 0.00632 * P))
 
 
 def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2_Liq_cat_frac,
@@ -222,7 +230,7 @@ def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2_Li
     '''
     Clinopyroxene-liquid  thermometer of Putirka (2008) Eq 33.
 
-    |  SEE=+-Â°C
+    |  SEE=+-°C
     '''
     return (10 ** 4 / (7.53 + 0.07 * H2O_Liq - 1.1 * Mg_Number_Liq_NoFe3
     - 14.9 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac) -
@@ -234,14 +242,17 @@ def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2_Li
 def T_Mas2013_eqalk33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2_Liq_cat_frac,
                       TiO2_Liq_cat_frac, Na2O_Liq_cat_frac, K2O_Liq_cat_frac, EnFs, lnK_Jd_DiHd_liq_2003):
     '''
-    Recalibration of the clinopyroxene-liquid thermometer of Putirka (2008) Eq 33 by Masotta et al. (2013) for alkaline melts
-    |  SEE=+-24Â°C
+    Recalibration of the clinopyroxene-liquid thermometer of Putirka (2008)
+    Eq 33 by Masotta et al. (2013) for alkaline melts
+    |  SEE=+-24°C
     '''
-    return (10 ** 4 / (6.80728851520843 + 0.0500993963259582 * H2O_Liq - 1.91449550102791 * Mg_Number_Liq_NoFe3
+    return (10 ** 4 / (6.80728851520843 + 0.0500993963259582 * H2O_Liq
+    - 1.91449550102791 * Mg_Number_Liq_NoFe3
     - 25.0429785936576 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac) -
     0.304200646919069 * np.log(TiO2_Liq_cat_frac.astype(float))
     + 2.25444204541222 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac)
-    - 0.021072700182831 * np.log(EnFs.astype(float)) + 0.00268252978603778 * lnK_Jd_DiHd_liq_2003
+    - 0.021072700182831 * np.log(EnFs.astype(float))
+    + 0.00268252978603778 * lnK_Jd_DiHd_liq_2003
     + 0.0614725514133312 * P))
 
 
@@ -266,7 +277,7 @@ FeOt_Liq_cat_frac, MgO_Liq_cat_frac, CaO_Liq_cat_frac, K2O_Liq_cat_frac):
     '''
     Clinopyroxene-liquid  thermometer of Brugmann and Till (2019) for evolved systems (Cpx Mg#>64, Al2O3 Cpx<7 wt%, SiO2_Liq>70 wt%)
 
-    |  SEE==+-20Â°C
+    |  SEE==+-20°C
     '''
     return (273.15 + 300 * (-1.8946098 - 0.6010197 * CaTs - 0.1856423 * DiHd_2003
 + 4.71248858 * SiO2_Liq_cat_frac + 77.5861878 * TiO2_Liq_cat_frac +
@@ -282,7 +293,7 @@ Cpx_Liq_P_funcs_by_name = {p.__name__: p for p in Cpx_Liq_P_funcs}
 
 
 def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltmatch=None,
-                            T=None, eq_tests=False, Fe3FeT_Liq=None, H2O_Liq=None,
+                            T=None, eq_tests=False, Fe3Fet_Liq=None, H2O_Liq=None,
                            sigma=1, KdErr=0.03):
     '''
     Clinopyroxene-Liquid barometer, calculates pressure in kbar
@@ -352,7 +363,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
     else:
         if T is not None:
-            w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+            print('Youve selected a T-independent function')
 
     if isinstance(T, pd.Series):
         if liq_comps is not None:
@@ -361,24 +372,24 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
 
 
 
-# This replaces H2O and Fe3FeT_Liq in the input
+# This replaces H2O and Fe3Fet_Liq in the input
     if liq_comps is not None:
         liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None and not isinstance(H2O_Liq, str):
             liq_comps_c['H2O_Liq'] = H2O_Liq
-        if Fe3FeT_Liq is not None:
-            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+        if Fe3Fet_Liq is not None:
+            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
 
     if equationP == "P_Mas2013_eqalk32c" or equationP == "P_Mas2013_eqPalk2" or equationP == "P_Mas2013_eqPalk1":
-        if liq_comps is not None and np.max(liq_comps_c['Fe3FeT_Liq']) > 0:
-            w.warn('Some Fe3FeT_Liq are greater than 0. Masotta et al. (2013)'
+        if liq_comps is not None and np.max(liq_comps_c['Fe3Fet_Liq']) > 0:
+            w.warn('Some Fe3Fet_Liq are greater than 0. Masotta et al. (2013)'
             ' calibrate their equations assuming all Fe is Fe2+. '
-            'You should set Fe3FeT_Liq=0 in the function for consistency. ')
-        if meltmatch is not None and np.max(meltmatch['Fe3FeT_Liq']) > 0:
-            w.warn('Some Fe3FeT_Liq are greater than 0. Masotta et al. (2013)'
+            'You should set Fe3Fet_Liq=0 in the function for consistency. ')
+        if meltmatch is not None and np.max(meltmatch['Fe3Fet_Liq']) > 0:
+            w.warn('Some Fe3Fet_Liq are greater than 0. Masotta et al. (2013)'
             ' calibrate their equations assuming all Fe is Fe2+. '
-            'You should set Fe3FeT_Liq=0 in the function for consistency. ')
+            'You should set Fe3Fet_Liq=0 in the function for consistency. ')
 
 
 
@@ -397,7 +408,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
             raise ValueError(f'{equationP} requires you to enter T')
     else:
         if T is not None:
-            w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+            print('Youve selected a T-independent function')
 
     kwargs = {name: Combo_liq_cpxs[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
     if isinstance(T, str) or T is None:
@@ -426,10 +437,10 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
             'e.g., if you havent specified a T for a T-dependent thermometer')
         if meltmatch is None:
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
-            liq_comps=liq_comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P_kbar, T=T, sigma=sigma, KdErr=KdErr)
+            liq_comps=liq_comps_c, Fe3Fet_Liq=Fe3Fet_Liq, P=P_kbar, T=T, sigma=sigma, KdErr=KdErr)
         if meltmatch is not None:
             eq_tests = calculate_cpx_liq_eq_tests(meltmatch=meltmatch,
-            Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
+            Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
         eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
         return eq_tests
 
@@ -442,7 +453,7 @@ T_Mas2013_Talk2012, T_Brug2019} # put on outside
 Cpx_Liq_T_funcs_by_name = {p.__name__: p for p in Cpx_Liq_T_funcs}
 
 def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmatch=None,
-                           P=None, eq_tests=False, H2O_Liq=None, Fe3FeT_Liq=None,
+                           P=None, eq_tests=False, H2O_Liq=None, Fe3Fet_Liq=None,
                            sigma=1, KdErr=0.03):
     '''
     Clinopyroxene-Liquid thermometry, calculates temperature in Kelvin
@@ -512,7 +523,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
     else:
         if P is not None:
-            w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+            print('Youve selected a P-independent function')
 
     if isinstance(P, pd.Series):
         if liq_comps is not None:
@@ -529,12 +540,12 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
         liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
-        if Fe3FeT_Liq is not None:
-            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+        if Fe3Fet_Liq is not None:
+            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
         if equationT == "T_Mas2013_Palk2012" or equationT == "T_Mas2013_eqalk33" or equationT == "T_Mas2013_eqTalk2" or equationT == "T_Mas2013_eqTalk1":
-            if np.max(liq_comps_c['Fe3FeT_Liq']) > 0:
-                w.warn('Some Fe3FeT_Liq are greater than 0. Masotta et al. (2013) calibrate their equations assuming all Fe is Fe2+. You should set Fe3FeT_Liq=0 in the function for consistency. ')
+            if np.max(liq_comps_c['Fe3Fet_Liq']) > 0:
+                w.warn('Some Fe3Fet_Liq are greater than 0. Masotta et al. (2013) calibrate their equations assuming all Fe is Fe2+. You should set Fe3Fet_Liq=0 in the function for consistency. ')
 
         Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(liq_comps=liq_comps_c,
         cpx_comps=cpx_comps)
@@ -584,10 +595,10 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
             'e.g., if you havent specified a P for a P-dependent thermometer')
         if meltmatch is None:
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
-            liq_comps=liq_comps_c, Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
+            liq_comps=liq_comps_c, Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
         if meltmatch is not None:
             eq_tests = calculate_cpx_liq_eq_tests(meltmatch=meltmatch,
-            Fe3FeT_Liq=Fe3FeT_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
+            Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
         eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
         return eq_tests
 
@@ -595,7 +606,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
 ## Function for iterating P and T
 
 def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=None, equationP=None, equationT=None,
-                              T=None, P=None, iterations=None, Fe3FeT_Liq=None, H2O_Liq=None, T_K_guess=1300, eq_tests=False):
+                              T=None, P=None, iterations=None, Fe3Fet_Liq=None, H2O_Liq=None, T_K_guess=1300, eq_tests=False):
     '''
     Solves simultaneous equations for temperature and pressure
     using clinopyroxene-liquid thermometers and barometers.
@@ -654,10 +665,10 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
     T_K_guess: int or float. Default is 1300K
          Initial guess of temperature.
 
-    Fe3FeT_Liq: float, int, series,
-        Fe3FeT ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
-        If users don't specify, uses Fe3FeT_Liq from liq_comps.
-        If specified, overwrites the Fe3FeT_Liq column in the liquid input.
+    Fe3Fet_Liq: float, int, series,
+        Fe3Fet ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
+        If users don't specify, uses Fe3Fet_Liq from liq_comps.
+        If specified, overwrites the Fe3Fet_Liq column in the liquid input.
 
     H2O_Liq: float, int, series, optional
         If users don't specify, uses H2O_Liq from liq_comps,
@@ -692,11 +703,11 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
 
     if meltmatch is None:
         liq_comps_c = liq_comps.copy()
-        # This overwrites the Fe3FeT in their inputted dataframe
-        if Fe3FeT_Liq is not None:
-            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
-        if "Fe3FeT_Liq" not in liq_comps:
-            liq_comps_c['Fe3FeT_Liq'] = 0
+        # This overwrites the Fe3Fet in their inputted dataframe
+        if Fe3Fet_Liq is not None:
+            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
+        if "Fe3Fet_Liq" not in liq_comps:
+            liq_comps_c['Fe3Fet_Liq'] = 0
         if "Sample_ID_Liq" not in liq_comps:
             liq_comps_c['Sample_ID_Liq'] = liq_comps_c.index
         # This overwites H2O_Liq in the input
@@ -752,7 +763,7 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
 
 def calculate_cpx_liq_press_temp_matching(*, liq_comps, cpx_comps, equationT=None,
 equationP=None, P=None, T=None, eq_crit="All", PMax=30, sigma=1,
-Fe3FeT_Liq=None, KdErr=0.03, KdMatch=None, Cpx_Quality=False,
+Fe3Fet_Liq=None, KdErr=0.03, KdMatch=None, Cpx_Quality=False,
 H2O_Liq=None, Return_All_Matches=False):
 
     '''
@@ -839,10 +850,10 @@ H2O_Liq=None, Return_All_Matches=False):
         specify KdMatch=Masotta to use the Kd model fo Masotta et al. (2013),
         which is also a function of Na and K, for trachytic and phonolitic magmas.
 
-    Fe3FeT_Liq: float, int, series, optional
-        Fe3FeT ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
-        If users don't specify, uses Fe3FeT_Liq from liq_comps.
-        If specified, overwrites the Fe3FeT_Liq column in the liquid input.
+    Fe3Fet_Liq: float, int, series, optional
+        Fe3Fet ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
+        If users don't specify, uses Fe3Fet_Liq from liq_comps.
+        If specified, overwrites the Fe3Fet_Liq column in the liquid input.
 
     H2O_Liq: float, int, series, optional
         If users don't specify, uses H2O_Liq from liq_comps, if specified overwrites this.
@@ -877,12 +888,12 @@ H2O_Liq=None, Return_All_Matches=False):
         raise ValueError('You have entered an equation for T and specified a temperature. '
         'Either enter a T equation, or choose a temperature, not both  ')
 
-    # This allows users to overwrite H2O and Fe3FeT
+    # This allows users to overwrite H2O and Fe3Fet
     liq_comps_c = liq_comps.copy()
-    if Fe3FeT_Liq is not None:
-        liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
-    if "Fe3FeT_Liq" not in liq_comps:
-        liq_comps_c['Fe3FeT_Liq'] = 0
+    if Fe3Fet_Liq is not None:
+        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
+    if "Fe3Fet_Liq" not in liq_comps:
+        liq_comps_c['Fe3Fet_Liq'] = 0
     if "Sample_ID_Liq" not in liq_comps:
         liq_comps_c['Sample_ID_Liq'] = liq_comps.index
     if H2O_Liq is not None:
@@ -1145,6 +1156,33 @@ H2O_Liq=None, Return_All_Matches=False):
 
 ## Clinopyroxene-only pressure equations
 
+def P_Wang2021_eq1(T=None, *, Al_VI_cat_6ox, SiO2_Cpx_cat_6ox, TiO2_Cpx_cat_6ox, Cr2O3_Cpx_cat_6ox,
+FeOt_Cpx_cat_6ox, MnO_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na2O_Cpx_cat_6ox, K2O_Cpx_cat_6ox, CaO_Cpx_cat_6ox):
+    '''
+    Clinopyroxene-only barometer of Wang et al. (2021) equation 1 - currently on Zenodo - 10.5281/zenodo.4727870
+    '''
+    NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*TiO2_Cpx_cat_6ox
+    +1.5117*Cr2O3_Cpx_cat_6ox+1.4768*FeOt_Cpx_cat_6ox-5.7686*MnO_Cpx_cat_6ox-0.0864*MgO_Cpx_cat_6ox))
+
+    return (-7.6551*NCT*np.log(Al_VI_cat_6ox.astype(float))-10.2203*SiO2_Cpx_cat_6ox+4.8343*FeOt_Cpx_cat_6ox
++0.7397*MgO_Cpx_cat_6ox-13.1746*CaO_Cpx_cat_6ox+122.1294*Na2O_Cpx_cat_6ox+23.35)
+
+
+def P_Wang2021_eq3(T=None, *, Al_VI_cat_6ox, SiO2_Cpx_cat_6ox, TiO2_Cpx_cat_6ox, Cr2O3_Cpx_cat_6ox,
+FeOt_Cpx_cat_6ox, MnO_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na2O_Cpx_cat_6ox, K2O_Cpx_cat_6ox,
+FeII_Wang21, FeIII_Wang21, CaO_Cpx_cat_6ox, Al2O3_Cpx_cat_6ox):
+    '''
+    Clinopyroxene-only barometer of Wang et al. (2021) equation 3 - currently on Zenodo - 10.5281/zenodo.4727870
+    '''
+    NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*TiO2_Cpx_cat_6ox
+    +1.5117*Cr2O3_Cpx_cat_6ox+1.4768*FeOt_Cpx_cat_6ox-5.7686*MnO_Cpx_cat_6ox-0.0864*MgO_Cpx_cat_6ox))
+
+    return (-1105.84-18.6052*TiO2_Cpx_cat_6ox+252.1033*Al2O3_Cpx_cat_6ox+311.0123*Cr2O3_Cpx_cat_6ox+550.2534*FeOt_Cpx_cat_6ox+
+451.6495*MnO_Cpx_cat_6ox+554.0535*MgO_Cpx_cat_6ox+540.2934*CaO_Cpx_cat_6ox
++902.6805*Na2O_Cpx_cat_6ox-535.305*FeIII_Wang21-70.1424*Al_VI_cat_6ox*np.log(Al_VI_cat_6ox.astype(float))
+-1.74473*np.log(Al_VI_cat_6ox))
+
+
 
 def P_Put2008_eq32a(T, *, MgO_Cpx_cat_6ox, Na2O_Cpx_cat_6ox,
                     Al_VI_cat_6ox, DiHd_2003, EnFs):
@@ -1191,6 +1229,35 @@ Al2O3_Cpx_cat_6ox, K2O_Cpx_cat_6ox, Al_IV_cat_6ox, TiO2_Cpx_cat_6ox, Cr2O3_Cpx_c
     + 30.7 * Mg_M2**2 - 27.6 * DiHd_1996**2)
 
 ## Clinopyroxene-only temperature equations
+def T_Wang2021_eq2(P=None, *, Al_VI_cat_6ox, SiO2_Cpx_cat_6ox, TiO2_Cpx_cat_6ox, Cr2O3_Cpx_cat_6ox,
+FeOt_Cpx_cat_6ox, MnO_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na2O_Cpx_cat_6ox, K2O_Cpx_cat_6ox,
+FeII_Wang21, H2O_Liq, Al2O3_Cpx_cat_6ox, CaO_Cpx_cat_6ox):
+    '''
+    Clinopyroxene-only thermometer of Wang et al. (2021) equation 2 - currently on Zenodo - 10.5281/zenodo.4727870
+    '''
+    NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*TiO2_Cpx_cat_6ox
+    +1.5117*Cr2O3_Cpx_cat_6ox+1.4768*FeOt_Cpx_cat_6ox-5.7686*MnO_Cpx_cat_6ox-0.0864*MgO_Cpx_cat_6ox))
+
+
+    return (273.15+226.3499*NCT-444.507*TiO2_Cpx_cat_6ox-550.66*Al2O3_Cpx_cat_6ox
+    -4290.88*MnO_Cpx_cat_6ox-580.33*MgO_Cpx_cat_6ox-760.789*CaO_Cpx_cat_6ox
+    -3612.82*K2O_Cpx_cat_6ox-732.13*FeII_Wang21-23.6413*H2O_Liq+2513.694)
+
+
+def T_Wang2021_eq4(P=None, *, Al_VI_cat_6ox, SiO2_Cpx_cat_6ox, TiO2_Cpx_cat_6ox, Cr2O3_Cpx_cat_6ox,
+FeOt_Cpx_cat_6ox, MnO_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na2O_Cpx_cat_6ox, K2O_Cpx_cat_6ox,
+FeII_Wang21, H2O_Liq, Al2O3_Cpx_cat_6ox):
+    '''
+    Clinopyroxene-only thermometer of Wang et al. (2021) equation 2 - currently on Zenodo - 10.5281/zenodo.4727870
+    '''
+    NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*TiO2_Cpx_cat_6ox
+    +1.5117*Cr2O3_Cpx_cat_6ox+1.4768*FeOt_Cpx_cat_6ox-5.7686*MnO_Cpx_cat_6ox-0.0864*MgO_Cpx_cat_6ox))
+
+
+    return (273.15+1270.004-1362.6*Al2O3_Cpx_cat_6ox+2087.355*Cr2O3_Cpx_cat_6ox
+    +850.6013*FeOt_Cpx_cat_6ox-2881.1*MnO_Cpx_cat_6ox-5511.84*K2O_Cpx_cat_6ox
+    +2821.792*Al_VI_cat_6ox-972.506*FeII_Wang21-26.7148*H2O_Liq)
+
 
 
 def T_Put2008_eq32d(P, *, TiO2_Cpx_cat_6ox, FeOt_Cpx_cat_6ox, Al2O3_Cpx_cat_6ox,
@@ -1198,8 +1265,8 @@ def T_Put2008_eq32d(P, *, TiO2_Cpx_cat_6ox, FeOt_Cpx_cat_6ox, Al2O3_Cpx_cat_6ox,
     '''
     Clinopyroxene-only thermometer of Putirka (2008) Eq32d. Does overestimate temperature for hydrous data
 
-    | SEE=Â±58Â°C (anhydrous)
-    | SEE=Â±87Â°C (anhydrous)
+    | SEE=±58°C (anhydrous)
+    | SEE=±87°C (anhydrous)
     '''
 
     return (((93100 + 544 * P) / (61.1 + 36.6 * TiO2_Cpx_cat_6ox + 10.9 * FeOt_Cpx_cat_6ox
@@ -1222,7 +1289,7 @@ def T_Put2008_eq32d_subsol(P, *, TiO2_Cpx_cat_6ox, FeOt_Cpx_cat_6ox, Al2O3_Cpx_c
     + 3.5 * (np.log(a_cpx_En.astype(float)))**2)))
 
 ## Function for calculationg Cpx-only pressure
-Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b}
+Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1, P_Wang2021_eq3}
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
@@ -1272,7 +1339,7 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=0):
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
     else:
         if T is not None:
-            w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+            print('Youve selected a T-independent function')
 
     if isinstance(T, pd.Series):
         if len(T) != len(cpx_comps):
@@ -1303,11 +1370,11 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=0):
     return P_kbar
 
 ## Function for calculating Cpx-only temperature
-Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol}
+Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol, T_Wang2021_eq4, T_Wang2021_eq2}
 Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
-def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None):
+def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None, H2O_Liq=None):
     '''
     Clinopyroxene only thermometer. Enter a panda dataframe with Cpx compositions,
     returns a temperature in Kelvin.
@@ -1348,7 +1415,7 @@ def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None):
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
     else:
         if P is not None:
-            w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+            print('Youve selected a P-independent function')
 
     if isinstance(P, pd.Series):
         if len(P) != len(cpx_comps):
@@ -1357,6 +1424,13 @@ def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None):
 
 
     cpx_comps = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
+    if H2O_Liq is not None:
+        cpx_comps['H2O_Liq']=H2O_Liq
+    if equationT=="T_Wang2021_eq2" or equationT=="T_Wang2021_eq4":
+        if H2O_Liq is None:
+            cpx_comps['H2O_Liq']=0
+            w.warn('These thermometers need a H2O content of the liquid, by default, '
+            'we have set this to 0, you can overwrite this using H2O_Liq=...')
 
 
     kwargs = {name: cpx_comps[name] for name, p in sig.parameters.items()

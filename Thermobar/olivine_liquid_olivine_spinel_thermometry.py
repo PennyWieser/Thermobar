@@ -32,6 +32,16 @@ def T_Beatt93_ol_HerzCorr(P, *, Den_Beat93):
             (10**(-6)) / 8.3144) / Den_Beat93) + 54 * (0.1 * P) + 2 * (0.1 * P)**2)
 
 
+def T_Put2008_eq19(P, *, DMg_Meas, CNML, CSiO2L, NF):
+    '''
+    Olivine-Liquid thermometer originally from Beattie, (1993), form from Putirka (2008)
+
+    '''
+    return ((13603) + (4.943 * 10**(-7)) * ((0.1 * P) - 10**(-5))) / (6.26 + 2 *
+            np.log(DMg_Meas) + 2 * np.log(1.5 * CNML) + 2 * np.log(3 * CSiO2L) - NF)
+
+
+
 def T_Put2008_eq21(P, *, DMg_Meas, Na2O_Liq, K2O_Liq, H2O_Liq):
     '''
     Olivine-Liquid thermometer: Putirka (2008), equation 21 (originally Putirka et al., 2007,  Eq 2). Recalibration of Beattie (1993) to account for the pressures sensitivity noted by Herzberg and O'Hara (2002), and esliminates the systematic error of Beattie (1993) for hydrous compositions.
@@ -92,7 +102,7 @@ def T_Pu2021(P, *, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, MgO_Liq
             np.log(SiO2_Liq_mol_frac) + 4.319)) - 70 + 110 * (P * 0.1) - 18 * (P * 0.1)**2
 
 ## Listing all equation options
-Liquid_olivine_funcs = {T_Beatt93_ol, T_Beatt93_ol_HerzCorr, T_Put2008_eq21, T_Put2008_eq21,
+Liquid_olivine_funcs = {T_Beatt93_ol, T_Beatt93_ol_HerzCorr, T_Put2008_eq19, T_Put2008_eq21,
 T_Put2008_eq22, T_Sisson1992, T_Pu2017, T_Pu2021}
 
 Liquid_olivine_funcs_by_name = {p.__name__: p for p in Liquid_olivine_funcs}
@@ -101,7 +111,7 @@ Liquid_olivine_funcs_by_name = {p.__name__: p for p in Liquid_olivine_funcs}
 ## Function for calculating olivine-liquid temperature using various equations.
 
 def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
-                          NiO_Ol_Mol=None, H2O_Liq=None, Fe3FeT_Liq=None, eq_tests=False):
+                          NiO_Ol_Mol=None, H2O_Liq=None, Fe3Fet_Liq=None, eq_tests=False):
     '''
     Olivine-liquid thermometers. Returns the temperature in Kelvin,
     along with calculations of Kd-Fe-Mg equilibrium tests.
@@ -163,8 +173,8 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
 
     if H2O_Liq is not None:
         liq_comps_c['H2O_Liq'] = H2O_Liq
-    if Fe3FeT_Liq is not None:
-        liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+    if Fe3Fet_Liq is not None:
+        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
 # Allows different calculation scheme for Ni-bearing equations
     if equationT == "T_Pu2017" or equationT == "T_Pu2021":
@@ -214,7 +224,7 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
 
     # This performs extra calculation steps for Beattie equations
         if equationT == "T_Put2008_eq22" or equationT == "T_Put2008_eq21" or \
-        equationT == "T_Beatt93_ol" or equationT == "T_Beatt93_ol_HerzCorr":
+        equationT == "T_Beatt93_ol" or equationT == "T_Beatt93_ol_HerzCorr" or equationT=="T_Put2008_eq19":
 
                 Liq_Ols['DMg_Meas'] = Liq_Ols['MgO_Ol_cat_frac'] / \
                     Liq_Ols['MgO_Liq_cat_frac']
@@ -238,7 +248,7 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
                 raise ValueError(f'{equationT} requires you to enter P')
         else:
             if P is not None:
-                w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+                print('Youve selected a P-independent function')
 
 
         kwargs = {name: Liq_Ols[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -254,7 +264,7 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
     if eq_tests is False and ol_comps is not None:
         KdFeMg_Meas = (
             ((ol_comps_c['FeOt_Ol'] / 71.844) / (ol_comps_c['MgO_Ol'] / 40.3044)) /
-            ((liq_comps_c['FeOt_Liq'] * (1 - liq_comps_c['Fe3FeT_Liq']
+            ((liq_comps_c['FeOt_Liq'] * (1 - liq_comps_c['Fe3Fet_Liq']
                                          ) / 71.844) / (liq_comps_c['MgO_Liq'] / 40.3044))
         )
         df = pd.DataFrame(
@@ -273,7 +283,7 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
             ((ol_comps_c['MgO_Ol'] / 40.3044) + ol_comps_c['FeOt_Ol'] / 71.844)
         KdFeMg_Meas = (
             ((ol_comps_c['FeOt_Ol'] / 71.844) / (ol_comps_c['MgO_Ol'] / 40.3044)) /
-            ((liq_comps_c['FeOt_Liq'] * (1 - liq_comps_c['Fe3FeT_Liq']
+            ((liq_comps_c['FeOt_Liq'] * (1 - liq_comps_c['Fe3Fet_Liq']
                                          ) / 71.844) / (liq_comps_c['MgO_Liq'] / 40.3044))
         )
         Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'], Na2O_mol=Liq_Ols[

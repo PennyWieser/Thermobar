@@ -13,6 +13,6 @@ from Thermobar.core import *
 def T_Put2008_eq13(P=None, *, MgO_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids: Equation 13 of Putirka et al. (2008)
-    SEE=Â±72 Â°C
+    SEE=±72 °C
     '''
     return (26.3 * MgO_Liq + 994.4 + 273.15)

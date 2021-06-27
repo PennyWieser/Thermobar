@@ -31,8 +31,9 @@ def P_Put2008_eq29a(T, *, SiO2_Liq_cat_frac, MgO_Liq_cat_frac, FeOt_Opx_cat_6ox,
 
 
 
-def P_Put2008_eq29b(T, *, ln_FmAl2SiO6_liq, Al2O3_Liq_cat_frac, MgO_Liq_cat_frac, FeOt_Liq_cat_frac, SiO2_Opx_cat_6ox, FeOt_Opx_cat_6ox,
-                    Na2O_Liq_cat_frac, K2O_Liq_cat_frac, H2O_Liq):
+def P_Put2008_eq29b(T, *, ln_FmAl2SiO6_liq, Al2O3_Liq_cat_frac, MgO_Liq_cat_frac,
+FeOt_Liq_cat_frac, SiO2_Opx_cat_6ox, FeOt_Opx_cat_6ox,
+Na2O_Liq_cat_frac, K2O_Liq_cat_frac, H2O_Liq):
     '''
     Orthopyroxene-Liquid barometer of Putirka, (2008) eq 29b. Global calibration of experiments.
 
@@ -97,13 +98,15 @@ def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, MgO_Liq_cat_frac,
                     K2O_Liq_cat_frac, FeOt_Liq_cat_frac, FeOt_Opx_cat_6ox):
     """
     Putirka (2008) Equation 28a.
-    Global calibration: T=750-1600Â°C, SiO2=33-77 wt%, P=atm-11 GPa. H2O=0-14.2 wt%.
+    Global calibration: T=750-1600°C, SiO2=33-77 wt%, P=atm-11 GPa. H2O=0-14.2 wt%.
 
-    |  SEE= Â±26Â°C for calibration data
-    |  SEE=Â± 41Â°C for testing data
+    |  SEE= ±26°C for calibration data
+    |  SEE=± 41°C for testing data
     """
-    return (273.15 + 10**4 / (4.07 - 0.329 * (0.1 * P) + 0.12 * H2O_Liq + 0.567 * ln_Fm2Si2O6_liq - 3.06 * MgO_Liq_cat_frac -
-            6.17 * K2O_Liq_cat_frac + 1.89 * MgO_Liq_cat_frac / (MgO_Liq_cat_frac + FeOt_Liq_cat_frac) + 2.57 * FeOt_Opx_cat_6ox))
+    return (273.15 + 10**4 / (4.07 - 0.329 * (0.1 * P) + 0.12 * H2O_Liq +
+    0.567 * ln_Fm2Si2O6_liq - 3.06 * MgO_Liq_cat_frac -
+    6.17 * K2O_Liq_cat_frac + 1.89 * MgO_Liq_cat_frac /
+    (MgO_Liq_cat_frac + FeOt_Liq_cat_frac) + 2.57 * FeOt_Opx_cat_6ox))
 
 def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, MgO_Liq_cat_frac, CaO_Liq_cat_frac, K2O_Liq_cat_frac, MnO_Liq_cat_frac,
                             FeOt_Liq_cat_frac, FeOt_Opx_cat_6ox, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac, Mg_Number_Liq_NoFe3):
@@ -183,7 +186,7 @@ Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Fel
 Opx_Liq_P_funcs_by_name = {p.__name__: p for p in Opx_Liq_P_funcs}
 
 def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltmatch=None,
-                            T=None, eq_tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
+                            T=None, eq_tests=False, H2O_Liq=None, Fe3Fet_Liq=None):
     '''
     Orthopyroxene-Liquid barometer, user specifies equation, and calculates pressure in kbar.
     Also has option to calculate equilibrium tests.
@@ -243,7 +246,7 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
     else:
         if T is not None:
-            w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+            print('Youve selected a T-independent function')
 
     if isinstance(T, pd.Series):
         if liq_comps is not None:
@@ -253,13 +256,13 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
 
 
 
-# This replaces H2O and Fe3FeT_Liq in the input
+# This replaces H2O and Fe3Fet_Liq in the input
     if liq_comps is not None:
         liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None and not isinstance(H2O_Liq, str):
             liq_comps_c['H2O_Liq'] = H2O_Liq
-        if Fe3FeT_Liq is not None:
-            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+        if Fe3Fet_Liq is not None:
+            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
 
 
@@ -279,7 +282,7 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
             raise ValueError(f'{equationP} requires you to enter T')
     else:
         if T is not None:
-            w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+            print('Youve selected a T-independent function')
 
 
     kwargs = {name: Combo_liq_opxs[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -318,7 +321,7 @@ Opx_Liq_T_funcs = {T_Put2008_eq28a, T_Put2008_eq28b_opx_sat, T_Beatt1993_opx}
 
 Opx_Liq_T_funcs_by_name = {p.__name__: p for p in Opx_Liq_T_funcs}
 def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmatch=None,
-                           P=None, eq_tests=False, Fe3FeT_Liq=None, H2O_Liq=None):
+                           P=None, eq_tests=False, Fe3Fet_Liq=None, H2O_Liq=None):
     '''
     Orthopyroxene-Liquid thermometer, user specifies equation,
     and calculates temperature in Kelvin.  Also has option to calculate equilibrium tests.
@@ -373,7 +376,7 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmat
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
     else:
         if P is not None:
-            w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+            print('Youve selected a P-independent function')
 
     if isinstance(P, pd.Series):
         if liq_comps is not None:
@@ -389,8 +392,8 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmat
         liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None and not isinstance(H2O_Liq, str):
             liq_comps_c['H2O_Liq'] = H2O_Liq
-        if Fe3FeT_Liq is not None:
-            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+        if Fe3Fet_Liq is not None:
+            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
         Combo_liq_opxs = calculate_orthopyroxene_liquid_components(
             liq_comps=liq_comps_c, opx_comps=opx_comps)
 
@@ -433,7 +436,7 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmat
 
 ## Iterating P and T when you don't know either
 def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=None, equationP=None, equationT=None,
-                              iterations=30, T_K_Guess=1300, eq_tests=False, H2O_Liq=None, Fe3FeT_Liq=None):
+                              iterations=30, T_K_Guess=1300, eq_tests=False, H2O_Liq=None, Fe3Fet_Liq=None):
     '''
     Solves simultaneous equations for temperature and pressure using
     orthopyroxene-liquid thermometers and barometers.
@@ -505,8 +508,8 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
     if meltmatch is None:
         liq_comps_c = liq_comps.copy()
 
-        if Fe3FeT_Liq is not None:
-            liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+        if Fe3Fet_Liq is not None:
+            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
@@ -574,7 +577,7 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
 ## Considering all possible Orthopyroxene-melt pairs, and iterating P and T
 
 def calculate_opx_liq_press_temp_matching(*, liq_comps, opx_comps, equationT=None,
-equationP=None, P=None, T=None, eq_crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
+equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
  KdMatch=None, KdErr=None, Opx_Quality=False, Return_All_Matches=False):
 
     '''
@@ -632,10 +635,10 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
     Opx Quality: bool, optional
         If True, filters out orthopyroxenes with cation sums outside of 4.02-3.99 (after Neave et al. 2017)
 
-   Fe3FeT_Liq: int or float, optional
+   Fe3Fet_Liq: int or float, optional
         Fe3FeT ratio used to assess Kd Fe-Mg equilibrium between opx and melt.
-        If users don't specify, uses Fe3FeT_Liq from liq_comps.
-        If specified, overwrites the Fe3FeT_Liq column in the liquid input.
+        If users don't specify, uses Fe3Fet_Liq from liq_comps.
+        If specified, overwrites the Fe3Fet_Liq column in the liquid input.
 
 
     Returns: dict
@@ -657,12 +660,12 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
 
     # This over-writes inputted Fe3Fet_Liq and H2O_Liq inputs.
     liq_comps_c = liq_comps.copy()
-    if Fe3FeT_Liq is not None:
-        liq_comps_c['Fe3FeT_Liq'] = Fe3FeT_Liq
+    if Fe3Fet_Liq is not None:
+        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
     if H2O_Liq is not None and not isinstance(H2O_Liq, str):
         liq_comps_c['H2O_Liq'] = H2O_Liq
-    if "Fe3FeT_Liq" not in liq_comps:
-        liq_comps_c['Fe3FeT_Liq'] = 0
+    if "Fe3Fet_Liq" not in liq_comps:
+        liq_comps_c['Fe3Fet_Liq'] = 0
 
     # Adding sample names if there aren't any
     if "Sample_ID_Liq" not in liq_comps:
@@ -730,6 +733,11 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
         if KdMatch is None and KdErr is not None:
             Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < KdErr].reset_index(drop=True)
             Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
+
+        if len(Combo_liq_opx_fur_filt) == 0:
+            raise Exception('No matches found to the choosen Kd criteria.')
+
+
 
         # Replace automatically calculated one with various user-options.
         Combo_liq_opx_fur_filt.drop(['Delta_Kd_Fe_Mg_Fe2'], axis=1, inplace=True)
@@ -807,10 +815,6 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3FeT_Liq=None, H2O_Liq=None,
             df1_M.insert(1, "st_dev_T_K_calc", df1_S['st_dev_T_K_calc'])
             df1_M.insert(3, "st_dev_P_kbar_calc", df1_S['st_dev_P_kbar_calc'])
             df1_M.insert(0, "No. of Cpxs averaged", df1_S['st_dev_N'])
-
-        else:
-            raise Exception(
-                'No Matches - to set less strict filters, change KdErr and/or KdMatch')
 
         if P is not None:
             Combo_liq_opx_fur_filt = Combo_liq_opx_fur_filt.rename(

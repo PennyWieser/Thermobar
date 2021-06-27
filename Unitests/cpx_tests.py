@@ -15,7 +15,7 @@ LiqT=pd.DataFrame(data={"SiO2_Liq": 51,
                             "Cr2O3_Liq": 0.11,
                             "P2O5_Liq": 0.11,
                             "H2O_Liq": 5,
- "Fe3FeT_Liq":0.1,
+ "Fe3Fet_Liq":0.1,
 }, index=[0])
 
 CpxT=pd.DataFrame(data={"SiO2_Cpx": 49,
@@ -94,7 +94,7 @@ class test_cpx_liq_press(unittest.TestCase):
     def test_Put32_deltaKd_30fe(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
        liq_comps=LiqT, equationP="P_Put2008_eq32c", T=1300,
-       eq_tests=True, Fe3FeT_Liq=0.3).Delta_Kd_Put2008[0], 0.170583,
+       eq_tests=True, Fe3Fet_Liq=0.3).Delta_Kd_Put2008[0], 0.170583,
        decimalPlace,
        "Calc Delta Kd from  P_Put2008_eq32c not equal to test value")
 
@@ -176,13 +176,13 @@ class test_cpx_liq_melt_matching(unittest.TestCase):
    def test_eq33_P2017_press(self):
       self.assertAlmostEqual(pt.calculate_cpx_liq_press_temp_matching(cpx_comps=Cpx2, liq_comps=Liq2,
       equationT="T_Put2008_eq33", equationP="P_Neave2017", KdErr=0.11, eq_crit="All",
-Fe3FeT_Liq=0.0, sigma=4).get("Av_PTs").Mean_P_kbar_calc[0], 5.993997, decimalPlace,
+Fe3Fet_Liq=0.0, sigma=4).get("Av_PTs").Mean_P_kbar_calc[0], 5.993997, decimalPlace,
 "Calc P from melt matching eq33-N2017 not equal to test value")
 #
    def test_eq33_P2017_temp(self):
       self.assertAlmostEqual(pt.calculate_cpx_liq_press_temp_matching(cpx_comps=Cpx2, liq_comps=Liq2,
 equationT="T_Put2008_eq33", equationP="P_Neave2017", KdErr=0.11, eq_crit="All",
-Fe3FeT_Liq=0.0, sigma=4).get("Av_PTs").Mean_T_K_calc[0], 1480.039007, decimalPlace,
+Fe3Fet_Liq=0.0, sigma=4).get("Av_PTs").Mean_T_K_calc[0], 1480.039007, decimalPlace,
        "Calc T from melt matching eq33-N2017 not equal to test value")
 
 

@@ -13,7 +13,7 @@ from Thermobar.core import *
 def T_Put2008_eq13(P=None, *, MgO_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids: Equation 13 of Putirka et al. (2008)
-    SEE=Â±72 Â°C
+    SEE=±72 °C
     '''
     return (26.3 * MgO_Liq + 994.4 + 273.15)
 
@@ -22,7 +22,7 @@ def T_Put2008_eq14(P=None, *, Mg_Number_Liq_NoFe3, MgO_Liq,
                    FeOt_Liq, Na2O_Liq, K2O_Liq, H2O_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids: Equation 14 of Putirka et al. (2008)
-    SEE=±58 Â°C
+    SEE=±58 °C
     '''
     return (754 + 190.6 * Mg_Number_Liq_NoFe3 + 25.52 * MgO_Liq + 9.585 *
             FeOt_Liq + 14.87 * (Na2O_Liq + K2O_Liq) - 9.176 * H2O_Liq + 273.15)
@@ -32,7 +32,7 @@ def T_Put2008_eq15(P, *, Mg_Number_Liq_NoFe3, MgO_Liq,
                    FeOt_Liq, Na2O_Liq, K2O_Liq, H2O_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids: Equation 15 of Putirka et al. (2008). Pressure-dependent form of Equation 14.
-    SEE=Â±46 Â°C
+    SEE=±46 °C
     '''
     return (815.3 + 265.5 * Mg_Number_Liq_NoFe3 + 15.37 * MgO_Liq + 8.61 * FeOt_Liq +
             6.646 * (Na2O_Liq + K2O_Liq) + 39.16 * 0.1 * P - 12.83 * H2O_Liq + 273.15)
@@ -43,7 +43,7 @@ def T_Put2008_eq16(P, *, SiO2_Liq_mol_frac,
     '''
     Liquid-only thermometer for ol-cpx-plag-saturated liquids:
     Equation 16 of Putirka et al. (2008). Adapted from Yang et al (1996).
-    SEE=Â±19 Â°C
+    SEE=±19 °C
     '''
     return (- 583 + 3141 * SiO2_Liq_mol_frac + 15779 * Al2O3_Liq_mol_frac + 1338.6 *
             MgO_Liq_mol_frac - 31440 * (Al2O3_Liq_mol_frac) * (SiO2_Liq_mol_frac) + 77.67 * 0.1 * P + 273.15)
@@ -53,15 +53,16 @@ def T_Helz1987_MgO(P=None, *, MgO_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids:
     Equation 1 (MgO thermometer) of Helz and Thornber (1987)
-    SEE=Â±10 Â°C
+    SEE=±10 °C
     '''
     return (20.1 * MgO_Liq + 1014 + 273.15)
 
 
 def T_Montierth1995_MgO(P=None, *, MgO_Liq):
     '''
-    Liquid-only thermometer for olivine-saturated liquids: update of Helz and Thornber (1987) by Montrieth et al. (1995).
-    SEE=Â±10 Â°C
+    Liquid-only thermometer for olivine-saturated liquids:
+    update of Helz and Thornber (1987) by Montrieth et al. (1995).
+    SEE=±10 °C
     '''
     return (23.0 * MgO_Liq + 1012 + 273.15)
 
@@ -70,7 +71,7 @@ def T_Helz1987_CaO(P=None, *, CaO_Liq):
     '''
     Liquid-only thermometer for glasses with Ol+Augite+Plag
     Equation 2 (CaO thermometer) of Helz and Thornber (1987)
-    SEE=Â±10 Â°C
+    SEE=±10 °C
     '''
     return (16.6 * CaO_Liq + 968 + 273.15)
 
@@ -97,13 +98,6 @@ def T_Beatt93_BeattDMg_HerzCorr(P, *, Den_Beat93):
             (10**(-6)) / 8.3144) / Den_Beat93) + 54 * (0.1 * P) + 2 * (0.1 * P)**2)
 
 
-def T_Put2008_eq19_BeattDMg(P, *, calcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_NF):
-    '''
-    Liquid-only thermometer. Combining terms from Beattie et al. (1993) by Putirka (2008).
-    This function uses calculated DMg from Beattie, so you don't need a measured olivine composition.
-    '''
-    return ((13603) + (4.943 * 10**(-7)) * ((0.1 * P) - 10**(-5))) / (6.26 + 2 *
-            np.log(calcDMg_Beat93) + 2 * np.log(1.5 * Beat_CNML) + 2 * np.log(3 * Beat_CSiO2L) - Beat_NF)
 
 
 def T_Sug2000_eq1(P=None, *, MgO_Liq_mol_frac):
@@ -180,29 +174,14 @@ def T_Sug2000_eq6b(P, *, SiO2_Liq_mol_frac,
     return (1202 + 1.511 * SiO2_Liq_mol_frac * 100 - 1.426 * FeOt_Liq_mol_frac * 100 +
             8.780 * MgO_Liq_mol_frac * 100 + 5.537 * CaO_Liq_mol_frac * 100 + 0.0081 * (P * 1000))
 
-# These two functions allow equations 21 and 22 to be iterated for
-# temperature, using DMg from 21, and Temp from 22
-
-
-def calculate_DMg_eq21(T, *, P, H2O_Liq, Na2O_Liq, K2O_Liq):
-    return (np.exp(-2.158 + 55.09 * (P / 10) / (T - 273.15) - 6.213 * 10**(-2) * H2O_Liq + 4430 / (T - 273.15)
-                   + 5.115 * 10**(-2) * (Na2O_Liq + K2O_Liq)))
-
-
-def T_Put2008_eq22_DMgIter(DMg, *, P, MgO_Liq_cat_frac, FeOt_Liq_cat_frac, CaO_Liq_cat_frac,
-                           MnO_Liq_cat_frac, SiO2_Liq_cat_frac, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac, H2O_Liq):
+def T_Put2008_eq19_BeattDMg(P, *, calcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_NF):
     '''
-    Liquid-only thermometer (adapted from ol-liq thermometer using calc DMg from Beattie) Putirka (2008), equation 22 (originally Putirka et al., 2007,  Eq 4). Recalibration of Beattie (1993) to account for the pressures sensitivity noted by Herzberg and O'Hara (2002), and eliminates the systematic error of Beattie (1993) for hydrous compositions.
+    Liquid-only thermometer. Combining terms from Beattie et al. (1993) by Putirka (2008).
+    This function uses calculated DMg from Beattie, so you don't need a measured olivine composition.
     '''
-    CNML = MgO_Liq_cat_frac + FeOt_Liq_cat_frac + CaO_Liq_cat_frac + MnO_Liq_cat_frac
-    CSiO2L = SiO2_Liq_cat_frac
-    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac +
-                          7 * np.log(1 - TiO2_Liq_cat_frac))
+    return ((13603) + (4.943 * 10**(-7)) * ((0.1 * P) - 10**(-5))) / (6.26 + 2 *
+            np.log(calcDMg_Beat93) + 2 * np.log(1.5 * Beat_CNML) + 2 * np.log(3 * Beat_CSiO2L) - Beat_NF)
 
-    return ((15294.6 + 1318.8 * 0.1 * P + 2.48348 * ((0.1 * P)**2)) / (8.048 + 2.8352 * np.log(DMg)
-                                                                       + 2.097 * np.log(1.5 * CNML) + 2.575 * np.log(3 * CSiO2L) - 1.41 * NF + 0.222 * H2O_Liq + 0.5 * (0.1 * P)) + 273.15)
-
-# Equation 21 and 22 - Using DMg Beattie
 
 
 def T_Put2008_eq21_BeattDMg(P, *, calcDMg_Beat93, Na2O_Liq, K2O_Liq, H2O_Liq):
@@ -250,7 +229,8 @@ def T_Put2016_eq3_amp_sat(P=None, *, FeOt_Liq_mol_frac_hyd, CaO_Liq_mol_frac_hyd
 def T_Put1999_cpx_sat(P, *, MgO_Liq_cat_frac, FeOt_Liq_cat_frac,
                       CaO_Liq_cat_frac, SiO2_Liq_cat_frac, Al2O3_Liq_cat_frac):
     '''
-    Liquid-only thermometer, Putirka (1999). temperature at which a liquid is saturated in clinopyroxene (for a given P).
+    Liquid-only thermometer, Putirka (1999). temperature at which a liquid is saturated
+    in clinopyroxene (for a given P).
     '''
     return (10 ** 4 / (3.12 - 0.0259 * P - 0.37 * np.log(MgO_Liq_cat_frac / (MgO_Liq_cat_frac + FeOt_Liq_cat_frac))
                        + 0.47 * np.log(CaO_Liq_cat_frac * (MgO_Liq_cat_frac +
@@ -272,7 +252,7 @@ def T_Beatt1993_opx(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
                     MnO_Liq_cat_frac, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac):
     '''
     Opx-Liquid thermometer of Beattie (1993). Only uses liquid composition.
-    Putirka (2008) warn that overpredicts for hydrous compositions at <1200Â°C, and anhydrous compositions at <1100Â°C
+    Putirka (2008) warn that overpredicts for hydrous compositions at <1200°C, and anhydrous compositions at <1100°C
     '''
     Num_B1993 = 125.9 * 1000 / 8.3144 + \
         ((0.1 * P) * 10**9 - 10**5) * 6.5 * (10**(-6)) / 8.3144
@@ -325,8 +305,9 @@ def T_Put2008_eq24c_kspar_sat(P, *, Al2O3_Liq_cat_frac, Na2O_Liq_cat_frac,
 ## Listing them all to check for invalid inputs- add new ones into this list so they become recognised.
 
 Liquid_only_funcs = {T_Put2008_eq13, T_Put2008_eq14, T_Put2008_eq15, T_Put2008_eq16,
-T_Helz1987_MgO, T_Montierth1995_MgO, T_Helz1987_CaO, T_Beatt93_BeattDMg, T_Beatt93_BeattDMg_HerzCorr, T_Sug2000_eq1,
-T_Sug2000_eq3_ol, T_Sug2000_eq3_opx, T_Sug2000_eq3_cpx, T_Sug2000_eq3_pig,
+T_Helz1987_MgO, T_Montierth1995_MgO, T_Helz1987_CaO, T_Beatt93_BeattDMg,
+T_Beatt93_BeattDMg_HerzCorr, T_Sug2000_eq1, T_Sug2000_eq3_ol, T_Sug2000_eq3_opx,
+T_Sug2000_eq3_cpx, T_Sug2000_eq3_pig,
 T_Sug2000_eq6a, T_Sug2000_eq6b, T_Put2008_eq19_BeattDMg, T_Put2008_eq21_BeattDMg,
 T_Put2008_eq22_BeattDMg, T_Molina2015_amp_sat, T_Put2016_eq3_amp_sat,
 T_Put2008_eq34_cpx_sat,
@@ -468,7 +449,7 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
     else:
         if P is not None:
-            w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+            print('Youve selected a P-independent function')
 
 
     kwargs = {name: anhyd_cat_frac[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}

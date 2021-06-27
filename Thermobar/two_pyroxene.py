@@ -5,10 +5,8 @@ import inspect
 import warnings as w
 import numbers
 import pandas as pd
-w.filterwarnings(
-    "ignore", message="rubicon.objc.ctypes_patch has only been tested ")
-w.filterwarnings("ignore", message="The handle")
-w.simplefilter("once")
+
+
 
 from Thermobar.core import *
 
@@ -265,7 +263,7 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
     else:
         if T is not None:
-            w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+            print('Youve selected a T-independent function')
 
     if isinstance(T, pd.Series):
         if cpx_comps is not None:
@@ -361,7 +359,7 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
     else:
         if P is not None:
-            w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+            print('Youve selected a P-independent function')
 
     if isinstance(P, pd.Series):
         if cpx_comps is not None:
@@ -425,6 +423,8 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     cpx_comps: DataFrame (not required for P_Put2008_eq29c)
         Cpxuid compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
+    Or:
+
     meltmatch: DataFrame
         Combined dataframe of Opx-Cpx compositions (headings SiO2_Cpx, SiO2_Opx etc.). S
         Used for calculate Cpx_Opx_press_temp_matching function.
@@ -471,6 +471,7 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     # Gives users flexibility to reduce or increase iterations
 
 
+
     if Two_Px_Match is None:
         T_func = calculate_cpx_opx_temp(
             cpx_comps=cpx_comps, opx_comps=opx_comps, equationT=equationT, P="Solve")
@@ -482,8 +483,8 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
         P_func = calculate_cpx_opx_press(
             Two_Px_Match=Two_Px_Match, equationP=equationP, T="Solve")
 
- # This bit checks if temperature is already a series - e.g., equations
- # with no pressure dependence
+    # This bit checks if temperature is already a series - e.g., equations
+    # with no pressure dependence
     if isinstance(T_func, pd.Series) and isinstance(P_func, pd.Series):
         P_guess = P_func
         T_K_guess = T_func
@@ -504,9 +505,9 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
 
-    T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
-    T_K_guess[T_K_guess_is_bad] = np.nan
-    P_guess[T_K_guess_is_bad] = np.nan
+        T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
+        T_K_guess[T_K_guess_is_bad] = np.nan
+        P_guess[T_K_guess_is_bad] = np.nan
 
 
     if eq_tests is False:
@@ -565,8 +566,8 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
 
     KdMatch: str
         |  If None, returns all cpx-opx pairs.
-        |  If "HighTemp", returns all cpxs-opxs within 1.09+-0.14 suggested by Putirka (2008)
-        |  If "Subsolidus" returns all cpxs-opxs within 0.7+-0.2 suggested by Putirka (2008)
+        |  If "HighTemp", returns all cpxs-opxs within Kd cpx-opx=1.09+-0.14 suggested by Putirka (2008)
+        |  If "Subsolidus" returns all cpxs-opxs within Kd cpx-opx=0.7+-0.2 suggested by Putirka (2008)
         |  If int or float, also need to specify KdErr. returns all matches within KdMatch +- KdErr
 
 
@@ -591,9 +592,10 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         All_PTs: Returns output parameters for all matches (e.g, cpx1-Liq1, cpx1-Liq4) without any averaging.
 
     '''
-    if isinstance(KdMatch, int or float) and KdErr is None:
+    if (KdErr is None and isinstance(KdMatch, int)) or (KdErr is None and isinstance(KdMatch, float)):
         raise Exception(
-            'You have entered a numerical value for KdMatch, but have not specified a KdErr to accept matches within KdMatch+-KdErr')
+            'You have entered a numerical value for KdMatch, but have not'
+            'specified a KdErr to accept matches within KdMatch+-KdErr')
 
     # calculating Cpx and opx components. Do before duplication to save
     # computation time
@@ -675,6 +677,11 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
 
     # Combo_opxs_cpxs_names= Combo_opxs_cpxs.copy() # Making a copy to keep
     # the names
+
+    if len(Combo_opxs_cpxs_2) == 0:
+        raise Exception('No matches found after Kd and quality filter.')
+
+
     Combo_opxs_cpxs_2_names = Combo_opxs_cpxs_2.copy()
     Combo_opxs_cpxs_2 = Combo_opxs_cpxs_2.drop(
         ['Sample_ID_Cpx', 'Sample_ID_Opx'], axis=1).astype('float64')
@@ -780,7 +787,8 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
 
     else:
         raise Exception(
-            'No Matches - to set less strict filters, e.g., could edit KdMatch is None and KdErr to get more matches')
+            'No Matches - you may need to set less strict filters, e.g.,'
+            'you could edit KdMatch is None and KdErr to get more matches')
 
     print('Done!')
     return {'Av_PTs_perCPX': df1_M, 'All_PTs': Combo_opxs_cpxs_2}

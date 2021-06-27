@@ -19,11 +19,11 @@ def calculate_ol_fo(ol_comps):
     Fo=(ol_comps['MgO_Ol']/40.3044)/((ol_comps['MgO_Ol']/40.3044)+(ol_comps['FeOt_Ol']/71.844))
     return Fo
 
-def calculate_liq_mgno(liq_comps, Fe3FeT_Liq=None):
+def calculate_liq_mgno(liq_comps, Fe3Fet_Liq=None):
     liq_comps_c=liq_comps.copy()
-    if Fe3FeT_Liq is not None:
-        liq_comps_c['Fe3FeT_Liq']=Fe3FeT_Liq
-    Mgno=(liq_comps['MgO_Ol']/40.3044)/((liq_comps['MgO_Ol']/40.3044)+(liq_comps_c['Fe3FeT_Liq']*liq_comps['FeOt_Ol']/71.844))
+    if Fe3Fet_Liq is not None:
+        liq_comps_c['Fe3Fet_Liq']=Fe3Fet_Liq
+    Mgno=(liq_comps['MgO_Ol']/40.3044)/((liq_comps['MgO_Ol']/40.3044)+(liq_comps_c['Fe3Fet_Liq']*liq_comps['FeOt_Ol']/71.844))
     return Fo
 
 def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
@@ -67,7 +67,7 @@ def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
 
 
 def calculate_eq_ol_content(liq_comps, Kd_model, ol_comps=None, T=None, P=None,
-Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
+Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None):
     '''calculates equilibrium forsterite contents based on inputtted liquid compositions.
 
 
@@ -90,7 +90,7 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
         "All": Returns outputs for all models
 
     Fe3FeT: optional, float or int.
-        overwrites Fe3FeT_Liq in liq_comps DataFrame
+        overwrites Fe3Fet_Liq in liq_comps DataFrame
 
     Additional required inputs for Toplis, 2005:
         P: Pressure in kbar
@@ -109,8 +109,8 @@ Fe3FeT_Liq=None, ol_fo=None, H2O_Liq=None):
     '''
     if ol_comps is not None:
         ol_comps['Fo_meas']=calculate_ol_fo(ol_comps)
-    if Fe3FeT_Liq is not None:
-        liq_comps['Fe3FeT_Liq'] = Fe3FeT_Liq
+    if Fe3Fet_Liq is not None:
+        liq_comps['Fe3Fet_Liq'] = Fe3Fet_Liq
     if H2O_Liq is not None:
         liq_comps['H2O_Liq'] = H2O_Liq
 

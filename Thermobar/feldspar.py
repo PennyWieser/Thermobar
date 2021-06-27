@@ -164,7 +164,7 @@ def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
     else:
         if P is not None:
-            w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+            print('Youve selected a P-independent function')
 
 
 
@@ -271,7 +271,7 @@ def calculate_fspar_liq_press(*, plag_comps=None, kspar_comps=None, liq_comps=No
             raise ValueError(f'{equationP} requires you to enter T')
     else:
         if T is not None:
-            w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+            print('Youve selected a T-independent function')
 
 
     kwargs = {name: combo_plag_liq[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -376,13 +376,14 @@ def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_com
         P_guess = P_func
 
     if isinstance(P_func, partial) and isinstance(T_func, partial):
+        with w.catch_warnings():
+            w.simplefilter('ignore')
 
         # Gives users flexibility to add a different guess temperature
 
-
-        for _ in range(iterations):
-            P_guess = P_func(T_K_guess)
-            T_K_guess = T_func(P_guess)
+            for _ in range(iterations):
+                P_guess = P_func(T_K_guess)
+                T_K_guess = T_func(P_guess)
 
     # calculates Kd Fe-Mg if eq_tests="True"
 
@@ -667,7 +668,7 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
             raise ValueError(f'{equationH} requires you to enter T')
     else:
         if T is not None:
-            w.warn('Youve selected a T-independent function, so your T input doesnt do anything')
+            print('Youve selected a T-independent function')
 
 
     # Then, warn if enter contradicting inputs;
@@ -714,6 +715,9 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
 
 
     if equationH == "H_Put2008_eq25b" or equationH == "H_Put2005_eqH":
+        if P is None:
+            raise TypeError('even if the equation doesnt require a P to be entered'
+            ' because you have selected eq tests, you need to enter a P')
         if plag_comps is not None:
             combo_plag_liq = calculate_plag_liq_eq_tests(
                 liq_comps=liq_comps, plag_comps=plag_comps, T=T, P=P)
@@ -849,7 +853,7 @@ def calculate_plag_kspar_temp(*, plag_comps=None, kspar_comps=None, Two_Fspar_Ma
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
     else:
         if P is not None:
-            w.warn('Youve selected a P-independent function, so your P input doesnt do anything')
+            print('Youve selected a P-independent function')
 
 
     kwargs = {name: combo_fspars[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}

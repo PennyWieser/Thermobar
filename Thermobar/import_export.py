@@ -200,7 +200,7 @@ def import_lepr_file(filename):
 
 
 # Loading Excel, returns a disctionry
-def import_excel(filename, sheet_name, GEOROC=False):
+def import_excel(filename, sheet_name, sample_label=None, GEOROC=False):
     '''
     Import excel sheet of oxides in wt%, headings should be of the form SiO2_Liq (for the melt/liquid), SiO2_Ol (for olivine comps), SiO2_Cpx (for clinopyroxene compositions). Order doesn't matter
 
@@ -242,6 +242,51 @@ def import_excel(filename, sheet_name, GEOROC=False):
 
     my_input_c = my_input.copy()
 
+    if any(my_input.columns.str.contains("_cpx")):
+        w.warn("You've got a column heading with a lower case _cpx, this is okay if this column is for your"
+        " own use, but if its an input to Thermobar, it needs to be capitalized (_Cpx)" )
+
+    if any(my_input.columns.str.contains("_opx")):
+        w.warn("You've got a column heading with a lower case _opx, this is okay if this column is for your"
+        " own use, but if its an input to Thermobar, it needs to be capitalized (_Opx)" )
+
+    if any(my_input.columns.str.contains("_plag")):
+        w.warn("You've got a column heading with a lower case _plag, this is okay if this column is for your"
+        " own use, but if its an input to Thermobar, it needs to be capitalized (_Plag)" )
+
+    if any(my_input.columns.str.contains("_kspar")):
+       w.warn("You've got a column heading with a lower case _kspar, this is okay if this column is for your"
+        " own use, but if its an input to Thermobar, it needs to be capitalized (_Kspar)" )
+
+    if any(my_input.columns.str.contains("_sp")):
+        w.warn("You've got a column heading with a lower case _sp, this is okay if this column is for your"
+        " own use, but if its an input to Thermobar, it needs to be capitalized (_Sp)" )
+
+    if any(my_input.columns.str.contains("_ol")):
+        w.warn("You've got a column heading with a lower case _ol, this is okay if this column is for your"
+        " own use, but if its an input to Thermobar, it needs to be capitalized (_Ol)" )
+
+    if any(my_input.columns.str.contains("_amp")):
+        w.warn("You've got a column heading with a lower case _amp, this is okay if this campumn is for your"
+        " own use, but if its an input to Thermobar, it needs to be capitalized (_Amp)" )
+
+    if any(my_input.columns.str.contains("_liq")):
+        w.warn("You've got a column heading with a lower case _liq, this is okay if this column is for your"
+        " own use, but if its an input to Thermobar, it needs to be capitalized (_Liq)" )
+
+    if any(my_input.columns.str.contains("FeO_")) and ~any(my_input.columns.str.contains("FeOt_")):
+        raise ValueError("No FeOt found. You've got a column heading with FeO. To avoid errors based on common EPMA outputs"
+        " thermobar only recognises columns with FeOt for all phases except liquid"
+        " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")
+
+    if any(my_input.columns.str.contains("Fe2O3_")) and ~any(my_input.columns.str.contains("FeOt_")):
+         raise ValueError("No FeOt column found. You've got a column heading with Fe2O3. To avoid errors based on common EPMA outputs"
+        " thermobar only recognises columns with FeOt for all phases except liquid"
+        " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")
+
+
+
+
  #   myLabels=my_input.Sample_ID
 
     Experimental_press_temp1 = my_input.reindex(df_ideal_exp.columns, axis=1)
@@ -249,100 +294,7 @@ def import_excel(filename, sheet_name, GEOROC=False):
 # E.g., if users only enter FeO (not FeOt and Fe2O3), allocates a FeOt
 # column. If enter FeO and Fe2O3, put a FeOt column
 
-    if "FeO_Cpx" in my_input and "FeOt_Cpx" not in my_input and "Fe2O3_Cpx" not in my_input:
-        my_input_c['FeOt_Cpx'] = my_input_c['FeO_Cpx']
-    if "Fe2O3_Cpx" in my_input and "FeOt_Cpx" not in my_input and "FeO_Cpx" not in my_input:
-        my_input_c['FeOt_Cpx'] = 0.8998 * my_input_c['Fe2O3_Cpx']
-        print('Only FeO_Cpx found in input, the code has allocated this to FeOt_Cpx')
-    if "FeO_Cpx" in my_input and "Fe2O3_Cpx" in my_input and 'FeOt_Cpx' not in my_input:
-        my_input_c['FeOt_Cpx'] = my_input_c['FeO_Cpx'] + \
-            0.8998 * my_input_c['Fe2O3_Cpx']
 
-    if "FeO_Opx" in my_input and "FeOt_Opx" not in my_input and "Fe2O3_Opx" not in my_input:
-        my_input_c['FeOt_Opx'] = my_input_c['FeO_Opx']
-        print('Only FeO_Opx found in input, the code has allocated this to FeOt_Opx')
-    if "FeO_Opx" in my_input and "Fe2O3_Opx" in my_input and 'FeOt_Opx' not in my_input:
-        my_input_c['FeOt_Opx'] = my_input_c['FeO_Opx'] + \
-            0.8998 * my_input_c['Fe2O3_Opx']
-    if "Fe2O3_Opx" in my_input and "FeOt_Opx" not in my_input and "FeO_Opx" not in my_input:
-        my_input_c['FeOt_Opx'] = 0.8998 * my_input_c['Fe2O3_Opx']
-
-    if "FeO_Plag" in my_input and "FeOt_Plag" not in my_input and "Fe2O3_Plag" not in my_input:
-        my_input_c['FeOt_Plag'] = my_input_c['FeO_Plag']
-        print('Only FeO_Plag found in input, the code has allocated this to FeOt_Plag')
-    if "FeO_Plag" in my_input and "Fe2O3_Plag" in my_input and 'FeOt_Plag' not in my_input:
-        my_input_c['FeOt_Plag'] = my_input_c['FeO_Plag'] + \
-            0.8998 * my_input_c['Fe2O3_Plag']
-    if "Fe2O3_Plag" in my_input and "FeOt_Plag" not in my_input and "FeO_Plag" not in my_input:
-        my_input_c['FeOt_Plag'] = 0.8998 * my_input_c['Fe2O3_Plag']
-
-    if "FeO_Kspar" in my_input and "FeOt_Kspar" not in my_input and "Fe2O3_Kspar" not in my_input:
-        my_input_c['FeOt_Kspar'] = my_input_c['FeO_Kspar']
-        print('Only FeO_Kspar found in input, the code has allocated this to FeOt_Kspar')
-    if "FeO_Kspar" in my_input and "Fe2O3_Kspar" in my_input and 'FeOt_Kspar' not in my_input:
-        my_input_c['FeOt_Kspar'] = my_input_c['FeO_Kspar'] + \
-            0.8998 * my_input_c['Fe2O3_Kspar']
-    if "Fe2O3_Kspar" in my_input and "FeOt_Kspar" not in my_input and "FeO_Kspar" not in my_input:
-        my_input_c['FeOt_Kspar'] = 0.8998 * my_input_c['Fe2O3_Kspar']
-
-    if "FeO_Amp" in my_input and "FeOt_Amp" not in my_input and "Fe2O3_Amp" not in my_input:
-        my_input_c['FeOt_Amp'] = my_input_c['FeO_Amp']
-        print('Only FeO_Amp found in input, the code has allocated this to FeOt_Amp')
-    if "FeO_Amp" in my_input and "Fe2O3_Amp" in my_input and 'FeOt_Amp' not in my_input:
-        my_input_c['FeOt_Amp'] = my_input_c['FeO_Amp'] + \
-            0.8998 * my_input_c['Fe2O3_Amp']
-    if "Fe2O3_Amp" in my_input and "FeOt_Amp" not in my_input and "FeO_Amp" not in my_input:
-        my_input_c['FeOt_Amp'] = 0.8998 * my_input_c['Fe2O3_Amp']
-
-    if "FeO_Sp" in my_input and "FeOt_Sp" not in my_input and "Fe2O3_Sp" not in my_input:
-        my_input_c['FeOt_Sp'] = my_input_c['FeO_Sp']
-        print('Only FeO_Sp found in input, the code has allocated this to FeOt_Sp')
-    if "FeO_Sp" in my_input and "Fe2O3_Sp" in my_input and 'FeOt_Sp' not in my_input:
-        my_input_c['FeOt_Sp'] = my_input_c['FeO_Sp'] + \
-            0.8998 * my_input_c['Fe2O3_Sp']
-    if "Fe2O3_Sp" in my_input and "FeOt_Sp" not in my_input and "FeO_Sp" not in my_input:
-        my_input_c['FeOt_Sp'] = 0.8998 * my_input_c['Fe2O3_Sp']
-
-    if "FeO_Ol" in my_input and "FeOt_Ol" not in my_input and "Fe2O3_Ol" not in my_input:
-        my_input_c['FeOt_Ol'] = my_input_c['FeO_Ol']
-        print('Only FeO_Ol found in input, the code has allocated this to FeOt_Ol')
-    if "FeO_Ol" in my_input and "Fe2O3_Ol" in my_input and 'FeOt_Ol' not in my_input:
-        my_input_c['FeOt_Ol'] = my_input_c['FeO_Ol'] + \
-            0.8998 * my_input_c['Fe2O3_Ol']
-    if "Fe2O3_Ol" in my_input and "FeOt_Ol" not in my_input and "FeO_Ol" not in my_input:
-        my_input_c['FeOt_Ol'] = 0.8998 * my_input_c['Fe2O3_Ol']
-
-    # For liquids, users have an option to specify Fe3FeT_Liq.
-    # 1st scenario, users only enter FeOt, code sets Fe3FeT to 0.
-    if "FeOt_Liq" in my_input and "Fe2O3_Liq" not in my_input and "Fe3FeT_Liq" not in my_input:
-        my_input_c['Fe3FeT_Liq'] = 0
-        print('We have set Fe3Fet_Liq to zero, as you only entered FeOt. You can input a Fe3FeT_Liq column to specify this value instead')
-    # 2nd scenario, user only enteres FeO. Code sets FeO=FeOt, sets Fe3FeT to 0
-    if "FeO_Liq" in my_input and "Fe2O3_Liq" not in my_input and 'FeOt_Liq' not in my_input and "Fe3FeT_Liq" not in my_input:
-        my_input_c['FeOt_Liq'] = my_input_c['FeO_Liq']
-        my_input_c['Fe3FeT_Liq'] = 0
-        print('Only FeO_Ol found in input, the code has allocated this to FeOt_Ol')
-    # 3rd scenario, user only enteres Fe2O3. code calculates FeOt
-    if "Fe2O3_Liq" in my_input and "FeO_Liq" not in my_input and 'FeOt_Liq' not in my_input and "Fe3FeT_Liq" not in my_input:
-        my_input_c['FeOt_Liq'] = 0.8998 * my_input_c['Fe2O3_Liq']
-        my_input_c['Fe3FeT_Liq'] = 0
-        print('Only Fe2O3_Liq found in input, the code has allocated this to FeOt_Ol, and set Fe3FeT_Liq=0, e.g., assuming this is XRF data. If there really is some Fe3+, set Fe3Fet_Liq=value.')
-
-    # 4th scenario, users enter only FeO and Fe2O3
-    if "Fe2O3_Liq" in my_input and "FeO_Liq" in my_input and 'FeOt_Liq' not in my_input and "Fe3FeT_Liq" not in my_input:
-        my_input_c['FeOt_Liq'] = my_input_c['FeO_Liq'] + \
-            0.8998 * my_input_c['Fe2O3_Liq']
-        my_input_c['Fe3FeT_Liq'] = (0.89998 * my_input_c['Fe2O3_Liq']) / (
-            (0.89998 * my_input_c['Fe2O3_Liq'] + my_input_c['FeO_Liq']))
-    if "Fe2O3_Liq" in my_input and "FeO_Liq" in my_input and 'FeOt_Liq' in my_input:
-        w.warn('You have entered FeO, Fe2O3, AND FeOt. The code uses FeO and Fe2O3 to recalculate FeOt and Fe3FeT ')
-        my_input_c['FeOt_Liq'] = my_input_c['FeO_Liq'] + \
-            0.8998 * my_input_c['Fe2O3_Liq']
-        my_input_c['Fe3FeT_Liq'] = (0.89998 * my_input_c['Fe2O3_Liq']) / (
-            (0.89998 * my_input_c['Fe2O3_Liq'] + my_input_c['FeO_Liq']))
-
-        # This is the georoc example, where have some columns with all 3, but
-        # only want to replace zeros
     if GEOROC is True:
         my_input_c.loc[np.isnan(my_input_c['FeOt_Liq']) is True, 'FeOt_Liq'] = my_input_c.loc[np.isnan(
             my_input_c['FeOt_Liq']) is True, 'FeO_Liq'] + my_input_c.loc[np.isnan(my_input_c['FeOt_Liq']) is True, 'Fe2O3_Liq'] * 0.8999998
@@ -523,33 +475,33 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
         my_input_c['FeOt_Ol_Err'] = my_input_c['FeO_Ol_Err'] + \
             0.8998 * my_input_c['Fe2O3_Ol_Err']
 
-    # For liquids, users have an option to specify Fe3FeT_Liq.
+    # For liquids, users have an option to specify Fe3Fet_Liq.
     # 1st scenario, users only enter FeOt, code sets Fe3FeT to 0.
-    if "FeOt_Err_Liq_Err" in my_input and "Fe2O3_Err_Liq" not in my_input and "Fe3FeT_Err_Liq" not in my_input:
-        my_input_c['Fe3FeT_Liq_Err'] = 0
-        print('We have set Fe3Fet_Liq_Err to zero, as you only entered FeOt. You can input a Fe3FeT_Liq_Er column to specify this value instead')
+    if "FeOt_Err_Liq_Err" in my_input and "Fe2O3_Err_Liq" not in my_input and "Fe3Fet_Err_Liq" not in my_input:
+        my_input_c['Fe3Fet_Liq_Err'] = 0
+        print('We have set Fe3Fet_Liq_Err to zero, as you only entered FeOt. You can input a Fe3Fet_Liq_Er column to specify this value instead')
     # 2nd scenario, user only enteres FeO. Code sets FeO=FeOt, sets Fe3FeT to 0
-    if "FeO_Err_Liq_Err" in my_input and "Fe2O3_Err_Liq" not in my_input and 'FeOt_Liq' not in my_input and "Fe3FeT_Err_Liq" not in my_input:
+    if "FeO_Err_Liq_Err" in my_input and "Fe2O3_Err_Liq" not in my_input and 'FeOt_Liq' not in my_input and "Fe3Fet_Err_Liq" not in my_input:
         my_input_c['FeOt_Liq_Err'] = my_input_c['FeO_Liq_Err']
-        my_input_c['Fe3FeT_Liq_Err'] = 0
+        my_input_c['Fe3Fet_Liq_Err'] = 0
         print('Only FeO_Ol found in input, the code has allocated this to FeOt_Ol')
     # 3rd scenario, user only enteres Fe2O3. code calculates FeOt
-    if "Fe2O3_Err_Liq_Err" in my_input and "FeO_Err_Liq" not in my_input and 'FeOt_Liq' not in my_input and "Fe3FeT_Err_Liq" not in my_input:
+    if "Fe2O3_Err_Liq_Err" in my_input and "FeO_Err_Liq" not in my_input and 'FeOt_Liq' not in my_input and "Fe3Fet_Err_Liq" not in my_input:
         my_input_c['FeOt_Liq_Err'] = 0.8998 * my_input_c['Fe2O3_Liq_Err']
-        my_input_c['Fe3FeT_Liq_Err'] = 1
-        print('Only Fe2O3_Ol found in input, the code has allocated this to FeOt_Ol, and set Fe3FeT_Liq=1')
+        my_input_c['Fe3Fet_Liq_Err'] = 1
+        print('Only Fe2O3_Ol found in input, the code has allocated this to FeOt_Ol, and set Fe3Fet_Liq=1')
 
     # 4th scenario, users enter only FeO and Fe2O3
-    if "Fe2O3_Err_Liq_Err" in my_input and "FeO_Err_Liq_Err" in my_input and 'FeOt_Liq' not in my_input and "Fe3FeT_Err_Liq" not in my_input:
+    if "Fe2O3_Err_Liq_Err" in my_input and "FeO_Err_Liq_Err" in my_input and 'FeOt_Liq' not in my_input and "Fe3Fet_Err_Liq" not in my_input:
         my_input_c['FeOt_Liq_Err'] = my_input_c['FeO_Liq_Err'] + \
             0.8998 * my_input_c['Fe2O3_Liq_Err']
-        my_input_c['Fe3FeT_Liq_Err'] = (0.89998 * my_input_c['Fe2O3_Liq_Err']) / (
+        my_input_c['Fe3Fet_Liq_Err'] = (0.89998 * my_input_c['Fe2O3_Liq_Err']) / (
             (0.89998 * my_input_c['Fe2O3_Liq_Err'] + my_input_c['FeO_Liq_Err']))
     if "Fe2O3_Err_Liq_Err" in my_input and "FeO_Err_Liq_Err" in my_input and 'FeOt_Liq' in my_input:
         w.warn('You have entered FeO, Fe2O3, AND FeOt. The code uses FeO and Fe2O3 to recalculate FeOt and Fe3FeT ')
         my_input_c['FeOt_Liq_Err'] = my_input_c['FeO_Liq_Err'] + \
             0.8998 * my_input_c['Fe2O3_Liq_Err']
-        my_input_c['Fe3FeT_Liq_Err'] = (0.89998 * my_input_c['Fe2O3_Liq_Err']) / (
+        my_input_c['Fe3Fet_Liq_Err'] = (0.89998 * my_input_c['Fe2O3_Liq_Err']) / (
             (0.89998 * my_input_c['Fe2O3_Liq_Err'] + my_input_c['FeO_Liq_Err']))
 
         # This is the georoc example, where have some columns with all 3, but
@@ -653,7 +605,7 @@ def convert_to_vesical(liq_comps, T1):
     '''
     df = liq_comps.copy()
     df['Temp'] = T1 - 273.15
-    df.drop('Fe3FeT_Liq', inplace=True, axis=1)
+    df.drop('Fe3Fet_Liq', inplace=True, axis=1)
     df.columns = [str(col).replace('_Liq', '') for col in df.columns]
     return df
 
@@ -676,7 +628,7 @@ def convert_from_vesical(data):
                             ['SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MnO', 'MgO', 'CaO',
                              'K2O', 'Na2O', 'Cr2O3', 'P2O5', 'H2O', 'NiO']})
     df['FeOt_Liq'] = df['FeO_Liq'] + 0.8999998 * df['Fe2O3_Liq']
-    df['Fe3FeT_Liq'] = df['Fe2O3_Liq'] * 1.111111 / \
+    df['Fe3Fet_Liq'] = df['Fe2O3_Liq'] * 1.111111 / \
         (df['Fe2O3_Liq'] * 1.111111 + df['FeO_Liq'])
     df['Sample_ID_Liq'] = df.index
     return df
