@@ -1142,7 +1142,8 @@ H2O_Liq=None, Return_All_Matches=False):
 
         else:
             raise Exception(
-                'No Matches - to set less strict filters, change perhaps change sigma to a value greater than one, or specify eq_crit for only a subset of the values in Neave and Putirka')
+                'No Matches - to set less strict filters, change perhaps change sigma to a value greater'
+                ' than one, or specify eq_crit for only a subset of the values in Neave and Putirka')
 
         if P is not None:
             combo_liq_cpx_fur_filt = combo_liq_cpx_fur_filt.rename(

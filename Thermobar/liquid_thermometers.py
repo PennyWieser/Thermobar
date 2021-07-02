@@ -154,6 +154,16 @@ def T_Sug2000_eq3_pig(P, *, MgO_Liq_mol_frac):
     C = 0.0052
     return (A + B * MgO_Liq_mol_frac * 100 + C * (P * 1000))
 
+def T_Sug2000_eq6a_H7a(P, *, SiO2_Liq_mol_frac,
+                   FeOt_Liq_mol_frac, MgO_Liq_mol_frac, CaO_Liq_mol_frac, H2O_mol_frac):
+    '''
+    Liquid-only thermometer. Equation 6a of Sugawara et al. (2000) for
+    olivine-saturated liquids. Adds terms for CaO, SiO2 and FeO relative to equation 1 and 3.
+    Included corrections for H2O given in their equation 7a.
+    '''
+    return ((1446 - 1.440 * SiO2_Liq_mol_frac * 100 - 0.5 * FeOt_Liq_mol_frac * 100 +
+            12.32 * MgO_Liq_mol_frac * 100 - 3.899 * CaO_Liq_mol_frac * 100 + 0.0043 * (P * 1000))
+            -5.403*100*H2O_mol_frac)
 
 def T_Sug2000_eq6a(P, *, SiO2_Liq_mol_frac,
                    FeOt_Liq_mol_frac, MgO_Liq_mol_frac, CaO_Liq_mol_frac):
@@ -174,12 +184,23 @@ def T_Sug2000_eq6b(P, *, SiO2_Liq_mol_frac,
     return (1202 + 1.511 * SiO2_Liq_mol_frac * 100 - 1.426 * FeOt_Liq_mol_frac * 100 +
             8.780 * MgO_Liq_mol_frac * 100 + 5.537 * CaO_Liq_mol_frac * 100 + 0.0081 * (P * 1000))
 
+def T_Sug2000_eq6b_H7b(P, *, SiO2_Liq_mol_frac,
+                   FeOt_Liq_mol_frac, MgO_Liq_mol_frac, CaO_Liq_mol_frac, H2O_mol_frac):
+    '''
+    Liquid-only thermometer. Equation 6b of Sugawara et al. (2000) for cpx-saturated liquids.
+    Adds terms for CaO, SiO2 and FeO relative to equation 3.
+    Included corrections for H2O given in their equation 7b.
+    '''
+    return ((1202 + 1.511 * SiO2_Liq_mol_frac * 100 - 1.426 * FeOt_Liq_mol_frac * 100 +
+            8.780 * MgO_Liq_mol_frac * 100 + 5.537 * CaO_Liq_mol_frac * 100 + 0.0081 * (P * 1000))
+            -5.674*100*H2O_mol_frac)
+
 def T_Put2008_eq19_BeattDMg(P, *, calcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_NF):
     '''
     Liquid-only thermometer. Combining terms from Beattie et al. (1993) by Putirka (2008).
     This function uses calculated DMg from Beattie, so you don't need a measured olivine composition.
     '''
-    return ((13603) + (4.943 * 10**(-7)) * ((0.1 * P) - 10**(-5))) / (6.26 + 2 *
+    return ((13603) + (4.943 * 10**(-7)) * ((0.1 * P)*10**9 - 10**(-5))) / (6.26 + 2 *
             np.log(calcDMg_Beat93) + 2 * np.log(1.5 * Beat_CNML) + 2 * np.log(3 * Beat_CSiO2L) - Beat_NF)
 
 
@@ -308,7 +329,7 @@ Liquid_only_funcs = {T_Put2008_eq13, T_Put2008_eq14, T_Put2008_eq15, T_Put2008_e
 T_Helz1987_MgO, T_Montierth1995_MgO, T_Helz1987_CaO, T_Beatt93_BeattDMg,
 T_Beatt93_BeattDMg_HerzCorr, T_Sug2000_eq1, T_Sug2000_eq3_ol, T_Sug2000_eq3_opx,
 T_Sug2000_eq3_cpx, T_Sug2000_eq3_pig,
-T_Sug2000_eq6a, T_Sug2000_eq6b, T_Put2008_eq19_BeattDMg, T_Put2008_eq21_BeattDMg,
+T_Sug2000_eq6a, T_Sug2000_eq6a_H7a, T_Sug2000_eq6b, T_Sug2000_eq6b_H7b, T_Put2008_eq19_BeattDMg, T_Put2008_eq21_BeattDMg,
 T_Put2008_eq22_BeattDMg, T_Molina2015_amp_sat, T_Put2016_eq3_amp_sat,
 T_Put2008_eq34_cpx_sat,
 T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq24c_kspar_sat, T_Beatt1993_opx} # put on outside
@@ -426,6 +447,10 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
         anhyd_cat_frac = calculate_hydrous_mol_fractions_liquid(liq_comps=liq_comps_c)
     else:
         anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+
+    if equationT=="T_Sug2000_eq6a_H7a" or equationT=="T_Sug2000_eq6b_H7b":
+        anhyd_cat_frac['H2O_mol_frac']=calculate_hydrous_mol_fractions_liquid(liq_comps=liq_comps_c).H2O_Liq_mol_frac_hyd
+
 
 
 # This performs extra calculation steps for Beattie equations

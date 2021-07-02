@@ -274,12 +274,12 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False):
         w.warn("You've got a column heading with a lower case _liq, this is okay if this column is for your"
         " own use, but if its an input to Thermobar, it needs to be capitalized (_Liq)" )
 
-    if any(my_input.columns.str.contains("FeO_")) and ~any(my_input.columns.str.contains("FeOt_")):
+    if any(my_input.columns.str.contains("FeO_")) and (all(my_input.columns.str.contains("FeOt_")==False)):
         raise ValueError("No FeOt found. You've got a column heading with FeO. To avoid errors based on common EPMA outputs"
         " thermobar only recognises columns with FeOt for all phases except liquid"
         " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")
 
-    if any(my_input.columns.str.contains("Fe2O3_")) and ~any(my_input.columns.str.contains("FeOt_")):
+    if any(my_input.columns.str.contains("Fe2O3_")) and (all(my_input.columns.str.contains("FeOt_")==False)):
          raise ValueError("No FeOt column found. You've got a column heading with Fe2O3. To avoid errors based on common EPMA outputs"
         " thermobar only recognises columns with FeOt for all phases except liquid"
         " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")

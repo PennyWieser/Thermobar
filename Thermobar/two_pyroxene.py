@@ -364,7 +364,7 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
     if isinstance(P, pd.Series):
         if cpx_comps is not None:
             if len(P) != len(cpx_comps):
-                raise ValueError('The panda series entered for Pressure isnt the same length as the dataframe of liquid compositions')
+                raise ValueError('The panda series entered for Pressure isnt the same length as the dataframe of cpx compositions')
 
 
 
@@ -411,7 +411,7 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
 def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match=None,
                               equationP=None, equationT=None, iterations=30, T_K_guess=1300, eq_tests=False):
     '''
-    Solves simultaneous equations for temperature and pressure using orthopyroxene-liquid thermometers and barometers.
+    Solves simultaneous equations for temperature and pressure using clinopyroxene-orthopyroxene thermometers and barometers.
 
 
    Parameters
@@ -455,7 +455,7 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     eq_tests: bool
         If False, just returns pressure (default) as a panda series
         If True, returns pressure, Values of Eq tests,
-        as well as user-entered opx and liq comps and components.
+        as well as user-entered opx and cpx comps and components.
 
 
 
@@ -586,10 +586,10 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         dict
 
         Av_PTs_perCpx: Average P and T for each cpx.
-        E.g., if cpx1 matches Opx1, Opx4, Opx6, Opx10, averages outputs for all 4 of those liquids.
+        E.g., if cpx1 matches Opx1, Opx4, Opx6, Opx10, averages outputs for all 4 of those opxs.
         Returns mean and 1 sigma of these averaged parameters for each Cpx.
 
-        All_PTs: Returns output parameters for all matches (e.g, cpx1-Liq1, cpx1-Liq4) without any averaging.
+        All_PTs: Returns output parameters for all matches (e.g, cpx1-opx1, cpx1-opx4) without any averaging.
 
     '''
     if (KdErr is None and isinstance(KdMatch, int)) or (KdErr is None and isinstance(KdMatch, float)):
@@ -609,7 +609,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         myCPXs1_concat['Sample_ID_Cpx'] = myCPXs1_concat.index
     if "Sample_ID_Opx" not in myOPXs1_concat:
         myOPXs1_concat['Sample_ID_Opx'] = myOPXs1_concat.index
-    # Duplicate cpxs and liquids so end up with panda of all possible liq-cpx
+    # Duplicate cpxs and opxs so end up with panda of all possible opx-cpx
     # matches
 
     # This duplicates CPXs, repeats cpx1-cpx1*N, cpx2-cpx2*N etc.
@@ -617,16 +617,16 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         myOPXs1_concat)[0], axis=0))  # .astype('float64')
     DupCPXs.columns = myCPXs1_concat.columns
 
-    # This duplicates liquids like liq1-liq2-liq3 for cpx1, liq1-liq2-liq3 for
+    # This duplicates opxs like opx1-opx2-opx3 for cpx1, opx1-opx2-opx3 for
     # cpx2 etc.
     DupOPXs = pd.concat([myOPXs1_concat] * np.shape(myCPXs1_concat)[0]).reset_index(drop=True)
-    # Combines these merged liquids and cpx dataframes
+    # Combines these merged opx and cpx dataframes
     Combo_opxs_cpxs = pd.concat([DupOPXs, DupCPXs], axis=1)
 
     Combo_opxs_cpxs_1 = Combo_opxs_cpxs.copy()
     LenCombo = str(np.shape(Combo_opxs_cpxs)[0])
     print("Considering " + LenCombo +
-          " Liq-Cpx pairs, be patient if this is >>1 million!")
+          " Opx-Cpx pairs, be patient if this is >>1 million!")
 
     # calculate Kd for these pairs
     En = (Combo_opxs_cpxs.Fm2Si2O6 * (Combo_opxs_cpxs.MgO_Opx_cat_6ox /

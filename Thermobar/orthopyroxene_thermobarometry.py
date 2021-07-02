@@ -224,7 +224,7 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
     eq_tests: bool
         If False, just returns pressure (default) as a panda series
         If True, returns pressure, Values of Eq tests,
-        as well as user-entered cpx and liq comps and components.
+        as well as user-entered opx and liq comps and components.
 
     Returns
     -------
@@ -555,24 +555,24 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
 
         return PT_out
     if eq_tests is True and meltmatch is None:
-        Combo_liq_cpxs = calculate_orthopyroxene_liquid_components(
+        Combo_liq_opxs = calculate_orthopyroxene_liquid_components(
             opx_comps=opx_comps, liq_comps=liq_comps_c)
-        Combo_liq_cpxs.insert(0, "P_kbar_calc", P_guess)
-        Combo_liq_cpxs.insert(1, "T_K_calc", T_K_guess)
-        Combo_liq_cpxs.insert(3, "Eq_Test_Kd_Fe_Mg_Fet",
-                              Combo_liq_cpxs['Kd_Fe_Mg_Fet'])
-        Combo_liq_cpxs.insert(4, "Eq_Test_Kd_Fe_Mg_Fe2",
-                              Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
+        Combo_liq_opxs.insert(0, "P_kbar_calc", P_guess)
+        Combo_liq_opxs.insert(1, "T_K_calc", T_K_guess)
+        Combo_liq_opxs.insert(3, "Eq_Test_Kd_Fe_Mg_Fet",
+                              Combo_liq_opxs['Kd_Fe_Mg_Fet'])
+        Combo_liq_opxs.insert(4, "Eq_Test_Kd_Fe_Mg_Fe2",
+                              Combo_liq_opxs['Kd_Fe_Mg_Fe2'])
     if eq_tests is True and meltmatch is not None:
-        Combo_liq_cpxs = meltmatch.copy()
-        Combo_liq_cpxs.insert(0, "P_kbar_calc", P_guess)
-        Combo_liq_cpxs.insert(1, "T_K_calc", T_K_guess)
-        Combo_liq_cpxs.insert(3, "Eq_Test_Kd_Fe_Mg_Fet",
+        Combo_liq_opxs = meltmatch.copy()
+        Combo_liq_opxs.insert(0, "P_kbar_calc", P_guess)
+        Combo_liq_opxs.insert(1, "T_K_calc", T_K_guess)
+        Combo_liq_opxs.insert(3, "Eq_Test_Kd_Fe_Mg_Fet",
                               meltmatch['Kd_Fe_Mg_Fet'])
-        Combo_liq_cpxs.insert(4, "Eq_Test_Kd_Fe_Mg_Fe2",
+        Combo_liq_opxs.insert(4, "Eq_Test_Kd_Fe_Mg_Fe2",
                               meltmatch['Kd_Fe_Mg_Fe2'])
 
-    return Combo_liq_cpxs
+    return Combo_liq_opxs
 
 ## Considering all possible Orthopyroxene-melt pairs, and iterating P and T
 
@@ -581,7 +581,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
  KdMatch=None, KdErr=None, Opx_Quality=False, Return_All_Matches=False):
 
     '''
-    Evaluates all possible Opx-Liq pairs from  N Liquids, M Cpx compositions
+    Evaluates all possible Opx-Liq pairs from  N Liquids, M opx compositions
     returns P (kbar) and T (K) for those in equilibrium.
 
    Parameters
@@ -814,7 +814,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
 
             df1_M.insert(1, "st_dev_T_K_calc", df1_S['st_dev_T_K_calc'])
             df1_M.insert(3, "st_dev_P_kbar_calc", df1_S['st_dev_P_kbar_calc'])
-            df1_M.insert(0, "No. of Cpxs averaged", df1_S['st_dev_N'])
+            df1_M.insert(0, "No. of Opxs averaged", df1_S['st_dev_N'])
 
         if P is not None:
             Combo_liq_opx_fur_filt = Combo_liq_opx_fur_filt.rename(

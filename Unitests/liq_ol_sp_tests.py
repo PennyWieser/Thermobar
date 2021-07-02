@@ -80,25 +80,39 @@ class test_liq_ol_temp(unittest.TestCase):
 
     def test_19_Kd(self):
         self.assertAlmostEqual(pt.calculate_ol_liq_temp(liq_comps=LiqT, ol_comps=OlT,
-        equationT="T_Put2008_eq19", P=5, H2O_Liq=0).get("Kd (Fe-Mg) Meas")[0], 0.246796,
+        equationT="T_Put2008_eq19", P=5, H2O_Liq=0).get("Kd (Fe-Mg) Meas")[0], 0.277645,
         decimalPlace, "T from eq19 not equal to test value")
 
 class test_liq_ol_eq(unittest.TestCase):
     def test_Roedder(self):
-        self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=myLiquids1,
-        ol_comps=myOls1, Kd_model="Roeder1970", Fe3Fet_Liq=0.2).get("Eq Fo (Roeder, Kd=0.3)")[0], 0.8631287764106546,
+        self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=LiqT,
+        ol_comps=OlT, Kd_model="Roeder1970", Fe3Fet_Liq=0.2).get("Eq Fo (Roeder, Kd=0.3)")[0], 0.8631287764106546,
         decimalPlace, "Eq Ol from Roedder not equal to test value")
 
     def test_Matzen(self):
-        self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=myLiquids1,
-        ol_comps=myOls1, Kd_model="Matzen", Fe3Fet_Liq=0.2).get("Eq Fo (Matzen, Kd=0.352)")[0], 0.843126,
+        self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=LiqT,
+        ol_comps=OlT, Kd_model="Matzen2011", Fe3Fet_Liq=0.2).get("Eq Fo (Matzen, Kd=0.352)")[0], 0.843126,
         decimalPlace, "Eq Ol from Roedder not equal to test value")
 
-    def test_Toplis(self):
-        self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=myLiquids1,
-        ol_comps=myOls1, Kd_model="Toplis200", Fe3Fet_Liq=0.2).get("Eq Fo (Matzen, Kd=0.352)")[0], 0.843126,
-        decimalPlace, "Eq Ol from Roedder not equal to test value")
+    def test_Toplis_Fo(self):
+        self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=LiqT,
+        ol_comps=OlT, Kd_model="Toplis2005", Fe3Fet_Liq=0.2, P=5, T=1300).get("Eq Fo (Toplis, input Fo)")[0], 0.863482,
+        decimalPlace, "Eq Ol from Toplis not equal to test value")
 
+    def test_Toplis_Kd(self):
+        self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=LiqT,
+        ol_comps=OlT, Kd_model="Toplis2005", Fe3Fet_Liq=0.2, P=5, T=1300).get("Kd (Toplis, input Fo)")[0], 0.299103,
+        decimalPlace, "Calculated Kd from Roedder not equal to test value")
+
+    def test_Toplis_Kd_Iter(self):
+        self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=LiqT,
+        Kd_model="Toplis2005", Fe3Fet_Liq=0.2, P=5, T=1300).get("Kd (Toplis, Iter)")[0], 0.300625,
+        decimalPlace, "Calculated Kd from Roedder not equal to test value")
+
+    def test_Toplis_Fo_Iter(self):
+        self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=LiqT,
+        Kd_model="Toplis2005", Fe3Fet_Liq=0.2, P=5, T=1300).get("Eq Fo (Toplis, Iter)")[0], 0.862883,
+        decimalPlace, "Calculated Kd from Toplis Iter not equal to test value")
 
 if __name__ == '__main__':
      unittest.main()

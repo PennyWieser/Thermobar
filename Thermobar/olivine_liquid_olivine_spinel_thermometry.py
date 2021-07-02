@@ -37,7 +37,7 @@ def T_Put2008_eq19(P, *, DMg_Meas, CNML, CSiO2L, NF):
     Olivine-Liquid thermometer originally from Beattie, (1993), form from Putirka (2008)
 
     '''
-    return ((13603) + (4.943 * 10**(-7)) * ((0.1 * P) - 10**(-5))) / (6.26 + 2 *
+    return ((13603) + (4.943 * 10**(-7)) * ((0.1 * P)*10**9 - 10**(-5))) / (6.26 + 2 *
             np.log(DMg_Meas) + 2 * np.log(1.5 * CNML) + 2 * np.log(3 * CSiO2L) - NF)
 
 
