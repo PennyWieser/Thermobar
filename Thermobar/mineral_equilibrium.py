@@ -67,7 +67,7 @@ def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
 
 
 def calculate_eq_ol_content(liq_comps, Kd_model, ol_comps=None, T=None, P=None,
-Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None):
+Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
     '''calculates equilibrium forsterite contents based on inputtted liquid compositions.
 
 
@@ -86,6 +86,18 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None):
 
         "Toplis2005": calculates Kd based on melt SiO2, Na2O, K2O, P, T, H2O, Ol Fo content.
         Users can specify a ol_fo content, or the function iterates Kd and Fo and returns both.
+
+        "Putirka2016":
+        Uses equation 8a, 8b and 8c of Putirka (2016)
+        These are recomended when the proportion of Fe2O3 is known.
+        8a=0.33+-0.04 (constant)
+        8b= function of P, Si, Na and K
+        8c= function of Si, Na and K
+
+        Also uses equation 9a and 9b of Putirka, which are
+        designed for FeOt. 9a is 0.29+-0.051, 9b is a function of Si, P, Na and
+        K, and fo2.
+
 
         "All": Returns outputs for all models
 
@@ -116,6 +128,7 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None):
 
     liq = calculate_anhydrous_cat_fractions_liquid(liq_comps)
     Mgno = liq['Mg_Number_Liq_Fe3']
+    Mgno_noFe3 = liq['Mg_Number_Liq_NoFe3']
     if Kd_model == "Roeder1970" or Kd_model == "All":
         Eq_ol_03 = 1 / ((0.3 / Mgno) + (1 - 0.3))
         Eq_ol_027 = 1 / ((0.27 / Mgno) + (1 - 0.27))
@@ -129,6 +142,70 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None):
         Eq_ol_035 = 1 / ((0.352 / Mgno) + (1 - 0.352))
         Kd_out_mat = pd.DataFrame(data={'Eq Fo (Matzen, Kd=0.34)': Eq_ol_034,
                                   'Eq Fo (Matzen, Kd=0.352)': Eq_ol_035, 'Eq Fo (Matzen, Kd=0.328)': Eq_ol_032})
+
+
+    if Kd_model =="Putirka2016" or Kd_model == "All":
+
+        Kd_8a=0.33
+        Eq_ol_8a=1 / ((Kd_8a / Mgno) + (1 - Kd_8a))
+
+        Kd_8a_m_1sigma=0.33-0.044
+        Eq_ol_8a_m_1sigma=1 / ((Kd_8a_m_1sigma / Mgno) + (1 - Kd_8a_m_1sigma))
+
+        Kd_8a_p_1sigma=0.33+0.044
+        Eq_ol_8a_p_1sigma=1 / ((Kd_8a_p_1sigma / Mgno) + (1 - Kd_8a_p_1sigma))
+
+
+
+        Kd_8c=(0.25 + 0.0018*liq_comps['SiO2_Liq']
+        -3.27*10**(-4)*(liq_comps['Na2O_Liq']+liq_comps['K2O_Liq'])**2)
+        Eq_ol_8c=1 / ((Kd_8c / Mgno) + (1 - Kd_8c))
+
+        Kd_9a=0.29
+        Eq_ol_9a=1 / ((Kd_9a / Mgno_noFe3) + (1 - Kd_9a))
+
+        Kd_9a_m_1sigma=0.29-0.051
+        Eq_ol_9a_m_1sigma=1 / ((Kd_9a_m_1sigma / Mgno_noFe3 ) + (1 - Kd_9a_m_1sigma))
+
+        Kd_9a_p_1sigma=0.29+0.051
+        Eq_ol_9a_p_1sigma=1 / ((Kd_9a_p_1sigma / Mgno_noFe3 ) + (1 - Kd_9a_p_1sigma))
+
+
+
+        Kd_out_Put=pd.DataFrame(
+        data={
+        'Eq Fo (Putirka 8a Fe2, Kd=0.33)': Eq_ol_8a,
+        'Eq Fo (Putirka 8a Fe2, Kd=0.33-0.044)': Eq_ol_8a_m_1sigma,
+        'Eq Fo (Putirka 8a Fe2, Kd=0.33+0.044)': Eq_ol_8a_p_1sigma,
+        'Eq Fo (Putirka 8a Fe2, Kd=0.33+0.044)': Eq_ol_8a_p_1sigma,
+        'Calc Kd (Putirka 8c, Fe2)': Kd_8c,
+        'Eq Fo (Putirka 8c Fe2)': Eq_ol_8c,
+        'Eq Fo (Putirka 9a Fet, Kd=0.29)': Eq_ol_9a,
+        'Eq Fo (Putirka 9a Fet, Kd=0.29-0.051)': Eq_ol_9a_m_1sigma,
+        'Eq Fo (Putirka 9a Fet, Kd=0.29+0.051)': Eq_ol_9a_m_1sigma})
+
+        if P is None:
+            w.warn(
+                'Putirka (2016) Kd models equation 8b and 9b are P-dependent you need to enter a P in kbar to get these outputs')
+
+
+
+        if P is not None:
+            Kd_8b=(0.21+0.008*(P/10) + 0.0025*liq_comps['SiO2_Liq']
+            -3.63*10**(-4)*(liq_comps['Na2O_Liq']+liq_comps['K2O_Liq'])**2)
+            Eq_ol_8b=1 / ((Kd_8b / Mgno) + (1 - Kd_8b))
+            Kd_out_Put['Calc Kd (Putirka 8b, Fe2)']=Kd_8b
+            Kd_out_Put['Eq Fo (Putirka 8b Fe2)']=Eq_ol_8b
+
+
+            if logfo2 is not None:
+                Kd_9b=(0.0583+0.00252*liq_comps['SiO2_Liq']+ 0.028*(P/10)
+                -0.0091* (liq_comps['Na2O_Liq']+liq_comps['K2O_Liq'])
+                -0.013383*logfo2)
+
+                Eq_ol_9b=1 / ((Kd_9b / Mgno) + (1 - Kd_9b))
+                Kd_out_Put['Calc Kd (Putirka 9b, Fet)']=Kd_9b
+                Kd_out_Put['Eq Fo (Putirka 9b Fet)']=Eq_ol_9b
 
 
     if Kd_model == "Toplis2005" or Kd_model == "All":
@@ -168,16 +245,22 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None):
                     data={'Kd (Toplis, Iter)': Kd_Guess, 'Eq Fo (Toplis, Iter)': Eq_ol_guess})
 
     if Kd_model == "All":
-        Kd_out = pd.concat([Kd_out_ro, Kd_out_mat, Kd_out_top], axis=1)
+        Kd_out = pd.concat([Kd_out_ro, Kd_out_mat, Kd_out_top, Kd_out_Put], axis=1)
     if Kd_model == "Roeder1970":
         Kd_out=Kd_out_ro
     if Kd_model == "Matzen2011":
         Kd_out=Kd_out_mat
     if Kd_model == "Toplis2005":
         Kd_out=Kd_out_top
+    if Kd_model == "Putirka2016":
+        Kd_out=Kd_out_Put
 
     if ol_comps is not None:
         Kd_out['Fo_meas']=ol_comps['Fo_meas']
+
+    Kd_out.insert(0, 'Mg#_Liq_Fe2', Mgno)
+    Kd_out.insert(1, 'Mg#_Liq_Fet', Mgno_noFe3)
+
 
     return Kd_out
 
