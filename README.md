@@ -1,1 +1,0 @@
-This is still a work in progress, contact wieserp@oregonstate.edu with any questions/bugs you have!
