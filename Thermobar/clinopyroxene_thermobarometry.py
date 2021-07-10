@@ -128,14 +128,14 @@ def P_Mas2013_eqalk32c(T, *, FeOt_Liq_cat_frac, CaTs, H2O_Liq, CaO_Liq_cat_frac,
 
 
 def P_Mas2013_Palk2012(T=None, *, lnK_Jd_liq, H2O_Liq,
-                       Na2O_Liq_cat_frac, K2O_Liq_cat_frac, Kd_Fe_Mg_NoFe3):
+                       Na2O_Liq_cat_frac, K2O_Liq_cat_frac, Kd_Fe_Mg_Fet):
     '''
     Clinopyroxene-liquid barometer of Masotta et al. (2013) for alkaline melts
     | SEE=+-1.15 kbar
     '''
     return (-3.88903951262765 + 0.277651046511846 * np.exp(lnK_Jd_liq)
     + 0.0740292491471828 * H2O_Liq + 5.00912129248619 * (Na2O_Liq_cat_frac)
-    / (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) + 6.39451438456963 * Kd_Fe_Mg_NoFe3)
+    / (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) + 6.39451438456963 * Kd_Fe_Mg_Fet)
 
 
 def P_Wieser2021_H2O_indep(T=None, *, MgO_Liq, CaO_Liq_cat_frac, lnK_Jd_liq, Jd,
@@ -257,7 +257,7 @@ def T_Mas2013_eqalk33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2
 
 
 # ones without P in the function
-def T_Mas2013_Talk2012(P=None, *, H2O_Liq, Kd_Fe_Mg_NoFe3, lnK_Jd_DiHd_liq_2003,
+def T_Mas2013_Talk2012(P=None, *, H2O_Liq, Kd_Fe_Mg_Fet, lnK_Jd_DiHd_liq_2003,
 Mg_Number_Liq_NoFe3, DiHd_2003, Na2O_Liq_cat_frac, K2O_Liq_cat_frac,
 TiO2_Liq_cat_frac, lnK_Jd_liq, CaO_Liq_cat_frac, SiO2_Liq_cat_frac):
     '''
@@ -269,7 +269,7 @@ TiO2_Liq_cat_frac, lnK_Jd_liq, CaO_Liq_cat_frac, SiO2_Liq_cat_frac):
         (Mg_Number_Liq_NoFe3 / DiHd_2003) + 1.01129776262724 *
         ((Na2O_Liq_cat_frac) / (Na2O_Liq_cat_frac + K2O_Liq_cat_frac))
         - 0.21766733252629 * np.log(TiO2_Liq_cat_frac.astype(float)) + 0.466149612620683
-        * lnK_Jd_liq + 1.61626798988239 * Kd_Fe_Mg_NoFe3 + 23.3855047471225 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac)))
+        * lnK_Jd_liq + 1.61626798988239 * Kd_Fe_Mg_Fet + 23.3855047471225 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac)))
 
 
 def T_Brug2019(P=None, *, CaTs, DiHd_2003, SiO2_Liq_cat_frac, TiO2_Liq_cat_frac,
@@ -993,17 +993,17 @@ H2O_Liq=None, Return_All_Matches=False):
                         -0.107 - 1719 / Combo_liq_cpxs_2['T_Liq_MaxP'])
 
                     Delta_Kd_T_MinP = abs(
-                        Combo_liq_cpxs_2['Kd_MinP'] - Combo_liq_cpxs_2['Kd_Fe_Mg'])
+                        Combo_liq_cpxs_2['Kd_MinP'] - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
                     Delta_Kd_T_MaxP = abs(
-                        Combo_liq_cpxs_2['Kd_MaxP'] - Combo_liq_cpxs_2['Kd_Fe_Mg'])
+                        Combo_liq_cpxs_2['Kd_MaxP'] - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
 
                 if KdMatch is not None and KdMatch != "Masotta" and KdMatch != "Putirka":
                     str3 = str(KdMatch)
                     print('the code is evaluating Kd matches using Kd=' + str3)
                     Delta_Kd_T_MinP = abs(
-                        KdMatch - Combo_liq_cpxs_2['Kd_Fe_Mg'])
+                        KdMatch - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
                     Delta_Kd_T_MaxP = abs(
-                        KdMatch - Combo_liq_cpxs_2['Kd_Fe_Mg'])
+                        KdMatch - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
                     Combo_liq_cpxs_2.insert(
                         0, "DeltaKd_userselected=" + str3, Delta_Kd_T_MinP)
 
@@ -1012,9 +1012,9 @@ H2O_Liq=None, Return_All_Matches=False):
                     ratioMasotta = Combo_liq_cpxs_2['Na2O_Liq_cat_frac'] / (
                         Combo_liq_cpxs_2['Na2O_Liq_cat_frac'] + Combo_liq_cpxs_2['K2O_Liq_cat_frac'])
                     Delta_Kd_T_MinP = abs(
-                        np.exp(1.735 - 3056 / Combo_liq_cpxs_2['T_Liq_MinP'] - 1.668 * ratioMasotta) - Combo_liq_cpxs_2['Kd_Fe_Mg'])
+                        np.exp(1.735 - 3056 / Combo_liq_cpxs_2['T_Liq_MinP'] - 1.668 * ratioMasotta) - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
                     Delta_Kd_T_MaxP = abs(
-                        np.exp(1.735 - 3056 / Combo_liq_cpxs_2['T_Liq_MaxP'] - 1.668 * ratioMasotta) - Combo_liq_cpxs_2['Kd_Fe_Mg'])
+                        np.exp(1.735 - 3056 / Combo_liq_cpxs_2['T_Liq_MaxP'] - 1.668 * ratioMasotta) - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
 
                 # The logic here is that if Delta KD with both the max and min temperature are outside the specified KDerror,
                 # no temperature inbetween will be inequilibrium.
@@ -1043,7 +1043,7 @@ H2O_Liq=None, Return_All_Matches=False):
         # First, make filter based on various Kd optoins
         if KdMatch is not None and KdMatch != "Masotta" and KdMatch != "Putirka":
             Combo_liq_cpxs_eq_comp.loc[:, 'DeltaKd_KdMatch_userSp']= abs(
-                KdMatch - Combo_liq_cpxs_eq_comp['Kd_Fe_Mg'])
+                KdMatch - Combo_liq_cpxs_eq_comp['Kd_Fe_Mg_Fe2'])
             filtKd = (Combo_liq_cpxs_eq_comp['DeltaKd_KdMatch_userSp'] < KdErr)
         else:
             if KdMatch is None or KdMatch == "Putirka":

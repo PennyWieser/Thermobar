@@ -414,10 +414,10 @@ filter_q=None, append=False):
         mynoisedDataframe['T_K'] = T_K_Err
 
         mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
-        if positive is True:
-            mynoisedDataframe[mynoisedDataframe < 0] = 0
-            print('All negative numbers replaced with zeros. '\
-             'If you wish to keep these, set positive=False')
+    if positive is True:
+        mynoisedDataframe[mynoisedDataframe < 0] = 0
+        print('All negative numbers replaced with zeros. '\
+        'If you wish to keep these, set positive=False')
     if append is True:
         mynoisedDataframe2 = pd.concat([Sample_c, mynoisedDataframe], axis=0)
         return mynoisedDataframe2

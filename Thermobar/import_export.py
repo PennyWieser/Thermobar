@@ -356,23 +356,23 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False):
     else:
         myAmphs1['Sample_ID_Amp'] = my_input.index
 
-    if "P_kbar" in my_input:
-        myAmphs1['P_kbar'] = my_input['P_kbar']
-        myPlags1['P_kbar'] = my_input['P_kbar']
-        myOls1['P_kbar'] = my_input['P_kbar']
-        myCPXs1['P_kbar'] = my_input['P_kbar']
-        myOPXs1['P_kbar'] = my_input['P_kbar']
-        mySps1['P_kbar'] = my_input['P_kbar']
-        myLiquids1['P_kbar'] = my_input['P_kbar']
-
-    if "T_K" in my_input:
-        myAmphs1['T_K'] = my_input['T_K']
-        myPlags1['T_K'] = my_input['T_K']
-        myOls1['T_K'] = my_input['T_K']
-        myCPXs1['T_K'] = my_input['T_K']
-        myOPXs1['T_K'] = my_input['T_K']
-        mySps1['T_K'] = my_input['T_K']
-        myLiquids1['T_K'] = my_input['T_K']
+    # if "P_kbar" in my_input:
+    #     myAmphs1['P_kbar'] = my_input['P_kbar']
+    #     myPlags1['P_kbar'] = my_input['P_kbar']
+    #     myOls1['P_kbar'] = my_input['P_kbar']
+    #     myCPXs1['P_kbar'] = my_input['P_kbar']
+    #     myOPXs1['P_kbar'] = my_input['P_kbar']
+    #     mySps1['P_kbar'] = my_input['P_kbar']
+    #     myLiquids1['P_kbar'] = my_input['P_kbar']
+    #
+    # if "T_K" in my_input:
+    #     myAmphs1['T_K'] = my_input['T_K']
+    #     myPlags1['T_K'] = my_input['T_K']
+    #     myOls1['T_K'] = my_input['T_K']
+    #     myCPXs1['T_K'] = my_input['T_K']
+    #     myOPXs1['T_K'] = my_input['T_K']
+    #     mySps1['T_K'] = my_input['T_K']
+    #     myLiquids1['T_K'] = my_input['T_K']
 
     return {'my_input': my_input, 'Experimental_press_temp': Experimental_press_temp1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs': myLiquids1,
             'Plags': myPlags1, 'Kspars': myKspars1, 'Amps': myAmphs1, 'Ols': myOls1, 'Sps': mySps1}  # , 'y1': y1 ,'y2': y2}

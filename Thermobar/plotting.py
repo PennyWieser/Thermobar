@@ -29,6 +29,8 @@ def calculate_R2(x, y):
     lr=LinearRegression()
     lr.fit(regx,regy)
     Y_pred=lr.predict(regx)
+    Int=lr.intercept_
+    Grad=lr.coef_
     #R="R\N{SUPERSCRIPT TWO} = " +  str(np.round(r2_score(regy, Y_pred), 2))
     R=(np.round(r2_score(regy, Y_pred), 2))
     RMSE=std_dev(regx, regy)
@@ -41,7 +43,7 @@ def calculate_R2(x, y):
 
     return {'R2': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp,
     'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
-'x_pred': regx, 'y_pred': Y_pred}
+'x_pred': regx, 'y_pred': Y_pred, 'Int': Int, 'Grad':Grad[0]}
 
 def calculate_R2_np(x, y):
     masknan=(~np.isnan(x) & ~np.isnan(y))

@@ -1267,10 +1267,10 @@ def calculate_clinopyroxene_liquid_components(
 
 
 # Measured Kd Fe-Mg (using 2+)
-    combo_liq_cpxs['Kd_Fe_Mg'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
+    combo_liq_cpxs['Kd_Fe_Mg_Fe2'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['FeOt_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['MgO_Liq_cat_frac'])))
 # Measured Kd Fe-Mg using Fet
-    combo_liq_cpxs['Kd_Fe_Mg_NoFe3'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
+    combo_liq_cpxs['Kd_Fe_Mg_Fet'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['FeOt_Liq_cat_frac'] / combo_liq_cpxs['MgO_Liq_cat_frac'])))
 
     combo_liq_cpxs['lnK_Jd_liq'] = np.log((combo_liq_cpxs['Jd']) / ((combo_liq_cpxs['Na2O_Liq_cat_frac']) * (
@@ -1296,7 +1296,7 @@ def calculate_clinopyroxene_liquid_components(
 # Different ways to calculate DeltaFeMg
 
     combo_liq_cpxs['DeltaFeMg_WB'] = abs(
-        combo_liq_cpxs['Kd_Fe_Mg'] - combo_liq_cpxs['Kd_Fe_Mg_IdealWB'])
+        combo_liq_cpxs['Kd_Fe_Mg_Fe2'] - combo_liq_cpxs['Kd_Fe_Mg_IdealWB'])
     # Adding back in sample names
     if meltmatch is not None and "Sample_ID_Cpx" in meltmatch:
         combo_liq_cpxs['Sample_ID_Cpx'] = meltmatch['Sample_ID_Cpx']
@@ -1898,9 +1898,9 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     Combo_liq_cpxs['Kd_Ideal_Masotta'] = np.exp(
         1.735 - 3056 / T - 1.668 * ratioMasotta)  # eq35 alk, for trachytes and phonolites
     Combo_liq_cpxs['Delta_Kd_Put2008'] = abs(
-        Combo_liq_cpxs['Kd_Ideal_Put'] - Combo_liq_cpxs['Kd_Fe_Mg'])
+        Combo_liq_cpxs['Kd_Ideal_Put'] - Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
     Combo_liq_cpxs['Delta_Kd_Mas2013'] = abs(
-        Combo_liq_cpxs['Kd_Ideal_Masotta'] - Combo_liq_cpxs['Kd_Fe_Mg'])
+        Combo_liq_cpxs['Kd_Ideal_Masotta'] - Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
 
     # Equation X of Mollo for DiHd and EnFs components
     Combo_liq_cpxs['DiHd_Pred_Mollo'] = (np.exp(-2.18 - 3.16 * Combo_liq_cpxs['TiO2_Liq_cat_frac'] - 0.365 * np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'])
@@ -2222,5 +2222,89 @@ def calculate_plag_components(*, CaO_Liq_cat_frac, H2O_Liq, Na2O_Liq_cat_frac, A
     Components=pd.DataFrame(data={'An_Pred': An_Pred, 'Ab_Pred': Ab_Pred, 'Or_Pred': Or_Pred})
 
     return Components
+
+def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model=None, fo2, re_norm=False, fo2_offset=0):
+    if isinstance(fo2, str):
+        if fo2=="NNO":
+        # Buffer position from Campbell et al. (2009), code from Kayla Iacovino's website
+            # logfo2=((8.699 + 0.01642*(P_kbar*1000) -0.0003*(P_kbar*1000)**2 + (2.7*10**(-6))*(P_kbar*1000)**3 -
+            # (10**(-8))*(P_kbar*1000)**4) + (-24205 + 444.73*(P_kbar*1000) - 0.5929*(P_kbar*1000)**2 + 0.00153*(P_kbar*1000)**3)/T_K
+            # + fo2_offset)
+            logfo2=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K+fo2_offset
+
+            fo2=10**logfo2
+            print(logfo2)
+
+        if fo2=="QFM":
+            logfo2=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K+fo2_offset
+            fo2=10**logfo2
+            print(logfo2)
+
+
+
+    liq_comps_c=liq_comps.copy()
+    mol_frac_hyd_short=calculate_hydrous_mol_fractions_liquid(liq_comps_c)
+    mol_frac_hyd=pd.concat([mol_frac_hyd_short, liq_comps_c], axis=1)
+    To=1673.15
+
+    if model=="Kress1991":
+        ln_XFe2FeO3_XFeO=((0.196*np.log(fo2))+(11492/T_K)-6.675+((-2.243*mol_frac_hyd['Al2O3_Liq_mol_frac_hyd'])+(-1.828*mol_frac_hyd['FeOt_Liq_mol_frac_hyd'])
+        +(3.201*mol_frac_hyd['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd['K2O_Liq_mol_frac_hyd']))
+        -3.36*(1-(To/T_K) - np.log(T_K/To)) -0.000000701*((P_kbar*100000000)/T_K)
+         + -0.000000000154*(((T_K-1673)*(P_kbar*100000000))/T_K) + 0.0000000000000000385*((P_kbar*100000000)**2/T_K))
+    if model=="Put2016_eq6b":
+        ln_XFe2FeO3_XFeO=(-6.35+10813.8/T_K + 0.19*np.log(fo2)+ 12.4*(mol_frac_hyd['Na2O_Liq_mol_frac_hyd']
+         +mol_frac_hyd['K2O_Liq_mol_frac_hyd'])
+        -3.44*(mol_frac_hyd['Al2O3_Liq_mol_frac_hyd']/(mol_frac_hyd['Al2O3_Liq_mol_frac_hyd']+mol_frac_hyd['SiO2_Liq_mol_frac_hyd']))
+        +4.15*mol_frac_hyd['CaO_Liq_mol_frac_hyd'])
+
+    X_Fe2O3_X_FeO=np.exp(ln_XFe2FeO3_XFeO)
+    X_Fe2O3=X_Fe2O3_X_FeO*mol_frac_hyd['FeOt_Liq_mol_frac_hyd']/(2*X_Fe2O3_X_FeO+1)
+
+    #X_FeO=mol_frac_hyd['FeOt_Liq_mol_frac_hyd']/(2*X_Fe2O3_X_FeO+1) Kayla's way
+    X_FeO=mol_frac_hyd['FeOt_Liq_mol_frac_hyd']-2*X_Fe2O3
+    Sum_all_mol_frac_hyd=(mol_frac_hyd['SiO2_Liq_mol_frac_hyd']+mol_frac_hyd['TiO2_Liq_mol_frac_hyd']+mol_frac_hyd['Al2O3_Liq_mol_frac_hyd']+mol_frac_hyd['MnO_Liq_mol_frac_hyd']
+                      +mol_frac_hyd['MgO_Liq_mol_frac_hyd']+mol_frac_hyd['CaO_Liq_mol_frac_hyd']+mol_frac_hyd['Na2O_Liq_mol_frac_hyd']+mol_frac_hyd['K2O_Liq_mol_frac_hyd']
+                      +mol_frac_hyd['P2O5_Liq_mol_frac_hyd']+X_FeO+X_Fe2O3)
+
+    Fe2O3_unnorm=X_Fe2O3*159.6
+    FeO_unnorm=X_FeO*71.844
+    Sum_All_mol=(mol_frac_hyd['SiO2_Liq_mol_frac_hyd']*60.0843+mol_frac_hyd['TiO2_Liq_mol_frac_hyd']*79.8788
+    +mol_frac_hyd['Al2O3_Liq_mol_frac_hyd']*101.961+mol_frac_hyd['MnO_Liq_mol_frac_hyd']*70.9375
+    +mol_frac_hyd['MgO_Liq_mol_frac_hyd']*40.3044+mol_frac_hyd['CaO_Liq_mol_frac_hyd']*56.0774+mol_frac_hyd['Na2O_Liq_mol_frac_hyd']*61.9789+mol_frac_hyd['K2O_Liq_mol_frac_hyd']*94.196
+    +mol_frac_hyd['P2O5_Liq_mol_frac_hyd']*141.937+X_Fe2O3*159.6+X_FeO*71.844)
+    New_Fe2O3_wt=(100*X_Fe2O3*159.6)/Sum_All_mol
+    New_FeO_wt=(100*X_FeO*71.844)/Sum_All_mol
+
+    New_Oxide_out_nonorm=liq_comps.copy()
+    New_Oxide_out_nonorm['FeO_Liq']=New_FeO_wt
+    New_Oxide_out_nonorm['Fe2O3_Liq']=New_Fe2O3_wt
+    New_Oxide_out_nonorm['XFe3Fe2']=X_Fe2O3_X_FeO
+    New_Oxide_out_nonorm['Fe3Fet_Liq']=New_Fe2O3_wt*0.8998/(New_FeO_wt+New_Fe2O3_wt*0.8998)
+
+
+    New_Oxide_out_norm=pd.DataFrame(data={'SiO2_Liq': 100*mol_frac_hyd['SiO2_Liq_mol_frac_hyd']*60.084/Sum_All_mol,
+                                         'TiO2_Liq': 100*mol_frac_hyd['TiO2_Liq_mol_frac_hyd']*79.8788/Sum_All_mol,
+                                         'Al2O3_Liq':100*mol_frac_hyd['Al2O3_Liq_mol_frac_hyd']*101.961/Sum_All_mol,
+                                          'Fe2O3_Liq': (100*X_Fe2O3*159.6)/Sum_All_mol,
+                                          'FeO_Liq': (100*X_FeO*71.844)/Sum_All_mol,
+                                          'MnO_Liq': 100*mol_frac_hyd['MnO_Liq_mol_frac_hyd']*70.9375/Sum_All_mol,
+                                          'MgO_Liq': 100*mol_frac_hyd['MgO_Liq_mol_frac_hyd']*40.3044/Sum_All_mol,
+                                         'CaO_Liq': 100*mol_frac_hyd['CaO_Liq_mol_frac_hyd']*56.0774/Sum_All_mol,
+                                          'Na2O_Liq': 100*mol_frac_hyd['Na2O_Liq_mol_frac_hyd']*61.9789/Sum_All_mol,
+                                          'K2O_Liq': 100*mol_frac_hyd['K2O_Liq_mol_frac_hyd']*94.196/Sum_All_mol,
+                                         'P2O5_Liq':  100*mol_frac_hyd['P2O5_Liq_mol_frac_hyd']*141.937/Sum_All_mol,
+                                         })
+    Old_Sum=(100/liq_comps_c.drop(['Sample_ID_Liq'], axis=1).sum(axis=1))
+    New_Oxide_out_New_old_total=New_Oxide_out_norm.div(Old_Sum, axis=0)
+    New_Oxide_out_New_old_total['Fe3Fet_Liq']=(New_Oxide_out_norm['Fe2O3_Liq']*0.8998/(New_Oxide_out_norm['FeO_Liq']+New_Oxide_out_norm['Fe2O3_Liq']*0.8998)).fillna(0)
+
+
+
+    if re_norm==False:
+        return New_Oxide_out_nonorm
+    else:
+        return New_Oxide_out_New_old_total
+
 
 
