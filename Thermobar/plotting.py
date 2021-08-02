@@ -45,7 +45,37 @@ def calculate_R2(x, y):
     'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
 'x_pred': regx, 'y_pred': Y_pred, 'Int': Int, 'Grad':Grad[0]}
 
+def calculate_R2_Tukey(x, y):
+    masknan=(~np.isnan(x) & ~np.isnan(y))
+    regx=x[masknan].values.reshape(-1, 1)
+    regy=y[masknan].values.reshape(-1, 1)
+    slope, intercept, r_value, p_value, std_err = stats.linregress(regx[:,0],regy[:,0])
+    p_value=np.round(p_value, 3)
+    lr=LinearRegression()
+    lr.fit(regx,regy)
+    Y_pred=lr.predict(regx)
+    Int=lr.intercept_
+    Int=np.round(Int[0], 2)
+    Grad=lr.coef_
+    Grad=np.round(Grad[0][0], 2)
+    #R="R\N{SUPERSCRIPT TWO} = " +  str(np.round(r2_score(regy, Y_pred), 2))
+    R=(np.round(r2_score(regy, Y_pred), 2))
+    RMSE=std_dev(regx, regy)
+    RMSEp=np.round(RMSE, 2)
+    Median=np.nanmedian(regy-regx)#
+    Medianp=np.round(Median, 2)
+    Mean=np.nanmean(regy-regx)
+    Meanp=np.round(Mean, 2)
+
+
+    return {'R$^{2}$': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp, 'Grad':Grad, 'Int': Int,
+    'Median Error':'{0:.2f}'.format(Medianp), 'Mean Error':'{0:.2f}'.format(Meanp), 'p value':'{0:.3f}'.format(p_value),
+     }
+
 def calculate_R2_np(x, y):
+    if len(x)!=len(y):
+        raise TypeError('X and y not same length')
+
     masknan=(~np.isnan(x) & ~np.isnan(y))
 
     regx=x[masknan].reshape(-1, 1)

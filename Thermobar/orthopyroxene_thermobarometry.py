@@ -134,10 +134,10 @@ def T_Beatt1993_opx(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
          0.352 * MnO_Liq_cat_frac + 0.264 * FeOt_Liq_cat_frac)
     Cl_NM = MgO_Liq_cat_frac + FeOt_Liq_cat_frac + \
         CaO_Liq_cat_frac + MnO_Liq_cat_frac
-    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac) + \
-        7 * np.log(1 - TiO2_Liq_cat_frac)
+    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac.astype(float)) + \
+        7 * np.log(1 - TiO2_Liq_cat_frac.astype(float))
     Den_B1993 = 67.92 / 8.3144 + 2 * \
-        np.log(D_Mg_opx_li1) + 2 * np.log(2 * Cl_NM) - NF
+        np.log(D_Mg_opx_li1.astype(float)) + 2 * np.log(2 * Cl_NM.astype(float)) - NF
     return Num_B1993 / Den_B1993
 
 ##  Opx-Only barometry function
@@ -693,6 +693,9 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     if "Sample_ID_Opx" not in opx_comps:
         opx_comps['Sample_ID_Opx'] = opx_comps.index
 
+
+
+
     # calculating Opx and liq components. Do before duplication to save
     # computation time
     myOPXs1_concat = calculate_orthopyroxene_components(opx_comps=opx_comps)
@@ -807,9 +810,10 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
                     df1_M = pd.concat([df1_M, dff_M], sort=False)
 
             df1_M = df1_M.add_prefix('Mean_')
-            cols_to_move = ['Mean_Sample_ID_Opx',
+            df1_M.rename(columns={'Mean_Sample_ID_Opx': 'Sample_ID_Opx'}, inplace=True)
+            cols_to_move = ['Sample_ID_Opx',
                             'Mean_T_K_calc', 'Mean_P_kbar_calc']
-            df1_M.rename(columns={'Mean_Sample_ID_Opx': 'Sample_ID_Opx'})
+
             df1_M = df1_M[cols_to_move +
                         [col for col in df1_M.columns if col not in cols_to_move]]
 

@@ -6,7 +6,9 @@ import warnings as w
 import numbers
 import pandas as pd
 from pickle import load
-
+import pickle
+from pathlib import Path
+Thermobar_dir=Path(__file__).parent
 
 from Thermobar.core import *
 
@@ -169,11 +171,16 @@ def P_Petrelli2021_Cpx_Liq(T=None, *, cpx_comps, liq_comps):
     liq_test_noID_noT=liq_test.drop(['Sample_ID_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq', 'CO2_Liq'], axis=1)
     cpx_liq_combo_test=pd.concat([cpx_test_noID_noT, liq_test_noID_noT], axis=1)
     x_test=cpx_liq_combo_test.values
-    scaler_P2020_Cpx_Liq=load(open('scaler_Petrelli2020_Cpx_Liq.pkl', 'rb'))
-    ETR_Press_P2020_Cpx_Liq=load(open('ETR_Press_Petrelli2020_Cpx_Liq.pkl', 'rb'))
+    scaler_P2020_Cpx_Liq=load(open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq.pkl', 'rb'))
+    ETR_Press_P2020_Cpx_Liq=load(open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Liq.pkl', 'rb'))
     x_test_scaled=scaler_P2020_Cpx_Liq.transform(x_test)
     Pred_P_kbar=ETR_Press_P2020_Cpx_Liq.predict(x_test_scaled)
-    return Pred_P_kbar
+
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_Liq)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+
+    return df_stats
 
 ## Equations for Cpx-Liquid Thermometry written as functions
 
@@ -239,7 +246,7 @@ def T_Put2003(P, *, lnK_Jd_DiHd_liq_2003, Mg_Number_Liq_NoFe3,
     Clinopyroxene-liquid thermometer of Putirka (2003)
 
     '''
-    return (10 ** 4 / (4.6 - 0.437 * lnK_Jd_DiHd_liq_2003 - 0.654 * np.log(Mg_Number_Liq_NoFe3)
+    return (10 ** 4 / (4.6 - 0.437 * lnK_Jd_DiHd_liq_2003 - 0.654 * np.log(Mg_Number_Liq_NoFe3.astype(float))
     - 0.326 * np.log(Na2O_Liq_cat_frac.astype(float)) -0.92 * np.log(SiO2_Liq_cat_frac.astype(float))
     + 0.274 * np.log(Jd.astype(float)) - 0.00632 * P))
 
@@ -303,6 +310,34 @@ FeOt_Liq_cat_frac, MgO_Liq_cat_frac, CaO_Liq_cat_frac, K2O_Liq_cat_frac):
 10.8503727 * FeOt_Liq_cat_frac + 33.6303471 * MgO_Liq_cat_frac
 + 15.4532888 * CaO_Liq_cat_frac + 15.6390115 * K2O_Liq_cat_frac))
 
+## Testing Maurizios voting stuff
+def get_voting_ExtraTreesRegressor(X, reg):
+    voting = []
+    for tree in reg.estimators_:
+        voting.append(tree.predict(X).tolist())
+    voting = np.asarray(voting)
+    return voting
+
+def get_voting_stats_ExtraTreesRegressor(X, reg, central_tendency='aritmetic_mean', dispersion='dev_std'):
+
+    voting = get_voting_ExtraTreesRegressor(X, reg)
+
+    voting_central_tendency_mean = voting.mean(axis=0)
+    voting_central_tendency_median = np.median(voting, axis=0)
+    voting_dispersion_std = voting.std(axis=0)
+    voting_dispersion_IQR = np.percentile(voting, 75, axis=0) - np.percentile(voting, 25, axis=0)
+    df_stats=pd.DataFrame(data={'Mean_Trees': voting_central_tendency_mean,
+                          'Median_Trees': voting_central_tendency_median,
+                          'Std_Trees': voting_dispersion_std,
+                          'IQR_Trees': voting_dispersion_IQR})
+    df_voting=pd.DataFrame(voting).T.add_prefix('Tree_')
+
+    return  df_stats, df_voting
+
+    ##
+
+
+
 
 def T_Petrelli2021_Cpx_Liq(P=None, *, cpx_comps, liq_comps):
     '''
@@ -316,11 +351,14 @@ def T_Petrelli2021_Cpx_Liq(P=None, *, cpx_comps, liq_comps):
     liq_test_noID_noT=liq_test.drop(['Sample_ID_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq', 'CO2_Liq'], axis=1)
     cpx_liq_combo_test=pd.concat([cpx_test_noID_noT, liq_test_noID_noT], axis=1)
     x_test=cpx_liq_combo_test.values
-    scaler_P2020_Cpx_Liq=load(open('scaler_Petrelli2020_Cpx_Liq.pkl', 'rb'))
-    ETR_Temp_P2020_Cpx_Liq=load(open('ETR_Temp_Petrelli2020_Cpx_Liq.pkl', 'rb'))
+    scaler_P2020_Cpx_Liq=load(open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq.pkl', 'rb'))
+    ETR_Temp_P2020_Cpx_Liq=load(open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Liq.pkl', 'rb'))
     x_test_scaled=scaler_P2020_Cpx_Liq.transform(x_test)
     Pred_T_K=ETR_Temp_P2020_Cpx_Liq.predict(x_test_scaled)
-    return Pred_T_K
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_P2020_Cpx_Liq)
+    df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+    return df_stats
 
 ## Function for calculatin clinopyroxene-liquid pressure
 Cpx_Liq_P_funcs = {P_Put1996_eqP1, P_Mas2013_eqPalk1, P_Put1996_eqP2, P_Mas2013_eqPalk2,
@@ -445,9 +483,12 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         if T is not None:
             print('Youve selected a T-independent function')
     # Easiest to treat Machine Learning ones differently
+
+
+
     if equationP == "P_Petrelli2021_Cpx_Liq":
-        P_kbar_np=P_Petrelli2021_Cpx_Liq(liq_comps=liq_comps, cpx_comps=cpx_comps)
-        P_kbar=pd.Series(P_kbar_np)
+        df_stats=P_Petrelli2021_Cpx_Liq(cpx_comps=cpx_comps, liq_comps=liq_comps_c)
+        P_kbar=df_stats['P_kbar_calc']
 
     else:
 
@@ -469,7 +510,11 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         else:
             P_kbar_is_bad = (P_kbar == 0) | (P_kbar == 273.15) | (P_kbar ==  -np.inf) | (P_kbar ==  np.inf)
             P_kbar[P_kbar_is_bad] = np.nan
-            return P_kbar
+
+            if equationP == "P_Petrelli2021_Cpx_Liq" and T != "Solve":
+                return df_stats
+            else:
+                return P_kbar
 
 
 
@@ -477,6 +522,9 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         if isinstance(P_kbar, partial):
             raise TypeError('cant calculate equilibrium tests if P_kbar isnt numerical'
             'e.g., if you havent specified a T for a T-dependent thermometer')
+        if T is None:
+            raise TypeError('You need to specify a T for equilibrium tests')
+
         if meltmatch is None:
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps_c, Fe3Fet_Liq=Fe3Fet_Liq, P=P_kbar, T=T, sigma=sigma, KdErr=KdErr)
@@ -609,8 +657,8 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
 
     # Easiest to treat Machine Learning ones differently
     if equationT == "T_Petrelli2021_Cpx_Liq":
-        T_K_np=T_Petrelli2021_Cpx_Liq(cpx_comps=cpx_comps, liq_comps=liq_comps)
-        T_K=pd.Series(T_K_np)
+        df_stats=T_Petrelli2021_Cpx_Liq(cpx_comps=cpx_comps, liq_comps=liq_comps_c)
+        T_K=df_stats['T_K_calc']
     else:
         kwargs = {name: Combo_liq_cpxs[name] for name, p in sig.parameters.items()
         if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -628,16 +676,24 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
     if eq_tests is False:
         if isinstance(T_K, partial):
             return T_K
+
+
         else:
             T_K_is_bad = (T_K == 0) | (T_K == 273.15) | (T_K ==  -np.inf) | (T_K ==  np.inf)
             T_K[T_K_is_bad] = np.nan
-            return T_K
+
+            if equationT == "T_Petrelli2021_Cpx_Liq" and P != "Solve":
+                return df_stats
+            else:
+                return T_K
 
 
     if eq_tests is True:
         if isinstance(T_K, partial):
             raise TypeError('cant calculate equilibrium tests if T_K isnt numerical'
             'e.g., if you havent specified a P for a P-dependent thermometer')
+        if P is None:
+            raise TypeError('You need to specify a P for equilibrium tests')
         if meltmatch is None:
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps_c, Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
@@ -786,9 +842,11 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
 
-    T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
-    T_K_guess[T_K_guess_is_bad] = np.nan
-    P_guess[T_K_guess_is_bad] = np.nan
+    if equationT != "T_Petrelli2021_Cpx_Liq":
+        T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
+        T_K_guess[T_K_guess_is_bad] = np.nan
+    if equationP != "P_Petrelli2021_Cpx_Liq":
+        P_guess[T_K_guess_is_bad] = np.nan
 
 
     # calculates equilibrium tests of Neave and Putirka if eq_tests="True"
@@ -955,6 +1013,12 @@ H2O_Liq=None, Return_All_Matches=False):
 
     # Adding an ID label to help with melt-cpx rematching later
     myCPXs1_concat['ID_CPX'] = myCPXs1_concat.index
+    if "Sample_ID_Cpx" not in cpx_comps:
+        myCPXs1_concat['Sample_ID_Cpx'] = myCPXs1_concat.index
+    else:
+        myCPXs1_concat['Sample_ID_Cpx']=cpx_comps['Sample_ID_Cpx']
+
+    myCPXs1_concat['ID_CPX']=myCPXs1_concat.index
     myLiquids1_concat['ID_Liq'] = myLiquids1_concat.index
 
 
@@ -1229,7 +1293,7 @@ FeII_Wang21, FeIII_Wang21, CaO_Cpx_cat_6ox, Al2O3_Cpx_cat_6ox):
     return (-1105.84-18.6052*TiO2_Cpx_cat_6ox+252.1033*Al2O3_Cpx_cat_6ox+311.0123*Cr2O3_Cpx_cat_6ox+550.2534*FeOt_Cpx_cat_6ox+
 451.6495*MnO_Cpx_cat_6ox+554.0535*MgO_Cpx_cat_6ox+540.2934*CaO_Cpx_cat_6ox
 +902.6805*Na2O_Cpx_cat_6ox-535.305*FeIII_Wang21-70.1424*Al_VI_cat_6ox*np.log(Al_VI_cat_6ox.astype(float))
--1.74473*np.log(Al_VI_cat_6ox))
+-1.74473*np.log(Al_VI_cat_6ox.astype(float)))
 
 
 
@@ -1286,12 +1350,37 @@ def P_Petrelli2021_Cpx_only(T=None, *, cpx_comps):
     cpx_test=cpx_comps.copy()
     Cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
     x_test=Cpx_test_noID_noT.values
-    scaler_P2020_Cpx_only=load(open('scaler_Petrelli2020_Cpx_Only.pkl', 'rb'))
-    ETR_Press_P2020_Cpx_only=load(open('ETR_Press_Petrelli2020_Cpx_Only.pkl', 'rb'))
+    in_ML_scaler_Petrelli2020_Cpx = open(Thermobar_dir/'ML_scaler_Petrelli2020_Cpx_Only','rb')
+    scaler_P2020_Cpx_only = pickle.load(in_ML_scaler_Petrelli2020_Cpx)
+    ETR_Press_P2020_Cpx_only=load(open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only.pkl', 'rb'))
     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
-    Pred_T_K=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
-    return Pred_T_K
+    Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
 
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+    return df_stats
+
+
+def P_Petrelli2021_Cpx_only_withH2O(T=None, *, cpx_comps, H2O_Liq):
+    '''
+    Clinopyroxene-only  barometer following the Machine learning approach of
+    Petrelli et al. (2021),
+    but including the H2O content of the liquid while training the model.
+    '''
+    cpx_test=cpx_comps.copy()
+    cpx_test['H2O_Liq']=H2O_Liq
+    Cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
+    x_test=Cpx_test_noID_noT.values
+    in_ML_scaler_Petrelli2020_Cpx = open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O.pkl','rb')
+    scaler_P2020_Cpx_only = pickle.load(in_ML_scaler_Petrelli2020_Cpx)
+    ETR_Press_P2020_Cpx_only=load(open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_H2O.pkl', 'rb'))
+    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+    Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+    return df_stats
 
 
 
@@ -1368,15 +1457,41 @@ def T_Petrelli2021_Cpx_only(P=None, *, cpx_comps):
 
     print(np.shape(x_test))
 
-    scaler_P2020_Cpx_only=load(open('scaler_Petrelli2020_Cpx_Only.pkl', 'rb'))
-    ETR_Temp_P2020_Cpx_only=load(open('ETR_Temp_Petrelli2020_Cpx_Only.pkl', 'rb'))
+    scaler_P2020_Cpx_only=load(open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only.pkl', 'rb'))
+    ETR_Temp_P2020_Cpx_only=load(open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only.pkl', 'rb'))
     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
     Pred_T_K=ETR_Temp_P2020_Cpx_only.predict(x_test_scaled)
-    return Pred_T_K
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_P2020_Cpx_only)
+    df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+    return df_stats
+
+
+def T_Petrelli2021_Cpx_only_withH2O(P=None, *, cpx_comps, H2O_Liq):
+    '''
+    Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
+    Machine Learning.
+    |  SEE==+-51°C
+    '''
+    cpx_test=cpx_comps.copy()
+    cpx_test['H2O_Liq']=H2O_Liqcpx_test['H2O_Liq']=H2O_Liq
+    Cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
+    x_test=Cpx_test_noID_noT.values
+
+    print(np.shape(x_test))
+
+    scaler_P2020_Cpx_only=load(open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O.pkl', 'rb'))
+    ETR_Temp_P2020_Cpx_only=load(open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only_H2O.pkl', 'rb'))
+    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+    Pred_T_K=ETR_Temp_P2020_Cpx_only.predict(x_test_scaled)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_P2020_Cpx_only)
+    df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+    return df_stats
 
 ## Function for calculationg Cpx-only pressure
 Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
-P_Wang2021_eq3, P_Petrelli2021_Cpx_only}
+P_Wang2021_eq3, P_Petrelli2021_Cpx_only, P_Petrelli2021_Cpx_only_withH2O}
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
@@ -1436,11 +1551,26 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=0):
 
 
     cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
-    cpx_components['H2O_Liq'] = H2O_Liq
+
+    if H2O_Liq is not None:
+        cpx_components['H2O_Liq']=H2O_Liq
+
+    if equationP=="P_Petrelli2021_Cpx_only_withH2O":
+        if H2O_Liq is None:
+            cpx_components['H2O_Liq']=0
+            w.warn('These thermometers need a H2O content of the liquid, by default, '
+            'we have set this to 0, you can overwrite this using H2O_Liq=...')
+
+
+
 
     if equationP == "P_Petrelli2021_Cpx_only":
-        P_kbar_np=P_Petrelli2021_Cpx_only(cpx_comps=cpx_comps)
-        P_kbar=pd.Series(P_kbar_np)
+        df_stats=P_Petrelli2021_Cpx_only(cpx_comps=cpx_comps)
+        P_kbar=df_stats['P_kbar_calc']
+
+    elif equationP == "P_Petrelli2021_Cpx_only_withH2O":
+        df_stats=P_Petrelli2021_Cpx_only(cpx_comps=cpx_comps)
+        P_kbar=df_stats['P_kbar_calc']
 
     else:
 
@@ -1458,11 +1588,18 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=0):
         if not isinstance(P_kbar, partial):
             P_kbar.replace([np.inf, -np.inf], np.nan, inplace=True)
 
-    return P_kbar
+
+
+    if equationP == "P_Petrelli2021_Cpx_only" and T != "Solve":
+        return df_stats
+    elif equationP == "P_Petrelli2021_Cpx_only_withH2O" and T != "Solve":
+        return df_stats
+    else:
+        return P_kbar
 
 ## Function for calculating Cpx-only temperature
 Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol, T_Wang2021_eq4,
-T_Wang2021_eq2, T_Petrelli2021_Cpx_only}
+T_Wang2021_eq2, T_Petrelli2021_Cpx_only, T_Petrelli2021_Cpx_only_withH2O}
 Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
@@ -1518,15 +1655,21 @@ def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None, H2O_Liq=N
     cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
     if H2O_Liq is not None:
         cpx_components['H2O_Liq']=H2O_Liq
-    if equationT=="T_Wang2021_eq2" or equationT=="T_Wang2021_eq4":
+    if equationT=="T_Wang2021_eq2" or equationT=="T_Wang2021_eq4" or equationT=="T_Petrelli2021_Cpx_only_withH2O":
         if H2O_Liq is None:
             cpx_components['H2O_Liq']=0
             w.warn('These thermometers need a H2O content of the liquid, by default, '
             'we have set this to 0, you can overwrite this using H2O_Liq=...')
 
     if equationT == "T_Petrelli2021_Cpx_only":
-        T_K_np=T_Petrelli2021_Cpx_only(cpx_comps=cpx_comps)
-        T_K=pd.Series(T_K_np)
+        df_stats=T_Petrelli2021_Cpx_only(cpx_comps=cpx_comps)
+        T_K=df_stats['T_K_calc']
+
+
+    elif equationT == "T_Petrelli2021_Cpx_only_withH2O":
+        df_stats=T_Petrelli2021_Cpx_only(cpx_comps=cpx_comps)
+        T_K=df_stats['T_K_calc']
+
 
     else:
 
@@ -1545,7 +1688,14 @@ def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None, H2O_Liq=N
         if not isinstance(T_K, partial):
             T_K.replace([np.inf, -np.inf], np.nan, inplace=True)
 
-    return T_K
+
+
+    if P != "Solve" and equationT == "T_Petrelli2021_Cpx_only":
+        return df_stats
+    elif P != "Solve" and equationT == "T_Petrelli2021_Cpx_only_withH2O":
+        return df_stats
+    else:
+        return T_K
 
 ## Iterating PT- Cpx only
 def calculate_cpx_only_press_temp(*, cpx_comps=None, equationP=None,
@@ -1624,3 +1774,5 @@ def calculate_cpx_only_press_temp(*, cpx_comps=None, equationP=None,
     PT_out.replace([np.inf, -np.inf], np.nan, inplace=True)
 
     return PT_out
+
+

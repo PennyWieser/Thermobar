@@ -1237,10 +1237,11 @@ def calculate_clinopyroxene_liquid_components(
         combo_liq_cpxs = meltmatch
         if "Sample_ID_Cpx" in combo_liq_cpxs:
             combo_liq_cpxs = combo_liq_cpxs.drop(
-                ['Sample_ID_Cpx'], axis=1).astype('float64')
+                ['Sample_ID_Cpx'], axis=1) #.astype('float64')
         if  "Sample_ID_Liq" in combo_liq_cpxs:
             combo_liq_cpxs = combo_liq_cpxs.drop(
-                ['Sample_ID_Liq'], axis=1).astype('float64')
+                ['Sample_ID_Liq'], axis=1)#.astype('float64')
+
 
     if liq_comps is not None and cpx_comps is not None:
         liq_comps_c=liq_comps.copy()
@@ -1273,14 +1274,15 @@ def calculate_clinopyroxene_liquid_components(
     combo_liq_cpxs['Kd_Fe_Mg_Fet'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['FeOt_Liq_cat_frac'] / combo_liq_cpxs['MgO_Liq_cat_frac'])))
 
-    combo_liq_cpxs['lnK_Jd_liq'] = np.log((combo_liq_cpxs['Jd']) / ((combo_liq_cpxs['Na2O_Liq_cat_frac']) * (
+    combo_liq_cpxs['lnK_Jd_liq'] = np.log((combo_liq_cpxs['Jd'].astype(float)) / ((combo_liq_cpxs['Na2O_Liq_cat_frac']) * (
         combo_liq_cpxs['Al2O3_Liq_cat_frac']) * ((combo_liq_cpxs['SiO2_Liq_cat_frac'])**2)))
 
-    combo_liq_cpxs['lnK_Jd_DiHd_liq_1996'] = np.log((combo_liq_cpxs['Jd']) * (combo_liq_cpxs['CaO_Liq_cat_frac']) * ((combo_liq_cpxs['FeOt_Liq_cat_frac']) + (
-        combo_liq_cpxs['MgO_Liq_cat_frac'])) / ((combo_liq_cpxs['DiHd_1996']) * (combo_liq_cpxs['Na2O_Liq_cat_frac']) * (combo_liq_cpxs['Al2O3_Liq_cat_frac'])))
+    combo_liq_cpxs['lnK_Jd_DiHd_liq_1996'] = np.log((combo_liq_cpxs['Jd'].astype(float))
+    * (combo_liq_cpxs['CaO_Liq_cat_frac'].astype(float)) * ((combo_liq_cpxs['FeOt_Liq_cat_frac'].astype(float)) + (
+        combo_liq_cpxs['MgO_Liq_cat_frac'].astype(float))) / ((combo_liq_cpxs['DiHd_1996'].astype(float)) * (combo_liq_cpxs['Na2O_Liq_cat_frac'].astype(float)) * (combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))))
 
-    combo_liq_cpxs['lnK_Jd_DiHd_liq_2003'] = np.log((combo_liq_cpxs['Jd']) * (combo_liq_cpxs['CaO_Liq_cat_frac']) * ((combo_liq_cpxs['FeOt_Liq_cat_frac']) + (
-        combo_liq_cpxs['MgO_Liq_cat_frac'])) / ((combo_liq_cpxs['DiHd_2003']) * (combo_liq_cpxs['Na2O_Liq_cat_frac']) * (combo_liq_cpxs['Al2O3_Liq_cat_frac'])))
+    combo_liq_cpxs['lnK_Jd_DiHd_liq_2003'] = np.log((combo_liq_cpxs['Jd'].astype(float)) * (combo_liq_cpxs['CaO_Liq_cat_frac'].astype(float)) * ((combo_liq_cpxs['FeOt_Liq_cat_frac'].astype(float)) + (
+        combo_liq_cpxs['MgO_Liq_cat_frac'].astype(float))) / ((combo_liq_cpxs['DiHd_2003'].astype(float)) * (combo_liq_cpxs['Na2O_Liq_cat_frac'].astype(float)) * (combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))))
 
     combo_liq_cpxs['Kd_Fe_Mg_IdealWB'] = 0.109 + 0.186 * \
         combo_liq_cpxs['Mgno_CPX']  # equation 35 of wood and blundy
@@ -1903,8 +1905,9 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
         Combo_liq_cpxs['Kd_Ideal_Masotta'] - Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
 
     # Equation X of Mollo for DiHd and EnFs components
-    Combo_liq_cpxs['DiHd_Pred_Mollo'] = (np.exp(-2.18 - 3.16 * Combo_liq_cpxs['TiO2_Liq_cat_frac'] - 0.365 * np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'])
-                                                + 0.05 * np.log(Combo_liq_cpxs['MgO_Liq_cat_frac']) - 3858.2 * (
+    Combo_liq_cpxs['DiHd_Pred_Mollo'] = (np.exp(-2.18 - 3.16 * Combo_liq_cpxs['TiO2_Liq_cat_frac']
+    - 0.365 * np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))
+     + 0.05 * np.log(Combo_liq_cpxs['MgO_Liq_cat_frac']) - 3858.2 * (
                                                     Combo_liq_cpxs['EnFs']**2 / T) + (2107.4 / T)
                                                 - 17.64 * P / T))
 
@@ -1912,15 +1915,13 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
                                                 7.46 *
                                                 Combo_liq_cpxs['MgO_Liq_cat_frac'] *
                                                 Combo_liq_cpxs['SiO2_Liq_cat_frac']
-                                                - 0.34 *
-                                                np.log(
-                                                    Combo_liq_cpxs['Al2O3_Liq_cat_frac'])
+                                                - 0.34 *np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))
                                                 - 3.78 * (Combo_liq_cpxs['Na2O_Liq_cat_frac'] + Combo_liq_cpxs['K2O_Liq_cat_frac']) -
                                                 3737.3 * (Combo_liq_cpxs['DiHd_1996']**2) / T - 46.8 * P / T))
 
     #     # Putirka 1999 equations
     Combo_liq_cpxs['CaTs_Pred_P1999'] = (np.exp(2.58 + 0.12 * P / T - 9 * 10**(-7) * P**2 / T
-                                                + 0.78 * np.log(Combo_liq_cpxs['CaO_Liq_cat_frac'] * Combo_liq_cpxs['Al2O3_Liq_cat_frac']**2 * Combo_liq_cpxs['SiO2_Liq_cat_frac']) - 4.3 * 10**3 * (Combo_liq_cpxs['DiHd_1996']**2 / T)))
+    + 0.78 * np.log(Combo_liq_cpxs['CaO_Liq_cat_frac'].astype(float) * Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float)**2 * Combo_liq_cpxs['SiO2_Liq_cat_frac'].astype(float)) - 4.3 * 10**3 * (Combo_liq_cpxs['DiHd_1996']**2 / T)))
 
     Combo_liq_cpxs['CrCaTS_Pred_P1999'] = (np.exp(12.8) * Combo_liq_cpxs['CaO_Liq_cat_frac'] * (
         Combo_liq_cpxs['Cr2O3_Liq_cat_frac']**2) * Combo_liq_cpxs['SiO2_Liq_cat_frac'])

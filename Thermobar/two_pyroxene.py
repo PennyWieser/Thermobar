@@ -73,7 +73,7 @@ def T_Put2008_eq36(P, *, EnFs, Fm2Si2O6, CaO_Cpx_cat_6ox,
     SEE=+-45C for Cpx Mg#>0.75
     SEE=+-56C for all data
     '''
-    return (273.15 + 10 ** 4 / (11.2 - 1.96 * np.log(EnFs / Fm2Si2O6) - 3.3 * CaO_Cpx_cat_6ox - 25.8 *
+    return (273.15 + 10 ** 4 / (11.2 - 1.96 * np.log(EnFs.astype(float) / Fm2Si2O6.astype(float)) - 3.3 * CaO_Cpx_cat_6ox - 25.8 *
             CrCaTs + 33.2 * MnO_Opx_cat_6ox - 23.6 * Na2O_Opx_cat_6ox - 2.08 * En_Opx - 8.33 * Di_Opx - 0.05 * P))
 
 
@@ -85,8 +85,8 @@ def T_Brey1990(P, *, FeOt_Cpx_cat_6ox, CaO_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na2O_Cp
     SEE=+-70C for all data
     '''
     return ((23664 + (24.9 + 126.3 * FeOt_Cpx_cat_6ox / (FeOt_Cpx_cat_6ox + MgO_Cpx_cat_6ox)) * P)
-    / (13.38 + (np.log((1 - CaO_Cpx_cat_6ox /(1 - Na2O_Cpx_cat_6ox)) /
-    (1 - CaO_Opx_cat_6ox / (1 - Na2O_Opx_cat_6ox))))**2
+    / (13.38 + (np.log((1 - CaO_Cpx_cat_6ox.astype(float) /(1 - Na2O_Cpx_cat_6ox.astype(float))) /
+    (1 - CaO_Opx_cat_6ox.astype(float) / (1 - Na2O_Opx_cat_6ox.astype(float)))))**2
     + 11.59 * FeOt_Opx_cat_6ox / (FeOt_Opx_cat_6ox + MgO_Opx_cat_6ox)))
 
 
@@ -97,7 +97,7 @@ def T_Put2008_eq37(P, *, EnFs, Di_Cpx, Fm2Si2O6, MnO_Opx_cat_6ox,
     SEE=+-38C for Cpx Mg#>0.75
     SEE=+-60C for all data
     '''
-    return (273.15 + 10**4 / (13.4 - 3.4 * np.log(EnFs / Fm2Si2O6) + 5.59 * np.log(MgO_Cpx_cat_6ox)
+    return (273.15 + 10**4 / (13.4 - 3.4 * np.log(EnFs.astype(float) / Fm2Si2O6.astype(float)) + 5.59 * np.log(MgO_Cpx_cat_6ox.astype(float))
     + 23.85 * MnO_Opx_cat_6ox +6.48 * FmAl2SiO6 - 2.38 * Di_Cpx - 0.044 * P
     - 8.8 * MgO_Cpx_cat_6ox / (MgO_Cpx_cat_6ox + FeOt_Cpx_cat_6ox)))
 
@@ -149,7 +149,7 @@ Al_VI_cat_6ox, TiO2_Cpx_cat_6ox, Cr2O3_Cpx_cat_6ox):
         (X_Mg_M1_Cpx / (Lindley_Fe3_Cpx + TiO2_Cpx_cat_6ox +
          Al_VI_cat_6ox + Cr2O3_Cpx_cat_6ox + X_Mg_M1_Cpx + X_Fe_M1_Cpx))
 
-    return ((-10202 / (np.log(a_cpx_En / a_opx_En) - 7.65 *
+    return ((-10202 / (np.log(a_cpx_En.astype(float) / a_opx_En.astype(float)) - 7.65 *
             (1 - MgNo_WB_Opx) + 3.88 * (1 - MgNo_WB_Opx)**2 - 4.6)))
 
 
@@ -199,7 +199,7 @@ FeOt_Opx_cat_6ox, Na2O_Opx_cat_6ox, Al_IV_Opx_cat_6ox, Al_VI_Opx_cat_6ox,
         (X_Mg_M1_Cpx / (Lindley_Fe3_Cpx + TiO2_Cpx_cat_6ox +
          Al_VI_cat_6ox + Cr2O3_Cpx_cat_6ox + X_Mg_M1_Cpx + X_Fe_M1_Cpx))
 
-    return ((7341 / (3.355 + 2.44 * (1 - MgNo_WB_Opx) - np.log(a_cpx_En / a_opx_En))))
+    return ((7341 / (3.355 + 2.44 * (1 - MgNo_WB_Opx) - np.log(a_cpx_En.astype(float) / a_opx_En.astype(float)))))
 
 ## Function for calculating Cpx-Opx pressure
 
