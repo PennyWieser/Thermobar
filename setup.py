@@ -21,7 +21,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/PennyWieser/Thermobar",
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     install_requires=[
             'pandas',
             'numpy',
