@@ -12,7 +12,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 
-setuptools.setup(
+setup(
     name="Thermobar",
     version=__version__,
     author="Penny, Maurizio, Jordan, Eric",
