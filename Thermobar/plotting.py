@@ -186,32 +186,32 @@ def Tukey_Plot_np(x,y, name, xlower=-1, xupper=13, yupper=17, ylower=-3):
 
 def Experimental_av_values(LEPRin, calc):
 
-    ExperimentNumbers=LEPRin['Experiment_P_Name_y'].unique()
+    ExperimentNumbers=LEPRin[name].unique()
 
     for exp in ExperimentNumbers:
-        dff_M=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].mean(axis=0)).T
-        dff_Med=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].median(axis=0)).T
+        dff_M=pd.DataFrame(calc.loc[LEPRin[name]==exp].mean(axis=0)).T
+        dff_Med=pd.DataFrame(calc.loc[LEPRin[name]==exp].median(axis=0)).T
         dff_M['Median_P_kbar_calc']=dff_Med['P_kbar_calc']
         if "T_K_calc" in dff_M:
             dff_M['Median_T_K_calc']=dff_Med['T_K_calc']
 
-        dff_S=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].std(axis=0)).T
+        dff_S=pd.DataFrame(calc.loc[LEPRin[name]==exp].std(axis=0)).T
 
-        dff_M['Sample_ID']=LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, "Experiment_y"].iloc[0]
-        dff_M['Pressure_Exp']=np.nanmean(LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, 'P_kbar_x'])
-        dff_M['Temp_Exp']=np.nanmean(LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, 'T_K_x'])
+        dff_M['Sample_ID']=LEPRin.loc[LEPRin[name]==exp, "Experiment_y"].iloc[0]
+        dff_M['Pressure_Exp']=np.nanmean(LEPRin.loc[LEPRin[name]==exp, 'P_kbar_x'])
+        dff_M['Temp_Exp']=np.nanmean(LEPRin.loc[LEPRin[name]==exp, 'T_K_x'])
 
         if exp==ExperimentNumbers[0]:
             df1_M=dff_M
         else:
             df1_M=pd.concat([df1_M, dff_M],  sort=False)
 
-        if np.shape(LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp])[0]==1: # This tells us if there is only 1, in which case std will return Nan
+        if np.shape(LEPRin.loc[LEPRin[name]==exp])[0]==1: # This tells us if there is only 1, in which case std will return Nan
                     dff_S= dff_S.fillna(0)
                     dff_S['N']=1
         else:
             dff_S=dff_S
-            dff_S['N']=np.shape(calc.loc[LEPRin['Experiment_P_Name_y']==exp])[0]
+            dff_S['N']=np.shape(calc.loc[LEPRin[name]==exp])[0]
         if exp==ExperimentNumbers[0]:
             df1_S=dff_S
         else:
@@ -222,33 +222,33 @@ def Experimental_av_values(LEPRin, calc):
     df1_M.insert(0, "No. of Exp. averaged",  df1_S['st_dev_N'])
     df1_M.insert(1, "std_P_kbar_calc",  df1_S['st_dev_P_kbar_calc'])
     return df1_M
-def Experimental_av_plot(LEPRin, calc):
-
-    ExperimentNumbers=LEPRin['Experiment_P_Name_y'].unique()
+def Experimental_av_plot(LEPRin, calc, name="name"):
+ # before, was Experiment_P_Name_y rather than name
+    ExperimentNumbers=LEPRin[name].unique()
 
     for exp in ExperimentNumbers:
-        dff_M=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].mean(axis=0)).T
-        dff_Med=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].median(axis=0)).T
+        dff_M=pd.DataFrame(calc.loc[LEPRin[name]==exp].mean(axis=0)).T
+        dff_Med=pd.DataFrame(calc.loc[LEPRin[name]==exp].median(axis=0)).T
         dff_M['Median_P_kbar_calc']=dff_Med['P_kbar_calc']
         dff_M['Median_T_K_calc']=dff_Med['T_K_calc']
 
-        dff_S=pd.DataFrame(calc.loc[LEPRin['Experiment_P_Name_y']==exp].std(axis=0)).T
+        dff_S=pd.DataFrame(calc.loc[LEPRin[name]==exp].std(axis=0)).T
 
-        dff_M['Sample_ID']=LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, "Experiment_y"].iloc[0]
-        dff_M['Pressure_Exp']=np.nanmean(LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, 'P_kbar_x'])
-        dff_M['Temp_Exp']=np.nanmean(LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp, 'T_K_x'])
+        dff_M['Sample_ID']=LEPRin.loc[LEPRin[name]==exp, "Experiment_y"].iloc[0]
+        dff_M['Pressure_Exp']=np.nanmean(LEPRin.loc[LEPRin[name]==exp, 'P_kbar_x'])
+        dff_M['Temp_Exp']=np.nanmean(LEPRin.loc[LEPRin[name]==exp, 'T_K_x'])
 
         if exp==ExperimentNumbers[0]:
             df1_M=dff_M
         else:
             df1_M=pd.concat([df1_M, dff_M],  sort=False)
 
-        if np.shape(LEPRin.loc[LEPRin['Experiment_P_Name_y']==exp])[0]==1: # This tells us if there is only 1, in which case std will return Nan
+        if np.shape(LEPRin.loc[LEPRin[name]==exp])[0]==1: # This tells us if there is only 1, in which case std will return Nan
                     dff_S= dff_S.fillna(0)
                     dff_S['N']=1
         else:
             dff_S=dff_S
-            dff_S['N']=np.shape(calc.loc[LEPRin['Experiment_P_Name_y']==exp])[0]
+            dff_S['N']=np.shape(calc.loc[LEPRin[name]==exp])[0]
         if exp==ExperimentNumbers[0]:
             df1_S=dff_S
         else:

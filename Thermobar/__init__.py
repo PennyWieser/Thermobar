@@ -1,4 +1,3 @@
-__version__ = "0.1"
 __author__ = 'Penny Wieser, Maurizio Petrelli, Jordan Lubbers, Eric Wieser'
 
 
@@ -36,4 +35,7 @@ from Thermobar.feldspar import *
 from Thermobar.amphibole import *
 # plotting, R2 etc
 from Thermobar.plotting import *
+# version
+from ._version import __version__
+
 

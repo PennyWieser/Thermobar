@@ -10,6 +10,135 @@ import pandas as pd
 from Thermobar.core import *
 from Thermobar.mineral_equilibrium import *
 
+## Functions for olivine-liquid hygrometry
+def H_Gavr2016(*, CaO_Liq, MgO_Liq, CaO_Ol):
+    '''
+    Olivine-Liquid hygrometer of Gavrilenko et al. (2016).
+    '''
+    DCa_dry_HighMgO=0.00042*MgO_Liq+0.0196
+    DCa_dry_LowMgO=-0.0043*MgO_Liq+0.072
+    DCa_dry_calc=np.empty(len(MgO_Liq), dtype=float)
+    DeltaCa=np.empty(len(MgO_Liq), dtype=float)
+
+    H2O_Calc=np.empty(len(MgO_Liq), dtype=float)
+
+    DCa_Meas=CaO_Ol/CaO_Liq
+    DCa_Divider=0.00462*MgO_Liq-0.027
+    for i in range(0, len(MgO_Liq)):
+        if DCa_Meas[i]<=DCa_Divider[i]:
+            DCa_dry_calc[i]=DCa_dry_HighMgO[i]
+            DeltaCa[i]=DCa_dry_calc[i]-DCa_Meas[i]
+            H2O_Calc[i]=397*DeltaCa[i]
+        else:
+            DCa_dry_calc[i]=DCa_dry_LowMgO[i]
+            DeltaCa[i]=DCa_dry_calc[i]-DCa_Meas[i]
+            H2O_Calc[i]=188*DeltaCa[i]
+    H2O_Calc[CaO_Ol==0]=np.nan
+    return H2O_Calc
+
+Liquid_olivine_hygr_funcs = {H_Gavr2016}
+Liquid_olivine_hygr_funcs_by_name = {p.__name__: p for p in Liquid_olivine_hygr_funcs}
+
+
+def calculate_ol_liq_hygr(*, liq_comps, ol_comps, equationH, eq_tests=False,
+P=None, T=None, equationT=None, Fe3Fet_Liq=None):
+    '''
+    Olivine-liquid hygrometer. Returns the estimated H2O content
+    in wt%
+
+   Parameters
+    -------
+
+    liq_comps: DataFrame
+        liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
+
+    ol_comps: DataFrame
+        Olivine compositions with column headings SiO2_Ol, MgO_Ol etc.
+
+    equationH: str
+        H_Gavr2016 (P-independent, H2O_independent)
+
+    eq_tests: bool
+        if true, calculates Kd for olivine-liquid pairs.
+        Other inputs for these tests:
+
+        P: int, flt, Series (needed for Toplis Kd calculation).
+        If nothing inputted, P set to 1 kbar
+
+        T: int, flt, Series (needed for Toplis KD calculation).
+        Can also specify equationT="" to calculate temperature
+        using an olivine-liquid thermometer, using the calculated H2O content
+        from the hygrometer
+
+        Fe3Fet_Liq: int, flt, Series. As Kd calculated using only Fe2 in the Liq.
+
+
+    Returns
+    -------
+    pandas.core.series.Series
+        H2O content in wt%.
+ '''
+# These are checks that our inputs are okay
+    ol_comps_c=ol_comps.copy()
+    liq_comps_c=liq_comps.copy()
+
+    if Fe3Fet_Liq is not None:
+        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
+
+    try:
+        func = Liquid_olivine_hygr_funcs_by_name[equationH]
+    except KeyError:
+        raise ValueError(f'{equationH} is not a valid equation') from None
+    sig=inspect.signature(func)
+
+    anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+    ol_cat_frac = calculate_cat_fractions_olivine(ol_comps=ol_comps_c)
+    Liq_Ols = pd.concat([ol_comps_c, anhyd_cat_frac, ol_cat_frac], axis=1)
+
+
+
+    if len(liq_comps) != len(ol_comps):
+        raise ValueError('The panda series entered for olivine isnt the same length as for liquids')
+
+    kwargs = {name: Liq_Ols[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
+    H2O_Calc_np=func(**kwargs)
+    H2O_Calc=pd.Series(H2O_Calc_np)
+
+    if eq_tests is False and ol_comps is not None:
+         return H2O_Calc
+
+    if eq_tests is True:
+        if P is None:
+            P = 1
+            print(
+                'You have not selected a pressure, so we have calculated Toplis Kd at 1kbar')
+        if T is None and equationT is None:
+            raise ValueError('Temperature needed to calculate Delta Kd using Toplis.'
+             'Either enter T, or specify equationT=""')
+        if equationT is not None:
+            T=calculate_ol_liq_temp(ol_comps=ol_comps, liq_comps=liq_comps,
+            equationT=equationT, H2O_Liq=H2O_Calc, P=P).T_K_calc
+        ol_fo = (ol_comps_c['MgO_Ol'] / 40.3044) / \
+            ((ol_comps_c['MgO_Ol'] / 40.3044) + ol_comps_c['FeOt_Ol'] / 71.844)
+        KdFeMg_Meas = (
+            ((ol_comps_c['FeOt_Ol'] / 71.844) / (ol_comps_c['MgO_Ol'] / 40.3044)) /
+            ((liq_comps_c['FeOt_Liq'] * (1 - liq_comps_c['Fe3Fet_Liq']
+                                         ) / 71.844) / (liq_comps_c['MgO_Liq'] / 40.3044))
+        )
+        Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'],
+        Na2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['Na2O_Liq_mol_frac'],
+        P=P, H2O=Liq_Ols['H2O_Liq'], T=T)
+        Kd_Toplis_calc = Kd_func(ol_fo)
+
+        DeltaKd_Toplis = abs(KdFeMg_Meas - Kd_Toplis_calc)
+        DeltaKd_Roeder = abs(KdFeMg_Meas - 0.3)
+        DeltaKd_Matzen = abs(KdFeMg_Meas - 0.34)
+        df = pd.DataFrame(data={'H2O_calc': H2O_Calc, 'Temp used for calcs': T, 'P used for calcs': P, 'Kd Meas': KdFeMg_Meas, 'Kd calc (Toplis)': Kd_Toplis_calc,
+                                'ΔKd, Toplis': DeltaKd_Toplis, 'ΔKd, Roeder': DeltaKd_Roeder, 'ΔKd, Matzen': DeltaKd_Matzen})
+        df_out = pd.concat([df, Liq_Ols], axis=1)
+
+        return df_out
+
 ## Functions for olivine-Liquid thermometry
 # Defining functions where DMg is measured.
 def T_Beatt93_ol(P, *, Den_Beat93):

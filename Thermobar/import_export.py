@@ -504,11 +504,6 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
         my_input_c['Fe3Fet_Liq_Err'] = (0.89998 * my_input_c['Fe2O3_Liq_Err']) / (
             (0.89998 * my_input_c['Fe2O3_Liq_Err'] + my_input_c['FeO_Liq_Err']))
 
-        # This is the georoc example, where have some columns with all 3, but
-        # only want to replace zeros
-    if GEOROC is True:
-        my_input_c.loc[np.isnan(my_input_c['FeOt_Liq_Err']) is True, 'FeOt_Liq_Err'] = my_input_c.loc[np.isnan(
-            my_input_c['FeOt_Liq_Err']) is True, 'FeO_Liq_Err'] + my_input_c.loc[np.isnan(my_input_c['FeOt_Liq_Err']) is True, 'Fe2O3_Liq_Err'] * 0.8999998
 
     myLiquids1 = my_input.reindex(df_ideal_liq_Err.columns, axis=1).fillna(0)
     myLiquids1 = myLiquids1.apply(pd.to_numeric, errors='coerce').fillna(0)

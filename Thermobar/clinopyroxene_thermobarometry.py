@@ -310,33 +310,6 @@ FeOt_Liq_cat_frac, MgO_Liq_cat_frac, CaO_Liq_cat_frac, K2O_Liq_cat_frac):
 10.8503727 * FeOt_Liq_cat_frac + 33.6303471 * MgO_Liq_cat_frac
 + 15.4532888 * CaO_Liq_cat_frac + 15.6390115 * K2O_Liq_cat_frac))
 
-## Testing Maurizios voting stuff
-def get_voting_ExtraTreesRegressor(X, reg):
-    voting = []
-    for tree in reg.estimators_:
-        voting.append(tree.predict(X).tolist())
-    voting = np.asarray(voting)
-    return voting
-
-def get_voting_stats_ExtraTreesRegressor(X, reg, central_tendency='aritmetic_mean', dispersion='dev_std'):
-
-    voting = get_voting_ExtraTreesRegressor(X, reg)
-
-    voting_central_tendency_mean = voting.mean(axis=0)
-    voting_central_tendency_median = np.median(voting, axis=0)
-    voting_dispersion_std = voting.std(axis=0)
-    voting_dispersion_IQR = np.percentile(voting, 75, axis=0) - np.percentile(voting, 25, axis=0)
-    df_stats=pd.DataFrame(data={'Mean_Trees': voting_central_tendency_mean,
-                          'Median_Trees': voting_central_tendency_median,
-                          'Std_Trees': voting_dispersion_std,
-                          'IQR_Trees': voting_dispersion_IQR})
-    df_voting=pd.DataFrame(voting).T.add_prefix('Tree_')
-
-    return  df_stats, df_voting
-
-    ##
-
-
 
 
 def T_Petrelli2021_Cpx_Liq(P=None, *, cpx_comps, liq_comps):

@@ -2223,23 +2223,56 @@ def calculate_plag_components(*, CaO_Liq_cat_frac, H2O_Liq, Na2O_Liq_cat_frac, A
     Components=pd.DataFrame(data={'An_Pred': An_Pred, 'Ab_Pred': Ab_Pred, 'Or_Pred': Or_Pred})
 
     return Components
+## Tool to get Fe3Fet from logfo2 or buffer value.
+def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model=None, fo2, renorm=False, fo2_offset=0):
+    '''
+    Calculates Fe3Fet_Liq, FeO and Fe2O3 based on user-specified buffer
 
-def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model=None, fo2, re_norm=False, fo2_offset=0):
+   Parameters
+    -------
+
+    liq_comps: DataFrame
+        Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
+
+    T_K:  int, flt, Series
+        Temperature in Kelvin (buffer positions are very T-sensitive)
+
+    P_kbar: int, flt, Series
+        Pressure in Kbar (Buffer positions are slightly sensitive to pressure)
+
+    fo2:  str ("QFM", "NNO") or int, flt, series
+        Either a value of fo2 (enter 10*logfo2), or buffer position.
+        So far, includes QFM or NNO
+
+    fo2_offset: int, flt, series
+        log units offset from buffer, e.g., could specify fo2=QFM, fo2_offset=1
+        to perform calculations at QFM+1
+
+    model: str
+        "Kress1991" - Uses Kress and Carmichael 1991 to calculate XFe2Fe3 from fo2
+        "Put2016_eq6b" - Uses Putirka (2016) expression to calculate XFe2Fe3 from fo2
+
+    renorm: bool
+        Following excel code of K. Iacovino.
+        If True, renormalizes other oxide concentrations
+        to account for change in total following partitioning of Fe into FeO and Fe2O3.
+
+    Returns
+    -------
+
+    liquid compositions with calculated Fe3Fet_Liq, FeO_Liq, Fe2O3_Liq, and XFe3Fe2.
+
+    '''
     if isinstance(fo2, str):
         if fo2=="NNO":
-        # Buffer position from Campbell et al. (2009), code from Kayla Iacovino's website
-            # logfo2=((8.699 + 0.01642*(P_kbar*1000) -0.0003*(P_kbar*1000)**2 + (2.7*10**(-6))*(P_kbar*1000)**3 -
-            # (10**(-8))*(P_kbar*1000)**4) + (-24205 + 444.73*(P_kbar*1000) - 0.5929*(P_kbar*1000)**2 + 0.00153*(P_kbar*1000)**3)/T_K
-            # + fo2_offset)
+        # Buffer position from frost (1991)
             logfo2=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K+fo2_offset
-
             fo2=10**logfo2
-            print(logfo2)
 
         if fo2=="QFM":
+        # Buffer position from frost (1991)
             logfo2=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K+fo2_offset
             fo2=10**logfo2
-            print(logfo2)
 
 
 
@@ -2302,10 +2335,33 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model=None, fo2, re_
 
 
 
-    if re_norm==False:
+    if renorm==False:
         return New_Oxide_out_nonorm
     else:
         return New_Oxide_out_New_old_total
 
+## Machine Learning Voting
+def get_voting_ExtraTreesRegressor(X, reg):
+    voting = []
+    for tree in reg.estimators_:
+        voting.append(tree.predict(X).tolist())
+    voting = np.asarray(voting)
+    return voting
+
+def get_voting_stats_ExtraTreesRegressor(X, reg, central_tendency='aritmetic_mean', dispersion='dev_std'):
+
+    voting = get_voting_ExtraTreesRegressor(X, reg)
+
+    voting_central_tendency_mean = voting.mean(axis=0)
+    voting_central_tendency_median = np.median(voting, axis=0)
+    voting_dispersion_std = voting.std(axis=0)
+    voting_dispersion_IQR = np.percentile(voting, 75, axis=0) - np.percentile(voting, 25, axis=0)
+    df_stats=pd.DataFrame(data={
+                          'Median_Trees': voting_central_tendency_median,
+                          'Std_Trees': voting_dispersion_std,
+                          'IQR_Trees': voting_dispersion_IQR})
+    df_voting=pd.DataFrame(voting).T.add_prefix('Tree_')
+
+    return  df_stats, df_voting
 
 
