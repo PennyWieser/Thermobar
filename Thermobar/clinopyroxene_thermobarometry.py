@@ -1244,6 +1244,7 @@ def P_Wang2021_eq1(T=None, *, Al_VI_cat_6ox, SiO2_Cpx_cat_6ox, TiO2_Cpx_cat_6ox,
 FeOt_Cpx_cat_6ox, MnO_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na2O_Cpx_cat_6ox, K2O_Cpx_cat_6ox, CaO_Cpx_cat_6ox):
     '''
     Clinopyroxene-only barometer of Wang et al. (2021) equation 1
+    Uses NCT
     - currently on Zenodo - 10.5281/zenodo.4727870
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*TiO2_Cpx_cat_6ox
@@ -1258,10 +1259,10 @@ FeOt_Cpx_cat_6ox, MnO_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na2O_Cpx_cat_6ox, K2O_Cpx_ca
 FeII_Wang21, FeIII_Wang21, CaO_Cpx_cat_6ox, Al2O3_Cpx_cat_6ox):
     '''
     Clinopyroxene-only barometer of Wang et al. (2021) equation 3
-    - currently on Zenodo - 10.5281/zenodo.4727870
+    - currently on Zenodo - 10.5281/zenodo.4727870.
+    Doesnt use NCT
     '''
-    NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*TiO2_Cpx_cat_6ox
-    +1.5117*Cr2O3_Cpx_cat_6ox+1.4768*FeOt_Cpx_cat_6ox-5.7686*MnO_Cpx_cat_6ox-0.0864*MgO_Cpx_cat_6ox))
+
 
     return (-1105.84-18.6052*TiO2_Cpx_cat_6ox+252.1033*Al2O3_Cpx_cat_6ox+311.0123*Cr2O3_Cpx_cat_6ox+550.2534*FeOt_Cpx_cat_6ox+
 451.6495*MnO_Cpx_cat_6ox+554.0535*MgO_Cpx_cat_6ox+540.2934*CaO_Cpx_cat_6ox

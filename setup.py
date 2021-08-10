@@ -25,7 +25,10 @@ setuptools.setup(
     install_requires=[
             'pandas',
             'numpy',
-            'matplotlib'],
+            'matplotlib',
+            'sklearn'.
+            'scipy',
+            'statsmodels'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
