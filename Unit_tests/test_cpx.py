@@ -16,7 +16,8 @@ LiqT=pd.DataFrame(data={"SiO2_Liq": 51,
  "Fe3Fet_Liq":0.1,
 }, index=[0])
 
-CpxT=pd.DataFrame(data={"SiO2_Cpx": 49,
+CpxT=pd.DataFrame(data={"Sample_ID_Cpx": 'test',
+   "SiO2_Cpx": 49,
                             "TiO2_Cpx": 0.3,
                             "Al2O3_Cpx": 4.89,
                             "FeOt_Cpx": 5.71,
@@ -37,9 +38,15 @@ class test_cpx_only_press(unittest.TestCase):
     def test_press_32b_noH(self):
        self.assertAlmostEqual(pt.calculate_cpx_only_press(cpx_comps=CpxT, equationP="P_Put2008_eq32b",
          T=1300)[0], -1.575924, decimalPlace, "equation 32b not equal to test value")
+
     def test_press_32b_6H(self):
        self.assertAlmostEqual(pt.calculate_cpx_only_press(cpx_comps=CpxT, equationP="P_Put2008_eq32b",
          T=1300, H2O_Liq=6)[0], 1.142076, decimalPlace, "equation 32b (changed H2O) not equal to typed value")
+
+
+    def test_press_Petrelli(self):
+       self.assertAlmostEqual(pt.calculate_cpx_only_press(cpx_comps=CpxT, equationP="P_Petrelli2021_Cpx_only").P_kbar_calc[0],
+       5.435313, decimalPlace, "Petrelli 2021 not equal to typed value")
 
 class test_cpx_only_temp(unittest.TestCase):
     def test_temp_32d(self):
@@ -49,6 +56,11 @@ class test_cpx_only_temp(unittest.TestCase):
     def test_temp_32d_subsol(self):
        self.assertAlmostEqual(pt.calculate_cpx_only_temp(cpx_comps=CpxT, equationT="T_Put2008_eq32d_subsol",
          P=5)[0], 1252.508521, decimalPlace, "equation 32d not equal to test value")
+
+    def test_temp_Petrelli(self):
+       self.assertAlmostEqual(pt.calculate_cpx_only_temp(cpx_comps=CpxT, equationT="T_Petrelli2021_Cpx_only").T_K_calc[0],
+       1377.2655555555673, decimalPlace, "Petrelli 2021 not equal to typed value")
+
 
 class test_cpx_only_press_temp(unittest.TestCase):
     def test_32a_32d_press(self):

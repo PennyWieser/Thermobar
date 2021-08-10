@@ -1429,7 +1429,6 @@ def T_Petrelli2021_Cpx_only(P=None, *, cpx_comps):
     Cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
     x_test=Cpx_test_noID_noT.values
 
-    print(np.shape(x_test))
 
     scaler_P2020_Cpx_only=load(open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only.pkl', 'rb'))
     ETR_Temp_P2020_Cpx_only=load(open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only.pkl', 'rb'))
@@ -1483,6 +1482,10 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=0):
     equationP: str
         | P_Put2008_eq32a (T-dependent)
         | P_Put2008_eq32b (T-dependent, H2O dependent)
+        | P_Petrelli2021_Cpx_only (T_independent, H2O-independent)
+        | P_Petrelli2021_Cpx_only_withH2O (T_independent, H2O-dependent)
+        | P_Wang2021_eq1 (T_independent, H2O-independent)
+        | P_Wang2021_eq3 (T_independent, H2O-independent)
 
 
     T: float, int, series, str  ("Solve")
@@ -1591,6 +1594,10 @@ def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None, H2O_Liq=N
     equationT: str
         | T_Put2008_eq32d (P-dependent)
         | T_Put2008_eq32d_subsol (P-dependent)
+        | T_Petrelli2021_Cpx_only (P-independent, H2O-independent)
+        | T_Petrelli2021_Cpx_only_withH2O (P-independent, H2O-dependent)
+        | T_Wang2021_eq2 (P-independent, H2O-dependent)
+        | T_Wang2021_eq4 (P-independent, H2O-dependent)
 
 
 
