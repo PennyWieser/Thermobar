@@ -1,7 +1,5 @@
 import unittest
 import pandas as pd
-import sys
-sys.path.append("..")
 import Thermobar as pt
 
 LiqT=pd.DataFrame(data={"SiO2_Liq": 51,
