@@ -51,7 +51,7 @@ jobs:
 
     - name: Publish to PyPI (on tag)
       if: startsWith(github.event.ref, 'refs/tags/v')
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
-        password: ${{ secrets.pypi_password }}
+        password: ${{ secrets.pypi_token }}
