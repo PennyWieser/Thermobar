@@ -34,7 +34,8 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest --cov=Thermobar
+        cd Unit_tests
+        pytest --cov --cov-config=../.coveragerc
 
     - uses: codecov/codecov-action@v1
 
