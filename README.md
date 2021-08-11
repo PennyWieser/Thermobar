@@ -1,1 +1,1 @@
-read me test
+A python tool for thermobarometry. Work in progress, but contact Penny Wieser with any questions!
