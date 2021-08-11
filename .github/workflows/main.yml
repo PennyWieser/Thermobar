@@ -1,16 +1,24 @@
-name: Publish to PyPI
+name: Test and publish to PyPI
 
-on: push
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  release:
+    types: [ created ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: '3.8'
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -24,27 +32,22 @@ jobs:
       run: |
         pip install flake8 pytest pytest-cov
 
-
     - name: Test with pytest
       run: |
         pytest --cov=Thermobar
+
     - uses: codecov/codecov-action@v1
-
-
-
 
     - name: Build
       run: |
         python setup.py sdist bdist_wheel
+
 #     - name: Publish to Test PyPI (always)
 #       uses: pypa/gh-action-pypi-publish@master
 #       with:
 #         user: __token__
 #         password: ${{ secrets.test_pypi_password }}
 #         repository_url: https://test.pypi.org/legacy/
-
-
-
 
     - name: Publish to PyPI (on tag)
       if: startsWith(github.event.ref, 'refs/tags/v')
