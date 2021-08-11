@@ -78,7 +78,13 @@ class test_liq_ol_temp(unittest.TestCase):
 
     def test_19_Kd(self):
         self.assertAlmostEqual(pt.calculate_ol_liq_temp(liq_comps=LiqT, ol_comps=OlT,
-        equationT="T_Put2008_eq19", P=5, H2O_Liq=0).get("Kd (Fe-Mg) Meas")[0], 0.277645,
+        equationT="T_Put2008_eq19", P=5, H2O_Liq=0).get("Kd (Fe-Mg) Meas")[0], 0.24679563729002468,
+        decimalPlace, "T from eq19 not equal to test value")
+
+
+    def test_19_Kd_Fe3(self):
+        self.assertAlmostEqual(pt.calculate_ol_liq_temp(liq_comps=LiqT, ol_comps=OlT,
+        equationT="T_Put2008_eq19", P=5, H2O_Liq=0, Fe3Fet_Liq=0.5).get("Kd (Fe-Mg) Meas")[0], 0.4442321471220445,
         decimalPlace, "T from eq19 not equal to test value")
 
 class test_liq_ol_eq(unittest.TestCase):
