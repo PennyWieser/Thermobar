@@ -73,7 +73,7 @@ class test_liq_only_temp(unittest.TestCase):
 class test_liq_ol_temp(unittest.TestCase):
     def test_19_T(self):
         self.assertAlmostEqual(pt.calculate_ol_liq_temp(liq_comps=LiqT, ol_comps=OlT,
-        equationT="T_Put2008_eq19", P=5, H2O_Liq=0).T_K_calc[0], 1370.742988,
+        equationT="T_Put2008_eq19", P=5, H2O_Liq=0).T_K_calc[0], 1395.6477246471757,
         decimalPlace, "T from eq19 not equal to test value")
 
     def test_19_Kd(self):

@@ -1,7 +1,8 @@
 import unittest
 import pandas as pd
 import Thermobar as pt
-LiqT=pd.DataFrame(data={"SiO2_Liq": 51,
+LiqT=pd.DataFrame(data={"Sample_ID_Liq": 'test',
+                     "SiO2_Liq": 51,
                             "TiO2_Liq": 0.48,
                             "Al2O3_Liq": 19,
                             "FeOt_Liq": 5.3,
@@ -13,8 +14,14 @@ LiqT=pd.DataFrame(data={"SiO2_Liq": 51,
                             "Cr2O3_Liq": 0.11,
                             "P2O5_Liq": 0.11,
                             "H2O_Liq": 5,
- "Fe3Fet_Liq":0.1,
+                             "Fe3Fet_Liq":0.1,
+                            'NiO_Liq':0,
+                           'CoO_Liq':0,
+                           'CO2_Liq':0,
+
 }, index=[0])
+
+
 
 CpxT=pd.DataFrame(data={"Sample_ID_Cpx": 'test',
    "SiO2_Cpx": 49,
@@ -48,6 +55,12 @@ class test_cpx_only_press(unittest.TestCase):
        self.assertAlmostEqual(pt.calculate_cpx_only_press(cpx_comps=CpxT, equationP="P_Petrelli2021_Cpx_only").P_kbar_calc[0],
        5.435313, decimalPlace, "Petrelli 2021 not equal to typed value")
 
+    def test_press_Petrelli_withH2O(self):
+       self.assertAlmostEqual(pt.calculate_cpx_only_press(cpx_comps=CpxT,
+       equationP="P_Petrelli2021_Cpx_only_withH2O", H2O_Liq=5).P_kbar_calc[0],
+       5.463016, decimalPlace, "Petrelli 2021 not equal to typed value")
+
+
 class test_cpx_only_temp(unittest.TestCase):
     def test_temp_32d(self):
        self.assertAlmostEqual(pt.calculate_cpx_only_temp(cpx_comps=CpxT, equationT="T_Put2008_eq32d",
@@ -60,6 +73,11 @@ class test_cpx_only_temp(unittest.TestCase):
     def test_temp_Petrelli(self):
        self.assertAlmostEqual(pt.calculate_cpx_only_temp(cpx_comps=CpxT, equationT="T_Petrelli2021_Cpx_only").T_K_calc[0],
        1377.2655555555673, decimalPlace, "Petrelli 2021 not equal to typed value")
+
+    def test_temp_Petrelli_withH2O(self):
+       self.assertAlmostEqual(pt.calculate_cpx_only_temp(cpx_comps=CpxT,
+       equationT="T_Petrelli2021_Cpx_only_withH2O", H2O_Liq=5).T_K_calc[0],
+       1333.0700000000113, decimalPlace, "Petrelli 2021 not equal to typed value")
 
 
 class test_cpx_only_press_temp(unittest.TestCase):
@@ -80,6 +98,19 @@ class test_cpx_liq_temp(unittest.TestCase):
        decimalPlace,
        "Calc T from  T_Put2008_eq33 not equal to test value")
 
+    def test_Petrelli2021(self):
+       self.assertAlmostEqual(pt.calculate_cpx_liq_temp(cpx_comps=CpxT,
+       liq_comps=LiqT, equationT="T_Petrelli2021_Cpx_Liq", P=5).T_K_calc[0], 1324.07,
+       decimalPlace,
+       "Calc T from  Petrelli 2021 not equal to test value")
+
+
+    def test_Petrelli2021_withH2O(self):
+       self.assertAlmostEqual(pt.calculate_cpx_liq_temp(cpx_comps=CpxT,
+       liq_comps=LiqT, equationT="T_Petrelli2021_Cpx_Liq", P=5, H2O_Liq=10).T_K_calc[0], 1314.766364,
+       decimalPlace,
+       "Calc T from  Petrelli 2021 not equal to test value")
+
 
 class test_cpx_liq_press(unittest.TestCase):
     def test_maseq1(self):
@@ -87,6 +118,25 @@ class test_cpx_liq_press(unittest.TestCase):
        liq_comps=LiqT, equationP="P_Mas2013_eqPalk1", T=800)[0], -0.77056,
        decimalPlace,
        "Calc P from  P_Mas2013_eqPalk1 not equal to test value")
+
+    def test_Petrelli2021(self):
+       self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
+       liq_comps=LiqT, equationP="P_Petrelli2021_Cpx_Liq").P_kbar_calc[0], 5.049834,
+       decimalPlace,
+       "Calc P from  Petrelli 2021 not equal to test value")
+
+
+    def test_Petrelli2021_withH2O(self):
+       self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
+       liq_comps=LiqT, equationP="P_Petrelli2021_Cpx_Liq", H2O_Liq=10).Median_Trees[0], 4.049,
+       decimalPlace,
+       "Calc Median P from  Petrelli 2021 not equal to test value")
+
+    def test_Petrelli2021_withH2O_Median(self):
+       self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
+       liq_comps=LiqT, equationP="P_Petrelli2021_Cpx_Liq", H2O_Liq=10).P_kbar_calc[0], 5.463629,
+       decimalPlace,
+       "Calc P from  Petrelli 2021 not equal to test value")
 
     def test_Put32c(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
