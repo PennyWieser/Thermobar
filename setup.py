@@ -17,11 +17,15 @@ setup(
     version=__version__,
     author="Penny, Maurizio, Jordan, Eric",
     author_email="penny.wieser@gmail.com",
-    description=("Thermobar"),
+    description="Thermobar",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/PennyWieser/Thermobar",
     packages=find_packages(),
+    package_data={
+        # Include all pickle files
+        "": ["*.pkl"],
+    },
     install_requires=[
             'pandas',
             'numpy',
