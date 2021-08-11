@@ -1,0 +1,10 @@
+[paths]
+source =
+    ../Thermobar
+    */site-packages/Thermobar
+    
+[run]
+branch = true
+source =
+    Thermobar
+    .
