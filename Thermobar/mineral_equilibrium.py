@@ -119,14 +119,15 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
         For Toplis, returns Kd-Ol Fo pair if an olivine-forsterite content wasn't specified
 
     '''
+    liq_comps_c=liq_comps.copy()
     if ol_comps is not None:
         ol_comps['Fo_meas']=calculate_ol_fo(ol_comps)
     if Fe3Fet_Liq is not None:
-        liq_comps['Fe3Fet_Liq'] = Fe3Fet_Liq
+        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
     if H2O_Liq is not None:
-        liq_comps['H2O_Liq'] = H2O_Liq
+        liq_comps_c['H2O_Liq'] = H2O_Liq
 
-    liq = calculate_anhydrous_cat_fractions_liquid(liq_comps)
+    liq = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
     Mgno = liq['Mg_Number_Liq_Fe3']
     Mgno_noFe3 = liq['Mg_Number_Liq_NoFe3']
     if Kd_model == "Roeder1970" or Kd_model == "All":
@@ -157,8 +158,8 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
 
 
 
-        Kd_8c=(0.25 + 0.0018*liq_comps['SiO2_Liq']
-        -3.27*10**(-4)*(liq_comps['Na2O_Liq']+liq_comps['K2O_Liq'])**2)
+        Kd_8c=(0.25 + 0.0018*liq_comps_c['SiO2_Liq']
+        -3.27*10**(-4)*(liq_comps_c['Na2O_Liq']+liq_comps_c['K2O_Liq'])**2)
         Eq_ol_8c=1 / ((Kd_8c / Mgno) + (1 - Kd_8c))
 
         Kd_9a=0.29
@@ -191,16 +192,16 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
 
 
         if P is not None:
-            Kd_8b=(0.21+0.008*(P/10) + 0.0025*liq_comps['SiO2_Liq']
-            -3.63*10**(-4)*(liq_comps['Na2O_Liq']+liq_comps['K2O_Liq'])**2)
+            Kd_8b=(0.21+0.008*(P/10) + 0.0025*liq_comps_c['SiO2_Liq']
+            -3.63*10**(-4)*(liq_comps_c['Na2O_Liq']+liq_comps_c['K2O_Liq'])**2)
             Eq_ol_8b=1 / ((Kd_8b / Mgno) + (1 - Kd_8b))
             Kd_out_Put['Calc Kd (Putirka 8b, Fe2)']=Kd_8b
             Kd_out_Put['Eq Fo (Putirka 8b Fe2)']=Eq_ol_8b
 
 
             if logfo2 is not None:
-                Kd_9b=(0.0583+0.00252*liq_comps['SiO2_Liq']+ 0.028*(P/10)
-                -0.0091* (liq_comps['Na2O_Liq']+liq_comps['K2O_Liq'])
+                Kd_9b=(0.0583+0.00252*liq_comps_c['SiO2_Liq']+ 0.028*(P/10)
+                -0.0091* (liq_comps_c['Na2O_Liq']+liq_comps_c['K2O_Liq'])
                 -0.013383*logfo2)
 
                 Eq_ol_9b=1 / ((Kd_9b / Mgno) + (1 - Kd_9b))
@@ -216,11 +217,11 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
             raise Exception(
                 'The Toplis Kd model is T-dependent, please enter T in Kelvin into the function')
 
-        mol_perc = calculate_anhydrous_mol_fractions_liquid(liq_comps)
+        mol_perc = calculate_anhydrous_mol_fractions_liquid(liq_comps_c)
         SiO2_mol = mol_perc['SiO2_Liq_mol_frac']
         Na2O_mol = mol_perc['Na2O_Liq_mol_frac']
         K2O_mol = mol_perc['K2O_Liq_mol_frac']
-        H2O_Liq = liq_comps['H2O_Liq']
+        H2O_Liq = liq_comps_c['H2O_Liq']
         Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=SiO2_mol,
                           Na2O_mol=Na2O_mol, K2O_mol=K2O_mol, P=P, H2O=H2O_Liq, T=T)
         if ol_fo is not None or ol_comps is not None:
@@ -358,6 +359,7 @@ def calculate_opx_rhodes_diagram_lines(
         Returns headings corresponding to options selected above.
 
     '''
+    liq_comps_c=liq_comps.copy()
     Mgno = np.linspace(Min_Mgno, Max_Mgno, 100)
 
     Mgno = np.linspace(Min_Mgno, Max_Mgno, 100)
@@ -377,7 +379,7 @@ def calculate_opx_rhodes_diagram_lines(
         Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat_MM], axis=1)
 
     if liq_comps is not None:
-        cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps)
+        cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
         Si_mean_frac = np.nanmean(cat_frac['SiO2_Liq_cat_frac'])
         Kd = 0.4805 - 0.3733 * Si_mean_frac
         Eq_Opx = 1 / ((Kd / Mgno) + (1 - Kd))
