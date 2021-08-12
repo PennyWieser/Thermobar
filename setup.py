@@ -33,7 +33,7 @@ setup(
             'pandas',
             'numpy',
             'matplotlib',
-            'sklearn',
+            'scikit-learn',
             'scipy',
             'statsmodels',
             ],
