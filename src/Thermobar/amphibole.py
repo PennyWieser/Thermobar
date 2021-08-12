@@ -575,6 +575,19 @@ def get_amp_sites_ferric_ferrous_mutch(amp_apfu_df):
 
 ## Equations: Amphibole-only Barometers
 
+
+def P_Kraw2012(T=None, *, Mgno_Amp, deltaNNO):
+    '''
+    Amphibole-only barometer (PH2O) from Krawczynski et al. (2012)
+
+    **Note - this is only the pressure for the first appearance of amphibole,
+    so should only be applied to the highest Mg# amphiboles in each suite.
+    it also only gives the partial pressure of H2O, if there is CO2 in the system,
+    this will not be equal to the total pressure.**
+    '''
+
+    return 0.01*((Mgno_Amp/52.7 -0.014*deltaNNO)**15.12)
+
 def P_Ridolfi2012_1a(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
                      MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
     '''
@@ -701,16 +714,12 @@ def P_Schmidt1992(T=None, *, Al2O3_Amp_cat_23ox):
 
 Amp_only_P_funcs = { P_Ridolfi2012_1a, P_Ridolfi2012_1b, P_Ridolfi2012_1c, P_Ridolfi2012_1d,
 P_Ridolfi2012_1e, P_Ridolfi2010, P_Hammerstrom1986_eq1, P_Hammerstrom1986_eq2, P_Hammerstrom1986_eq3, P_Hollister1987,
-P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995} # put on outside
+P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995, P_Kraw2012} # put on outside
 
 Amp_only_P_funcs_by_name= {p.__name__: p for p in Amp_only_P_funcs}
 
-Amp_only_P_funcs_sim = {P_Hammerstrom1986_eq1, P_Hammerstrom1986_eq2, P_Hammerstrom1986_eq3,
-P_Hollister1987, P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995} # put on outside
 
-Amp_only_P_funcs_by_name_sim = {p.__name__: p for p in Amp_only_P_funcs_sim}
-
-def calculate_amp_only_press(amp_comps=None, equationP=None, T=None):
+def calculate_amp_only_press(amp_comps=None, equationP=None, T=None, deltaNNO=None):
     """
     Amphibole-only barometry, returns pressure in kbar.
 
@@ -768,6 +777,18 @@ def calculate_amp_only_press(amp_comps=None, equationP=None, T=None):
                 if len(T) != len(amp_comps):
                     raise ValueError('The panda series entered for Temperature isnt the same length as the dataframe of amphibole compositions')
 
+    if equationP == "P_Kraw2012":
+        w.warn('This barometer gives the PH2O for the first appearance of'
+        ' amphibole. It should only be applied to the highest Mg# in each'
+        ' sample suite. Note, if there is CO2 in the system P=/ PH2O')
+        if deltaNNO is None:
+            raise ValueError('P_Kraw2012 requires you to enter a deltaNNO value')
+        Mgno_Amp=100*(amp_comps['MgO_Amp']/40.3044)/((amp_comps['MgO_Amp']/40.3044)+(amp_comps['FeOt_Amp']/71.844))
+        P_kbar=P_Kraw2012(Mgno_Amp=Mgno_Amp,
+        deltaNNO=deltaNNO)
+        df_out=pd.DataFrame(data={'PH2O_kbar_calc': P_kbar,
+        'Mg#_Amp': Mgno_Amp})
+        return df_out
 
 
     if "Sample_ID_Amp" not in amp_comps:
