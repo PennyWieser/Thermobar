@@ -30,11 +30,20 @@ jobs:
 
     - name: Install test dependencies
       run: |
-        pip install flake8 pytest pytest-cov
+        pip install flake8 pytest coverage
 
     - name: Test with pytest
       run: |
-        pytest --cov --cov-config=.coveragerc
+        coverage run -m pytest
+      
+    - name: Clean up coverage data
+      run: |
+        # This is a workaround for the fact that the `[coverage:paths]` section
+        # of `setup.cfg` is not actually applies until we run `combine`; so we
+        # rename the report such that we can then "combine" it.
+        mv .coverage .coverage.hack
+        coverage combine
+        coverage report
 
     - uses: codecov/codecov-action@v1
 
