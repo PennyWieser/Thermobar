@@ -93,7 +93,8 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
     return Err_out
 
 
-def add_noise_sample_1phase(phase_comp, phase_err=None, phase_err_type="Abs",
+def add_noise_sample_1phase(phase_comp, phase_err=None,
+phase_err_type="Abs",
 variable=None, variable_err=None, variable_err_type="Abs", duplicates=10,
 noise_percent=None, err_dist="normal", positive=True,
 filter_q=None, append=False):
@@ -356,11 +357,12 @@ filter_q=None, append=False):
             Cr2O3_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['Cr2O3_{}'.format(
                 elx)].iloc[i], scale=Err['Cr2O3_{}_Err'.format(elx)].iloc[i], size=duplicates)
 
-            P_kbar_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['P_kbar'.format(
-                elx)].iloc[i], scale=Err['P_kbar_Err'.format(elx)].iloc[i], size=duplicates)
-
-            T_K_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['T_K'.format(
-                elx)].iloc[i], scale=Err['T_K_Err'.format(elx)].iloc[i], size=duplicates)
+            # Removed after removing T_K and P_kbar from ideal dataframes
+            # P_kbar_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['P_kbar'.format(
+            #     elx)].iloc[i], scale=Err['P_kbar_Err'.format(elx)].iloc[i], size=duplicates)
+            #
+            # T_K_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['T_K'.format(
+            #     elx)].iloc[i], scale=Err['T_K_Err'.format(elx)].iloc[i], size=duplicates)
 
             if any(Data.columns.str.contains("NiO")):
                 NiO_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['NiO_{}'.format(
@@ -410,8 +412,8 @@ filter_q=None, append=False):
                 mynoisedDataframe = mynoisedDataframe.apply(
                     pd.to_numeric, errors='coerce').fillna(0)
 
-        mynoisedDataframe['P_kbar'] = P_kbar_Err
-        mynoisedDataframe['T_K'] = T_K_Err
+        # mynoisedDataframe['P_kbar'] = P_kbar_Err
+        # mynoisedDataframe['T_K'] = T_K_Err
 
         mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
     if positive is True:
