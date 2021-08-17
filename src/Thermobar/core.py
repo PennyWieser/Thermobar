@@ -12,6 +12,15 @@ df_ideal_liq = pd.DataFrame(columns=['SiO2_Liq', 'TiO2_Liq', 'Al2O3_Liq',
 'Cr2O3_Liq', 'P2O5_Liq', 'H2O_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq',
  'CO2_Liq'])
 
+df_ideal_liq = pd.DataFrame(columns=['SiO2_Liq', 'TiO2_Liq', 'Al2O3_Liq',
+'FeOt_Liq', 'MnO_Liq', 'MgO_Liq', 'CaO_Liq', 'Na2O_Liq', 'K2O_Liq',
+'Cr2O3_Liq', 'P2O5_Liq', 'H2O_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq',
+ 'CO2_Liq'])
+
+df_ideal_oxide = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
+'FeOt', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O',
+'Cr2O3', 'P2O5'])
+
 df_ideal_cpx = pd.DataFrame(columns=['SiO2_Cpx', 'TiO2_Cpx', 'Al2O3_Cpx',
 'FeOt_Cpx','MnO_Cpx', 'MgO_Cpx', 'CaO_Cpx', 'Na2O_Cpx', 'K2O_Cpx',
 'Cr2O3_Cpx'])
@@ -926,6 +935,9 @@ def calculate_orthopyroxene_components(opx_comps):
                                   opx_calc['Na2O_Opx_cat_6ox']
                                   + opx_calc['K2O_Opx_cat_6ox'] + opx_calc['Cr2O3_Opx_cat_6ox'])
 
+    opx_calc['Ca_CaMgFe']=opx_calc['CaO_Opx_cat_6ox']/(opx_calc['CaO_Opx_cat_6ox']
+    +opx_calc['FeOt_Opx_cat_6ox']+opx_calc['MgO_Opx_cat_6ox'])
+
     opx_calc['NaAlSi2O6'] = opx_calc['Na2O_Opx_cat_6ox']
     opx_calc['FmTiAlSiO6'] = opx_calc['TiO2_Opx_cat_6ox']
     opx_calc['CrAl2SiO6'] = opx_calc['Cr2O3_Opx_cat_6ox']
@@ -1149,6 +1161,9 @@ def calculate_clinopyroxene_components(cpx_comps):
                                   cpx_calc['Na2O_Cpx_cat_6ox']
                                   + cpx_calc['K2O_Cpx_cat_6ox'] + cpx_calc['Cr2O3_Cpx_cat_6ox'])
 
+    cpx_calc['Ca_CaMgFe']=cpx_calc['CaO_Cpx_cat_6ox']/(cpx_calc['CaO_Cpx_cat_6ox']+cpx_calc['FeOt_Cpx_cat_6ox']
+    +cpx_calc['MgO_Cpx_cat_6ox'])
+
     # Cpx Components that don't nee if and else statements and don't rely on
     # others.
     cpx_calc['CrCaTs'] = 0.5 * cpx_calc['Cr2O3_Cpx_cat_6ox']
@@ -1161,6 +1176,7 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['CaTs'] = np.empty(len(cpx_calc), dtype=float)
     cpx_calc['CaTi'] = np.empty(len(cpx_calc), dtype=float)
     cpx_calc['DiHd_1996'] = np.empty(len(cpx_calc), dtype=float)
+    print('made it to for loop')
     for i in range(0, len(cpx_calc)):
 
         if (cpx_calc['Al_VI_cat_6ox'].iloc[i]) > (
@@ -1719,11 +1735,12 @@ def calculate_23oxygens_amphibole(amp_comps):
 
     cation_23.columns = [str(col).replace('_mol_prop', '_cat_23ox')
                          for col in mol_prop.columns]
-    cation_23['cation_sum_Si_Mg'] = cation_23['SiO2_Amp_cat_23ox'] + cation_23['TiO2_Amp_cat_23ox'] + cation_23['Al2O3_Amp_cat_23ox'] + \
-        cation_23['Cr2O3_Amp_cat_23ox'] + cation_23['FeOt_Amp_cat_23ox'] + \
-        cation_23['MnO_Amp_cat_23ox'] + cation_23['MgO_Amp_cat_23ox']
-    cation_23['cation_sum_Si_Ca'] = cation_23['cation_sum_Si_Mg'] + \
-        cation_23['CaO_Amp_cat_23ox']
+    cation_23['cation_sum_Si_Mg'] = (cation_23['SiO2_Amp_cat_23ox']
+    + cation_23['TiO2_Amp_cat_23ox'] + cation_23['Al2O3_Amp_cat_23ox'] +
+        cation_23['Cr2O3_Amp_cat_23ox'] + cation_23['FeOt_Amp_cat_23ox'] +
+        cation_23['MnO_Amp_cat_23ox'] + cation_23['MgO_Amp_cat_23ox'])
+    cation_23['cation_sum_Si_Ca'] = (cation_23['cation_sum_Si_Mg'] +
+        cation_23['CaO_Amp_cat_23ox'])
     cation_23['cation_sum_All'] = cation_23['cation_sum_Si_Ca'] + \
         cation_23['Na2O_Amp_cat_23ox'] + +cation_23['K2O_Amp_cat_23ox']
 

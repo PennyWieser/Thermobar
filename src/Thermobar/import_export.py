@@ -299,6 +299,10 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False):
         my_input_c.loc[np.isnan(my_input_c['FeOt_Liq']) is True, 'FeOt_Liq'] = my_input_c.loc[np.isnan(
             my_input_c['FeOt_Liq']) is True, 'FeO_Liq'] + my_input_c.loc[np.isnan(my_input_c['FeOt_Liq']) is True, 'Fe2O3_Liq'] * 0.8999998
 
+    myOxides1 = my_input_c.reindex(df_ideal_oxide.columns, axis=1).fillna(0)
+    myOxides1 = myOxides1.apply(pd.to_numeric, errors='coerce').fillna(0)
+    myOxides1[myOxides1 < 0] = 0
+
     myLiquids1 = my_input_c.reindex(df_ideal_liq.columns, axis=1).fillna(0)
     myLiquids1 = myLiquids1.apply(pd.to_numeric, errors='coerce').fillna(0)
     myLiquids1[myLiquids1 < 0] = 0
@@ -374,7 +378,7 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False):
     #     mySps1['T_K'] = my_input['T_K']
     #     myLiquids1['T_K'] = my_input['T_K']
 
-    return {'my_input': my_input, 'Experimental_press_temp': Experimental_press_temp1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs': myLiquids1,
+    return {'my_input': my_input, 'my_oxides': myOxides1, 'Experimental_press_temp': Experimental_press_temp1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs': myLiquids1,
             'Plags': myPlags1, 'Kspars': myKspars1, 'Amps': myAmphs1, 'Ols': myOls1, 'Sps': mySps1}  # , 'y1': y1 ,'y2': y2}
 
 

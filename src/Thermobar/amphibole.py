@@ -10,6 +10,16 @@ from Thermobar.core import *
 
 ## These functions calculate the additional amphibole site things needed for certain barometers
 
+def get_amp_sites_from_input(amp_comps):
+    """
+    get amp_sites from amp_comps input from import_excel() function.
+    """
+    amp_amfu_df=calculate_23oxygens_amphibole(amp_comps)
+    amp_sites=get_amp_sites(amp_amfu_df)
+    return amp_sites
+
+
+
 def get_amp_sites(amp_apfu_df):
     """
     get_amp_sites takes generalized atom per formula unit calculations from
@@ -873,7 +883,7 @@ def calculate_amp_only_press(amp_comps=None, equationP=None, T=None, deltaNNO=No
                 P_kbar = pd.DataFrame(data={"P_kbar_calc": (P_MPa / 100), "equation": name})
 
             if any(Sum_input) < 90:
-                print('The sum of Si, Ti, Al, Fe, Mg, Ca, Na and K based on 13 cations for some '
+                print('The sum of SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O and K2O for some '
                 'input amphiboles is <90; P=nan is returned for these analyses')
 
         if equationP == "P_Ridolfi2012_1a":
