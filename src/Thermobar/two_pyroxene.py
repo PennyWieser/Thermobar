@@ -401,7 +401,7 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
         two_pyx = calculate_cpx_opx_eq_tests(
             cpx_comps=cpx_comps, opx_comps=opx_comps)
         two_pyx.insert(0, "T_K_calc", T_K)
-        two_pyx.insert(2, "Equation Choice (T)", str(equationT))
+        two_pyx.insert(1, "Equation Choice (T)", str(equationT))
 
     return two_pyx
 

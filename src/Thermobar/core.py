@@ -5,6 +5,12 @@ from functools import partial
 import inspect
 import warnings as w
 import numbers
+from Thermobar.import_export import *
+from pickle import load
+import pickle
+from pathlib import Path
+Thermobar_dir=Path(__file__).parent
+
 
 ## This specifies the default order for each dataframe type used in calculations
 df_ideal_liq = pd.DataFrame(columns=['SiO2_Liq', 'TiO2_Liq', 'Al2O3_Liq',
@@ -1148,7 +1154,7 @@ def calculate_clinopyroxene_components(cpx_comps):
     Returns
     -------
     pandas DataFrame
-        Clinopyroxene components (column headings: Cation_Sum, CrCaTs, a_cpx_En, Mgno_CPX, Jd, CaTs, CaTi, DiHd_1996, DiHd_2003, En_Fs), cations on bases of 6 oxygens (column headings of form  Cr2O3_Cpx_cat_6ox), as well as inputted Cpx compositions (column headings of form MgO_Cpx)
+        Clinopyroxene components (column headings: Cation_Sum, CrCaTs, a_cpx_En, Mgno_Cpx, Jd, CaTs, CaTi, DiHd_1996, DiHd_2003, En_Fs), cations on bases of 6 oxygens (column headings of form  Cr2O3_Cpx_cat_6ox), as well as inputted Cpx compositions (column headings of form MgO_Cpx)
 
     '''
     cpx_calc = calculate_6oxygens_clinopyroxene(cpx_comps=cpx_comps)
@@ -1169,36 +1175,78 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['CrCaTs'] = 0.5 * cpx_calc['Cr2O3_Cpx_cat_6ox']
     cpx_calc['a_cpx_En'] = (1 - cpx_calc['CaO_Cpx_cat_6ox'] - cpx_calc['Na2O_Cpx_cat_6ox'] - cpx_calc['K2O_Cpx_cat_6ox']) * (1 - 0.5 * (cpx_calc['Al2O3_Cpx_cat_6ox']
                                                                                                                                         + cpx_calc['Cr2O3_Cpx_cat_6ox'] + cpx_calc['Na2O_Cpx_cat_6ox'] + cpx_calc['K2O_Cpx_cat_6ox']))
-    cpx_calc['Mgno_CPX'] = (cpx_comps['MgO_Cpx'] / 40.3044) / \
+    cpx_calc['Mgno_Cpx'] = (cpx_comps['MgO_Cpx'] / 40.3044) / \
         (cpx_comps['MgO_Cpx'] / 40.3044 + cpx_comps['FeOt_Cpx'] / 71.844)
 
     cpx_calc['Jd'] = np.empty(len(cpx_calc), dtype=float)
     cpx_calc['CaTs'] = np.empty(len(cpx_calc), dtype=float)
     cpx_calc['CaTi'] = np.empty(len(cpx_calc), dtype=float)
     cpx_calc['DiHd_1996'] = np.empty(len(cpx_calc), dtype=float)
-    print('made it to for loop')
-    for i in range(0, len(cpx_calc)):
 
-        if (cpx_calc['Al_VI_cat_6ox'].iloc[i]) > (
-                cpx_calc['Na2O_Cpx_cat_6ox'].iloc[i]):
-            cpx_calc['Jd'].iloc[i] = cpx_calc['Na2O_Cpx_cat_6ox'].iloc[i]
-            cpx_calc['CaTs'].iloc[i] = cpx_calc['Al_VI_cat_6ox'].iloc[i] - \
-                cpx_calc['Na2O_Cpx_cat_6ox'].iloc[i]
-        else:
-            cpx_calc['Jd'].iloc[i] = cpx_calc['Al_VI_cat_6ox'].iloc[i]
-            cpx_calc['CaTs'].iloc[i] = 0
+    #  Loop 1
 
-        if (cpx_calc['Al_IV_cat_6ox'].iloc[i]) > (cpx_calc['CaTs'].iloc[i]):
-            cpx_calc['CaTi'].iloc[i] = (
-                cpx_calc['Al_IV_cat_6ox'].iloc[i] - cpx_calc['CaTs'].iloc[i]) / 2
-        else:
-            cpx_calc['CaTi'].iloc[i] = 0
-        if (cpx_calc['CaO_Cpx_cat_6ox'].iloc[i] - cpx_calc['CaTs'].iloc[i] -
-                cpx_calc['CaTi'].iloc[i] - cpx_calc['CrCaTs'].iloc[i] > 0):
-            cpx_calc['DiHd_1996'].iloc[i] = (
-                cpx_calc['CaO_Cpx_cat_6ox'].iloc[i] - cpx_calc['CaTs'].iloc[i] - cpx_calc['CaTi'].iloc[i] - cpx_calc['CrCaTs'].iloc[i])
-        else:
-            cpx_calc['DiHd_1996'].iloc[i] = 0
+    # for i in range(0, len(cpx_calc)):
+    #
+    #     if (cpx_calc['Al_VI_cat_6ox'].iloc[i]) > (
+    #             cpx_calc['Na2O_Cpx_cat_6ox'].iloc[i]):
+    #         cpx_calc['Jd'].iloc[i] = cpx_calc['Na2O_Cpx_cat_6ox'].iloc[i]
+    #         cpx_calc['CaTs'].iloc[i] = cpx_calc['Al_VI_cat_6ox'].iloc[i] - \
+    #             cpx_calc['Na2O_Cpx_cat_6ox'].iloc[i]
+    #     else:
+    #         cpx_calc['Jd'].iloc[i] = cpx_calc['Al_VI_cat_6ox'].iloc[i]
+    #         cpx_calc['CaTs'].iloc[i] = 0
+    #If AlVi>Na cat fraction (e.g., if this value is >0, default)
+
+    AlVI_minus_Na=cpx_calc['Al_VI_cat_6ox']-cpx_calc['Na2O_Cpx_cat_6ox']
+    cpx_calc['Jd']=cpx_calc['Na2O_Cpx_cat_6ox']
+    cpx_calc['CaTs'] = cpx_calc['Al_VI_cat_6ox'] -cpx_calc['Na2O_Cpx_cat_6ox']
+
+    # If value of AlVI<Na cat frac
+
+    cpx_calc.loc[(AlVI_minus_Na<0), 'Jd']=cpx_calc['Al_VI_cat_6ox']
+    cpx_calc.loc[(AlVI_minus_Na<0), 'CaTs']=0
+
+    # Loop 2
+
+    #
+    #     if (cpx_calc['Al_IV_cat_6ox'].iloc[i]) > (cpx_calc['CaTs'].iloc[i]):
+    #         cpx_calc['CaTi'].iloc[i] = (
+    #             cpx_calc['Al_IV_cat_6ox'].iloc[i] - cpx_calc['CaTs'].iloc[i]) / 2
+    #     else:
+    #         cpx_calc['CaTi'].iloc[i] = 0
+
+    # If value of AlIV>CaTs
+    AlVI_minus_CaTs=cpx_calc['Al_IV_cat_6ox']-cpx_calc['CaTs']
+    #default, if is bigger
+    cpx_calc['CaTi']= (cpx_calc['Al_IV_cat_6ox'] - cpx_calc['CaTs']) / 2
+    cpx_calc.loc[(AlVI_minus_CaTs<0), 'CaTi']=0
+
+    #Loop 3
+    #     if (cpx_calc['CaO_Cpx_cat_6ox'].iloc[i] - cpx_calc['CaTs'].iloc[i] -
+    #             cpx_calc['CaTi'].iloc[i] - cpx_calc['CrCaTs'].iloc[i] > 0):
+    #         cpx_calc['DiHd_1996'].iloc[i] = (
+    #             cpx_calc['CaO_Cpx_cat_6ox'].iloc[i] - cpx_calc['CaTs'].iloc[i] - cpx_calc['CaTi'].iloc[i]
+    #- cpx_calc['CrCaTs'].iloc[i])
+    #     else:
+    #         cpx_calc['DiHd_1996'].iloc[i] = 0
+
+    #  If CaO-CaTs-CaTi-CrCaTs is >0
+    Ca_CaTs_CaTi_CrCaTs=(cpx_calc['CaO_Cpx_cat_6ox'] - cpx_calc['CaTs'] -
+                cpx_calc['CaTi'] - cpx_calc['CrCaTs'])
+
+    cpx_calc['DiHd_1996']= (cpx_calc['CaO_Cpx_cat_6ox'] - cpx_calc['CaTs']
+- cpx_calc['CaTi'] - cpx_calc['CrCaTs'] )
+
+    cpx_calc.loc[(Ca_CaTs_CaTi_CrCaTs<0), 'DiHd_1996']=0
+
+
+
+
+
+
+
+
+
 
     cpx_calc['EnFs'] = ((cpx_calc['FeOt_Cpx_cat_6ox'] +
                         cpx_calc['MgO_Cpx_cat_6ox']) - cpx_calc['DiHd_1996']) / 2
@@ -1301,7 +1349,7 @@ def calculate_clinopyroxene_liquid_components(
         combo_liq_cpxs['MgO_Liq_cat_frac'].astype(float))) / ((combo_liq_cpxs['DiHd_2003'].astype(float)) * (combo_liq_cpxs['Na2O_Liq_cat_frac'].astype(float)) * (combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))))
 
     combo_liq_cpxs['Kd_Fe_Mg_IdealWB'] = 0.109 + 0.186 * \
-        combo_liq_cpxs['Mgno_CPX']  # equation 35 of wood and blundy
+        combo_liq_cpxs['Mgno_Cpx']  # equation 35 of wood and blundy
 
     combo_liq_cpxs['Mgno_Liq_noFe3']= (combo_liq_cpxs['MgO_Liq'] / 40.3044) / ((combo_liq_cpxs['MgO_Liq'] / 40.3044) +
             (combo_liq_cpxs['FeOt_Liq']) / 71.844)
@@ -1851,6 +1899,587 @@ def calculate_amp_liq_mgno_anhyd(liq_comps, amp_comps):
     Kd=((MolProp['FeOt_Amp_mol_prop']/MolProp['MgO_Amp_mol_prop'])/
     (liq_comps_hy['FeOt_Liq_mol_frac']/liq_comps_hy['MgO_Liq_mol_frac']))
     return Kd
+
+
+## These functions calculate the additional amphibole site things needed for certain barometers
+
+def get_amp_sites_from_input(amp_comps):
+    """
+    get amp_sites from amp_comps input from import_excel() function.
+    """
+    amp_amfu_df=calculate_23oxygens_amphibole(amp_comps)
+    amp_sites=get_amp_sites(amp_amfu_df)
+    out=pd.concat([amp_amfu_df, amp_sites], axis=1)
+
+    return out
+
+
+
+def get_amp_sites(amp_apfu_df):
+    """
+    get_amp_sites takes generalized atom per formula unit calculations from
+    calculate_23oxygens_amphibole and puts them in the proper cation sites
+    according to Leake et al., 1997.
+
+    Parameters
+    ----------
+    amp_apfu_df : pandas DataFrame
+        This is the dataframe output from calculate_23oxygens_amphibole. You should
+        not have to modify this dataframe at all.
+
+
+    Returns
+    -------
+    sites_df : pandas DataFrame
+        a samples by cation sites dimension dataframe where each column corresponds
+        to a cation site in amphibole. The suffix at the end corresponds to which site
+        the cation is in:
+            T = tetrahedral sites (8 total)
+            C = octahedral sites (5 total)
+            B  = M4 sites (2 total)
+            A = A site (0 - 1 total)
+    """
+
+# new column names to drop the amp_cat_23ox. Can make this more flexible or we can just force the formatting
+    # of the output inside the function. Mostly I didnt want to type it out a bunch so we can omit this little
+    # loop if we want to formalize things
+    newnames = []
+    for name in amp_apfu_df.columns.tolist():
+        newnames.append(name.split('_')[0])
+
+    norm_cations = amp_apfu_df.copy()
+    norm_cations.columns = newnames
+
+    samples = norm_cations.index.tolist()
+
+    # containers to fill later
+    Si_T = np.empty(len(samples))
+    Al_T = np.empty(len(samples))
+    Al_C = np.empty(len(samples))
+    Ti_C = np.empty(len(samples))
+    Mg_C = np.empty(len(samples))
+    Fe_C = np.empty(len(samples))
+    Mn_C = np.empty(len(samples))
+    Mg_B = np.empty(len(samples))
+    Fe_B = np.empty(len(samples))
+    Mn_B = np.empty(len(samples))
+    Na_B = np.empty(len(samples))
+    Ca_B = np.empty(len(samples))
+    Na_A = np.empty(len(samples))
+    K_A = np.empty(len(samples))
+    Cr_C = np.empty(len(samples))
+
+    for sample, i in zip(samples, range(len(samples))):
+        # these are all the cations that have no site ambiguity
+        Si_T[i] = norm_cations.loc[sample, 'SiO2']
+        K_A[i] = norm_cations.loc[sample, 'K2O']
+        Ti_C[i] = norm_cations.loc[sample, 'TiO2']
+        Ca_B[i] = norm_cations.loc[sample, 'CaO']
+        Cr_C[i] = norm_cations.loc[sample, 'Cr2O3']
+
+        # site ambiguous cations. Follows Leake et al., (1997) logic
+        if Si_T[i] + norm_cations.loc[sample, 'Al2O3'] > 8:
+            Al_T[i] = 8 - norm_cations.loc[sample, 'SiO2']
+            Al_C[i] = norm_cations.loc[sample, 'SiO2'] + \
+                norm_cations.loc[sample, 'Al2O3'] - 8
+        else:
+            Al_T[i] = norm_cations.loc[sample, 'Al2O3']
+            Al_C[i] = 0
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + norm_cations.loc[sample, 'MgO'] > 5:
+            Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i]
+            Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
+                norm_cations.loc[sample, 'MgO'] - 5
+        else:
+            Mg_C[i] = norm_cations.loc[sample, 'MgO']
+            Mg_B[i] = 0
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] > 5:
+            Fe_C[i] = 0
+            Fe_B[i] = norm_cations.loc[sample, 'FeOt']
+        else:
+            Fe_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i])
+            Fe_B[i] = norm_cations.loc[sample, 'FeOt'] - Fe_C[i]
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe_C[i] > 5:
+            Mn_C[i] = 0
+            Mn_B[i] = norm_cations.loc[sample, 'MnO']
+        else:
+            Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe_C[i])
+            Mn_B[i] = norm_cations.loc[sample, 'MnO'] - Mn_C[i]
+
+        if Mg_B[i] + Fe_B[i] + Mn_B[i] + Ca_B[i] > 2:
+            Na_B[i] = 0
+            Na_A[i] = norm_cations.loc[sample, 'Na2O']
+        else:
+            Na_B[i] = 2 - (Mg_B[i] + Fe_B[i] + Mn_B[i] + Ca_B[i])
+            # Euan has as if Na A >0, set as 0, otherwise, =Na cations 23 O -
+            # Na from A site. Ask jordan where he got this from.
+            Na_A[i] = norm_cations.loc[sample, 'Na2O'] - Na_B[i]
+
+    # making the dataframe for the output
+    site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe_C, Mn_C, Cr_C, Mg_B,
+    Fe_B, Mn_B, Na_B, Ca_B, Na_A, K_A])
+    sites_df = pd.DataFrame(site_vals.T, columns=['Si_T', 'Al_T', 'Al_C', 'Ti_C',
+     'Mg_C', 'Fe_C', 'Mn_C', 'Cr_C', 'Mg_B', 'Fe_B', 'Mn_B', 'Na_B', 'Ca_B', 'Na_A', 'K_A'],
+                            index=amp_apfu_df.index
+                            )
+    return sites_df
+
+
+def amp_components_ferric_ferrous(sites_df, norm_cations):
+    """
+    amp_components_ferric_ferrous calculates the Fe3+ and Fe2+ apfu values of
+    amphibole and adjusts the generic stoichiometry such that charge balance is
+    maintained. This is based off the "f parameters" listed in Holland and Blundy
+    (1994).
+
+    Parameters
+    ----------
+    sites_df : pandas DataFrame
+        output from the get_amp_sites function. you do not need to modify this at all
+    norm_cations : pandas DataFrame
+        This is the dataframe output from calculate_23oxygens_amphibole. You should
+        not have to modify this dataframe at all.
+
+
+    Returns
+    -------
+    norm_cations_hb : pandas DataFrame
+        amphibole apfu values for each cation, however two things are different:
+            1) FeOt is replaced by individual Fe2O3 and FeO columns
+            2) all apfu values from the generic mineral recalculation have been
+                adjusted by the "f" parameter from Holland and Blundy (1994)
+                to maintain charge balance and stoichiometry
+
+    """
+    # A group
+    f1 = 16 / sites_df.sum(axis='columns')
+    f2 = 8 / sites_df['Si_T']
+    f3 = 15 / (sites_df.sum(axis='columns') -
+               (sites_df['Na_B'] + sites_df['Na_A']) - sites_df['K_A'] + sites_df['Mn_C'])
+    f4 = 2 / sites_df['Ca_B']
+    f5 = 1
+    fa = pd.DataFrame({'f1': f1, 'f2': f2, 'f3': f3, 'f4': f4, 'f5': f5, })
+
+    # B group
+    f6 = 8 / (sites_df['Si_T'] + sites_df['Al_T'] + sites_df['Al_C'])
+    f7 = 15 / (sites_df.sum(axis='columns') - sites_df['K_A'])
+    f8 = 12.9 / (sites_df.sum(axis='columns') - (sites_df['Na_A'] + sites_df['K_A'] +
+    sites_df['K_A']) - sites_df['Ca_B'] - (sites_df['Mn_C'] + sites_df['Mn_B']))
+    f9 = 36 / (46 - (sites_df['Al_T'] + sites_df['Al_C']
+                     ) - sites_df['Si_T'] - sites_df['Ti_C'])
+    f10 = 46 / ((sites_df['Fe_C'] + sites_df['Fe_B']) + 46)
+    fb = pd.DataFrame({'f6': f6, 'f7': f7, 'f8': f8, 'f9': f9, 'f10': f10, })
+
+    f_ave = (fa.min(axis='columns') + fb.max(axis='columns')) / 2
+    # f_ave = (2/3)*fa.min(axis = 'columns') + (1/3)*fb.max(axis = 'columns')
+
+    norm_cations_hb = norm_cations.multiply(f_ave, axis='rows')
+    norm_cations_hb['Fe2O3'] = 46 * (1 - f_ave)
+    norm_cations_hb['FeO'] = norm_cations_hb['FeOt_Amp_cat_23ox'] - \
+        norm_cations_hb['Fe2O3']
+    norm_cations_hb.drop(columns=['FeOt_Amp_cat_23ox', 'oxy_renorm_factor',
+                         'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All'], inplace=True)
+    newnames = []
+    for name in norm_cations_hb.columns.tolist():
+        newnames.append(name.split('_')[0])
+
+    norm_cations_hb.columns = newnames
+
+    return norm_cations_hb
+
+
+def get_amp_sites_ferric_ferrous(amp_apfu_df):
+    """
+    get_amp_sites_ferric_ferrous is very similar to get_amp_sites, however it now
+    incorporates the newly calculated Fe2O3 and FeO apfu values such that all
+    Fe2O3 gets incorporated into the octahedral sites before any FeO. For more
+    information see Leake et al., 1997 Appendix A.
+
+    Parameters
+    ----------
+    amp_apfu_df :pandas DataFrame
+        amphibole apfu values for each cation, now reflecting Fe2O3 and FeO
+        values. This is the output from amp_components_ferric_ferrous and does
+        not need to be modified at all.
+
+    Returns
+    -------
+    sites_df : pandas DataFrame
+    a samples by cation sites dimension dataframe where each column corresponds
+        to a cation site in amphibole. The suffix at the end corresponds to which site
+        the cation is in:
+            T = tetrahedral sites (8 total)
+            C = octahedral sites (5 total)
+            B  = M4 sites (2 total)
+            A = A site (0 - 1 total)
+        See Leake et al., 1997 for a discussion on cation site prioritization
+
+    """
+    samples = amp_apfu_df.index.tolist()
+    Si_T = np.empty(len(samples))
+    Al_T = np.empty(len(samples))
+    Al_C = np.empty(len(samples))
+    Ti_C = np.empty(len(samples))
+    Mg_C = np.empty(len(samples))
+    Fe3_C = np.empty(len(samples))
+    Fe2_C = np.empty(len(samples))
+    Mn_C = np.empty(len(samples))
+    Mg_B = np.empty(len(samples))
+    Fe2_B = np.empty(len(samples))
+    Mn_B = np.empty(len(samples))
+    Na_B = np.empty(len(samples))
+    Ca_B = np.empty(len(samples))
+    Na_A = np.empty(len(samples))
+    K_A = np.empty(len(samples))
+    Cr_C = np.empty(len(samples))
+    Fe3_C = np.empty(len(samples))
+
+    for sample, i in zip(samples, range(len(samples))):
+        Si_T[i] = amp_apfu_df.loc[sample, 'SiO2']
+        K_A[i] = amp_apfu_df.loc[sample, 'K2O']
+        Ti_C[i] = amp_apfu_df.loc[sample, 'TiO2']
+        Ca_B[i] = amp_apfu_df.loc[sample, 'CaO']
+        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr2O3']
+        Fe3_C[i] = amp_apfu_df.loc[sample, 'Fe2O3']
+
+        if Si_T[i] + amp_apfu_df.loc[sample, 'Al2O3'] > 8:
+            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'SiO2']
+            Al_C[i] = amp_apfu_df.loc[sample, 'SiO2'] + \
+                amp_apfu_df.loc[sample, 'Al2O3'] - 8
+        else:
+            Al_T[i] = amp_apfu_df.loc[sample, 'Al2O3']
+            Al_C[i] = 0
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + \
+                amp_apfu_df.loc[sample, 'MgO'] > 5:
+            Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i]
+            Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
+                Fe3_C[i] + amp_apfu_df.loc[sample, 'MgO'] - 5
+        else:
+            Mg_C[i] = amp_apfu_df.loc[sample, 'MgO']
+            Mg_B[i] = 0
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i] > 5:
+            Fe2_C[i] = 0
+            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO']
+        else:
+            Fe2_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i])
+            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO'] - Fe2_C[i]
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe3_C[i] + Fe2_C[i] > 5:
+            Mn_C[i] = 0
+            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO']
+        else:
+            Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] +
+                           Mg_C[i] + Fe2_C[i] + Fe3_C[i])
+            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO'] - Mn_C[i]
+
+        if Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i] > 2:
+            Na_B[i] = 0
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O']
+        else:
+            Na_B[i] = 2 - (Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i])
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O'] - Na_B[i]
+
+    site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe3_C, Fe2_C, Mn_C, Cr_C,
+    Mg_B, Fe2_B, Mn_B, Na_B, Ca_B, Na_A, K_A])
+    sites_df = pd.DataFrame(site_vals.T, columns=['Si_T', 'Al_T', 'Al_C', 'Ti_C', 'Mg_C', 'Fe3_C',
+    'Fe2_C','Mn_C', 'Cr_C', 'Mg_B','Fe2_B','Mn_B', 'Na_B','Ca_B', 'Na_A', 'K_A'],
+                            index=amp_apfu_df.index)
+    return sites_df
+
+
+def get_amp_sites_mutch(amp_apfu_df):
+    """
+    get_amp_sites takes generalized atom per formula unit calculations from
+    calculate_23oxygens_amphibole and puts them in the proper cation sites
+    according to the spreasheet of Mutch et al. Gives negative numbers for Na. .
+
+    Parameters
+    ----------
+    amp_apfu_df : pandas DataFrame
+        This is the dataframe output from calculate_23oxygens_amphibole. You should
+        not have to modify this dataframe at all.
+
+
+    Returns
+    -------
+    sites_df : pandas DataFrame
+        a samples by cation sites dimension dataframe where each column corresponds
+        to a cation site in amphibole. The suffix at the end corresponds to which site
+        the cation is in:
+            T = tetrahedral sites (8 total)
+            C = octahedral sites (5 total)
+            B  = M4 sites (2 total)
+            A = A site (0 - 1 total)
+    """
+
+# new column names to drop the amp_cat_23ox. Can make this more flexible or we can just force the formatting
+    # of the output inside the function. Mostly I didnt want to type it out a bunch so we can omit this little
+    # loop if we want to formalize things
+    newnames = []
+    for name in amp_apfu_df.columns.tolist():
+        newnames.append(name.split('_')[0])
+
+    norm_cations = amp_apfu_df.copy()
+    norm_cations.columns = newnames
+
+    samples = norm_cations.index.tolist()
+
+    # containers to fill later
+    Si_T = np.empty(len(samples))
+    Al_T = np.empty(len(samples))
+    Al_C = np.empty(len(samples))
+    Ti_C = np.empty(len(samples))
+    Mg_C = np.empty(len(samples))
+    Fe_C = np.empty(len(samples))
+    Mn_C = np.empty(len(samples))
+    Mg_B = np.empty(len(samples))
+    Fe_B = np.empty(len(samples))
+    Mn_B = np.empty(len(samples))
+    Na_B = np.empty(len(samples))
+    Ca_B = np.empty(len(samples))
+    Na_A = np.empty(len(samples))
+    K_A = np.empty(len(samples))
+    Cr_C = np.empty(len(samples))
+
+    for sample, i in zip(samples, range(len(samples))):
+        # these are all the cations that have no site ambiguity
+        Si_T[i] = norm_cations.loc[sample, 'SiO2']
+        K_A[i] = norm_cations.loc[sample, 'K2O']
+        Ti_C[i] = norm_cations.loc[sample, 'TiO2']
+        Ca_B[i] = norm_cations.loc[sample, 'CaO']
+        Cr_C[i] = norm_cations.loc[sample, 'Cr2O3']
+
+        # site ambiguous cations. Follows Leake et al., (1997) logic
+        if Si_T[i] + norm_cations.loc[sample, 'Al2O3'] > 8:
+            Al_T[i] = 8 - norm_cations.loc[sample, 'SiO2']
+            Al_C[i] = norm_cations.loc[sample, 'SiO2'] + \
+                norm_cations.loc[sample, 'Al2O3'] - 8
+        else:
+            Al_T[i] = norm_cations.loc[sample, 'Al2O3']
+            Al_C[i] = 0
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + norm_cations.loc[sample, 'MgO'] > 5:
+            Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i]
+            Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
+                norm_cations.loc[sample, 'MgO'] - 5
+        else:
+            Mg_C[i] = norm_cations.loc[sample, 'MgO']
+            Mg_B[i] = 0
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] > 5:
+            Fe_C[i] = 0
+            Fe_B[i] = norm_cations.loc[sample, 'FeOt']
+        else:
+            Fe_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i])
+            Fe_B[i] = norm_cations.loc[sample, 'FeOt'] - Fe_C[i]
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe_C[i] > 5:
+            Mn_C[i] = 0
+            Mn_B[i] = norm_cations.loc[sample, 'MnO']
+        else:
+            Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe_C[i])
+            Mn_B[i] = norm_cations.loc[sample, 'MnO'] - Mn_C[i]
+
+        if Mg_B[i] + Fe_B[i] + Mn_B[i] + Ca_B[i] + \
+                amp_apfu_df['Na2O_Amp_cat_23ox'].iloc[i] > 2:
+            Na_B[i] = 2 - (Mg_B[i] + Fe_B[i] + Mn_B[i] + Ca_B[i])
+            Na_A[i] = amp_apfu_df['Na2O_Amp_cat_23ox'].iloc[i] - Na_B[i]
+        else:
+            Na_B[i] = amp_apfu_df['Na2O_Amp_cat_23ox'].iloc[i]
+            # Euan has as if Na A >0, set as 0, otherwise, =Na cations 23 O -
+            # Na from A site. Ask jordan where he got this from.
+            Na_A[i] = amp_apfu_df['Na2O_Amp_cat_23ox'].iloc[i] - Na_B[i]
+
+
+    site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe_C, Mn_C, Cr_C, Mg_B,
+    Fe_B, Mn_B, Na_B, Ca_B, Na_A, K_A])
+    sites_df = pd.DataFrame(site_vals.T, columns=['Si_T', 'Al_T', 'Al_C', 'Ti_C',
+     'Mg_C', 'Fe_C', 'Mn_C', 'Cr_C', 'Mg_B', 'Fe_B', 'Mn_B', 'Na_B', 'Ca_B', 'Na_A', 'K_A'],
+    index=amp_apfu_df.index)
+    return sites_df
+
+
+def amp_components_ferric_ferrous_mutch(sites_df, norm_cations):
+    """
+    amp_components_ferric_ferrous calculates the Fe3+ and Fe2+ apfu values of
+    amphibole and adjusts the generic stoichiometry such that charge balance is
+    maintained. This is based off the "f parameters" listed in Holland and Blundy
+    (1994), using the averaging in the spreadsheet supplied by Euan Mutch
+
+    Parameters
+    ----------
+    sites_df : pandas DataFrame
+        output from the get_amp_sites function. you do not need to modify this at all
+    norm_cations : pandas DataFrame
+        This is the dataframe output from calculate_23oxygens_amphibole. You should
+        not have to modify this dataframe at all.
+
+
+    Returns
+    -------
+    norm_cations_hb : pandas DataFrame
+        amphibole apfu values for each cation, however two things are different:
+            1) FeOt is replaced by individual Fe2O3 and FeO columns
+            2) all apfu values from the generic mineral recalculation have been
+                adjusted by the "f" parameter from Holland and Blundy (1994)
+                to maintain charge balance and stoichiometry
+
+    """
+    # A group
+    f1 = 16 / sites_df.sum(axis='columns')
+    f2 = 8 / sites_df['Si_T']
+    #f3 = 15/(sites_df.sum(axis = 'columns') - (sites_df['Na_B'] + sites_df['Na_A']) - sites_df['K_A'] + sites_df['Mn_C'])
+    f3 = 15 / (sites_df.sum(axis='columns') -
+               sites_df['K_A'] - (sites_df['Na_A'] + sites_df['Na_B']) + sites_df['Mn_B'])
+
+    f4 = 2 / sites_df['Ca_B']
+    f5 = 1
+    fa = pd.DataFrame({'f1': f1, 'f2': f2, 'f3': f3, 'f4': f4, 'f5': f5, })
+
+    # B group
+    f6 = 8 / (sites_df['Si_T'] + sites_df['Al_T'] + sites_df['Al_C'])
+    f7 = 15 / (sites_df.sum(axis='columns') - sites_df['K_A'])
+    f8 = 12.9 / (sites_df.sum(axis='columns') - (sites_df['Na_A'] + sites_df['K_A'] +
+                                                 sites_df['K_A']) - sites_df['Ca_B'] - (sites_df['Mn_C'] + sites_df['Mn_B']))
+    f8 = (13 / (sites_df.sum(axis='columns') - (sites_df['K_A'] + sites_df['Na_A'] + sites_df['Na_B'])
+                - (sites_df['Mn_B'] + sites_df['Mn_C']) - sites_df['Ca_B']))
+
+    f9 = 36 / (46 - (sites_df['Al_T'] + sites_df['Al_C']
+                     ) - sites_df['Si_T'] - sites_df['Ti_C'])
+    f10 = 46 / ((sites_df['Fe_C'] + sites_df['Fe_B']) + 46)
+    fb = pd.DataFrame({'f6': f6, 'f7': f7, 'f8': f8, 'f9': f9, 'f10': f10, })
+
+    #f_ave = (fa.min(axis = 'columns') + fb.max(axis = 'columns'))/2
+    f_ave = (2 / 3) * fa.min(axis='columns') + (1 / 3) * fb.max(axis='columns')
+
+    norm_cations_hb = norm_cations.multiply(f_ave, axis='rows')
+    norm_cations_hb['Fe2O3'] = 46 * (1 - f_ave)
+    norm_cations_hb['FeO'] = norm_cations_hb['FeOt_Amp_cat_23ox'] - \
+        norm_cations_hb['Fe2O3']
+    norm_cations_hb.drop(columns=['FeOt_Amp_cat_23ox', 'oxy_renorm_factor',
+                         'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All'], inplace=True)
+    newnames = []
+    for name in norm_cations_hb.columns.tolist():
+        newnames.append(name.split('_')[0])
+
+    norm_cations_hb.columns = newnames
+
+    return norm_cations_hb
+
+##
+
+
+def get_amp_sites_ferric_ferrous_mutch(amp_apfu_df):
+    """
+    get_amp_sites_ferric_ferrous is very similar to get_amp_sites, however it now
+    incorporates the newly calculated Fe2O3 and FeO apfu values such that all
+    Fe2O3 gets incorporated into the octahedral sites before any FeO. For more
+    information see Leake et al., 1997 Appendix A.
+
+    Parameters
+    ----------
+    amp_apfu_df :pandas DataFrame
+        amphibole apfu values for each cation, now reflecting Fe2O3 and FeO
+        values. This is the output from amp_components_ferric_ferrous and does
+        not need to be modified at all.
+
+    Returns
+    -------
+    sites_df : pandas DataFrame
+    a samples by cation sites dimension dataframe where each column corresponds
+        to a cation site in amphibole. The suffix at the end corresponds to which site
+        the cation is in:
+            T = tetrahedral sites (8 total)
+            C = octahedral sites (5 total)
+            B  = M4 sites (2 total)
+            A = A site (0 - 1 total)
+        See Leake et al., 1997 for a discussion on cation site prioritization
+
+    """
+    samples = amp_apfu_df.index.tolist()
+    Si_T = np.empty(len(samples))
+    Al_T = np.empty(len(samples))
+    Al_C = np.empty(len(samples))
+    Ti_C = np.empty(len(samples))
+    Mg_C = np.empty(len(samples))
+    Fe3_C = np.empty(len(samples))
+    Fe2_C = np.empty(len(samples))
+    Mn_C = np.empty(len(samples))
+    Mg_B = np.empty(len(samples))
+    Fe2_B = np.empty(len(samples))
+    Mn_B = np.empty(len(samples))
+    Na_B = np.empty(len(samples))
+    Ca_B = np.empty(len(samples))
+    Na_A = np.empty(len(samples))
+    K_A = np.empty(len(samples))
+    Cr_C = np.empty(len(samples))
+    Fe3_C = np.empty(len(samples))
+
+    for sample, i in zip(samples, range(len(samples))):
+        Si_T[i] = amp_apfu_df.loc[sample, 'SiO2']
+        K_A[i] = amp_apfu_df.loc[sample, 'K2O']
+        Ti_C[i] = amp_apfu_df.loc[sample, 'TiO2']
+        Ca_B[i] = amp_apfu_df.loc[sample, 'CaO']
+        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr2O3']
+        Fe3_C[i] = amp_apfu_df.loc[sample, 'Fe2O3']
+
+        if Si_T[i] + amp_apfu_df.loc[sample, 'Al2O3'] > 8:
+            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'SiO2']
+            Al_C[i] = amp_apfu_df.loc[sample, 'SiO2'] + \
+                amp_apfu_df.loc[sample, 'Al2O3'] - 8
+        else:
+            Al_T[i] = amp_apfu_df.loc[sample, 'Al2O3']
+            Al_C[i] = 0
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + \
+                amp_apfu_df.loc[sample, 'MgO'] > 5:
+            Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i]
+            Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
+                Fe3_C[i] + amp_apfu_df.loc[sample, 'MgO'] - 5
+        else:
+            Mg_C[i] = amp_apfu_df.loc[sample, 'MgO']
+            Mg_B[i] = 0
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i] > 5:
+            Fe2_C[i] = 0
+            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO']
+        else:
+            Fe2_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i])
+            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO'] - Fe2_C[i]
+
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe3_C[i] + Fe2_C[i] > 5:
+            Mn_C[i] = 0
+            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO']
+        else:
+            Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] +
+                           Mg_C[i] + Fe2_C[i] + Fe3_C[i])
+            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO'] - Mn_C[i]
+
+        if Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i] + \
+                amp_apfu_df.loc[sample, 'Na2O'] > 2:
+            Na_B[i] = 2 - (Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i])
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O'] - Na_B[i]
+
+        else:
+            Na_B[i] = amp_apfu_df.loc[sample, 'Na2O']
+            # Euan has as if Na A >0, set as 0, otherwise, =Na cations 23 O -
+            # Na from A site. Ask jordan where he got this from.
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O'] - Na_B[i]
+
+    site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe3_C, Fe2_C, Mn_C, Cr_C, Mg_B,
+    Fe2_B, Mn_B, Na_B, Ca_B, Na_A, K_A])
+    sites_df = pd.DataFrame(site_vals.T, columns=['Si_T', 'Al_T', 'Al_C', 'Ti_C',
+     'Mg_C', 'Fe3_C', 'Fe2_C', 'Mn_C', 'Cr_C', 'Mg_B', 'Fe2_B', 'Mn_B', 'Na_B', 'Ca_B', 'Na_A', 'K_A'],
+    index=amp_apfu_df.index)
+
+    return sites_df
+
+
+
+
+
 ## Equilibrium tests clinopyroxene
 
 def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None,
@@ -2029,8 +2658,8 @@ def calculate_cpx_opx_eq_tests(cpx_comps, opx_comps):
         if abs(1.09 - two_pyx['Kd_Fe_Mg_Cpx_Opx'].iloc[i]) > 0.14:
             a[i] = str("No")
 
-    two_pyx.insert(1, "High T Kd Eq?", a)
-    two_pyx.insert(2, "Low T Kd Eq?", b)
+    two_pyx.insert(0, "High T Kd Eq?", a)
+    two_pyx.insert(1, "Low T Kd Eq?", b)
     return two_pyx
 
 
@@ -2381,4 +3010,106 @@ def get_voting_stats_ExtraTreesRegressor(X, reg, central_tendency='aritmetic_mea
 
     return  df_stats, df_voting
 
+
+def classify_phases(filename, sheet_name, return_end_members=False, str_to_drop=None):
+    """
+    Function in progress
+
+
+    """
+    Excel_In=import_excel(filename, sheet_name)
+    if str_to_drop is None:
+        Oxides=Excel_In['my_oxides']
+    if str_to_drop is not None:
+        my_input=Excel_In['my_input']
+        my_input_copy=my_input.copy()
+        my_input_copy.columns = [col.replace(str_to_drop, '') for col in my_input_copy.columns]
+
+        myOxides1 = my_input_copy.reindex(df_ideal_oxide.columns, axis=1).fillna(0)
+        myOxides1 = myOxides1.apply(pd.to_numeric, errors='coerce').fillna(0)
+        myOxides1[myOxides1 < 0] = 0
+        Oxides=myOxides1
+
+
+
+
+    with open(Thermobar_dir/'svc_model_linear_MinClass.pkl', 'rb') as f:
+        svc_model=load(f)
+    with open(Thermobar_dir/'scaler_MinClass.pkl', 'rb') as f:
+        scaler=load(f)
+
+    # Dropping things which are often missing
+    Oxides_dropoxides=Oxides.drop(columns=['Cr2O3', 'K2O', 'P2O5'])
+    X_in=Oxides_dropoxides.values
+
+    # This does the machine learning classification
+    X_in_scaled= scaler.transform(X_in)
+    svc_predictions=svc_model.predict(X_in_scaled)
+    Oxides_out=Oxides.copy()
+    Oxides_out['Sum_Oxides']=Oxides.sum(axis=1)
+    Oxides_out['Phase_Min_Group_ML']=svc_predictions
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(0, "Amp")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(1, "Px")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(2, "Fspar")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(3, "Ol")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(4, "Sp")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(5, "Ox")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(6, "Ap")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(7, "Bt")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(8, "Qz")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(9, "Gt")
+
+    print(' # of Amps = ' + str(len(Oxides_out['Phase_Min_Group_ML']=="Amp")) + '# of Opxs = ')
+
+    Oxides_out.loc[Oxides_out['Sum_Oxides']<90, 'Phase_Min_Group_ML'] = "Not Classified - Total<90"
+    Oxides_out.loc[Oxides_out['Sum_Oxides']>110, 'Phase_Min_Group_ML'] = "Not Classified - Total>110"
+    Oxides_out['Phase_Mineral']=Oxides_out['Phase_Min_Group_ML']
+
+    #This does manual classification for feldsdpars.
+    Fspar=Oxides_out['Phase_Min_Group_ML']=="Fspar" # This checks we are only doing it for felspar
+    Oxides_Fspar=Oxides_out.add_suffix('_Plag')
+    Fspar_components=calculate_cat_fractions_plagioclase(plag_comps=Oxides_Fspar)
+    Fspar_An=Fspar_components['An_Plag']
+    Fspar_Ab=Fspar_components['Ab_Plag']
+    Fspar_Or=Fspar_components['Or_Plag']
+    if return_end_members==True:
+        Oxides_out['Ab']=Fspar_Ab
+        Oxides_out.loc[Oxides_out['Phase_Min_Group_ML']!="Fspar", 'Ab']="N/A"
+        Oxides_out['An']=Fspar_An
+        Oxides_out.loc[Oxides_out['Phase_Min_Group_ML']!="Fspar", 'An']="N/A"
+        Oxides_out['Or']=Fspar_Or
+        Oxides_out.loc[Oxides_out['Phase_Min_Group_ML']!="Fspar", 'Or']="N/A"
+
+    Oxides_out.loc[( (Fspar) & (Fspar_An>0.1) & (Fspar_Or<0.1) ), 'Phase_Mineral'] = "Plag"
+    Oxides_out.loc[( (Fspar) & (Fspar_Or>0.1) & (Fspar_An<0.1)), 'Phase_Mineral'] = "Kspar"
+    Oxides_out.loc[(Fspar & (Fspar_An<0.1) &  (Fspar_Or<0.1)), 'Phase_Mineral'] = "Albite"
+
+    Oxides_out['Fspar_Class']=Oxides_out['Phase_Min_Group_ML']
+
+    Oxides_out.loc[( (Fspar) & (Fspar_An<0.1) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Albite"
+    Oxides_out.loc[( (Fspar) & (Fspar_Or.between(0.1, 0.37) ) &  (Fspar_An<0.2)), 'Fspar_Class'] = "Anorthoclase"
+    Oxides_out.loc[( (Fspar) & (Fspar_Or>0.37) &  (Fspar_An<0.2) ), 'Fspar_Class'] = "Sanidine"
+    Oxides_out.loc[( (Fspar) & (Fspar_An.between(0.1, 0.3)) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Oligoclase"
+    Oxides_out.loc[( (Fspar) & (Fspar_An.between(0.3, 0.5)) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Andesine"
+    Oxides_out.loc[( (Fspar) & (Fspar_An.between(0.5, 0.7)) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Bytownite"
+    Oxides_out.loc[( (Fspar) & (Fspar_An>0.9) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Anorthite"
+    Oxides_out.loc[Oxides_out['Phase_Min_Group_ML']!="Fspar", 'Fspar_Class']="N/A"
+
+    # This does Manual Classification for Pyroxenes
+    Oxides_Pyroxenes=Oxides_out.add_suffix('_Opx')
+    Px=Oxides_out['Phase_Min_Group_ML']=="Px"
+
+    Px_components=calculate_orthopyroxene_components(opx_comps=Oxides_Pyroxenes)
+    Px_CaMgFe=Px_components['Ca_CaMgFe']
+    Oxides_out.loc[( (Px) & (Px_CaMgFe<0.05) ), 'Phase_Mineral'] = "Opx"
+    Oxides_out.loc[( (Px) & (Px_CaMgFe.between(0.05, 0.2)) ), 'Phase_Mineral'] = "Pig"
+    Oxides_out.loc[( (Px) & (Px_CaMgFe>0.2) ), 'Phase_Mineral'] = "Cpx"
+    if return_end_members==True:
+        Oxides_out['Ca/CaMgFe']=Px_CaMgFe
+        Oxides_out.loc[Oxides_out['Phase_Min_Group_ML']!="Px", 'Ca/CaMgFe']="N/A"
+
+    # This does manual classification for amphiboles, based on Leake (1997)
+
+
+    return Oxides_out
 

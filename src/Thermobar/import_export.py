@@ -10,6 +10,94 @@ import pandas as pd
 
 from Thermobar.core import *
 
+## This specifies the default order for each dataframe type used in calculations
+df_ideal_liq = pd.DataFrame(columns=['SiO2_Liq', 'TiO2_Liq', 'Al2O3_Liq',
+'FeOt_Liq', 'MnO_Liq', 'MgO_Liq', 'CaO_Liq', 'Na2O_Liq', 'K2O_Liq',
+'Cr2O3_Liq', 'P2O5_Liq', 'H2O_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq',
+ 'CO2_Liq'])
+
+df_ideal_liq = pd.DataFrame(columns=['SiO2_Liq', 'TiO2_Liq', 'Al2O3_Liq',
+'FeOt_Liq', 'MnO_Liq', 'MgO_Liq', 'CaO_Liq', 'Na2O_Liq', 'K2O_Liq',
+'Cr2O3_Liq', 'P2O5_Liq', 'H2O_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq',
+ 'CO2_Liq'])
+
+df_ideal_oxide = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
+'FeOt', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O',
+'Cr2O3', 'P2O5'])
+
+df_ideal_cpx = pd.DataFrame(columns=['SiO2_Cpx', 'TiO2_Cpx', 'Al2O3_Cpx',
+'FeOt_Cpx','MnO_Cpx', 'MgO_Cpx', 'CaO_Cpx', 'Na2O_Cpx', 'K2O_Cpx',
+'Cr2O3_Cpx'])
+
+df_ideal_ol = pd.DataFrame(columns=['SiO2_Ol', 'TiO2_Ol', 'Al2O3_Ol',
+'FeOt_Ol', 'MnO_Ol', 'MgO_Ol', 'CaO_Ol', 'Na2O_Ol', 'K2O_Ol', 'Cr2O3_Ol',
+'NiO_Ol'])
+
+df_ideal_sp = pd.DataFrame(columns=['SiO2_Sp', 'TiO2_Sp', 'Al2O3_Sp',
+'FeOt_Sp', 'MnO_Sp', 'MgO_Sp', 'CaO_Sp', 'Na2O_Sp', 'K2O_Sp', 'Cr2O3_Sp',
+'NiO_Sp'])
+
+df_ideal_opx = pd.DataFrame(columns=['SiO2_Opx', 'TiO2_Opx', 'Al2O3_Opx',
+'FeOt_Opx', 'MnO_Opx', 'MgO_Opx', 'CaO_Opx', 'Na2O_Opx', 'K2O_Opx',
+'Cr2O3_Opx'])
+
+df_ideal_plag = pd.DataFrame(columns=['SiO2_Plag', 'TiO2_Plag', 'Al2O3_Plag',
+'FeOt_Plag', 'MnO_Plag', 'MgO_Plag', 'CaO_Plag', 'Na2O_Plag', 'K2O_Plag',
+'Cr2O3_Plag'])
+
+df_ideal_kspar = pd.DataFrame(columns=['SiO2_Kspar', 'TiO2_Kspar',
+ 'Al2O3_Kspar', 'FeOt_Kspar','MnO_Kspar', 'MgO_Kspar', 'CaO_Kspar',
+ 'Na2O_Kspar', 'K2O_Kspar', 'Cr2O3_Kspar'])
+
+df_ideal_amp = pd.DataFrame(columns=['SiO2_Amp', 'TiO2_Amp', 'Al2O3_Amp',
+ 'FeOt_Amp', 'MnO_Amp', 'MgO_Amp', 'CaO_Amp', 'Na2O_Amp', 'K2O_Amp',
+ 'Cr2O3_Amp', 'F_Amp', 'Cl_Amp'])
+
+# Same, but order for errors
+df_ideal_liq_Err = pd.DataFrame(columns=['SiO2_Liq_Err', 'TiO2_Liq_Err',
+'Al2O3_Liq_Err', 'FeOt_Liq_Err', 'MnO_Liq_Err', 'MgO_Liq_Err', 'CaO_Liq_Err',
+'Na2O_Liq_Err', 'K2O_Liq_Err', 'Cr2O3_Liq_Err', 'P2O5_Liq_Err', 'H2O_Liq_Err',
+ 'Fe3Fet_Liq_Err', 'NiO_Liq_Err', 'CoO_Liq_Err', 'CO2_Liq_Err'])
+
+df_ideal_cpx_Err = pd.DataFrame(columns=['SiO2_Cpx_Err', 'TiO2_Cpx_Err',
+ 'Al2O3_Cpx_Err', 'FeOt_Cpx_Err', 'MnO_Cpx_Err', 'MgO_Cpx_Err', 'CaO_Cpx_Err',
+  'Na2O_Cpx_Err', 'K2O_Cpx_Err', 'Cr2O3_Cpx_Err', 'P_kbar_Err', 'T_K_Err'])
+
+df_ideal_ol_Err = pd.DataFrame(columns=['SiO2_Ol_Err', 'TiO2_Ol_Err',
+'Al2O3_Ol_Err', 'FeOt_Ol_Err', 'MnO_Ol_Err', 'MgO_Ol_Err', 'CaO_Ol_Err',
+ 'Na2O_Ol_Err', 'K2O_Ol_Err', 'Cr2O3_Ol_Err', 'NiO_Ol_Err', 'P_kbar_Err',
+ 'T_K_Err'])
+
+df_ideal_sp_Err = pd.DataFrame(columns=['SiO2_Sp_Err', 'TiO2_Sp_Err',
+'Al2O3_Sp_Err', 'FeOt_Sp_Err', 'MnO_Sp_Err', 'MgO_Sp_Err', 'CaO_Sp_Err',
+'Na2O_Sp_Err', 'K2O_Sp_Err', 'Cr2O3_Sp_Err', 'NiO_Sp_Err', 'P_kbar_Err',
+'T_K_Err'])
+
+df_ideal_opx_Err = pd.DataFrame(columns=['SiO2_Opx_Err', 'TiO2_Opx_Err',
+'Al2O3_Opx_Err', 'FeOt_Opx_Err', 'MnO_Opx_Err', 'MgO_Opx_Err', 'CaO_Opx_Err',
+ 'Na2O_Opx_Err', 'K2O_Opx_Err', 'Cr2O3_Opx_Err', 'P_kbar_Err', 'T_K_Err'])
+
+df_ideal_plag_Err = pd.DataFrame(columns=['SiO2_Plag_Err', 'TiO2_Plag_Err',
+'Al2O3_Plag_Err', 'FeOt_Plag_Err', 'MnO_Plag_Err', 'MgO_Plag_Err',
+'CaO_Plag_Err', 'Na2O_Plag_Err', 'K2O_Plag_Err', 'Cr2O3_Plag_Err',
+'P_kbar_Err', 'T_K_Err'])
+
+df_ideal_kspar_Err = pd.DataFrame(columns=['SiO2_Kspar_Err', 'TiO2_Kspar_Err',
+'Al2O3_Kspar_Err', 'FeOt_Kspar_Err', 'MnO_Kspar_Err', 'MgO_Kspar_Err',
+'CaO_Kspar_Err', 'Na2O_Kspar_Err', 'K2O_Kspar_Err', 'Cr2O3_Kspar_Err',
+ 'P_kbar_Err', 'T_K_Err'])
+
+df_ideal_amp_Err = pd.DataFrame(columns=['SiO2_Amp_Err', 'TiO2_Amp_Err',
+ 'Al2O3_Amp_Err', 'FeOt_Amp_Err', 'MnO_Amp_Err', 'MgO_Amp_Err',
+'CaO_Amp_Err', 'Na2O_Amp_Err', 'K2O_Amp_Err', 'Cr2O3_Amp_Err',
+'F_Amp_Err', 'Cl_Amp_Err', 'P_kbar_Err', 'T_K_Err'])
+
+# Used to store variables.
+
+
+df_ideal_exp = pd.DataFrame(columns=['P_kbar', 'T_K'])
+df_ideal_exp_Err = pd.DataFrame(columns=['P_kbar_Err', 'T_K_Err'])
+
 def import_lepr_file(filename):
     """
     Reads in data from the outputs from the Caltech LEPR site (where oxides are followed by the word "value")

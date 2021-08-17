@@ -542,6 +542,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
 
     liq_comps: DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
+
     Or:
 
     meltmatch: DataFrame
@@ -628,7 +629,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
 
 
     if equationT == "T_Brug2019":
-        if np.max(Combo_liq_cpxs['Mgno_CPX']) > 0.65:
+        if np.max(Combo_liq_cpxs['Mgno_Cpx']) > 0.65:
             w.warn("Some inputted CPX compositions have Cpx Mg#>0.65;.",
                 stacklevel=2)
         if np.max(Combo_liq_cpxs['Al2O3_Cpx']) > 7:
@@ -637,7 +638,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
         if np.max(Combo_liq_cpxs['SiO2_Liq']) < 70:
             w.warn("Some inputted Liq compositions have  SiO2<70 wt%;",
                 stacklevel=2)
-        if np.max(Combo_liq_cpxs['Mgno_CPX']) > 0.65 or Combo_liq_cpxs['Al2O3_Cpx'] or p.max(
+        if np.max(Combo_liq_cpxs['Mgno_Cpx']) > 0.65 or Combo_liq_cpxs['Al2O3_Cpx'] or p.max(
                 Combo_liq_cpxs['SiO2_Liq']) < 70:
             w.warn("which is outside the recomended calibration range of Brugman and Till (2019)")
 

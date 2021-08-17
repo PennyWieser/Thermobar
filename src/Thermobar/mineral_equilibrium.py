@@ -359,7 +359,7 @@ def calculate_opx_rhodes_diagram_lines(
         Returns headings corresponding to options selected above.
 
     '''
-    liq_comps_c=liq_comps.copy()
+
     Mgno = np.linspace(Min_Mgno, Max_Mgno, 100)
 
     Mgno = np.linspace(Min_Mgno, Max_Mgno, 100)
@@ -379,6 +379,7 @@ def calculate_opx_rhodes_diagram_lines(
         Kd_out_mat = pd.concat([Kd_out_mat, Kd_out_mat_MM], axis=1)
 
     if liq_comps is not None:
+        liq_comps_c=liq_comps.copy()
         cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
         Si_mean_frac = np.nanmean(cat_frac['SiO2_Liq_cat_frac'])
         Kd = 0.4805 - 0.3733 * Si_mean_frac
