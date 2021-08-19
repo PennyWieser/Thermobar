@@ -462,4 +462,219 @@ def calculate_cpx_rhodes_diagram_lines(
     return Kd_out_mat
 
 
+## Amphibole classification diagram
 
+def add_Leake_Amp_Fields_Fig3a(plot_axes, fontsize=8, color=[0.3, 0.3, 0.3],
+linewidth=0.5, lower_text=0.3, upper_text=0.7, text_labels=True):
+    """
+    Code adapted from TAS plot
+    (see https://bitbucket.org/jsteven5/tasplot/src/90ed07ec34fa13405e7d2d5c563341b3e5eef95f/tasplot.py?at=master)
+    Following Putirka, all Fe is assumed to be Fet
+    """
+    # Check that plot_axis can plot
+    if 'plot' not in dir(plot_axes):
+        raise TypeError('plot_axes is not a matplotlib axes instance.')
+
+# Si Boundaries
+    Tremolite_Mgno_low=0.9
+    Tremolite_Mgno_up=1
+    Tremolite_Si_up=8
+    Tremolite_Si_low=7.5
+
+    Actinolite_Mgno_low=0.5
+    Actinolite_Mgno_up=0.9
+    Actinolite_Si_up=8
+    Actinolite_Si_low=7.5
+
+    Ferroactinolite_Mgno_low=0
+    Ferroactinolite_Mgno_up=0.5
+    Ferroactinolite_Si_up=8
+    Ferroactinolite_Si_low=7.5
+
+    Magnesiohornblende_Mgno_low=0.5
+    Magnesiohornblende_Mgno_up=1
+    Magnesiohornblende_Si_up=7.5
+    Magnesiohornblende_Si_low=6.5
+
+    Ferrohornblende_Mgno_low=0
+    Ferrohornblende_Mgno_up=0.5
+    Ferrohornblende_Si_up=7.5
+    Ferrohornblende_Si_low=6.5
+
+
+    Tschermakite_Mgno_low=0.5
+    Tschermakite_Mgno_up=1
+    Tschermakite_Si_up=6.5
+    Tschermakite_Si_low=5.5
+
+    Ferrotschermakite_Mgno_low=0
+    Ferrotschermakite_Mgno_up=0.5
+    Ferrotschermakite_Si_up=6.5
+    Ferrotschermakite_Si_low=5.5
+
+
+    from collections import namedtuple
+    FieldLine = namedtuple('FieldLine', 'x1 y1 x2 y2')
+    lines = (
+             FieldLine(x1=Tremolite_Si_up, y1=Tremolite_Mgno_low,
+                       x2=Tremolite_Si_up, y2=Tremolite_Mgno_up),
+             FieldLine(x1=Tremolite_Si_low, y1=Tremolite_Mgno_low,
+                       x2=Tremolite_Si_low, y2=Tremolite_Mgno_up),
+
+             FieldLine(x1=Tremolite_Si_up, y1=Tremolite_Mgno_up,
+                       x2=Tremolite_Si_low, y2=Tremolite_Mgno_up),
+             FieldLine(x1=Tremolite_Si_up, y1=Tremolite_Mgno_low,
+                       x2=Tremolite_Si_low, y2=Tremolite_Mgno_low),
+
+             FieldLine(x1=Actinolite_Si_up, y1=Actinolite_Mgno_low,
+                       x2=Actinolite_Si_up, y2=Actinolite_Mgno_up),
+             FieldLine(x1=Actinolite_Si_low, y1=Actinolite_Mgno_low,
+                       x2=Actinolite_Si_low, y2=Actinolite_Mgno_up),
+
+             FieldLine(x1=Actinolite_Si_up, y1=Actinolite_Mgno_up,
+                       x2=Actinolite_Si_low, y2=Actinolite_Mgno_up),
+             FieldLine(x1=Actinolite_Si_up, y1=Actinolite_Mgno_low,
+                       x2=Actinolite_Si_low, y2=Actinolite_Mgno_low),
+
+             FieldLine(x1=Ferroactinolite_Si_up, y1=Ferroactinolite_Mgno_low,
+                       x2=Ferroactinolite_Si_up, y2=Ferroactinolite_Mgno_up),
+             FieldLine(x1=Ferroactinolite_Si_low, y1=Ferroactinolite_Mgno_low,
+                       x2=Ferroactinolite_Si_low, y2=Ferroactinolite_Mgno_up),
+
+             FieldLine(x1=Ferroactinolite_Si_up, y1=Ferroactinolite_Mgno_up,
+                       x2=Ferroactinolite_Si_low, y2=Ferroactinolite_Mgno_up),
+             FieldLine(x1=Ferroactinolite_Si_up, y1=Ferroactinolite_Mgno_low,
+                       x2=Ferroactinolite_Si_low, y2=Ferroactinolite_Mgno_low),
+
+             FieldLine(x1=Magnesiohornblende_Si_up, y1=Magnesiohornblende_Mgno_low,
+                       x2=Magnesiohornblende_Si_up, y2=Magnesiohornblende_Mgno_up),
+             FieldLine(x1=Magnesiohornblende_Si_low, y1=Magnesiohornblende_Mgno_low,
+                       x2=Magnesiohornblende_Si_low, y2=Magnesiohornblende_Mgno_up),
+
+             FieldLine(x1=Magnesiohornblende_Si_up, y1=Magnesiohornblende_Mgno_up,
+                       x2=Magnesiohornblende_Si_low, y2=Magnesiohornblende_Mgno_up),
+             FieldLine(x1=Magnesiohornblende_Si_up, y1=Magnesiohornblende_Mgno_low,
+                       x2=Magnesiohornblende_Si_low, y2=Magnesiohornblende_Mgno_low),
+
+             FieldLine(x1=Ferrohornblende_Si_up, y1=Ferrohornblende_Mgno_low,
+                       x2=Ferrohornblende_Si_up, y2=Ferrohornblende_Mgno_up),
+             FieldLine(x1=Ferrohornblende_Si_low, y1=Ferrohornblende_Mgno_low,
+                       x2=Ferrohornblende_Si_low, y2=Ferrohornblende_Mgno_up),
+
+             FieldLine(x1=Ferrohornblende_Si_up, y1=Ferrohornblende_Mgno_up,
+                       x2=Ferrohornblende_Si_low, y2=Ferrohornblende_Mgno_up),
+             FieldLine(x1=Ferrohornblende_Si_up, y1=Ferrohornblende_Mgno_low,
+                       x2=Ferrohornblende_Si_low, y2=Ferrohornblende_Mgno_low),
+
+             FieldLine(x1=Tschermakite_Si_up, y1=Tschermakite_Mgno_low,
+                       x2=Tschermakite_Si_up, y2=Tschermakite_Mgno_up),
+             FieldLine(x1=Tschermakite_Si_low, y1=Tschermakite_Mgno_low,
+                       x2=Tschermakite_Si_low, y2=Tschermakite_Mgno_up),
+
+             FieldLine(x1=Tschermakite_Si_up, y1=Tschermakite_Mgno_up,
+                       x2=Tschermakite_Si_low, y2=Tschermakite_Mgno_up),
+             FieldLine(x1=Tschermakite_Si_up, y1=Tschermakite_Mgno_low,
+                       x2=Tschermakite_Si_low, y2=Tschermakite_Mgno_low),
+
+             FieldLine(x1=Ferrotschermakite_Si_up, y1=Ferrotschermakite_Mgno_low,
+                       x2=Ferrotschermakite_Si_up, y2=Ferrotschermakite_Mgno_up),
+             FieldLine(x1=Ferrotschermakite_Si_low, y1=Ferrotschermakite_Mgno_low,
+                       x2=Ferrotschermakite_Si_low, y2=Ferrotschermakite_Mgno_up),
+
+             FieldLine(x1=Ferrotschermakite_Si_up, y1=Ferrotschermakite_Mgno_up,
+                       x2=Ferrotschermakite_Si_low, y2=Ferrotschermakite_Mgno_up),
+             FieldLine(x1=Ferrotschermakite_Si_up, y1=Ferrotschermakite_Mgno_low,
+                       x2=Ferrotschermakite_Si_low, y2=Ferrotschermakite_Mgno_low),
+
+
+            )
+    FieldName = namedtuple('FieldName', 'name x y rotation')
+    names = (FieldName('Tremolite', 7.75, 0.95, 0),
+             FieldName('Actinolite', 7.75, upper_text, 0),
+             FieldName('Ferroactinolite', 7.75, lower_text, 0),
+             FieldName('Magnesio\nhornblende', 7, upper_text, 0),
+             FieldName('Ferro\nhornblende', 7, lower_text, 0),
+             FieldName('Tschermakite', 6, upper_text, 0),
+              FieldName('Ferrotschermakite', 6, lower_text, 0),
+            )
+    for line in lines:
+        plot_axes.plot([line.x1, line.x2], [line.y1, line.y2],
+                       '-', color=color, zorder=0, lw=linewidth)
+    if text_labels==True:
+
+        for name in names:
+            plot_axes.text(name.x, name.y, name.name, color=color, size=fontsize,
+                    horizontalalignment='center', verticalalignment='top',
+                    rotation=name.rotation, zorder=0)
+
+def plot_amp_class_Leake(amp_comps, fontsize=8, color=[0.3, 0.3, 0.3],
+linewidth=0.5, lower_text=0.3, upper_text=0.7, text_labels=True, site_check=True,
+plots="Ca_Amphiboles", marker='.k'):
+
+
+    cat_23ox=calculate_23oxygens_amphibole(amp_comps)
+    Leake_Sites=get_amp_sites_from_input(amp_comps)
+    low_Ca_B=Leake_Sites['Ca_B']<1.5
+    low_NaK_B=(Leake_Sites['Na_A']+Leake_Sites['K_A'])<0.5
+
+    if site_check==False:
+
+        if (any(Leake_Sites['Ca_B']<1.5)):
+
+            #print(str(sum(low_Ca_B))+ " amphiboles have Ca_B<1.5")
+            w.warn(str(sum(low_Ca_B))+ " of your amphiboles have Ca_B<1.5, so shouldnt be plotted on this diagram based on Leake. site_check=True filters these out")
+        if (any((Leake_Sites['Na_A']+Leake_Sites['K_A'])<0.5)):
+            #print(str(sum(low_NaK_B=))+ " amphiboles have Na_A+K_A<1.5, so arent shown on this plot")
+            w.warn(str(sum(low_NaK_B))+ " of your amphiboles have Na_A+K_A>0.5"
+            "so shouldnt be plotted on this diagram based on Leake. site_check=True filters these out")
+        fig, (ax1) = plt.subplots(1, 1, figsize = (7,5))
+        ax1.plot(cat_23ox['SiO2_Amp_cat_23ox'], cat_23ox['Mgno_Amp'], 'ok')
+        add_Leake_Amp_Fields_Fig3a(ax1, fontsize=fontsize, color=color,
+        linewidth=linewidth, lower_text=lower_text, upper_text=upper_text,
+        text_labels=text_labels)
+        ax1.invert_xaxis()
+        ax1.set_xlabel('Si (apfu)')
+        ax1.set_ylabel('Mg# Amphibole')
+        #     ax2.plot(Leake_Sites['Ca_B'], Leake_Sites['Na_A']+Leake_Sites['K_A'],
+        #     'ok')
+        #     ax2.plot([1.5, 1.5], [0, 0.5], '-r')
+        #     ax2.plot([0, 1.5], [0.5, 0.5], '-r')
+        # #out_range=
+        #
+        #     ax2.annotate("Out of range\n for this diagram", xy=(0.1, 0.25), xycoords="axes fraction", fontsize=8)
+        #     ax2.set_xlabel('Ca_B site')
+        #     ax2.set_ylabel('Na_A + K_A site')
+
+    # if site_check==False:
+    #     fig, (ax1) = plt.subplots(figsize = (8,5))
+    #     ax1.plot(cat_23ox['SiO2_Amp_cat_23ox'], cat_23ox['Mgno_Amp'], 'ok')
+    #     add_Leake_Amp_Fields_Fig3a(ax1, fontsize=fontsize, color=color,
+    #     linewidth=linewidth, lower_text=lower_text, upper_text=upper_text,
+    #     text_labels=text_labels)
+    #     ax1.invert_xaxis()
+    #     ax1.set_xlabel('Si (apfu)')
+    #     ax1.set_ylabel('Mg# Amphibole')
+
+    if site_check==True:
+        if plots == "Ca_Amphiboles":
+            print(str(sum(low_Ca_B))+ " amphiboles have Ca_B<1.5, so arent shown on this plot")
+            print(str(sum(low_NaK_B))+ " amphiboles have Na_A+K_A<1.5, so arent shown on this plot")
+            fig, (ax1) = plt.subplots(1, 1, figsize = (7,5))
+            low_NaK_A=(Leake_Sites['Na_A']+Leake_Sites['K_A'])<0.5
+            high_NaK_A=(Leake_Sites['Na_A']+Leake_Sites['K_A'])>=0.5
+            ax1.plot(cat_23ox['SiO2_Amp_cat_23ox'].loc[(~low_NaK_A)&(~low_Ca_B)],
+            cat_23ox['Mgno_Amp'].loc[(~low_NaK_A)&(~low_Ca_B)], marker)
+
+            add_Leake_Amp_Fields_Fig3a(ax1, fontsize=fontsize, color=color,
+        linewidth=linewidth, lower_text=lower_text, upper_text=upper_text,
+        text_labels=text_labels)
+            ax1.invert_xaxis()
+            ax1.set_xlabel('Si (apfu)')
+            ax1.set_ylabel('Mg# Amphibole')
+
+
+
+
+
+
+    #return fig
