@@ -188,7 +188,8 @@ filter_q=None, append=False):
         'while variable_err adds noise to a single variable'\
         'specify only one of these arguements')
     if filter_q is not None:
-        Sample_c = phase_comp.query(filter_q)
+        Sample_c = phase_comp.query(filter_q).copy()
+
     else:
         Sample_c = phase_comp.copy()
     if phase_err is not None and noise_percent is not None:
@@ -214,7 +215,7 @@ filter_q=None, append=False):
         elx = 'Ol'
     if phase_err is None or (phase_err is not None and err_dist == "uniform"):
 
-        Sample_c.loc[:, 'Sample_ID_{}_Num'.format(elx)] = Sample_c.index
+        Sample_c['Sample_ID_{}_Num'.format(elx)] = Sample_c.index
 
         # This duplicates your entered composition the number of times
         # specified by noise samples (Cpx1-Cpx1-Cpx1, Cpx2, Cpx2,...)

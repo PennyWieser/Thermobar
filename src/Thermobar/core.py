@@ -2765,14 +2765,14 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     Combo_liq_cpxs['Delta_DiHd'] = abs(
         Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_Mollo'])
 
-    b = np.empty(len(Combo_liq_cpxs), dtype=str)
+    b = np.empty(len(Combo_liq_cpxs), dtype=bool)
     for i in range(0, len(Combo_liq_cpxs)):
 
         if ((Combo_liq_cpxs['Delta_Kd_Put2008'].iloc[i] < KdErr) & (Combo_liq_cpxs['Delta_EnFs'].iloc[i] < 0.05 * sigma) &
                 (Combo_liq_cpxs['Delta_CaTs'].iloc[i] < 0.03 * sigma) & (Combo_liq_cpxs['Delta_DiHd'].iloc[i] < 0.06 * sigma)):
-            b[i] = str("Yes")
+            b[i] = True
         else:
-            b[i] = str("No")
+            b[i] = False
     Combo_liq_cpxs.insert(1, "Eq Tests Neave2017?", b)
 
     cols_to_move = ['P_kbar_calc', 'T_K_calc', "Eq Tests Neave2017?",
@@ -2780,7 +2780,7 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     Combo_liq_cpxs = Combo_liq_cpxs[cols_to_move +
                                     [col for col in Combo_liq_cpxs.columns if col not in cols_to_move]]
 
-    return Combo_liq_cpxs
+    return Combo_liq_cpxs.copy()
 
 
 def calculate_cpx_opx_eq_tests(cpx_comps, opx_comps):

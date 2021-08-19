@@ -626,7 +626,7 @@ plots="Ca_Amphiboles", marker='.k'):
         if (any((Leake_Sites['Na_A']+Leake_Sites['K_A'])<0.5)):
             #print(str(sum(low_NaK_B=))+ " amphiboles have Na_A+K_A<1.5, so arent shown on this plot")
             w.warn(str(sum(low_NaK_B))+ " of your amphiboles have Na_A+K_A>0.5"
-            "so shouldnt be plotted on this diagram based on Leake. site_check=True filters these out")
+            " so shouldn\'t be plotted on this diagram based on Leake. site_check=True filters these out", stacklevel=2)
         fig, (ax1) = plt.subplots(1, 1, figsize = (7,5))
         ax1.plot(cat_23ox['SiO2_Amp_cat_23ox'], cat_23ox['Mgno_Amp'], 'ok')
         add_Leake_Amp_Fields_Fig3a(ax1, fontsize=fontsize, color=color,
