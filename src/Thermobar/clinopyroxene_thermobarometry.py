@@ -1048,14 +1048,14 @@ H2O_Liq=None, Return_All_Matches=False):
         # the preliminary Kd filter
 
         if P is not None:
-            Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs2.copy()
+            Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
             T_K_calc = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
             equationT=equationT, P=P)
             P_guess = P
             T_K_guess = T_K_calc
         if T is not None:
             Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
-            P_kbar_calc = calculate_cpx_opx_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
+            P_kbar_calc = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs_FeMgMatch,
             equationP=equationP, T=T)
             P_guess = P_kbar_calc
             T_K_guess = T
@@ -1195,87 +1195,37 @@ H2O_Liq=None, Return_All_Matches=False):
             df1_Mean.rename(columns={"Mean_ID_CPX": "ID_CPX"}, inplace=True)
             df1_Std.rename(columns={"Std_ID_CPX": "ID_CPX"}, inplace=True)
 
+
+
             df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_CPX'])
             df1_M['Sample_ID_Cpx']=Sample_ID_Cpx_Mean
-            cols_to_move = ['Sample_ID_Cpx',
+
+            if equationT is not None and equationP is not None:
+                cols_to_move = ['Sample_ID_Cpx',
                             'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+                            'Std_P_kbar_calc']
+
+            if equationT is not None and equationP is None:
+                cols_to_move = ['Sample_ID_Cpx',
+                            'Mean_P_kbar_input',
+                            'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
+
+            if equationT is None and equationP is not None:
+                cols_to_move = ['Sample_ID_Cpx',
+                            'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
                             'Std_P_kbar_calc']
 
             df1_M = df1_M[cols_to_move +
                       [col for col in df1_M.columns if col not in cols_to_move]]
 
 
-            # df1_M = pd.DataFrame()
-            # df1_S = pd.DataFrame()
-            # for cpx in CpxNumbers:
-            #     dff_M = pd.DataFrame(
-            #         combo_liq_cpx_fur_filt.loc[combo_liq_cpx_fur_filt['ID_CPX'] == cpx].mean(axis=0)).T
-            #     dff_M['Sample_ID_Cpx'] = combo_liq_cpx_fur_filt.loc[combo_liq_cpx_fur_filt['ID_CPX']
-            #                                                         == cpx, "Sample_ID_Cpx"].iloc[0]
-            #     if cpx == CpxNumbers[0]:
-            #         df1_M = dff_M
-            #         df1_M['Sample_ID_Cpx'] = combo_liq_cpx_fur_filt.loc[combo_liq_cpx_fur_filt['ID_CPX']
-            #                                                             == cpx, "Sample_ID_Cpx"].iloc[0]
-            #     else:
-            #         df1_M = pd.concat([df1_M, dff_M], sort=False)
-            #
-            # df1_M = df1_M.add_prefix('Mean_')
-            # c
-            # df1_M = df1_M.rename(
-            #     columns={'Mean_Sample_ID_Cpx': 'Sample_ID_Cpx'})
-            # for cpx in CpxNumbers:
-            #     dff_S = pd.DataFrame(
-            #         combo_liq_cpx_fur_filt.loc[combo_liq_cpx_fur_filt['ID_CPX'] == cpx].std(axis=0)).T
-            #     # This tells us if there is only 1, in which case std will
-            #     # return Nan
-            #     if np.shape(
-            #             combo_liq_cpx_fur_filt.loc[combo_liq_cpx_fur_filt['ID_CPX'] == cpx])[0] == 1:
-            #         dff_S = dff_S.fillna(0)
-            #         dff_S['N'] = 1
-            #     else:
-            #         dff_S = dff_S
-            #         dff_S['N'] = np.shape(
-            #             combo_liq_cpx_fur_filt.loc[combo_liq_cpx_fur_filt['ID_CPX'] == cpx])[0]
-            #     if cpx == CpxNumbers[0]:
-            #         df1_S = dff_S
-            #     else:
-            #         df1_S = pd.concat([df1_S, dff_S])
-            #
-            # df1_S = df1_S.add_prefix('st_dev_')
-            # df1_M.insert(0, "No. of liquids averaged", df1_S['st_dev_N'])
-            # if equationP is not None and equationT is not None:
-            #     df1_M.insert(3, "st_dev_T_K_calc", df1_S['st_dev_T_K_calc'])
-            #     df1_M.insert(5, "st_dev_P_kbar_calc",
-            #                  df1_S['st_dev_P_kbar_calc'])
-            # if P is not None:
-            #     df1_M.insert(3, "st_dev_T_K_calc", df1_S['st_dev_T_K_calc'])
-            #     #df1_M=df1_M.drop(['Mean_Sample_ID_Liq', 'Mean_index'], axis=1)
-            #     df1_M.rename(columns={'Mean_P_kbar_calc': 'P_kbar_input'})
-            # if T is not None:
-            #     df1_M.insert(5, "st_dev_P_kbar_calc",
-            #                  df1_S['st_dev_P_kbar_calc'])
-            #     #df1_M=df1_M.drop(['Mean_Sample_ID_Liq', 'Mean_index'], axis=1)
-            #     df1_M.rename(columns={'Mean_T_K_calc': 'T_K_input'})
-
         else:
             raise Exception(
                 'No Matches - to set less strict filters, change perhaps change sigma to a value greater'
                 ' than one, or specify eq_crit for only a subset of the values in Neave and Putirka')
 
-        if P is not None:
-            combo_liq_cpx_fur_filt.rename(
-                columns={'P_kbar_calc': 'P_kbar_input'})
-            df1_M.rename(
-                columns={'Mean_P_kbar_calc': 'Mean_P_kbar_input'})
-            df1_M.rename(
-                columns={'Std_P_kbar_calc': 'Std_P_kbar_input'})
-        if T is not None:
-            combo_liq_cpx_fur_filt = combo_liq_cpx_fur_filt.rename(
-                columns={'T_K_calc': 'T_K_input'})
-            df1_M.rename(
-                columns={'Mean_T_K_calc': 'Mean_T_K_input'})
-            df1_M.rename(
-                columns={'Std_T_K_calc': 'Std_T_K_input'})
+
+
         print('Done!')
         return {'Av_PTs': df1_M, 'All_PTs': combo_liq_cpx_fur_filt}
 

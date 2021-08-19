@@ -104,7 +104,7 @@ def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, MgO_Liq_cat_frac,
     |  SEE=± 41°C for testing data
     """
     return (273.15 + 10**4 / (4.07 - 0.329 * (0.1 * P) + 0.12 * H2O_Liq +
-    0.567 * ln_Fm2Si2O6_liq - 3.06 * MgO_Liq_cat_frac -
+    0.567 * ln_Fm2Si2O6_liq.astype(float) - 3.06 * MgO_Liq_cat_frac -
     6.17 * K2O_Liq_cat_frac + 1.89 * MgO_Liq_cat_frac /
     (MgO_Liq_cat_frac + FeOt_Liq_cat_frac) + 2.57 * FeOt_Opx_cat_6ox))
 
@@ -773,82 +773,73 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
             PT_out = calculate_opx_liq_press_temp(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
             P_guess = PT_out['P_kbar_calc'].astype('float64')
             T_K_guess = PT_out['T_K_calc'].astype('float64')
+            Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
+            Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
 
         # Users may already know their pressure, rather than choosing an equation.
-        if P is not None:
+        if equationT is not None and equationP is None:
             P_guess = P
             T_K_guess = calculate_opx_liq_temp(meltmatch=Combo_liq_opx_fur_filt, equationT=equationT, P=P_guess)
+            Combo_liq_opx_fur_filt.insert(0, "P_kbar_input", P_guess)
+            Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
 
     # Users may already know their temperature, rather than using an equation
-        if T is not None:
+        if equationP is not None and equationT is None:
             T_K_guess = T
             P_guess = calculate_opx_liq_press(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, T=T_K_guess)
+            Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
+            Combo_liq_opx_fur_filt.insert(1, "T_K_input", T_K_guess)
 
-        Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess)
-        Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess)
 
 
         print('Finished calculating Ps and Ts, now just averaging the results. Almost there!')
 
-        # This bit averages all the matches for a given Opx (e.g, Opx1-Liq1,
-        # Opx1-Liq10 etc).
-        OpxNumbers = Combo_liq_opx_fur_filt['ID_OPX'].unique()
-        if len(OpxNumbers) > 0:
-            df1_M = pd.DataFrame()
-            df1_S = pd.DataFrame()
-            for opx in OpxNumbers:
-                dff_M = pd.DataFrame(
-                    Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX'] == opx].mean(axis=0)).T
-                dff_M['Sample_ID_Opx'] = Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX']
-                                                                    == opx, "Sample_ID_Opx"].iloc[0]
 
-                if opx == OpxNumbers[0]:
-                    df1_M = dff_M
-                    df1_M['Sample_ID_Opx'] = Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX']
-                                                                        == opx, "Sample_ID_Opx"].iloc[0]
-                else:
-                    df1_M = pd.concat([df1_M, dff_M], sort=False)
 
-            df1_M = df1_M.add_prefix('Mean_')
-            df1_M.rename(columns={'Mean_Sample_ID_Opx': 'Sample_ID_Opx'}, inplace=True)
-            cols_to_move = ['Sample_ID_Opx',
-                            'Mean_T_K_calc', 'Mean_P_kbar_calc']
+        # # This bit averages all the matches for a given Opx (e.g, Opx1-Liq1,
+        opxNumbers = Combo_liq_opx_fur_filt['ID_OPX'].unique()
+        if len(opxNumbers) > 0:
+            df1_Mean_nopref=Combo_liq_opx_fur_filt.groupby(['ID_OPX', 'Sample_ID_Opx'], as_index=False).mean()
+            df1_Std_nopref=Combo_liq_opx_fur_filt.groupby(['ID_OPX', 'Sample_ID_Opx'], as_index=False).std()
+            count=Combo_liq_opx_fur_filt.groupby('ID_OPX').count()
+            Sample_ID_Opx_Mean=df1_Mean_nopref['Sample_ID_Opx']
+            Sample_ID_Opx_Std=df1_Std_nopref['Sample_ID_Opx']
+            df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+            df1_Std=df1_Std_nopref.add_prefix('Std_')
+            df1_Mean=df1_Mean.drop(['Mean_Sample_ID_Opx'], axis=1)
+            df1_Std=df1_Std.drop(['Std_Sample_ID_Opx'], axis=1)
+            df1_Mean.rename(columns={"Mean_ID_OPX": "ID_OPX"}, inplace=True)
+            df1_Std.rename(columns={"Std_ID_OPX": "ID_OPX"}, inplace=True)
+
+            df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_OPX'])
+            df1_M['Sample_ID_Opx']=Sample_ID_Opx_Mean
+
+            if equationT is not None and equationP is not None:
+                cols_to_move = ['Sample_ID_Opx',
+                            'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+                            'Std_P_kbar_calc']
+
+            if equationT is not None and equationP is None:
+                cols_to_move = ['Sample_ID_Opx',
+                            'Mean_P_kbar_input',
+                            'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
+
+            if equationT is None and equationP is not None:
+                cols_to_move = ['Sample_ID_Opx',
+                            'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
+                            'Std_P_kbar_calc']
+
+
 
             df1_M = df1_M[cols_to_move +
-                        [col for col in df1_M.columns if col not in cols_to_move]]
+                            [col for col in df1_M.columns if col not in cols_to_move]]
 
-            for opx in OpxNumbers:
 
-                dff_S = pd.DataFrame(
-                    Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX'] == opx].std(axis=0)).T
-                # This tells us if there is only 1, in which case std will return
-                # Nan
-                if np.shape(Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX'] == opx])[0] == 1:
-                    dff_S = dff_S.fillna(0)
-                    dff_S['N'] = 1
-                else:
-                    dff_S = dff_S
-                    dff_S['N'] = np.shape(Combo_liq_opx_fur_filt.loc[Combo_liq_opx_fur_filt['ID_OPX'] == opx])[0]
-                if opx == OpxNumbers[0]:
-                    df1_S = dff_S
-                else:
-                    df1_S = pd.concat([df1_S, dff_S])
+        else:
+            raise Exception(
+                'No Matches - you may need to set less strict filters, e.g.,'
+                'you could edit KdMatch is None and KdErr to get more matches')
 
-            df1_S = df1_S.add_prefix('st_dev_')
-
-            df1_M.insert(1, "st_dev_T_K_calc", df1_S['st_dev_T_K_calc'])
-            df1_M.insert(3, "st_dev_P_kbar_calc", df1_S['st_dev_P_kbar_calc'])
-            df1_M.insert(0, "No. of Opxs averaged", df1_S['st_dev_N'])
-
-        if P is not None:
-            Combo_liq_opx_fur_filt = Combo_liq_opx_fur_filt.rename(
-                columns={'P_kbar_calc': 'P_kbar_input'})
-            df1_M.drop(columns=['st_dev_P_kbar_calc', 'Mean_P_kbar_calc'])
-
-        if T is not None:
-            Combo_liq_opx_fur_filt = Combo_liq_opx_fur_filt.rename(
-                columns={'T_K_calc': 'T_K_input'})
-            df1_M.drop(columns=['st_dev_T_K_calc', 'Mean_T_K_calc'])
 
         # Returns all opxs-liquids that went through 1st Kd filter with
         # equilibrium parameters, averaged matches, and all matches (not averaged)
