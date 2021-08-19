@@ -1791,6 +1791,8 @@ def calculate_23oxygens_amphibole(amp_comps):
         cation_23['CaO_Amp_cat_23ox'])
     cation_23['cation_sum_All'] = cation_23['cation_sum_Si_Ca'] + \
         cation_23['Na2O_Amp_cat_23ox'] + +cation_23['K2O_Amp_cat_23ox']
+    cation_23['Mgno_Amp']=cation_23['MgO_Amp_cat_23ox']/(cation_23['MgO_Amp_cat_23ox']
+    +cation_23['FeOt_Amp_cat_23ox'])
 
     return cation_23
 # Ridolfi Amphiboles, using Cl and F, does on 13 cations.
@@ -1876,6 +1878,7 @@ def calculate_13cations_amphibole_ridolfi(amp_comps):
     cats = calculate_cat_proportions_amphibole_ridolfi(amp_comps=amp_comps)
     cats['cation_sum_Si_Mg'] = (cats['SiO2_Amp_cat_prop'] + cats['TiO2_Amp_cat_prop'] + cats['Al2O3_Amp_cat_prop'] +
                                 cats['Cr2O3_Amp_cat_prop'] + cats['FeOt_Amp_cat_prop'] + cats['MnO_Amp_cat_prop'] + cats['MgO_Amp_cat_prop'])
+
     sum_SiMg = cats['cation_sum_Si_Mg']
     cats.drop(['cation_sum_Si_Mg'], axis=1, inplace=True)
     cat_13 = 13 * cats.divide(sum_SiMg, axis='rows')
@@ -1913,9 +1916,180 @@ def get_amp_sites_from_input(amp_comps):
 
     return out
 
-
-
 def get_amp_sites(amp_apfu_df):
+    """
+    get_amp_sites takes generalized atom per formula unit calculations from
+    calculate_23oxygens_amphibole and puts them in the proper cation sites
+    according to Leake et al., 1997.
+
+    Parameters
+    ----------
+    amp_apfu_df : pandas DataFrame
+        This is the dataframe output from calculate_23oxygens_amphibole. You should
+        not have to modify this dataframe at all.
+
+
+    Returns
+    -------
+    sites_df : pandas DataFrame
+        a samples by cation sites dimension dataframe where each column corresponds
+        to a cation site in amphibole. The suffix at the end corresponds to which site
+        the cation is in:
+            T = tetrahedral sites (8 total)
+            C = octahedral sites (5 total)
+            B  = M4 sites (2 total)
+            A = A site (0 - 1 total)
+    """
+
+
+
+    norm_cations = amp_apfu_df.copy()
+
+    # Take unambigous ones and allocate them, set everything else to zero
+
+
+    norm_cations['Si_T']=norm_cations['SiO2_Amp_cat_23ox']
+    norm_cations['Al_T']=0
+    norm_cations['Al_C']=0
+    norm_cations['Ti_C']=norm_cations['TiO2_Amp_cat_23ox']
+    norm_cations['Mg_C']=0
+    norm_cations['Fe_C']=0
+    norm_cations['Mn_C']=0
+    norm_cations['Cr_C']=norm_cations['Cr2O3_Amp_cat_23ox']
+    norm_cations['Mg_B']=0
+    norm_cations['Fe_B']=0
+    norm_cations['Mn_B']=0
+    norm_cations['Na_B']=0
+    norm_cations['Ca_B']=norm_cations['CaO_Amp_cat_23ox']
+    norm_cations['Na_A']=0
+    norm_cations['K_A']=norm_cations['K2O_Amp_cat_23ox']
+
+
+    # 5a) Leake T Sites. Place all Si here, if Si<8, fill rest of T with Al.
+
+    #If Si + Al is greater than 8, need to split Al between Al_T and Al_C as it can't all go here
+    Si_Ti_sum_gr8=(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['Al2O3_Amp_cat_23ox'])>8
+    # Calculate the amount of Ti sites left to fill after putting Si in. dont need to worry
+    # about overallocating Ti, as already know they sum to more than 8.
+    Al_T_Si_Ti_sum_gr8=8-norm_cations['SiO2_Amp_cat_23ox']
+    # Got to be careful here, if Si on 23ox is >8, Al_T_Si_Ti_sum_gr8 ends up negative. Add another check
+    Si_l_8=(norm_cations['SiO2_Amp_cat_23ox']<=8)
+    # If Si is less than 8 already, set Ti to the difference
+    norm_cations.loc[(Si_Ti_sum_gr8&Si_l_8), 'Al_T']=Al_T_Si_Ti_sum_gr8
+    # If Si is greater than 8, set Al_T to zero
+    norm_cations.loc[(Si_Ti_sum_gr8&(~Si_l_8)), 'Al_T']=0
+
+
+    # Put remaining Al
+    norm_cations.loc[(Si_Ti_sum_gr8), 'Al_C']=norm_cations['Al2O3_Amp_cat_23ox']-norm_cations['Al_T']
+
+    #If Si+Al<8, put all Al in tetrahedlra sites
+    Si_Ti_sum_less8=(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['Al2O3_Amp_cat_23ox'])<8
+    norm_cations.loc[(Si_Ti_sum_less8), 'Al_T']=norm_cations['Al2O3_Amp_cat_23ox']
+    norm_cations.loc[(Si_Ti_sum_less8), 'Al_C']=0
+
+    # 5b) Leake Octaherdal C sites.
+    #already filled some with Al in lines above. Place Ti (unambg), Cr (unamb).
+    # Fill sites with Mg, Fe, and Mn to bring total to 5.
+
+    # If Sites sum to less than 5, place all elements here
+    Al_Ti_Cr_Mg_Fe_Mn_less5=(norm_cations['Al_C']+norm_cations['TiO2_Amp_cat_23ox']+norm_cations['FeOt_Amp_cat_23ox']
+    +norm_cations['Cr2O3_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']+norm_cations['MgO_Amp_cat_23ox'])<5
+
+    norm_cations.loc[(Al_Ti_Cr_Mg_Fe_Mn_less5), 'Fe_C']=norm_cations['FeOt_Amp_cat_23ox']
+    norm_cations.loc[(Al_Ti_Cr_Mg_Fe_Mn_less5), 'Mn_C']=norm_cations['MnO_Amp_cat_23ox']
+    norm_cations.loc[(Al_Ti_Cr_Mg_Fe_Mn_less5), 'Mg_C']=norm_cations['MgO_Amp_cat_23ox']
+
+
+    #If sites sum to more than 5, after placing Ti and Cr here, fill rest with Mg, Fe and Mn
+    Al_Ti_Cr_Mg_Fe_Mn_more5=(norm_cations['Al_C']+norm_cations['TiO2_Amp_cat_23ox']+norm_cations['FeOt_Amp_cat_23ox']
+    +norm_cations['Cr2O3_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']+norm_cations['MgO_Amp_cat_23ox'])>5
+
+    # First, check if Al+Cr+Ti sum to 5. If not, allocate Mg
+    sum_C_Al_Cr_Ti=norm_cations['Al_C']+norm_cations['Cr_C']+norm_cations['Ti_C']
+    check_C_Al_Cr_Ti=sum_C_Al_Cr_Ti<5
+    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti)), 'Mg_C']=norm_cations['MgO_Amp_cat_23ox']
+
+    # Now check you haven't added too much MgO to take you over 5
+    sum_C_Al_Cr_Ti_Mg=norm_cations['Al_C']+norm_cations['Cr_C']+norm_cations['Ti_C']+norm_cations['Mg_C']
+    check_C_Al_Cr_Ti_Mg_low=sum_C_Al_Cr_Ti_Mg<=5
+    check_C_Al_Cr_Ti_Mg_high=sum_C_Al_Cr_Ti_Mg>5
+    # If sum is >5, replace Mg with only the magnesium left needed to get to 5.
+    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti_Mg_high)), 'Mg_C']=5-sum_C_Al_Cr_Ti
+
+    # Now check if you are back under 5 again,  ready to allocate Fe
+    sum_C_Al_Cr_Ti_Mg2=norm_cations['Al_C']+norm_cations['Cr_C']+norm_cations['Ti_C']+norm_cations['Mg_C']
+    check_C_Al_Cr_Ti_Mg_low2=sum_C_Al_Cr_Ti_Mg2<5
+    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti_Mg_low2)), 'Fe_C']=norm_cations['FeOt_Amp_cat_23ox']
+
+    # Now check you haven't added too much FeO to take you over 5
+    sum_C_Al_Cr_Ti_Mg_Fe=(norm_cations['Al_C']+norm_cations['Cr_C']
+    +norm_cations['Ti_C']+norm_cations['Mg_C']+norm_cations['Fe_C'])
+    check_C_Al_Cr_Ti_Mg_Fe_low=sum_C_Al_Cr_Ti_Mg_Fe<=5
+    check_C_Al_Cr_Ti_Mg_Fe_high=sum_C_Al_Cr_Ti_Mg_Fe>5
+    # If sum is >5, replace Fe with only the Fe left needed to get to 5.
+    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti_Mg_Fe_high)), 'Fe_C']=5-sum_C_Al_Cr_Ti_Mg2
+
+    # Now check if you are back under 5 again,  ready to allocate Mn
+    sum_C_Al_Cr_Ti_Mg_Fe2=(norm_cations['Al_C']+norm_cations['Cr_C']+norm_cations['Ti_C']
+    +norm_cations['Mg_C']+norm_cations['Fe_C'])
+    check_C_Al_Cr_Ti_Mg_Fe_low2=sum_C_Al_Cr_Ti_Mg_Fe2<5
+    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti_Mg_Fe_low2)), 'Mn_C']=norm_cations['MnO_Amp_cat_23ox']
+
+    # Now check you haven't added too much Mn to take you over 5
+    sum_C_Al_Cr_Ti_Mg_Fe_Mn=(norm_cations['Al_C']+norm_cations['Cr_C']
+    +norm_cations['Ti_C']+norm_cations['Mg_C']+norm_cations['Fe_C']+norm_cations['Mn_C'])
+    check_C_Al_Cr_Ti_Mg_Fe_Mn_low=sum_C_Al_Cr_Ti_Mg_Fe_Mn<=5
+    check_C_Al_Cr_Ti_Mg_Fe_Mn_high=sum_C_Al_Cr_Ti_Mg_Fe_Mn>5
+    # If sum is >5, replace Mn with only the Mn left needed to get to 5.
+    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti_Mg_Fe_Mn_high)), 'Mn_C']=5-sum_C_Al_Cr_Ti_Mg_Fe2
+
+
+
+    # 5c) Leake. B Sites-
+    # if any Mg, Fe, Mn or Ca remaining put here;
+    Mg_remaining=norm_cations['MgO_Amp_cat_23ox']-norm_cations['Mg_C']
+    Fe_remaining=norm_cations['FeOt_Amp_cat_23ox']-norm_cations['Fe_C']
+    Mn_remaining=norm_cations['MnO_Amp_cat_23ox']-norm_cations['Mn_C']
+
+    norm_cations['Mg_B']= Mg_remaining
+    norm_cations['Fe_B']= Fe_remaining
+    norm_cations['Mn_B']= Mn_remaining
+
+
+
+    # If B sites sum to less than 2, fill sites with Na to bring total to 2
+
+    Sum_B=norm_cations['Mg_B']+norm_cations['Fe_B']+norm_cations['Mn_B']+norm_cations['Ca_B']
+    Left_to_fill_B=2- Sum_B
+    # Check there is actually enough Na to fill B this way fully, if so allocate the amount you need
+    Enough_Na=norm_cations['Na2O_Amp_cat_23ox']>=Left_to_fill_B
+    norm_cations.loc[((Sum_B<2)&(Enough_Na)), 'Na_B']=Left_to_fill_B
+    #  If there isn't enough Na2O, allocate all Na2O you have
+    norm_cations.loc[((Sum_B<2)&(~Enough_Na)), 'Na_B']=norm_cations['Na2O_Amp_cat_23ox']
+    Na_left_AfterB=norm_cations['Na2O_Amp_cat_23ox']-norm_cations['Na_B']
+
+    # A sites
+    norm_cations['K_A']=norm_cations['K2O_Amp_cat_23ox']
+    norm_cations['Na_A']=Na_left_AfterB
+
+    norm_cations['Sum_T']=norm_cations['Al_T']+norm_cations['Si_T']
+    norm_cations['Sum_C']=(norm_cations['Al_C']+norm_cations['Cr_C']+norm_cations['Mg_C']
+    +norm_cations['Fe_C']+norm_cations['Mn_C'])
+    norm_cations['Sum_B']=(norm_cations['Mg_B']+norm_cations['Fe_B']+norm_cations['Mn_B']
+    +norm_cations['Ca_B']+norm_cations['Na_B'])
+    norm_cations['Sum_A']=norm_cations['K_A']+norm_cations['Na_A']
+
+    norm_cations['cation_sum_All'] = norm_cations['cation_sum_Si_Ca'] + \
+        norm_cations['Na2O_Amp_cat_23ox'] + +norm_cations['K2O_Amp_cat_23ox']
+    norm_cations['Mgno_Amp']=norm_cations['MgO_Amp_cat_23ox']/(norm_cations['MgO_Amp_cat_23ox']
+    +norm_cations['FeOt_Amp_cat_23ox'])
+
+
+    return norm_cations
+
+
+def get_amp_sites2(amp_apfu_df):
     """
     get_amp_sites takes generalized atom per formula unit calculations from
     calculate_23oxygens_amphibole and puts them in the proper cation sites
@@ -2018,12 +2192,23 @@ def get_amp_sites(amp_apfu_df):
             Na_A[i] = norm_cations.loc[sample, 'Na2O'] - Na_B[i]
 
     # making the dataframe for the output
+    Sum_T=Al_T+Si_T
+    Sum_C=Al_C+Cr_C+Mg_C+Fe_C+Mn_C
+    Sum_B=Mg_B+Fe_B+Mn_B+Ca_B+Na_B
+    Sum_A=K_A+Na_A
+
+
     site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe_C, Mn_C, Cr_C, Mg_B,
     Fe_B, Mn_B, Na_B, Ca_B, Na_A, K_A])
     sites_df = pd.DataFrame(site_vals.T, columns=['Si_T', 'Al_T', 'Al_C', 'Ti_C',
      'Mg_C', 'Fe_C', 'Mn_C', 'Cr_C', 'Mg_B', 'Fe_B', 'Mn_B', 'Na_B', 'Ca_B', 'Na_A', 'K_A'],
                             index=amp_apfu_df.index
                             )
+    sites_df['Sum_T'] =   Sum_T
+    sites_df['Sum_C'] =   Sum_C
+    sites_df['Sum_B'] =   Sum_B
+    sites_df['Sum_A'] =   Sum_A
+
     return sites_df
 
 
