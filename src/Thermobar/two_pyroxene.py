@@ -798,21 +798,6 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         raise Exception(
             'No Matches - you may need to set less strict filters, e.g.,'
             'you could edit KdMatch is None and KdErr to get more matches')
-    if P is not None:
-        Combo_opxs_cpxs_2.rename(
-            columns={'P_kbar_calc': 'P_kbar_input'})
-        # df1_M=df1_M.rename(
-        #     columns={'Mean_P_kbar_calc': 'Mean_P_kbar_input', 'Std_P_kbar_calc': 'Std_P_kbar_input'})
-        # df1_2M=df1_2M.rename(
-        #     columns={'Mean_P_kbar_calc': 'Mean_P_kbar_input', 'Std_P_kbar_calc': 'Std_P_kbar_input'})
-
-    if T is not None:
-        Combo_opxs_cpxs_2 = Combo_opxs_cpxs_2.rename(
-            columns={'T_K_calc': 'T_K_input'})
-        # df1_M=df1_M.rename(
-        #     columns={'Mean_T_K_calc': 'Mean_T_K_input', 'Std_T_K_calc': 'Std_T_K_input'})
-        # df1_2M=df1_2M.rename(
-        #     columns={'Mean_T_K_calc': 'Mean_T_K_input', 'Std_T_K_calc': 'Std_T_K_input'})
 
 
 
