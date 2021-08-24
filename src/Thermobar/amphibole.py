@@ -199,6 +199,25 @@ def calculate_amp_only_melt_comps(amp_comps=None, equation=None, T_K=None):
         amp_sites['MgO_Eq9']=(np.exp(12.6618  -2.63189*amp_sites['Si_T_ideal']
            +1.04995*amp_sites['Al_VI_C_ideal'] +1.26035*amp_sites['Mg_C_ideal']))
 
+        amp_sites['CaO_Eq10']=(41.2784  -7.1955*amp_sites['Si_T_ideal']
+           +3.6412*amp_sites['Mg_C_ideal'] -5.0437*amp_sites['Na_A_ideal'])
+
+        amp_sites['CaO_Eq11']=np.exp((6.4192  -1.17372*amp_sites['Si_T_ideal']
+           +1.31976*amp_sites['Al_VI_C_ideal'] +0.67733*amp_sites['Mg_C_ideal']))
+
+        amp_sites['K2O_Eq12']=(100.5909  -4.3246*amp_sites['Si_T_ideal']
+            -17.8256*amp_sites['Al_VI_C_ideal']-10.0901*amp_sites['Mg_C_ideal'] -15.683*amp_sites['Fe3_C_ideal']
+            -8.8004*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal'])-19.7448*amp_sites['Ti_C_ideal']
+            -6.3727*amp_sites['Ca_B_ideal']-5.8069*amp_sites['Na_A_ideal'])
+
+        amp_sites['K2O_Eq13']=(-16.53  +1.6878*amp_sites['Si_T_ideal']
+            +1.2354*(amp_sites['Fe3_C_ideal']+amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal'])
+            +5.0404*amp_sites['Ti_C_ideal']+2.9703*amp_sites['Ca_B_ideal'])
+
+        amp_sites['Al2O3_Eq14']=(4.573 + 6.9408*amp_sites['Al_VI_C_ideal']+1.0059*amp_sites['Mg_C_ideal']
+         +4.5448*amp_sites['Fe3_C_ideal']+5.9679*amp_sites['Ti_C_ideal']
+            +7.1501*amp_sites['Na_A_ideal'])
+
 
         if T_K is not None:
             amp_sites['SiO2_Eq3']=(-228 + 0.01065*(T_K-273.15) + 165*np.log(amp_sites['Si_T_ideal'])

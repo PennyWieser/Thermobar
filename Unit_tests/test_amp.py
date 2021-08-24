@@ -25,7 +25,9 @@ AmpT=pd.DataFrame(data={"SiO2_Amp": 40.57,
                      "CaO_Amp": 11.63,
                      "Na2O_Amp": 2.20,
                      "K2O_Amp": 0.92,
-                     "Cr2O3_Amp": 0.01}, index=[0])
+                     "Cr2O3_Amp": 0.01,
+                       'F_Amp': 0,
+                       'Cl_Amp': 0}, index=[0])
 decimalPlace=4
 
 
