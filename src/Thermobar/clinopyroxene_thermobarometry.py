@@ -1581,6 +1581,52 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None):
     else:
         return P_kbar
 
+
+def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=None):
+    import warnings
+    with w.catch_warnings():
+        w.simplefilter('ignore')
+        cpx_comps_c=calculate_clinopyroxene_components(cpx_comps=cpx_comps)
+        cpx_comps_c['P_Wang21_eq1']=calculate_cpx_only_press(cpx_comps=cpx_comps, equationP="P_Wang2021_eq1")
+        cpx_comps_c['P_Wang21_eq3']=calculate_cpx_only_press(cpx_comps=cpx_comps, equationP="P_Wang2021_eq3")
+        cpx_comps_c['P_Petrelli21']=calculate_cpx_only_press(cpx_comps=cpx_comps,
+        equationP="P_Petrelli2021_Cpx_only").P_kbar_calc
+        cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
+        equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
+        cpx_comps_c['P_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
+        equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d").P_kbar_calc
+        X_Wangeq1_Sorted=np.sort(cpx_comps_c['P_Wang21_eq1'])
+        X_Wangeq3_Sorted=np.sort(cpx_comps_c['P_Wang21_eq3'])
+        X_Pet_Sorted=np.sort(cpx_comps_c['P_Petrelli21'])
+        X_Put_32d32a=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32a'])
+        X_Put_32d32b=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32b'])
+        if plot==True:
+            plt.step(np.concatenate([X_Wangeq1_Sorted, X_Wangeq1_Sorted[[-1]]]),
+            np.arange(X_Wangeq1_Sorted.size+1)/X_Wangeq1_Sorted.size, color='blue', linewidth=1,
+            label="Wang21_eq1")
+
+            plt.step(np.concatenate([X_Wangeq3_Sorted, X_Wangeq3_Sorted[[-1]]]),
+            np.arange(X_Wangeq3_Sorted.size+1)/X_Wangeq3_Sorted.size, color='cyan', linewidth=1,
+            label="Wang21_eq3")
+
+            plt.step(np.concatenate([X_Pet_Sorted, X_Pet_Sorted[[-1]]]),
+            np.arange(X_Pet_Sorted.size+1)/X_Pet_Sorted.size, color='orange', linewidth=1,
+            label="X_Pet_Sorted")
+
+            plt.step(np.concatenate([X_Put_32d32a, X_Put_32d32a[[-1]]]),
+            np.arange(X_Put_32d32a.size+1)/X_Put_32d32a.size, color='black', linewidth=1,
+            label="X_Put_32d32a")
+
+            plt.step(np.concatenate([X_Put_32d32b, X_Put_32d32b[[-1]]]),
+            np.arange(X_Put_32d32b.size+1)/X_Put_32d32b.size, color='grey', linewidth=1,
+            label="X_Put_32d32b")
+            plt.title('Cpx-only Barometry, N='+ str(len(cpx_comps)))
+
+            plt.legend()
+            plt.xlabel('P_kbar')
+            plt.xlim([-3, 16])
+
+    return cpx_comps_c
 ## Function for calculating Cpx-only temperature
 Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol, T_Wang2021_eq4,
 T_Wang2021_eq2, T_Petrelli2021_Cpx_only, T_Petrelli2021_Cpx_only_withH2O}

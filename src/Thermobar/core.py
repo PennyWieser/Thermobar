@@ -1888,6 +1888,85 @@ def calculate_13cations_amphibole_ridolfi(amp_comps):
     cat_13_out = pd.concat([cats, cat_13], axis=1)
     return cat_13_out
 
+def calculate_sites_ridolfi(amp_comps):
+    norm_cations=calculate_13cations_amphibole_ridolfi(amp_comps)
+
+    # Ridolfi T sites
+    norm_cations['Si_T']=norm_cations['SiO2_Amp_13_cat']
+    norm_cations['Al_IV_T']=0
+    norm_cations['Ti_T']=0
+    # Ridolfi C Sites
+
+
+    norm_cations['Cr_C']=0
+    norm_cations['Fe3_C']=0
+    norm_cations['Mg_C']=0
+    norm_cations['Fe2_C']=0
+    norm_cations['Mn_C']=0
+    # Ridolfi B sites
+    norm_cations['Ca_B']=norm_cations['CaO_Amp_13_cat']
+    norm_cations['Na_B']=0
+    # Ridolfi A sites
+    norm_cations['Na_A']=0
+    norm_cations['K_A']=norm_cations['K2O_Amp_13_cat']
+
+    # if sum greater than 8, equal to difference
+    norm_cations['Al_IV_T']=8-norm_cations['Si_T']
+    # But if SiTi grater than 8
+    Si_Al_less8=(norm_cations['SiO2_Amp_13_cat']+norm_cations['Al2O3_Amp_13_cat'])<8
+    norm_cations.loc[(Si_Al_less8), 'Al_IV_T']=norm_cations['Al2O3_Amp_13_cat']
+
+    # Ti, If Si + Al (IV)<8, 8-Si-AlIV
+    Si_Al_sites_less8=(norm_cations['Si_T']+norm_cations['Al_IV_T'])<8
+    norm_cations.loc[(Si_Al_sites_less8), 'Ti_T']=8-norm_cations['Si_T']-norm_cations['Al_IV_T']
+
+    #  AL VI, any AL left
+    norm_cations['Al_VI_C']=norm_cations['Al2O3_Amp_13_cat']-norm_cations['Al_IV_T']
+
+    # Ti C Sites, any Ti left
+    norm_cations['Ti_C']=norm_cations['TiO2_Amp_13_cat']-norm_cations['Ti_T']
+
+    # CR site, All Cr
+    norm_cations['Cr_C']=norm_cations['Cr2O3_Amp_13_cat']
+
+    # Calculate charge for Fe
+    norm_cations['Charge']=(norm_cations['SiO2_Amp_13_cat']*4+norm_cations['TiO2_Amp_13_cat']*4+norm_cations['Al2O3_Amp_13_cat']*3+
+    norm_cations['Cr2O3_Amp_13_cat']*3+norm_cations['FeOt_Amp_13_cat']*2+norm_cations['MnO_Amp_13_cat']*2+norm_cations['MgO_Amp_13_cat']*2
+    +norm_cations['CaO_Amp_13_cat']*2+norm_cations['Na2O_Amp_13_cat']+norm_cations['K2O_Amp_13_cat'])
+
+    # If DG2 (charge)>46, set Fe3 to zero, else set to 46-charge
+    norm_cations['Fe3_C']=46-norm_cations['Charge']
+    High_Charge=norm_cations['Charge']>46
+    norm_cations.loc[(High_Charge), 'Fe3_C']=0
+
+    norm_cations['Fe2_C']=norm_cations['FeOt_Amp_13_cat']-norm_cations['Fe3_C']
+
+    #  Allocate all Mg
+    norm_cations['Mg_C']=norm_cations['MgO_Amp_13_cat']
+
+    # Allocate all Mn
+    norm_cations['Mn_C']=norm_cations['MnO_Amp_13_cat']
+
+    # Na B site,
+
+    norm_cations['Na_B']=2-norm_cations['CaO_Amp_13_cat']
+    Ca_greaterthanNa=norm_cations['Na2O_Amp_13_cat']<(2-norm_cations['CaO_Amp_13_cat'])
+    norm_cations.loc[(Ca_greaterthanNa), 'Na_B']=norm_cations['Na2O_Amp_13_cat']
+
+    # All Na left after B
+    norm_cations['Na_A']=norm_cations['Na2O_Amp_13_cat']-norm_cations['Na_B']
+
+
+    return norm_cations
+
+
+
+
+
+
+
+
+
 
 def calculate_amp_liq_mgno_hyd(liq_comps, amp_comps):
     liq_comps_hy = calculate_hydrous_cat_fractions_liquid(liq_comps=liq_comps)
@@ -1911,12 +1990,31 @@ def get_amp_sites_from_input(amp_comps):
     get amp_sites from amp_comps input from import_excel() function.
     """
     amp_amfu_df=calculate_23oxygens_amphibole(amp_comps)
-    amp_sites=get_amp_sites(amp_amfu_df)
-    out=pd.concat([amp_amfu_df, amp_sites], axis=1)
+    amp_sites=get_amp_sites_leake(amp_amfu_df)
+ #   out=pd.concat([amp_sites], axis=1)
 
-    return out
+    return amp_sites
 
-def get_amp_sites(amp_apfu_df):
+def calculate_cpx_sites_from_input_not_cpx(dfin, col_drop):
+    cpx_comps_lie=dfin.copy()
+    cpx_comps_lie.columns = [col.replace(col_drop, '_Cpx') for col in cpx_comps_lie.columns]
+    cpx_sites=calculate_clinopyroxene_components(cpx_comps=cpx_comps_lie)
+    return cpx_sites
+
+def get_amp_sites_from_input_not_amp(dfin, col_drop):
+    """
+    get amp_sites from amp_comps input from import_excel() function.
+    """
+    amp_comps_lie=dfin.copy()
+    amp_comps_lie.columns = [col.replace(col_drop, '_Amp') for col in amp_comps_lie.columns]
+    amp_amfu_df=calculate_23oxygens_amphibole(amp_comps_lie)
+    amp_sites=get_amp_sites_leake(amp_amfu_df)
+ #   out=pd.concat([amp_sites], axis=1)
+
+    return amp_sites
+
+
+def get_amp_sites_leake(amp_apfu_df):
     """
     get_amp_sites takes generalized atom per formula unit calculations from
     calculate_23oxygens_amphibole and puts them in the proper cation sites
@@ -2085,9 +2183,187 @@ def get_amp_sites(amp_apfu_df):
     norm_cations['Mgno_Amp']=norm_cations['MgO_Amp_cat_23ox']/(norm_cations['MgO_Amp_cat_23ox']
     +norm_cations['FeOt_Amp_cat_23ox'])
 
-
+    #norm_cations['factor']=np.max()
+    # Ones being used, uses FW for Si, Fy,
     return norm_cations
 
+def get_amp_sites_avferric_zhang(amp_comps):
+    norm_cations=get_amp_sites_from_input(amp_comps)
+
+    # Taken from Zhang et al. 2017 Supplement
+    norm_cations['factor_8SiAl']=8/(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['Al2O3_Amp_cat_23ox'])
+
+    norm_cations['factor_15eK']=(15/(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['TiO2_Amp_cat_23ox']
+    +norm_cations['Al2O3_Amp_cat_23ox']+norm_cations['Cr2O3_Amp_cat_23ox']++norm_cations['FeOt_Amp_cat_23ox']
+    +norm_cations['MgO_Amp_cat_23ox']+norm_cations['CaO_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']
+    +norm_cations['Na2O_Amp_cat_23ox']))
+
+    norm_cations['factor_13eCNK']=13/((norm_cations['SiO2_Amp_cat_23ox']+norm_cations['TiO2_Amp_cat_23ox']
+    +norm_cations['Al2O3_Amp_cat_23ox']+norm_cations['Cr2O3_Amp_cat_23ox']+norm_cations['FeOt_Amp_cat_23ox']
+    +norm_cations['MgO_Amp_cat_23ox']+norm_cations['CaO_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']))
+
+    norm_cations['All ferric']=23/(23+(0.5*norm_cations['FeOt_Amp_cat_23ox']))
+
+    # Minimum Factors
+    norm_cations['8Si_Min']=8/norm_cations['SiO2_Amp_cat_23ox']
+
+    norm_cations['16CAT_Min']=(16/(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['TiO2_Amp_cat_23ox']
+    +norm_cations['Al2O3_Amp_cat_23ox']+norm_cations['Cr2O3_Amp_cat_23ox']++norm_cations['FeOt_Amp_cat_23ox']
+    +norm_cations['MgO_Amp_cat_23ox']+norm_cations['CaO_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']
+    +norm_cations['Na2O_Amp_cat_23ox']+norm_cations['K2O_Amp_cat_23ox']))
+
+    norm_cations['15eNK_Min']=15/((norm_cations['SiO2_Amp_cat_23ox']+norm_cations['TiO2_Amp_cat_23ox']
+    +norm_cations['Al2O3_Amp_cat_23ox']+norm_cations['Cr2O3_Amp_cat_23ox']+norm_cations['FeOt_Amp_cat_23ox']
+    +norm_cations['MgO_Amp_cat_23ox']+norm_cations['CaO_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']))
+
+    norm_cations['Min_MinFactor']=norm_cations[['8Si_Min', '16CAT_Min', '15eNK_Min']].min(axis=1)
+
+
+    #If Min_MinFactor<1, allocate to min factor
+    norm_cations['Min_factor']=norm_cations['Min_MinFactor']
+    Min_Min_Factor_g1=norm_cations['Min_MinFactor']>1
+    norm_cations.loc[Min_Min_Factor_g1, 'Min_factor']=1
+
+    norm_cations['Max_factor']=norm_cations[['factor_8SiAl', 'factor_15eK', 'factor_13eCNK', 'All ferric']].max(axis=1)
+
+
+    norm_cations['Av_factor']=0.5*(norm_cations['Max_factor']+norm_cations['Min_factor'])
+
+
+    # Then things times by factors
+    Si_factor=norm_cations['Av_factor']*norm_cations['SiO2_Amp_cat_23ox']
+    Ti_factor=norm_cations['Av_factor']*norm_cations['TiO2_Amp_cat_23ox']
+    Al_factor=norm_cations['Av_factor']*norm_cations['Al2O3_Amp_cat_23ox']
+    Cr_factor=norm_cations['Av_factor']*norm_cations['Cr2O3_Amp_cat_23ox']
+    Fe_factor=norm_cations['Av_factor']*norm_cations['FeOt_Amp_cat_23ox']
+    Mg_factor=norm_cations['Av_factor']*norm_cations['MgO_Amp_cat_23ox']
+    Ca_factor=norm_cations['Av_factor']*norm_cations['CaO_Amp_cat_23ox']
+    Mn_factor=norm_cations['Av_factor']*norm_cations['MnO_Amp_cat_23ox']
+    Na_factor=norm_cations['Av_factor']*norm_cations['Na2O_Amp_cat_23ox']
+    K_factor=norm_cations['Av_factor']*norm_cations['K2O_Amp_cat_23ox']
+
+
+    norm_cations['Si_T_ideal']=norm_cations['Av_factor']*norm_cations['SiO2_Amp_cat_23ox']
+    # Allocate Al to Tetrahedral. If 8-Si_T< Al_factor, equal to 8-Si_T
+
+    norm_cations['Al_IV_T_ideal']=8-norm_cations['Si_T_ideal']
+    # But if 8-SiT>Al factor, allocate all Al_Factor
+    eight_m_siT_g=(8-norm_cations['Si_T_ideal'])>Al_factor
+    norm_cations.loc[ eight_m_siT_g, 'Al_IV_T_ideal']=Al_factor
+    # And if SiT>8, allocate to zero
+    Si_T_g_8= norm_cations['Si_T_ideal']>8
+    norm_cations.loc[Si_T_g_8, 'Al_IV_T_ideal']=0
+
+    # Ti sites, if Si + Al>8, allocate 0 (as all filled up)
+    norm_cations['Ti_T_ideal']=0
+    # If Si and Al<8, if 8-Si-Al is > Ti_factor, Ti Factor (as all Ti can go in site)
+    Si_Al_l8=(norm_cations['Si_T_ideal']+norm_cations['Al_IV_T_ideal'])<8
+    eight_Si_Ti_gTiFactor=(8-norm_cations['Si_T_ideal']-norm_cations['Al_IV_T_ideal'])>Ti_factor
+    norm_cations.loc[(( Si_Al_l8)&(eight_Si_Ti_gTiFactor)), 'Ti_T_ideal']=Ti_factor
+    norm_cations.loc[(( Si_Al_l8)&(~eight_Si_Ti_gTiFactor)), 'Ti_T_ideal']=(8-norm_cations['Si_T_ideal']-norm_cations['Al_IV_T_ideal'])
+
+    # Al VI C site
+    norm_cations['Al_VI_C_ideal']=Al_factor-norm_cations['Al_IV_T_ideal']
+    # Unless Alfactor-Al_VI equal to or less than zero, in which case none left
+    Alfactor_Al_l0=(Al_factor-norm_cations['Al_IV_T_ideal'])<=0
+    norm_cations.loc[(Alfactor_Al_l0), 'Al_VI_C_ideal']=0
+
+    # Ti C site. If Ti Factor + Al_VI_C_ideal<5, equal to Ti Factor
+    norm_cations['Ti_C_ideal']=Ti_factor
+    # Else if >5, equal to 5-Al VI
+    Ti_fac_Al_VI_g5=(Ti_factor+ norm_cations['Al_VI_C_ideal'])>5
+    norm_cations.loc[(Ti_fac_Al_VI_g5), 'Ti_C_ideal']=5-norm_cations['Al_VI_C_ideal']
+
+    # Cr C site. If Al_C + Ti_C + Cr Factor . Equal to Cr factor
+    norm_cations['Cr_C_ideal']=Cr_factor
+    C_Al_Ti_Cr_g5=(norm_cations['Ti_C_ideal']+ norm_cations['Al_VI_C_ideal']+Cr_factor)>5
+    norm_cations.loc[(C_Al_Ti_Cr_g5), 'Cr_C_ideal']=5-norm_cations['Al_VI_C_ideal']-norm_cations['Ti_C_ideal']
+
+    #  Fe3 C site
+    NewSum=(Si_factor*2+Ti_factor*2+Al_factor*3/2+Cr_factor*3/2+Fe_factor
+    +Mg_factor+Ca_factor+Mn_factor+Na_factor/2+K_factor/2)
+    norm_cations['Fe3_C_ideal']=(23-NewSum)*2
+
+    # Mg C site - If Al, Ti, Fe3, Cr already 5, set to zero
+    norm_cations['Mg_C_ideal']=0
+
+    # If sum not 5, if sum + Mg<5, allocate Mg factor, else do 5- sum
+    Sum_beforeMgC=(norm_cations['Ti_C_ideal']+ norm_cations['Al_VI_C_ideal']
+    +norm_cations['Cr_C_ideal']+norm_cations['Fe3_C_ideal'])
+    Sum_beforeMgC_l5=Sum_beforeMgC<5
+    Sum_beforeMgC_Mg_l5=(Sum_beforeMgC+Mg_factor)<5
+    norm_cations.loc[((Sum_beforeMgC_l5)&(Sum_beforeMgC_Mg_l5)), 'Mg_C_ideal']=Mg_factor
+    norm_cations.loc[((Sum_beforeMgC_l5)&(~Sum_beforeMgC_Mg_l5)), 'Mg_C_ideal']=5-Sum_beforeMgC_l5
+
+    # Fe2_C site. If revious sum>5, alocate zero
+    norm_cations['Fe2_C_ideal']=0
+    # If previous sum<5
+    Sum_beforeFeC=(norm_cations['Ti_C_ideal']+ norm_cations['Al_VI_C_ideal']
+    +norm_cations['Cr_C_ideal']+norm_cations['Fe3_C_ideal']+norm_cations['Mg_C_ideal'])
+    Sum_beforeFeC_l5=Sum_beforeFeC<5
+    Sum_beforeFeC_Fe_l5=(Sum_beforeFeC+(Fe_factor-norm_cations['Fe3_C_ideal']))<5
+    norm_cations.loc[((Sum_beforeFeC_l5)&(Sum_beforeFeC_Fe_l5)), 'Fe2_C_ideal']=Fe_factor-norm_cations['Fe3_C_ideal']
+    norm_cations.loc[((Sum_beforeFeC_l5)&(~Sum_beforeFeC_Fe_l5)), 'Fe2_C_ideal']=5- Sum_beforeFeC
+
+    # Mn Site, if sum>=5, set to zero
+    norm_cations['Mn_C_ideal']=0
+    # IF previous sum <5
+    Sum_beforeMnC=(norm_cations['Ti_C_ideal']+ norm_cations['Al_VI_C_ideal']
+    +norm_cations['Cr_C_ideal']+norm_cations['Fe3_C_ideal']+norm_cations['Mg_C_ideal']+norm_cations['Fe2_C_ideal'])
+    Sum_beforeMnC_l5=Sum_beforeMnC<5
+    Sum_beforeMnC_Mn_l5=(Sum_beforeMnC+Mn_factor)<5
+    norm_cations.loc[((Sum_beforeMnC_l5)&(Sum_beforeMnC_Mn_l5)), 'Mn_C_ideal']=Mn_factor
+    norm_cations.loc[((Sum_beforeMnC_l5)&(~Sum_beforeMnC_Mn_l5)), 'Mn_C_ideal']=5-Sum_beforeMnC
+
+    # Mg B site, if any Mg left, put here.
+    norm_cations['Mg_B_ideal']=0
+    Mg_left_B=(Mg_factor-norm_cations['Mg_C_ideal'])>0
+    norm_cations.loc[(Mg_left_B), 'Mg_B_ideal']=Mg_factor-norm_cations['Mg_C_ideal']
+
+    # Fe B site, if any Fe2 left, but here
+    norm_cations['Fe2_B_ideal']=0
+    Fe2_left_B=(Fe_factor-norm_cations['Fe2_C_ideal']-norm_cations['Fe3_C_ideal'])>0
+    norm_cations.loc[(Fe2_left_B), 'Fe2_B_ideal']=Fe_factor-norm_cations['Fe2_C_ideal']-norm_cations['Fe3_C_ideal']
+
+
+    # Mn B site, if any Mn left, put here.
+    norm_cations['Mn_B_ideal']=0
+    Mn_left_B=(Mn_factor-norm_cations['Mn_C_ideal'])>0
+    norm_cations.loc[(Mn_left_B), 'Mn_B_ideal']=Mn_factor-norm_cations['Mn_C_ideal']
+
+    # Ca B site, all Ca
+    norm_cations['Ca_B_ideal']=Ca_factor
+
+    # Na, if Mg+Fe+Mn+Ca B >2, 0
+    norm_cations['Na_B_ideal']=0
+    Sum_beforeNa=(norm_cations['Mn_B_ideal']+norm_cations['Fe2_B_ideal']+norm_cations['Mg_B_ideal']+norm_cations['Ca_B_ideal'])
+    Sum_beforeNa_l2=Sum_beforeNa<2
+    Sum_before_Na_Na_l2=(Sum_beforeNa+Na_factor)<2
+    norm_cations.loc[((Sum_beforeNa_l2)&(Sum_before_Na_Na_l2)), 'Na_B_ideal']=Na_factor
+    norm_cations.loc[((Sum_beforeNa_l2)&(~Sum_before_Na_Na_l2)), 'Na_B_ideal']=2-Sum_beforeNa
+
+    # Na_A - any Na left
+    norm_cations['Na_A_ideal']=Na_factor-norm_cations['Na_B_ideal']
+    norm_cations['K_A_ideal']=K_factor
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    return norm_cations
 
 def get_amp_sites2(amp_apfu_df):
     """
@@ -3196,25 +3472,45 @@ def get_voting_stats_ExtraTreesRegressor(X, reg, central_tendency='aritmetic_mea
     return  df_stats, df_voting
 
 
-def classify_phases(filename, sheet_name, return_end_members=False, str_to_drop=None):
+def classify_phases(filename=None, sheet_name=None, df=None, return_end_members=False, str_to_drop=None):
     """
     Function in progress
 
 
     """
-    Excel_In=import_excel(filename, sheet_name)
-    if str_to_drop is None:
-        Oxides=Excel_In['my_oxides']
-    if str_to_drop is not None:
-        my_input=Excel_In['my_input']
+    if filename is not None:
+        Excel_In=import_excel(filename, sheet_name)
+        if str_to_drop is None:
+            my_input_copy=Excel_In['my_oxides']
+        if str_to_drop is not None:
+            my_input=Excel_In['my_input']
+            my_input_copy=my_input.copy()
+            my_input_copy.columns = [col.replace(str_to_drop, '') for col in my_input_copy.columns]
+    if df is not None:
+        my_input=df
         my_input_copy=my_input.copy()
-        my_input_copy.columns = [col.replace(str_to_drop, '') for col in my_input_copy.columns]
 
-        myOxides1 = my_input_copy.reindex(df_ideal_oxide.columns, axis=1).fillna(0)
-        myOxides1 = myOxides1.apply(pd.to_numeric, errors='coerce').fillna(0)
-        myOxides1[myOxides1 < 0] = 0
-        Oxides=myOxides1
+        if str_to_drop is not None:
+            my_input_copy.columns = [col.replace(str_to_drop, '') for col in my_input_copy.columns]
 
+
+    myOxides1 = my_input_copy.reindex(df_ideal_oxide.columns, axis=1).fillna(0)
+    myOxides1 = myOxides1.apply(pd.to_numeric, errors='coerce').fillna(0)
+    myOxides1[myOxides1 < 0] = 0
+    Oxides=myOxides1
+
+    Oxides_prefix=Oxides.drop(columns=['Cr2O3', 'P2O5'])
+    Oxides_prefix=Oxides_prefix.add_suffix('_input')
+
+
+    Oxides_amp_sites=get_amp_sites_from_input_not_amp(Oxides_prefix, "_input")
+    Oxides_cpx_sites=calculate_cpx_sites_from_input_not_cpx(Oxides_prefix, "_input")
+    Oxides_prefix['Ca_B']=Oxides_amp_sites['Ca_B']
+    Oxides_prefix['Na_K_A']=Oxides_amp_sites['Na_A']+Oxides_amp_sites['K_A']
+    Oxides_prefix['Sum_Amp_Cat_Sites']=Oxides_amp_sites['cation_sum_All']
+    Oxides_prefix['Cation_Sum_Cpx']=Oxides_cpx_sites['Cation_Sum_Cpx']
+    Oxides_prefix['Ca_CaMgFe']=Oxides_cpx_sites['Ca_CaMgFe']
+    Oxides_prefix.replace([np.nan, -np.nan], 0, inplace=True)
 
 
 
@@ -3224,17 +3520,20 @@ def classify_phases(filename, sheet_name, return_end_members=False, str_to_drop=
         scaler=load(f)
 
     # Dropping things which are often missing
-    Oxides_dropoxides=Oxides.drop(columns=['Cr2O3', 'K2O', 'P2O5'])
-    X_in=Oxides_dropoxides.values
+
+    X_in=Oxides_prefix.values
+
 
     # This does the machine learning classification
     X_in_scaled= scaler.transform(X_in)
     svc_predictions=svc_model.predict(X_in_scaled)
-    Oxides_out=Oxides.copy()
+    Oxides_out=Oxides_prefix.copy()
     Oxides_out['Sum_Oxides']=Oxides.sum(axis=1)
     Oxides_out['Phase_Min_Group_ML']=svc_predictions
     Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(0, "Amp")
     Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(1, "Px")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(10, "Px")
+    Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(11, "Px")
     Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(2, "Fspar")
     Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(3, "Ol")
     Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(4, "Sp")
@@ -3244,21 +3543,25 @@ def classify_phases(filename, sheet_name, return_end_members=False, str_to_drop=
     Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(8, "Qz")
     Oxides_out[['Phase_Min_Group_ML']]=Oxides_out[['Phase_Min_Group_ML']].replace(9, "Gt")
 
-    print(' # of Amps = ' + str(len(Oxides_out['Phase_Min_Group_ML']=="Amp")) + '# of Opxs = ')
+    #print(' # of Amps = ' + str(len(Oxides_out['Phase_Min_Group_ML']=="Amp")) + '# of Opxs = ')
 
-    Oxides_out.loc[Oxides_out['Sum_Oxides']<90, 'Phase_Min_Group_ML'] = "Not Classified - Total<90"
+    Oxides_out.loc[Oxides_out['Sum_Oxides']<60, 'Phase_Min_Group_ML'] = "Not Classified - Total<60"
     Oxides_out.loc[Oxides_out['Sum_Oxides']>110, 'Phase_Min_Group_ML'] = "Not Classified - Total>110"
     Oxides_out['Phase_Mineral']=Oxides_out['Phase_Min_Group_ML']
 
     #This does manual classification for feldsdpars.
     Fspar=Oxides_out['Phase_Min_Group_ML']=="Fspar" # This checks we are only doing it for felspar
-    Oxides_Fspar=Oxides_out.add_suffix('_Plag')
+    Oxides_Fspar=Oxides_out.copy()
+    Oxides_Fspar.columns = [col.replace("_input", "_Plag") for col in Oxides_Fspar.columns]
+
+
     Fspar_components=calculate_cat_fractions_plagioclase(plag_comps=Oxides_Fspar)
     Fspar_An=Fspar_components['An_Plag']
     Fspar_Ab=Fspar_components['Ab_Plag']
     Fspar_Or=Fspar_components['Or_Plag']
     if return_end_members==True:
         Oxides_out['Ab']=Fspar_Ab
+
         Oxides_out.loc[Oxides_out['Phase_Min_Group_ML']!="Fspar", 'Ab']="N/A"
         Oxides_out['An']=Fspar_An
         Oxides_out.loc[Oxides_out['Phase_Min_Group_ML']!="Fspar", 'An']="N/A"
@@ -3276,7 +3579,9 @@ def classify_phases(filename, sheet_name, return_end_members=False, str_to_drop=
     Oxides_out.loc[( (Fspar) & (Fspar_Or>0.37) &  (Fspar_An<0.2) ), 'Fspar_Class'] = "Sanidine"
     Oxides_out.loc[( (Fspar) & (Fspar_An.between(0.1, 0.3)) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Oligoclase"
     Oxides_out.loc[( (Fspar) & (Fspar_An.between(0.3, 0.5)) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Andesine"
-    Oxides_out.loc[( (Fspar) & (Fspar_An.between(0.5, 0.7)) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Bytownite"
+    Oxides_out.loc[( (Fspar) & (Fspar_An.between(0.5, 0.7)) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Labradorite"
+    Oxides_out.loc[( (Fspar) & (Fspar_An.between(0.7, 0.9)) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Bytownite"
+
     Oxides_out.loc[( (Fspar) & (Fspar_An>0.9) &  (Fspar_Or<0.1) ), 'Fspar_Class'] = "Anorthite"
     Oxides_out.loc[Oxides_out['Phase_Min_Group_ML']!="Fspar", 'Fspar_Class']="N/A"
 
@@ -3284,8 +3589,7 @@ def classify_phases(filename, sheet_name, return_end_members=False, str_to_drop=
     Oxides_Pyroxenes=Oxides_out.add_suffix('_Opx')
     Px=Oxides_out['Phase_Min_Group_ML']=="Px"
 
-    Px_components=calculate_orthopyroxene_components(opx_comps=Oxides_Pyroxenes)
-    Px_CaMgFe=Px_components['Ca_CaMgFe']
+    Px_CaMgFe=Oxides_out['Ca_CaMgFe']
     Oxides_out.loc[( (Px) & (Px_CaMgFe<0.05) ), 'Phase_Mineral'] = "Opx"
     Oxides_out.loc[( (Px) & (Px_CaMgFe.between(0.05, 0.2)) ), 'Phase_Mineral'] = "Pig"
     Oxides_out.loc[( (Px) & (Px_CaMgFe>0.2) ), 'Phase_Mineral'] = "Cpx"

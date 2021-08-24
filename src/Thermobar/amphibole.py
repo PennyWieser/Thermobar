@@ -154,6 +154,66 @@ P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995, P_Kraw2012} # put on
 
 Amp_only_P_funcs_by_name= {p.__name__: p for p in Amp_only_P_funcs}
 
+def calculate_amp_only_melt_comps(amp_comps=None, equation=None, T_K=None):
+    if equation=="Ridolfi21":
+        amp_sites=calculate_sites_ridolfi(amp_comps=amp_comps)
+        deltaNNO_calc= (-10.3216023230583*amp_sites['Al_IV_T'] + 4.47045484316415*amp_sites['Al_VI_C']
+        + 7.55122550171372*amp_sites['Ti_C'] + 5.46318534905121*amp_sites['Fe3_C'] -4.73884449358073*amp_sites['Mg_C']
+         -7.20328571556139*amp_sites['Fe2_C']-17.5610110666215*amp_sites['Mn_C'] + 13.762022684517*amp_sites['Ca_B']
+         + 13.7560270877436*amp_sites['Na_A']  + 27.5944871599305*amp_sites['K_A'])
+        amp_sites.insert(0, "deltaNNO_calc", deltaNNO_calc)
+
+        H2O_calc=(np.exp(-1.374845602*amp_sites['Al_IV_T'] + 1.7103210931239*amp_sites['Al_VI_C']
+        + 0.85944576818503*amp_sites['Ti_C'] + 1.18881568772057*amp_sites['Fe3_C'] -0.675980097369545*amp_sites['Mg_C']
+         -0.390086849565756*amp_sites['Fe2_C']-6.40208103925722*amp_sites['Mn_C'] + 2.54899046000297*amp_sites['Ca_B']
+         + 1.37094801209146*amp_sites['Na_A']  + 1.25720999388625*amp_sites['K_A']))
+        amp_sites.insert(0, "H2O_calc", H2O_calc)
+    if equation=="Zhang17":
+        if T_K is None:
+            w.warn('You must enter a value for T in Kelvin to get results from equation3')
+        amp_sites=get_amp_sites_avferric_zhang(amp_comps=amp_comps)
+
+        amp_sites['SiO2_Eq1']=(-736.7170+288.733*np.log(amp_sites['Si_T_ideal'])+56.536*amp_sites['Al_VI_C_ideal']
+        +27.169*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal'])
++ 62.665*amp_sites['Fe3_C_ideal']+34.814*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal'])
++83.989*(amp_sites['Ti_T_ideal']+amp_sites['Ti_C_ideal'])+44.225*amp_sites['Ca_B_ideal']+14.049*amp_sites['Na_A_ideal'])
+
+        amp_sites['SiO2_Eq2']=(-399.9891 + 212.9463*np.log(amp_sites['Si_T_ideal']) + 11.7464*amp_sites['Al_VI_C_ideal'] +
+        23.5653*amp_sites['Fe3_C_ideal'] + 6.8467*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal']) +
+        24.7743*(amp_sites['Ti_T_ideal']+amp_sites['Ti_C_ideal']) + 24.4399 * amp_sites['Ca_B_ideal'])
+
+        amp_sites['SiO2_Eq4']=(-222.614 + 167.517*np.log(amp_sites['Si_T_ideal']) -7.156*(amp_sites['Mg_C_ideal']
+        +amp_sites['Mg_B_ideal']))
+
+        amp_sites['TiO2_Eq6']=(np.exp(22.4650  -2.5975*amp_sites['Si_T_ideal']
+            -1.15502*amp_sites['Al_VI_C_ideal'] -2.23287*amp_sites['Fe3_C_ideal'] -1.03193*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal'])
+            -1.98253*amp_sites['Ca_B_ideal']-1.55912*amp_sites['Na_A_ideal']))
+
+        amp_sites['FeO_Eq7']=(np.exp(24.4613  -2.72308*amp_sites['Si_T_ideal']
+            -1.07345*amp_sites['Al_VI_C_ideal'] -1.0466*amp_sites['Fe3_C_ideal'] -0.25801*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal'])
+            -1.93601*amp_sites['Ti_C_ideal']-2.52281*amp_sites['Ca_B_ideal']))
+
+        amp_sites['FeO_Eq8']=(np.exp(15.6864  -2.09657*amp_sites['Si_T_ideal']
+           +0.36457*amp_sites['Mg_C_ideal'] -1.33131*amp_sites['Ca_B_ideal']))
+
+        amp_sites['MgO_Eq9']=(np.exp(12.6618  -2.63189*amp_sites['Si_T_ideal']
+           +1.04995*amp_sites['Al_VI_C_ideal'] +1.26035*amp_sites['Mg_C_ideal']))
+
+
+        if T_K is not None:
+            amp_sites['SiO2_Eq3']=(-228 + 0.01065*(T_K-273.15) + 165*np.log(amp_sites['Si_T_ideal'])
+            -7.219*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal']))
+
+            amp_sites['TiO2_Eq5']=(np.exp( 23.4870 -0.0011*(T_K-273.15) +-2.5692*amp_sites['Si_T_ideal']
+            -1.3919*amp_sites['Al_VI_C_ideal'] -2.1195361*amp_sites['Fe3_C_ideal'] -1.0510775*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal'])
+            -2.0634034*amp_sites['Ca_B_ideal']-1.5960633*amp_sites['Na_A_ideal']))
+
+
+
+
+        return amp_sites
+
+
 
 def calculate_amp_only_press(amp_comps=None, equationP=None, T=None, deltaNNO=None):
     """
@@ -242,7 +302,9 @@ def calculate_amp_only_press(amp_comps=None, equationP=None, T=None, deltaNNO=No
         return final_cat
 
     if 'Ridolfi2012' in equationP or equationP == "P_Ridolfi2021":
+
         cat13 = calculate_13cations_amphibole_ridolfi(amp_comps)
+
         myAmps1_label = amp_comps.drop(['Sample_ID_Amp'], axis='columns')
         Sum_input = myAmps1_label.sum(axis='columns')
 
@@ -264,6 +326,7 @@ def calculate_amp_only_press(amp_comps=None, equationP=None, T=None, deltaNNO=No
         P_MPa_1e = 100 * partial(P_Ridolfi2012_1e, **kwargs_1e)(0)
 
         if equationP == "P_Ridolfi2021":
+
 
             XPae = (P_MPa_1a - P_MPa_1e) / P_MPa_1a
             deltaPdb = P_MPa_1d - P_MPa_1b
@@ -306,28 +369,220 @@ def calculate_amp_only_press(amp_comps=None, equationP=None, T=None, deltaNNO=No
                     name[i]="1a"
                 if Sum_input[i] < 90:
                     P_MPa[i] = np.nan
-                P_kbar = pd.DataFrame(data={"P_kbar_calc": (P_MPa / 100), "equation": name})
 
-            if any(Sum_input) < 90:
-                print('The sum of SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O and K2O for some '
-                'input amphiboles is <90; P=nan is returned for these analyses')
+            # P_kbar = pd.DataFrame(data={"P_kbar_calc": (P_MPa / 100), "equation": name,
+            # "H2O":Calcs_R['H2O_calc']})
+
+        Calcs_R=cat13.copy()
+        Calcs_R['P_kbar_calc']=P_MPa / 100
+        Calcs_R['equation']=name
+        Calcs_R['Sum_input']=Sum_input
+        Low_sum=Sum_input<90
+        Calcs_R['H2O_calc']=(2-cat13['F_Amp_13_cat']-cat13['Cl_Amp_13_cat'])*cat13['cation_sum_Si_Mg']*17/13/2
+        Calcs_R.loc[(Low_sum), 'H2O_calc']=np.nan
+
+        Calcs_R['Charge']=(cat13['SiO2_Amp_13_cat']*4+cat13['TiO2_Amp_13_cat']*4+cat13['Al2O3_Amp_13_cat']*3+
+        cat13['Cr2O3_Amp_13_cat']*3+cat13['FeOt_Amp_13_cat']*2+cat13['MnO_Amp_13_cat']*2+cat13['MgO_Amp_13_cat']*2
+        +cat13['CaO_Amp_13_cat']*2+cat13['Na2O_Amp_13_cat']+cat13['K2O_Amp_13_cat'])
+
+         #BJ3>60
+        Calcs_R['APE']=np.abs(P_MPa_1a-P_MPa)/(P_MPa_1a+P_MPa)*200
+        High_APE=Calcs_R['APE']>60
+        Calcs_R.loc[(High_APE), 'Input_Check']=False
+        Calcs_R.loc[(High_APE), 'Fail Msg']="APE >60"
+
+        # If DG2 (charge)>46, set Fe3 to zero, else set to 46-charge
+        Calcs_R['Fe3_calc']=46-Calcs_R['Charge']
+        High_Charge=Calcs_R['Charge']>46
+        Calcs_R.loc[(High_Charge), 'Fe3_calc']=0
+
+        Calcs_R['Fe2_calc']=cat13['FeOt_Amp_13_cat']-Calcs_R['Fe3_calc']
+
+
+        Calcs_R['Fe2O3_calc']=Calcs_R['Fe3_calc']*cat13['cation_sum_Si_Mg']*159.691/13/2
+        Calcs_R.loc[(Low_sum), 'Fe2O3_calc']=np.nan
+
+        Calcs_R['FeO_calc']=Calcs_R['Fe2_calc']*cat13['cation_sum_Si_Mg']*71.846/13
+        Calcs_R.loc[(Low_sum), 'Fe2O3_calc']=np.nan
+
+        Calcs_R['O=F,Cl']=-(amp_comps['F_Amp']*0.421070639014633+amp_comps['Cl_Amp']*0.225636758525372)
+        Calcs_R.loc[(Low_sum), 'O=F,Cl']=np.nan
+
+        Calcs_R['Total_recalc']=(Sum_input-amp_comps['FeOt_Amp']+Calcs_R['H2O_calc']+Calcs_R['Fe2O3_calc']
+        +Calcs_R['FeO_calc']+Calcs_R['O=F,Cl'])
+        Calcs_R.loc[(Low_sum), 'Total']=np.nan
+
+        # Set up a column for a fail message
+        Calcs_R['Fail Msg']=""
+        Calcs_R['Input_Check']=True
+
+        # Check that old total isn't <90
+
+        Calcs_R.loc[(Low_sum), 'Input_Check']=False
+        Calcs_R.loc[(Low_sum), 'Fail Msg']="Cation oxide Total<90"
+
+        # First check, that new total is >98.5 (e.g with recalculated H2O etc).
+
+        Low_total_Recalc=Calcs_R['Total_recalc']<98.5
+        Calcs_R.loc[(Low_total_Recalc), 'Input_Check']=False
+        Calcs_R.loc[(Low_total_Recalc), 'Fail Msg']="Recalc Total<98.5"
+
+        # Next, check that new total isn't >102
+        High_total_Recalc=Calcs_R['Total_recalc']>102
+        Calcs_R.loc[(High_total_Recalc), 'Input_Check']=False
+        Calcs_R.loc[(High_total_Recalc), 'Fail Msg']="Recalc Total>102"
+
+        # Next, check that charge isn't >46.5 ("unbalanced")
+        Unbalanced_Charge=Calcs_R['Charge']>46.5
+        Calcs_R.loc[(Unbalanced_Charge), 'Input_Check']=False
+        Calcs_R.loc[(Unbalanced_Charge), 'Fail Msg']="unbalanced charge (>46.5)"
+
+        # Next check that Fe2+ is greater than 0, else unbalanced
+        Negative_Fe2=Calcs_R['Fe2_calc']<0
+        Calcs_R.loc[(Negative_Fe2), 'Input_Check']=False
+        Calcs_R.loc[(Negative_Fe2), 'Fail Msg']="unbalanced charge (Fe2<0)"
+
+        # Check that Mg# calculated using just Fe2 is >54, else low Mg
+        Calcs_R['Mgno_Fe2']=cat13['MgO_Amp_13_cat']/(cat13['MgO_Amp_13_cat']+Calcs_R['Fe2_calc'])
+        Low_Mgno=100*Calcs_R['Mgno_Fe2']<54
+        Calcs_R.loc[(Low_Mgno), 'Input_Check']=False
+        Calcs_R.loc[(Low_Mgno), 'Fail Msg']="Low Mg# (<54)"
+
+        #Only ones that matter are low Ca, high Ca, BJ3>60, low B cations"
+
+
+
+        # If Column CU<1.5,"low Ca"
+        Ca_low=cat13['CaO_Amp_13_cat']<1.5
+        Calcs_R.loc[(Ca_low), 'Input_Check']=False
+        Calcs_R.loc[(Ca_low), 'Fail Msg']="Low Ca (<1.5)"
+
+        # If Column CU>2.05, "high Ca"
+        Ca_high=cat13['CaO_Amp_13_cat']>2.05
+        Calcs_R.loc[(Ca_high), 'Input_Check']=False
+        Calcs_R.loc[(Ca_high), 'Fail Msg']="High Ca (>2.05)"
+
+        # Check that CW<1.99, else "Low B cations"
+        Calcs_R['Na_calc']=2-cat13['CaO_Amp_13_cat']
+        Ca_greaterthanNa=cat13['Na2O_Amp_13_cat']<(2-cat13['CaO_Amp_13_cat'])
+        Calcs_R.loc[(Ca_greaterthanNa), 'Na_calc']=cat13['Na2O_Amp_13_cat']
+        Calcs_R['B_Sum']=Calcs_R['Na_calc']+cat13['CaO_Amp_13_cat']
+
+        Low_B_Cations=Calcs_R['B_Sum']<1.99
+        Calcs_R.loc[(Low_B_Cations), 'Input_Check']=False
+        Calcs_R.loc[(Low_B_Cations), 'Fail Msg']="Low B Cations"
+
+
+         #P_MPa
+        Failed_input=Calcs_R['Input_Check']==False
+        Calcs_R.loc[Failed_input, 'P_kbar_calc']=np.nan
+
+        cols_to_move = ['P_kbar_calc', 'Input_Check', "Fail Msg",
+                        'equation', 'H2O_calc', 'Fe2O3_calc', 'FeO_calc', 'Total_recalc', 'Sum_input']
+        Calcs_R= Calcs_R[cols_to_move +
+                                        [col for col in Calcs_R.columns if col not in cols_to_move]]
+
+
+
+        # Check that CU>2.05, else high Ca
+
+
+        # Check that DK2>0.25, else "high Al#"
+
+
+
+        # Check that I2<38.8-0.42, else Low SiO2
+
+
+
+        # If I2>49.8, high SiO2
+
+
+        # IF  CI2>0.06+0.06*0.2,"high-[4]Ti
+
+
+        # If CL2>0.57+0.57*0.074,"high-[6]Al
+
+
+        # If CM2>0.7+0.7*0.07,"high-[6]Ti"
+
+
+        # If CN2>0.04+0.04*0.1,"high-Cr2O3
+
+
+        # If CO2>1.37+1.37*0.28,"high-Fe3+"
+
+
+        # If O2<9.71-0.35,"low-MgO"
+
+
+        # If O2>18.01+0.35,"high-MgO"
+
+        # If CQ2>1.69+1.69*0.28,"high-Fe2+"
+
+        # If N2>0.58+0.58*0.3,"high-MnO"
+
+        # If (P2>12.35+0.25,"high-CaO"
+
+        # If CY2<0,"low-ANa"
+
+
+        #  IF IF(CY2>0.58+0.58*0.11,"high-ANa"
+
+
+        # If R2<0,"low-K2O"
+
+        # If R2>2.03+0.05,"high-K2O"
+
+        # If DA2<0.03-0.03*0.3,"low-A(Na+K)
+
+        # If DA2>1,"high-A(Na+K)"
+
+        # If K2<6.5,"low-Al2O3
+
+        #  If K2>15.9+0.36,"high-Al2O3"
+
+        # If J2<1.1-0.2,"low-TiO2"
+
+        # If M2<5.85-0.44,"low-FeO"
+
+        # If M2>16.92+0.44,"high-FeO
+
+        # If Q2<1.07-0.1,"low-Na2O
+
+        # Q2>3.05+0.1,"high-Na2O
+
+        # But to print "wrong", is looking 1) If "low Total", "high total", "unbalanced", "low Mg", "low Ca",
+        # high Ca, BJ2>60, "low B cations".
+
+
+
+
+
+
+        return Calcs_R # was P_kbar
 
         if equationP == "P_Ridolfi2012_1a":
             P_kbar = P_MPa_1a / 100
+            return P_kbar
 
         if equationP == "P_Ridolfi2012_1b":
             P_kbar = P_MPa_1b / 100
+            return P_kbar
 
         if equationP == "P_Ridolfi2012_1c":
             P_kbar = P_MPa_1c / 100
+            return P_kbar
 
         if equationP == "P_Ridolfi2012_1d":
             P_kbar = P_MPa_1d / 100
+            return P_kbar
 
         if equationP == "P_Ridolfi2012_1e":
             P_kbar = P_MPa_1e / 100
+            return P_kbar
 
-        return P_kbar
+
 
     if equationP != "Mutch2016" and 'Ridolfi2012' not in equationP and equationP != "P_Ridolfi2021":
         ox23_amp = calculate_23oxygens_amphibole(amp_comps=amp_comps)
@@ -344,7 +599,21 @@ def calculate_amp_only_press(amp_comps=None, equationP=None, T=None, deltaNNO=No
 
     return P_kbar
 
+def calculate_amp_only_press_all_eqs(amp_comps, plot=False, H2O_Liq=None):
+    import warnings
+    with w.catch_warnings():
+        w.simplefilter('ignore')
+        amp_comps_c=get_amp_sites_from_input(amp_comps=amp_comps)
+        amp_comps_c['P_Ridolfi21']=calculate_amp_only_press(amp_comps=amp_comps, equationP="P_Ridolfi2021").P_kbar_calc
+        X_Ridolfi21_Sorted=np.sort(amp_comps_c['P_Ridolfi21'])
+        if plot==True:
+            plt.step(np.concatenate([X_Ridolfi21_Sorted, X_Ridolfi21_Sorted[[-1]]]),
+            np.arange(X_Ridolfi21_Sorted.size+1)/X_Ridolfi21_Sorted.size, color='blue', linewidth=1,
+            label="Ridolfi21")
 
+
+
+    return amp_comps_c
 
 ## Amphibole-only thermometers
 
