@@ -162,7 +162,7 @@ class test_cpx_liq_press(unittest.TestCase):
     def test_Put32_DeltaEnFs(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
        liq_comps=LiqT, equationP="P_Put2008_eq32c", T=1300,
-       eq_tests=True).Delta_EnFs[0], 0.073576,
+       eq_tests=True).Delta_EnFs_Mollo[0], 0.073576,
        decimalPlace,
        "Calc Delta EnFs from  P_Put2008_eq32c not equal to test value")
 
@@ -170,14 +170,14 @@ class test_cpx_liq_press(unittest.TestCase):
     def test_Put32_DeltaCaTs(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
        liq_comps=LiqT, equationP="P_Put2008_eq32c", T=1300,
-       eq_tests=True).Delta_CaTs[0], 0.017332,
+       eq_tests=True).Delta_CaTs_P1999[0], 0.017332,
        decimalPlace,
        "Calc Delta CaTs from  P_Put2008_eq32c not equal to test value")
 
     def test_Put32_DeltaDiHd(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
        liq_comps=LiqT, equationP="P_Put2008_eq32c", T=1300,
-       eq_tests=True).Delta_DiHd[0], 0.006175,
+       eq_tests=True).Delta_DiHd_Mollo[0], 0.006175,
        decimalPlace,
        "Calc Delta DiHd from  P_Put2008_eq32c not equal to test value")
 

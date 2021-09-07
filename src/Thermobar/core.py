@@ -1182,8 +1182,8 @@ def calculate_clinopyroxene_components(cpx_comps):
     # others.
     cpx_calc['CrCaTs'] = 0.5 * cpx_calc['Cr2O3_Cpx_cat_6ox']
     cpx_calc['a_cpx_En'] = ((1 - cpx_calc['CaO_Cpx_cat_6ox'] - cpx_calc['Na2O_Cpx_cat_6ox'] - cpx_calc['K2O_Cpx_cat_6ox'])
-     * (1 - 0.5 * (cpx_calc['Al2O3_Cpx_cat_6ox'])
-                                                                                                                                        + cpx_calc['Cr2O3_Cpx_cat_6ox'] + cpx_calc['Na2O_Cpx_cat_6ox'] + cpx_calc['K2O_Cpx_cat_6ox']))
+     * (1 - 0.5 * (cpx_calc['Al2O3_Cpx_cat_6ox']+ cpx_calc['Cr2O3_Cpx_cat_6ox'] + cpx_calc['Na2O_Cpx_cat_6ox']
+      + cpx_calc['K2O_Cpx_cat_6ox'])))
     cpx_calc['Mgno_Cpx'] = (cpx_comps['MgO_Cpx'] / 40.3044) / \
         (cpx_comps['MgO_Cpx'] / 40.3044 + cpx_comps['FeOt_Cpx'] / 71.844)
 
@@ -2680,9 +2680,9 @@ def amp_components_ferric_ferrous(sites_df, norm_cations):
     # f_ave = (2/3)*fa.min(axis = 'columns') + (1/3)*fb.max(axis = 'columns')
 
     norm_cations_hb = norm_cations.multiply(f_ave, axis='rows')
-    norm_cations_hb['Fe2O3'] = 46 * (1 - f_ave)
-    norm_cations_hb['FeO'] = norm_cations_hb['FeOt_Amp_cat_23ox'] - \
-        norm_cations_hb['Fe2O3']
+    norm_cations_hb['Fe2O3_Amp_cat_23ox'] = 46 * (1 - f_ave)
+    norm_cations_hb['FeO_Amp_cat_23ox'] = norm_cations_hb['FeOt_Amp_cat_23ox'] - \
+        norm_cations_hb['Fe2O3_Amp_cat_23ox']
     norm_cations_hb.drop(columns=['FeOt_Amp_cat_23ox', 'oxy_renorm_factor',
                          'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All'], inplace=True)
     newnames = []
@@ -2741,50 +2741,50 @@ def get_amp_sites_ferric_ferrous(amp_apfu_df):
     Fe3_C = np.empty(len(samples))
 
     for sample, i in zip(samples, range(len(samples))):
-        Si_T[i] = amp_apfu_df.loc[sample, 'SiO2']
-        K_A[i] = amp_apfu_df.loc[sample, 'K2O']
-        Ti_C[i] = amp_apfu_df.loc[sample, 'TiO2']
-        Ca_B[i] = amp_apfu_df.loc[sample, 'CaO']
-        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr2O3']
-        Fe3_C[i] = amp_apfu_df.loc[sample, 'Fe2O3']
+        Si_T[i] = amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox']
+        K_A[i] = amp_apfu_df.loc[sample, 'K2O_Amp_cat_23ox']
+        Ti_C[i] = amp_apfu_df.loc[sample, 'TiO2_Amp_cat_23ox']
+        Ca_B[i] = amp_apfu_df.loc[sample, 'CaO_Amp_cat_23ox']
+        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr2O3_Amp_cat_23ox']
+        Fe3_C[i] = amp_apfu_df.loc[sample, 'Fe2O3_Amp_cat_23ox']
 
-        if Si_T[i] + amp_apfu_df.loc[sample, 'Al2O3'] > 8:
-            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'SiO2']
-            Al_C[i] = amp_apfu_df.loc[sample, 'SiO2'] + \
-                amp_apfu_df.loc[sample, 'Al2O3'] - 8
+        if Si_T[i] + amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox'] > 8:
+            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox']
+            Al_C[i] = amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox'] + \
+                amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox'] - 8
         else:
-            Al_T[i] = amp_apfu_df.loc[sample, 'Al2O3']
+            Al_T[i] = amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox']
             Al_C[i] = 0
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + \
-                amp_apfu_df.loc[sample, 'MgO'] > 5:
+                amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox'] > 5:
             Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i]
             Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
-                Fe3_C[i] + amp_apfu_df.loc[sample, 'MgO'] - 5
+                Fe3_C[i] + amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox'] - 5
         else:
-            Mg_C[i] = amp_apfu_df.loc[sample, 'MgO']
+            Mg_C[i] = amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox']
             Mg_B[i] = 0
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i] > 5:
             Fe2_C[i] = 0
-            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO']
+            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO_Amp_cat_23ox']
         else:
             Fe2_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i])
-            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO'] - Fe2_C[i]
+            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO_Amp_cat_23ox'] - Fe2_C[i]
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe3_C[i] + Fe2_C[i] > 5:
             Mn_C[i] = 0
-            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO']
+            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO_Amp_cat_23ox']
         else:
             Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] +
                            Mg_C[i] + Fe2_C[i] + Fe3_C[i])
-            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO'] - Mn_C[i]
+            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO_Amp_cat_23ox'] - Mn_C[i]
 
         if Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i] > 2:
             Na_B[i] = 0
-            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O']
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox']
         else:
             Na_B[i] = 2 - (Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i])
-            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O'] - Na_B[i]
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox'] - Na_B[i]
 
     site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe3_C, Fe2_C, Mn_C, Cr_C,
     Mg_B, Fe2_B, Mn_B, Na_B, Ca_B, Na_A, K_A])
@@ -2822,13 +2822,7 @@ def get_amp_sites_mutch(amp_apfu_df):
 # new column names to drop the amp_cat_23ox. Can make this more flexible or we can just force the formatting
     # of the output inside the function. Mostly I didnt want to type it out a bunch so we can omit this little
     # loop if we want to formalize things
-    newnames = []
-    for name in amp_apfu_df.columns.tolist():
-        newnames.append(norm_cations.split('_')[0])
-
     norm_cations = amp_apfu_df.copy()
-    norm_cations.columns = newnames
-
     samples = norm_cations.index.tolist()
 
     # containers to fill later
@@ -2850,42 +2844,42 @@ def get_amp_sites_mutch(amp_apfu_df):
 
     for sample, i in zip(samples, range(len(samples))):
         # these are all the cations that have no site ambiguity
-        Si_T[i] = norm_cations.loc[sample, 'SiO2']
-        K_A[i] = norm_cations.loc[sample, 'K2O']
-        Ti_C[i] = norm_cations.loc[sample, 'TiO2']
-        Ca_B[i] = norm_cations.loc[sample, 'CaO']
-        Cr_C[i] = norm_cations.loc[sample, 'Cr2O3']
+        Si_T[i] = norm_cations.loc[sample, 'SiO2_Amp_cat_23ox']
+        K_A[i] = norm_cations.loc[sample, 'K2O_Amp_cat_23ox']
+        Ti_C[i] = norm_cations.loc[sample, 'TiO2_Amp_cat_23ox']
+        Ca_B[i] = norm_cations.loc[sample, 'CaO_Amp_cat_23ox']
+        Cr_C[i] = norm_cations.loc[sample, 'Cr2O3_Amp_cat_23ox']
 
         # site ambiguous cations. Follows Leake et al., (1997) logic
-        if Si_T[i] + norm_cations.loc[sample, 'Al2O3'] > 8:
-            Al_T[i] = 8 - norm_cations.loc[sample, 'SiO2']
-            Al_C[i] = norm_cations.loc[sample, 'SiO2'] + \
-                norm_cations.loc[sample, 'Al2O3'] - 8
+        if Si_T[i] + norm_cations.loc[sample, 'Al2O3_Amp_cat_23ox'] > 8:
+            Al_T[i] = 8 - norm_cations.loc[sample, 'SiO2_Amp_cat_23ox']
+            Al_C[i] = norm_cations.loc[sample, 'SiO2_Amp_cat_23ox'] + \
+                norm_cations.loc[sample, 'Al2O3_Amp_cat_23ox'] - 8
         else:
-            Al_T[i] = norm_cations.loc[sample, 'Al2O3']
+            Al_T[i] = norm_cations.loc[sample, 'Al2O3_Amp_cat_23ox']
             Al_C[i] = 0
 
-        if Al_C[i] + Ti_C[i] + Cr_C[i] + norm_cations.loc[sample, 'MgO'] > 5:
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + norm_cations.loc[sample, 'MgO_Amp_cat_23ox'] > 5:
             Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i]
             Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
-                norm_cations.loc[sample, 'MgO'] - 5
+                norm_cations.loc[sample, 'MgO_Amp_cat_23ox'] - 5
         else:
-            Mg_C[i] = norm_cations.loc[sample, 'MgO']
+            Mg_C[i] = norm_cations.loc[sample, 'MgO_Amp_cat_23ox']
             Mg_B[i] = 0
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] > 5:
             Fe_C[i] = 0
-            Fe_B[i] = norm_cations.loc[sample, 'FeOt']
+            Fe_B[i] = norm_cations.loc[sample, 'FeOt_Amp_cat_23ox']
         else:
             Fe_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i])
-            Fe_B[i] = norm_cations.loc[sample, 'FeOt'] - Fe_C[i]
+            Fe_B[i] = norm_cations.loc[sample, 'FeOt_Amp_cat_23ox'] - Fe_C[i]
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe_C[i] > 5:
             Mn_C[i] = 0
-            Mn_B[i] = norm_cations.loc[sample, 'MnO']
+            Mn_B[i] = norm_cations.loc[sample, 'MnO_Amp_cat_23ox']
         else:
             Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe_C[i])
-            Mn_B[i] = norm_cations.loc[sample, 'MnO'] - Mn_C[i]
+            Mn_B[i] = norm_cations.loc[sample, 'MnO_Amp_cat_23ox'] - Mn_C[i]
 
         if Mg_B[i] + Fe_B[i] + Mn_B[i] + Ca_B[i] + \
                 amp_apfu_df['Na2O_Amp_cat_23ox'].iloc[i] > 2:
@@ -2960,16 +2954,12 @@ def amp_components_ferric_ferrous_mutch(sites_df, norm_cations):
     f_ave = (2 / 3) * fa.min(axis='columns') + (1 / 3) * fb.max(axis='columns')
 
     norm_cations_hb = norm_cations.multiply(f_ave, axis='rows')
-    norm_cations_hb['Fe2O3'] = 46 * (1 - f_ave)
-    norm_cations_hb['FeO'] = norm_cations_hb['FeOt_Amp_cat_23ox'] - \
-        norm_cations_hb['Fe2O3']
+    norm_cations_hb['Fe2O3_Amp_cat_23ox'] = 46 * (1 - f_ave)
+    norm_cations_hb['FeO_Amp_cat_23ox'] = norm_cations_hb['FeOt_Amp_cat_23ox'] - \
+        norm_cations_hb['Fe2O3_Amp_cat_23ox']
     norm_cations_hb.drop(columns=['FeOt_Amp_cat_23ox', 'oxy_renorm_factor',
                          'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All'], inplace=True)
-    newnames = []
-    for name in norm_cations_hb.columns.tolist():
-        newnames.append(norm_cations.split('_')[0])
 
-    norm_cations_hb.columns = newnames
 
     return norm_cations_hb
 
@@ -3023,54 +3013,54 @@ def get_amp_sites_ferric_ferrous_mutch(amp_apfu_df):
     Fe3_C = np.empty(len(samples))
 
     for sample, i in zip(samples, range(len(samples))):
-        Si_T[i] = amp_apfu_df.loc[sample, 'SiO2']
-        K_A[i] = amp_apfu_df.loc[sample, 'K2O']
-        Ti_C[i] = amp_apfu_df.loc[sample, 'TiO2']
-        Ca_B[i] = amp_apfu_df.loc[sample, 'CaO']
-        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr2O3']
-        Fe3_C[i] = amp_apfu_df.loc[sample, 'Fe2O3']
+        Si_T[i] = amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox']
+        K_A[i] = amp_apfu_df.loc[sample, 'K2O_Amp_cat_23ox']
+        Ti_C[i] = amp_apfu_df.loc[sample, 'TiO2_Amp_cat_23ox']
+        Ca_B[i] = amp_apfu_df.loc[sample, 'CaO_Amp_cat_23ox']
+        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr2O3_Amp_cat_23ox']
+        Fe3_C[i] = amp_apfu_df.loc[sample, 'Fe2O3_Amp_cat_23ox']
 
-        if Si_T[i] + amp_apfu_df.loc[sample, 'Al2O3'] > 8:
-            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'SiO2']
-            Al_C[i] = amp_apfu_df.loc[sample, 'SiO2'] + \
-                amp_apfu_df.loc[sample, 'Al2O3'] - 8
+        if Si_T[i] + amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox'] > 8:
+            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox']
+            Al_C[i] = amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox'] + \
+                amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox'] - 8
         else:
-            Al_T[i] = amp_apfu_df.loc[sample, 'Al2O3']
+            Al_T[i] = amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox']
             Al_C[i] = 0
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + \
-                amp_apfu_df.loc[sample, 'MgO'] > 5:
+                amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox'] > 5:
             Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i]
             Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
-                Fe3_C[i] + amp_apfu_df.loc[sample, 'MgO'] - 5
+                Fe3_C[i] + amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox'] - 5
         else:
-            Mg_C[i] = amp_apfu_df.loc[sample, 'MgO']
+            Mg_C[i] = amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox']
             Mg_B[i] = 0
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i] > 5:
             Fe2_C[i] = 0
-            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO']
+            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO_Amp_cat_23ox']
         else:
             Fe2_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i])
-            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO'] - Fe2_C[i]
+            Fe2_B[i] = amp_apfu_df.loc[sample, 'FeO_Amp_cat_23ox'] - Fe2_C[i]
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe3_C[i] + Fe2_C[i] > 5:
             Mn_C[i] = 0
-            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO']
+            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO_Amp_cat_23ox']
         else:
             Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] +
                            Mg_C[i] + Fe2_C[i] + Fe3_C[i])
-            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO'] - Mn_C[i]
+            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO_Amp_cat_23ox'] - Mn_C[i]
 
         if Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i] + \
-                amp_apfu_df.loc[sample, 'Na2O'] > 2:
+                amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox'] > 2:
             Na_B[i] = 2 - (Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i])
-            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O'] - Na_B[i]
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox'] - Na_B[i]
 
         else:
-            Na_B[i] = amp_apfu_df.loc[sample, 'Na2O']
+            Na_B[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox']
             # Euan has as if Na A >0, set as 0, otherwise, =Na cations 23 O -
             # Na from A site. Ask jordan where he got this from.
-            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O'] - Na_B[i]
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox'] - Na_B[i]
 
     site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe3_C, Fe2_C, Mn_C, Cr_C, Mg_B,
     Fe2_B, Mn_B, Na_B, Ca_B, Na_A, K_A])

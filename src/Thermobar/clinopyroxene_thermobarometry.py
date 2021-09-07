@@ -263,7 +263,7 @@ def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2_Li
     '''
     Clinopyroxene-liquid  thermometer of Putirka (2008) Eq 33.
 
-    |  SEE=+-°C
+    |  SEE=+-45°C (all data)
     '''
     return (10 ** 4 / (7.53 + 0.07 * H2O_Liq - 1.1 * Mg_Number_Liq_NoFe3
     - 14.9 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac) -
