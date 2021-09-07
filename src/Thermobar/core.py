@@ -1170,10 +1170,19 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['Ca_CaMgFe']=cpx_calc['CaO_Cpx_cat_6ox']/(cpx_calc['CaO_Cpx_cat_6ox']+cpx_calc['FeOt_Cpx_cat_6ox']
     +cpx_calc['MgO_Cpx_cat_6ox'])
 
+
+    cpx_calc['Lindley_Fe3_Cpx'] = (cpx_calc['Na2O_Cpx_cat_6ox'] + cpx_calc['Al_IV_cat_6ox'] - cpx_calc['Al_VI_cat_6ox'] -
+        2 * cpx_calc['TiO2_Cpx_cat_6ox'] - cpx_calc['Cr2O3_Cpx_cat_6ox'])  # This is cell FR
+    cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] < 0.0000000001),  'Lindley_Fe3_Cpx'] = 0
+    cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] >= cpx_calc['FeOt_Cpx_cat_6ox'] ),  'Lindley_Fe3_Cpx'] = cpx_calc['FeOt_Cpx_cat_6ox']
+    cpx_calc['Lindley_Fe2_Cpx']=cpx_calc['FeOt_Cpx_cat_6ox']-cpx_calc['Lindley_Fe3_Cpx']
+    cpx_calc['Lindley_Fe3_Cpx_prop']=cpx_calc['Lindley_Fe3_Cpx']/cpx_calc['FeOt_Cpx_cat_6ox']
+
     # Cpx Components that don't nee if and else statements and don't rely on
     # others.
     cpx_calc['CrCaTs'] = 0.5 * cpx_calc['Cr2O3_Cpx_cat_6ox']
-    cpx_calc['a_cpx_En'] = (1 - cpx_calc['CaO_Cpx_cat_6ox'] - cpx_calc['Na2O_Cpx_cat_6ox'] - cpx_calc['K2O_Cpx_cat_6ox']) * (1 - 0.5 * (cpx_calc['Al2O3_Cpx_cat_6ox']
+    cpx_calc['a_cpx_En'] = ((1 - cpx_calc['CaO_Cpx_cat_6ox'] - cpx_calc['Na2O_Cpx_cat_6ox'] - cpx_calc['K2O_Cpx_cat_6ox'])
+     * (1 - 0.5 * (cpx_calc['Al2O3_Cpx_cat_6ox'])
                                                                                                                                         + cpx_calc['Cr2O3_Cpx_cat_6ox'] + cpx_calc['Na2O_Cpx_cat_6ox'] + cpx_calc['K2O_Cpx_cat_6ox']))
     cpx_calc['Mgno_Cpx'] = (cpx_comps['MgO_Cpx'] / 40.3044) / \
         (cpx_comps['MgO_Cpx'] / 40.3044 + cpx_comps['FeOt_Cpx'] / 71.844)
@@ -1334,6 +1343,12 @@ def calculate_clinopyroxene_liquid_components(
 # Measured Kd Fe-Mg (using 2+)
     combo_liq_cpxs['Kd_Fe_Mg_Fe2'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['FeOt_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['MgO_Liq_cat_frac'])))
+
+# Measured Kd Fe-Mg using 2+ in the liquid and Cpx based on Lindley
+    combo_liq_cpxs['Kd_Fe_Mg_Fe2_Lind'] = ((combo_liq_cpxs['Lindley_Fe2_Cpx'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
+        (combo_liq_cpxs['FeOt_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['MgO_Liq_cat_frac'])))
+
+
 # Measured Kd Fe-Mg using Fet
     combo_liq_cpxs['Kd_Fe_Mg_Fet'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['FeOt_Liq_cat_frac'] / combo_liq_cpxs['MgO_Liq_cat_frac'])))
@@ -1889,7 +1904,9 @@ def calculate_13cations_amphibole_ridolfi(amp_comps):
     return cat_13_out
 
 def calculate_sites_ridolfi(amp_comps):
-    norm_cations=calculate_13cations_amphibole_ridolfi(amp_comps)
+
+    amp_comps_c=amp_comps.copy()
+    norm_cations=calculate_13cations_amphibole_ridolfi(amp_comps_c)
 
     # Ridolfi T sites
     norm_cations['Si_T']=norm_cations['SiO2_Amp_13_cat']
@@ -1955,6 +1972,132 @@ def calculate_sites_ridolfi(amp_comps):
 
     # All Na left after B
     norm_cations['Na_A']=norm_cations['Na2O_Amp_13_cat']-norm_cations['Na_B']
+    if "Sample_ID_Amp" in amp_comps.columns:
+        myAmps1_label = amp_comps_c.drop(['Sample_ID_Amp'], axis='columns')
+    else:
+        myAmps1_label = amp_comps_c
+    norm_cations['Sum_input'] = myAmps1_label.sum(axis='columns')
+    Sum_input=norm_cations['Sum_input']
+    Low_sum=norm_cations['Sum_input'] <90
+
+   # Other checks in Ridolfi's spreadsheet
+    norm_cations['H2O_calc']=(2-norm_cations['F_Amp_13_cat']-norm_cations['Cl_Amp_13_cat'])*norm_cations['cation_sum_Si_Mg']*17/13/2
+    norm_cations.loc[(Low_sum), 'H2O_calc']=np.nan
+
+    norm_cations['Charge']=(norm_cations['SiO2_Amp_13_cat']*4+norm_cations['TiO2_Amp_13_cat']*4+norm_cations['Al2O3_Amp_13_cat']*3+
+    norm_cations['Cr2O3_Amp_13_cat']*3+norm_cations['FeOt_Amp_13_cat']*2+norm_cations['MnO_Amp_13_cat']*2+norm_cations['MgO_Amp_13_cat']*2
+    +norm_cations['CaO_Amp_13_cat']*2+norm_cations['Na2O_Amp_13_cat']+norm_cations['K2O_Amp_13_cat'])
+
+    norm_cations['Fe3_calc']=46-norm_cations['Charge']
+    High_Charge=norm_cations['Charge']>46
+    norm_cations.loc[(High_Charge), 'Fe3_calc']=0
+
+    norm_cations['Fe2_calc']=norm_cations['FeOt_Amp_13_cat']-norm_cations['Fe3_calc']
+
+
+    norm_cations['Fe2O3_calc']=norm_cations['Fe3_calc']*norm_cations['cation_sum_Si_Mg']*159.691/13/2
+    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=np.nan
+
+    norm_cations['FeO_calc']=norm_cations['Fe2_calc']*norm_cations['cation_sum_Si_Mg']*71.846/13
+    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=np.nan
+
+    norm_cations['O=F,Cl']=-(amp_comps_c['F_Amp']*0.421070639014633+amp_comps_c['Cl_Amp']*0.225636758525372)
+    norm_cations.loc[(Low_sum), 'O=F,Cl']=np.nan
+
+    norm_cations['Total_recalc']=(Sum_input-amp_comps_c['FeOt_Amp']+norm_cations['H2O_calc']+norm_cations['Fe2O3_calc']
+    +norm_cations['FeO_calc']+norm_cations['O=F,Cl'])
+    norm_cations.loc[(Low_sum), 'Total']=np.nan
+
+    # Set up a column for a fail message
+    norm_cations['Fail Msg']=""
+    norm_cations['Input_Check']=True
+
+    # Check that old total isn't <90
+
+    norm_cations.loc[(Low_sum), 'Input_Check']=False
+    norm_cations.loc[(Low_sum), 'Fail Msg']="Cation oxide Total<90"
+
+    # First check, that new total is >98.5 (e.g with recalculated H2O etc).
+
+    Low_total_Recalc=norm_cations['Total_recalc']<98.5
+    norm_cations.loc[(Low_total_Recalc), 'Input_Check']=False
+    norm_cations.loc[(Low_total_Recalc), 'Fail Msg']="Recalc Total<98.5"
+
+    # Next, check that new total isn't >102
+    High_total_Recalc=norm_cations['Total_recalc']>102
+    norm_cations.loc[(High_total_Recalc), 'Input_Check']=False
+    norm_cations.loc[(High_total_Recalc), 'Fail Msg']="Recalc Total>102"
+
+    # Next, check that charge isn't >46.5 ("unbalanced")
+    Unbalanced_Charge=norm_cations['Charge']>46.5
+    norm_cations.loc[(Unbalanced_Charge), 'Input_Check']=False
+    norm_cations.loc[(Unbalanced_Charge), 'Fail Msg']="unbalanced charge (>46.5)"
+
+    # Next check that Fe2+ is greater than 0, else unbalanced
+    Negative_Fe2=norm_cations['Fe2_calc']<0
+    norm_cations.loc[(Negative_Fe2), 'Input_Check']=False
+    norm_cations.loc[(Negative_Fe2), 'Fail Msg']="unbalanced charge (Fe2<0)"
+
+    # Check that Mg# calculated using just Fe2 is >54, else low Mg
+    norm_cations['Mgno_Fe2']=norm_cations['MgO_Amp_13_cat']/(norm_cations['MgO_Amp_13_cat']+norm_cations['Fe2_calc'])
+    norm_cations['Mgno_FeT']=norm_cations['MgO_Amp_13_cat']/(norm_cations['MgO_Amp_13_cat']+norm_cations['FeOt_Amp_13_cat'])
+
+    Low_Mgno=100*norm_cations['Mgno_Fe2']<54
+    norm_cations.loc[(Low_Mgno), 'Input_Check']=False
+    norm_cations.loc[(Low_Mgno), 'Fail Msg']="Low Mg# (<54)"
+
+    #Only ones that matter are low Ca, high Ca, BJ3>60, low B cations"
+
+
+
+    # If Column CU<1.5,"low Ca"
+    Ca_low=norm_cations['CaO_Amp_13_cat']<1.5
+    norm_cations.loc[(Ca_low), 'Input_Check']=False
+    norm_cations.loc[(Ca_low), 'Fail Msg']="Low Ca (<1.5)"
+
+    # If Column CU>2.05, "high Ca"
+    Ca_high=norm_cations['CaO_Amp_13_cat']>2.05
+    norm_cations.loc[(Ca_high), 'Input_Check']=False
+    norm_cations.loc[(Ca_high), 'Fail Msg']="High Ca (>2.05)"
+
+    # Check that CW<1.99, else "Low B cations"
+    norm_cations['Na_calc']=2-norm_cations['CaO_Amp_13_cat']
+    Ca_greaterthanNa=norm_cations['Na2O_Amp_13_cat']<(2-norm_cations['CaO_Amp_13_cat'])
+    norm_cations.loc[(Ca_greaterthanNa), 'Na_calc']=norm_cations['Na2O_Amp_13_cat']
+    norm_cations['B_Sum']=norm_cations['Na_calc']+norm_cations['CaO_Amp_13_cat']
+
+
+    Low_B_Cations=norm_cations['B_Sum']<1.99
+    norm_cations.loc[(Low_B_Cations), 'Input_Check']=False
+    norm_cations.loc[(Low_B_Cations), 'Fail Msg']="Low B Cations"
+
+    # Printing composition
+    norm_cations['A_Sum']=norm_cations['Na_A']+norm_cations['K_A']
+    norm_cations['class']="N/A"
+    # If <1.5, low Ca,
+    lowCa=norm_cations['Ca_B']<1.5
+    norm_cations.loc[(lowCa), 'classification']="low-Ca"
+    # Else, if high Ca, If Mgno<5, its low Mg
+    LowMgno=norm_cations['Mgno_Fe2']<0.5
+    norm_cations.loc[((~lowCa)&(LowMgno)), 'classification']="low-Mg"
+    # Else, if Si>6.5, its a Mg-hornblende
+    MgHbl=norm_cations['Si_T']>=6.5
+    norm_cations.loc[((~lowCa)&(~LowMgno)&(MgHbl)), 'classification']="Mg-Hornblende"
+    # Else if Ti_C >0.5, Kaerstiertei
+    Kaer=norm_cations['Ti_C']>0.5
+    norm_cations.loc[((~lowCa)&(~LowMgno)&(~MgHbl)&(Kaer)), 'classification']="kaersutite"
+    # Else if A_Sum<0.5, Tschermakitic pargasite
+    Tsh=norm_cations['A_Sum']<0.5
+    norm_cations.loc[((~lowCa)&(~LowMgno)&(~MgHbl)&(~Kaer)&(Tsh)), 'classification']="Tschermakitic pargasite"
+    # Else if Fe3+>AL VI C sum, Mg-hastingsite
+    MgHast=(norm_cations['Fe3_calc']>norm_cations['Al_VI_C'])
+    norm_cations.loc[((~lowCa)&(~LowMgno)&(~MgHbl)&(~Kaer)&(~Tsh)&(MgHast)), 'classification']="Mg-hastingsite"
+    # Else, its Pargasite
+    norm_cations.loc[((~lowCa)&(~LowMgno)&(~MgHbl)&(~Kaer)&(~Tsh)&(~MgHast)), 'classification']="Pargasite"
+
+
+
+
 
 
     return norm_cations
@@ -2395,7 +2538,7 @@ def get_amp_sites2(amp_apfu_df):
     # loop if we want to formalize things
     newnames = []
     for name in amp_apfu_df.columns.tolist():
-        newnames.append(name.split('_')[0])
+        newnames.append(norm_cations.split('_')[0])
 
     norm_cations = amp_apfu_df.copy()
     norm_cations.columns = newnames
@@ -2544,7 +2687,7 @@ def amp_components_ferric_ferrous(sites_df, norm_cations):
                          'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All'], inplace=True)
     newnames = []
     for name in norm_cations_hb.columns.tolist():
-        newnames.append(name.split('_')[0])
+        newnames.append(norm_cations.split('_')[0])
 
     norm_cations_hb.columns = newnames
 
@@ -2681,7 +2824,7 @@ def get_amp_sites_mutch(amp_apfu_df):
     # loop if we want to formalize things
     newnames = []
     for name in amp_apfu_df.columns.tolist():
-        newnames.append(name.split('_')[0])
+        newnames.append(norm_cations.split('_')[0])
 
     norm_cations = amp_apfu_df.copy()
     norm_cations.columns = newnames
@@ -2824,7 +2967,7 @@ def amp_components_ferric_ferrous_mutch(sites_df, norm_cations):
                          'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All'], inplace=True)
     newnames = []
     for name in norm_cations_hb.columns.tolist():
-        newnames.append(name.split('_')[0])
+        newnames.append(norm_cations.split('_')[0])
 
     norm_cations_hb.columns = newnames
 
@@ -3000,23 +3143,68 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
     Combo_liq_cpxs['P_kbar_calc'] = P
     Combo_liq_cpxs['T_K_calc'] = T
-    #     # Equation 35 of Putirka 2008 - theoretical Kd-Mg exchange coefficient
+
+    # First up, Kd Fe-MG
+
+     # Equation 35 of Putirka 2008 - theoretical Kd-Mg exchange coefficient
     Combo_liq_cpxs['Kd_Ideal_Put'] = np.exp(-0.107 - 1719 / T)  # eq 35
     ratioMasotta = Combo_liq_cpxs['Na2O_Liq_cat_frac'] / (
         Combo_liq_cpxs['Na2O_Liq_cat_frac'] + Combo_liq_cpxs['K2O_Liq_cat_frac'])
+
+    # Masotta et al. For Alkali basalts
     Combo_liq_cpxs['Kd_Ideal_Masotta'] = np.exp(
         1.735 - 3056 / T - 1.668 * ratioMasotta)  # eq35 alk, for trachytes and phonolites
     Combo_liq_cpxs['Delta_Kd_Put2008'] = abs(
         Combo_liq_cpxs['Kd_Ideal_Put'] - Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
+    Combo_liq_cpxs['Delta_Kd_Put2008_I_M'] = Combo_liq_cpxs['Kd_Ideal_Put'] - Combo_liq_cpxs['Kd_Fe_Mg_Fe2']
     Combo_liq_cpxs['Delta_Kd_Mas2013'] = abs(
         Combo_liq_cpxs['Kd_Ideal_Masotta'] - Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
 
-    # Equation X of Mollo for DiHd and EnFs components
+    # Di Hd equilibrium
+
+    # Putirka (1999) DiHd
+    Combo_liq_cpxs['DiHd_Pred_P1999']=(np.exp(-9.8
+    + 0.24*np.log(Combo_liq_cpxs['CaO_Liq_cat_frac']*(Combo_liq_cpxs['FeOt_Liq_cat_frac']+Combo_liq_cpxs['MgO_Liq_cat_frac'])*
+    Combo_liq_cpxs['SiO2_Liq_cat_frac']**2)+17558/T+8.7*np.log(T/1670)-4.61*10**3*(Combo_liq_cpxs['EnFs']**2/T))
+    )
+    Combo_liq_cpxs['Delta_DiHd_P1999'] = abs(
+        Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_P1999'])
+    Combo_liq_cpxs['Delta_DiHd_I_M_P1999']=Combo_liq_cpxs['DiHd_Pred_P1999']-Combo_liq_cpxs['DiHd_1996']
+
+    # One labelled "new", presume from Putirka (2008)
+    Combo_liq_cpxs['DiHd_Pred_P2008']=(np.exp(-0.482-0.439*np.log(Combo_liq_cpxs['SiO2_Liq_cat_frac'])
+    +101.03*(Combo_liq_cpxs['Na2O_Liq_cat_frac']+Combo_liq_cpxs['K2O_Liq_cat_frac'])**3
+    -51.69*P/T-3742.5*Combo_liq_cpxs['EnFs']**2/T) )
+    Combo_liq_cpxs['Delta_DiHd_P2008'] = abs(
+        Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_P2008'])
+
+
+
+    # Mollo 2013 for DiHd
     Combo_liq_cpxs['DiHd_Pred_Mollo'] = (np.exp(-2.18 - 3.16 * Combo_liq_cpxs['TiO2_Liq_cat_frac']
     - 0.365 * np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))
      + 0.05 * np.log(Combo_liq_cpxs['MgO_Liq_cat_frac']) - 3858.2 * (
                                                     Combo_liq_cpxs['EnFs']**2 / T) + (2107.4 / T)
                                                 - 17.64 * P / T))
+    Combo_liq_cpxs['Delta_DiHd_Mollo'] = abs(
+        Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_Mollo'])
+    Combo_liq_cpxs['Delta_DiHd_I_M_Mollo']=Combo_liq_cpxs['DiHd_Pred_Mollo']-Combo_liq_cpxs['DiHd_1996']
+
+    # En Fs equilibrium
+
+
+    # Putirka En Fs
+    Combo_liq_cpxs['EnFs_Pred_P1999']=( np.exp(-6.96+18438/T+8*np.log(T/1670)
+    +0.66*np.log((Combo_liq_cpxs['FeOt_Liq_cat_frac']+Combo_liq_cpxs['MgO_Liq_cat_frac'])**2*Combo_liq_cpxs['SiO2_Liq_cat_frac']**2)
+    -5.1*10**3*(Combo_liq_cpxs['DiHd_1996']**2/T)+1.81*np.log(Combo_liq_cpxs['SiO2_Liq_cat_frac']) ))
+    Combo_liq_cpxs['Delta_EnFs_P1999'] = abs(
+        Combo_liq_cpxs['EnFs'] - Combo_liq_cpxs['EnFs_Pred_P1999'])
+    Combo_liq_cpxs['Delta_EnFs_I_M_P1999'] = Combo_liq_cpxs['EnFs_Pred_P1999']-Combo_liq_cpxs['EnFs']
+
+
+
+
+    # En Fs Mollo
 
     Combo_liq_cpxs['EnFs_Pred_Mollo'] = (np.exp(0.018 - 9.61 * Combo_liq_cpxs['CaO_Liq_cat_frac'] +
                                                 7.46 *
@@ -3025,34 +3213,64 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
                                                 - 0.34 *np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))
                                                 - 3.78 * (Combo_liq_cpxs['Na2O_Liq_cat_frac'] + Combo_liq_cpxs['K2O_Liq_cat_frac']) -
                                                 3737.3 * (Combo_liq_cpxs['DiHd_1996']**2) / T - 46.8 * P / T))
-
-    #     # Putirka 1999 equations
-    Combo_liq_cpxs['CaTs_Pred_P1999'] = (np.exp(2.58 + 0.12 * P / T - 9 * 10**(-7) * P**2 / T
-    + 0.78 * np.log(Combo_liq_cpxs['CaO_Liq_cat_frac'].astype(float) * Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float)**2 * Combo_liq_cpxs['SiO2_Liq_cat_frac'].astype(float)) - 4.3 * 10**3 * (Combo_liq_cpxs['DiHd_1996']**2 / T)))
-
-    Combo_liq_cpxs['CrCaTS_Pred_P1999'] = (np.exp(12.8) * Combo_liq_cpxs['CaO_Liq_cat_frac'] * (
-        Combo_liq_cpxs['Cr2O3_Liq_cat_frac']**2) * Combo_liq_cpxs['SiO2_Liq_cat_frac'])
-
-    #     #calculating deltas -e.g., absolute difference between theoreitcal and observed using Mollo and P1999
-    Combo_liq_cpxs['Delta_EnFs'] = abs(
+    Combo_liq_cpxs['Delta_EnFs_Mollo'] = abs(
         Combo_liq_cpxs['EnFs'] - Combo_liq_cpxs['EnFs_Pred_Mollo'])
-    Combo_liq_cpxs['Delta_CaTs'] = abs(
+    Combo_liq_cpxs['Delta_EnFs_I_M_Mollo'] = Combo_liq_cpxs['EnFs_Pred_Mollo']-Combo_liq_cpxs['EnFs']
+
+
+    #  CaTs equilibrium (Mollo didnt release on of these)
+
+    Combo_liq_cpxs['CaTs_Pred_P1999'] = (np.exp(2.58 + 0.12 * P / T - 9 * 10**(-7) * P**2 / T
+    + 0.78 * np.log(Combo_liq_cpxs['CaO_Liq_cat_frac'].astype(float)
+    * Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float)**2
+    * Combo_liq_cpxs['SiO2_Liq_cat_frac'].astype(float)) - 4.3 * 10**3 * (Combo_liq_cpxs['DiHd_1996']**2 / T)))
+
+    Combo_liq_cpxs['Delta_CaTs_P1999'] = abs(
         Combo_liq_cpxs['CaTs'] - Combo_liq_cpxs['CaTs_Pred_P1999'])
-    Combo_liq_cpxs['Delta_DiHd'] = abs(
-        Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_Mollo'])
+    Combo_liq_cpxs['Delta_CaTs_I_M_P1999'] =Combo_liq_cpxs['CaTs_Pred_P1999']-Combo_liq_cpxs['CaTs']
+
+
+    #CrCaTs component
+
+    Combo_liq_cpxs['CrCaTs_Pred_P1999'] = (np.exp(12.8) * Combo_liq_cpxs['CaO_Liq_cat_frac'] * (
+        Combo_liq_cpxs['Cr2O3_Liq_cat_frac']**2) * Combo_liq_cpxs['SiO2_Liq_cat_frac'])
+    Combo_liq_cpxs['Delta_CrCaTs_P1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_P1999'])
+    Combo_liq_cpxs['Delta_CrCaTs_I_M_P1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_P1999'])
+
+    # CaTi component
+
+    Combo_liq_cpxs['CaTi_Pred_P1999']=( np.exp(5.1 + 0.52*np.log(Combo_liq_cpxs['CaO_Liq_cat_frac']*Combo_liq_cpxs['TiO2_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']**2)
+    +2.04*10**(3)* (Combo_liq_cpxs['DiHd_1996']**2 / T)- 6.2* Combo_liq_cpxs['SiO2_Liq_cat_frac']
+    +42.5*Combo_liq_cpxs['Na2O_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']
+    - 45.1*(Combo_liq_cpxs['FeOt_Liq_cat_frac']
+    +Combo_liq_cpxs['MgO_Liq_cat_frac'])*Combo_liq_cpxs['Al2O3_Liq_cat_frac'] ))
+
+    Combo_liq_cpxs['Delta_CaTi_P1999']=abs(Combo_liq_cpxs['CaTi']-Combo_liq_cpxs['CaTi_Pred_P1999'])
+    Combo_liq_cpxs['Delta_CaTi_I_M_P1999']=abs(Combo_liq_cpxs['CaTi']-Combo_liq_cpxs['CaTi_Pred_P1999'])
+
+
+    # Jd component
+    Combo_liq_cpxs['Jd_Pred_P1999']=(np.exp(-1.06+0.23*P/T-6*10**(-7)*P**2/T
+    +1.02*np.log(Combo_liq_cpxs['Na2O_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']*Combo_liq_cpxs['SiO2_Liq_cat_frac']**2)
+    -0.8*np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'])-2.2*np.log(Combo_liq_cpxs['SiO2_Liq_cat_frac'])))
+    Combo_liq_cpxs['Delta_Jd_P1999']=abs(Combo_liq_cpxs['Jd']-Combo_liq_cpxs['Jd_Pred_P1999'])
+    Combo_liq_cpxs['Delta_Jd_I_M_P1999']=abs(Combo_liq_cpxs['Jd']-Combo_liq_cpxs['Jd_Pred_P1999'])
+
 
     b = np.empty(len(Combo_liq_cpxs), dtype=bool)
     for i in range(0, len(Combo_liq_cpxs)):
 
-        if ((Combo_liq_cpxs['Delta_Kd_Put2008'].iloc[i] < KdErr) & (Combo_liq_cpxs['Delta_EnFs'].iloc[i] < 0.05 * sigma) &
-                (Combo_liq_cpxs['Delta_CaTs'].iloc[i] < 0.03 * sigma) & (Combo_liq_cpxs['Delta_DiHd'].iloc[i] < 0.06 * sigma)):
+        if ((Combo_liq_cpxs['Delta_Kd_Put2008'].iloc[i] < KdErr) & (Combo_liq_cpxs['Delta_EnFs_Mollo'].iloc[i] < 0.05 * sigma) &
+                (Combo_liq_cpxs['Delta_CaTs_P1999'].iloc[i] < 0.03 * sigma)
+                & (Combo_liq_cpxs['Delta_DiHd_Mollo'].iloc[i] < 0.06 * sigma)):
             b[i] = True
         else:
             b[i] = False
     Combo_liq_cpxs.insert(1, "Eq Tests Neave2017?", b)
 
     cols_to_move = ['P_kbar_calc', 'T_K_calc', "Eq Tests Neave2017?",
-                    'Delta_Kd_Put2008', 'Delta_Kd_Mas2013', 'Delta_EnFs', 'Delta_CaTs', 'Delta_DiHd']
+                    'Delta_Kd_Put2008', 'Delta_Kd_Mas2013', 'Delta_EnFs_Mollo', 'Delta_EnFs_P1999',
+                    'Delta_CaTs_P1999', 'Delta_DiHd_Mollo', 'Delta_DiHd_P1999', 'Delta_CrCaTs_P1999', 'Delta_CaTi_P1999']
     Combo_liq_cpxs = Combo_liq_cpxs[cols_to_move +
                                     [col for col in Combo_liq_cpxs.columns if col not in cols_to_move]]
 
@@ -3503,6 +3721,7 @@ def classify_phases(filename=None, sheet_name=None, df=None, return_end_members=
     Oxides_prefix=Oxides_prefix.add_suffix('_input')
 
 
+
     Oxides_amp_sites=get_amp_sites_from_input_not_amp(Oxides_prefix, "_input")
     Oxides_cpx_sites=calculate_cpx_sites_from_input_not_cpx(Oxides_prefix, "_input")
     Oxides_prefix['Ca_B']=Oxides_amp_sites['Ca_B']
@@ -3548,6 +3767,12 @@ def classify_phases(filename=None, sheet_name=None, df=None, return_end_members=
     Oxides_out.loc[Oxides_out['Sum_Oxides']<60, 'Phase_Min_Group_ML'] = "Not Classified - Total<60"
     Oxides_out.loc[Oxides_out['Sum_Oxides']>110, 'Phase_Min_Group_ML'] = "Not Classified - Total>110"
     Oxides_out['Phase_Mineral']=Oxides_out['Phase_Min_Group_ML']
+    # Classification for amphibole names based on Ridolfi
+    Oxides_Amp1=Oxides_out.copy()
+    Oxides_Amp1.columns = [col.replace("_input", "_Amp") for col in Oxides_Amp1.columns]
+    Oxides_Amp=Oxides_Amp1.reindex(df_ideal_amp.columns, axis=1)
+    amp_names = calculate_sites_ridolfi(amp_comps=Oxides_Amp).classification
+    Oxides_out.loc[Oxides_out['Phase_Min_Group_ML']=="Amp", 'Phase_Mineral']=amp_names
 
     #This does manual classification for feldsdpars.
     Fspar=Oxides_out['Phase_Min_Group_ML']=="Fspar" # This checks we are only doing it for felspar

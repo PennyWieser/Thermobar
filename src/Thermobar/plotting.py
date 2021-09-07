@@ -20,6 +20,58 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy import stats
+
+def Tukey_calc(x,y): #, name):
+    x=pd.Series(x)
+    y=pd.Series(y)
+    vals=np.array([3.1, 6.2, 9.3, 13])
+    X_Av=np.empty(len(vals), dtype=float)
+    Y_Av=np.empty(len(vals), dtype=float)
+    X_MedAv=np.empty(len(vals), dtype=float)
+    Y_MedAv=np.empty(len(vals), dtype=float)
+
+    Y_std=np.empty(len(vals), dtype=float)
+    X_std=np.empty(len(vals), dtype=float)
+    mask_iter=pd.DataFrame(index=x.index)
+    mask_iter=pd.DataFrame(index=x.index)
+    from scipy.stats import f_oneway
+    for i in range(0, len(vals)):
+        if i==0:
+            elx=i
+            mask_iter['mask_{}'.format(elx)]=(x<=vals[i])
+            X_Av[i]=np.nanmean(x.loc[mask_iter['mask_{}'.format(elx)]])
+            Y_Av[i]=np.nanmean(y.loc[mask_iter['mask_{}'.format(elx)]])
+            X_MedAv[i]=np.nanmedian(x.loc[mask_iter['mask_{}'.format(elx)]])
+            Y_MedAv[i]=np.nanmedian(y.loc[mask_iter['mask_{}'.format(elx)]])
+            Y_std[i]=np.nanstd(y.loc[mask_iter['mask_{}'.format(elx)]])
+            X_std[i]=np.nanstd(x.loc[mask_iter['mask_{}'.format(elx)]])
+
+        else:
+            elx=i
+            mask_iter['mask_{}'.format(elx)]=(x>vals[i-1])&(x<=vals[i])
+        #
+            X_Av[i]=np.nanmean(x.loc[mask_iter['mask_{}'.format(elx)]])
+            Y_Av[i]=np.nanmean(y.loc[mask_iter['mask_{}'.format(elx)]])
+            X_MedAv[i]=np.nanmedian(x.loc[mask_iter['mask_{}'.format(elx)]])
+            Y_MedAv[i]=np.nanmedian(y.loc[mask_iter['mask_{}'.format(elx)]])
+
+            Y_std[i]=np.nanstd(y.loc[mask_iter['mask_{}'.format(elx)]])
+            X_std[i]=np.nanstd(x.loc[mask_iter['mask_{}'.format(elx)]])
+
+    a=np.array(y.loc[mask_iter['mask_0']].dropna())
+    b=np.array(y.loc[mask_iter['mask_1']].dropna())
+    c=np.array(y.loc[mask_iter['mask_2']].dropna())
+    d=np.array(y.loc[mask_iter['mask_3']].dropna())
+    data=[a, b, c, d]
+    dfs=[pd.DataFrame({'score':a, 'group':i}) for a,i in zip(data, range(len(data)))]
+    df=pd.concat(dfs, axis='rows')
+    df['group'].replace({0: "Upper", 1: "Mid", 2: "Lower", 3: "Moho"}, inplace=True)
+
+    tukey=pairwise_tukeyhsd(endog=df['score'], groups=df['group'], alpha=0.05);
+
+    plt.annotate(print(tukey), xy=(1, 1.5), xycoords="axes fraction", fontsize=9)
+
+
 def calculate_R2(x, y):
     masknan=(~np.isnan(x) & ~np.isnan(y))
     regx=x[masknan].values.reshape(-1, 1)
@@ -184,7 +236,7 @@ def Tukey_Plot_np(x,y, name, xlower=-1, xupper=13, yupper=17, ylower=-3):
         strname=str(name)
         ax1.set_title(strname)
 
-def Experimental_av_values(LEPRin, calc):
+def Experimental_av_values(LEPRin, calc, name):
 
     ExperimentNumbers=LEPRin[name].unique()
 
@@ -200,6 +252,7 @@ def Experimental_av_values(LEPRin, calc):
         dff_M['Sample_ID']=LEPRin.loc[LEPRin[name]==exp, "Experiment_y"].iloc[0]
         dff_M['Pressure_Exp']=np.nanmean(LEPRin.loc[LEPRin[name]==exp, 'P_kbar_x'])
         dff_M['Temp_Exp']=np.nanmean(LEPRin.loc[LEPRin[name]==exp, 'T_K_x'])
+        dff_M['Exp']=exp
 
         if exp==ExperimentNumbers[0]:
             df1_M=dff_M

@@ -96,7 +96,6 @@ def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
     EquationT: str
         Equation choices:
             |   T_Put2008_eq24b (Kspar-Liq, P-dependent, H2O-independent
-
             |   T_Put2008_eq23 (Plag-Liq, P-dependent, H2O-dependent)
             |   T_Put2008_eq24a (Plag-Liq, P-dependent, H2O-dependent)
 
@@ -188,7 +187,7 @@ def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
         if plag_comps is not None:
             eq_tests=calculate_plag_liq_eq_tests(liq_comps=liq_comps,
             plag_comps=plag_comps, P=P, T=T_K)
-            eq_tests.insert(1, "T_K_calc", T_K)
+            eq_tests.insert(0, "T_K_calc", T_K)
             return eq_tests
 
 
@@ -629,7 +628,7 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
         If plag_comps is None, enter XAn and XAb for plagioclases instead.
         XOr is set to zero by default, but can be overwritten for equilibrium tests
 
-    equation: str
+    equationH: str
 
         |  H_Waters2015 (T-dependent, P-dependent)
         |  H_Put2005_eqH (T-dependent, P-independent)
@@ -702,7 +701,7 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
             eq_tests=calculate_plag_liq_eq_tests(plag_comps=plag_comps,
                 liq_comps=liq_comps, P=P, T=T)
 
-        Combo_Out.insert(0, "Pass An-Ab Eq Test Put2008?", eq_tests['Pass An-Ab Eq Test Put2008?'])
+        Combo_Out.insert(1, "Pass An-Ab Eq Test Put2008?", eq_tests['Pass An-Ab Eq Test Put2008?'])
 
         Combo_Out.insert(2, 'Delta_An', eq_tests['Delta_An'])
         Combo_Out.insert(3, 'Delta_Ab', eq_tests['Delta_Ab'])
@@ -734,6 +733,113 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
         combo_plag_liq.insert(0, "H2O_calc", H2O_out)
         return combo_plag_liq
 
+
+## Function for iterating temperature and water content
+
+# plag_liq_T_funcs = {T_Put2008_eq23, T_Put2008_eq24a}
+# plag_liq_T_funcs_by_name = {p.__name__: p for p in plag_liq_T_funcs}
+
+# plag_liq_H_funcs = {H_Put2008_eq25b, H_Put2005_eqH, H_Waters2015}
+# plag_liq_H_funcs_by_name = {p.__name__: p for p in plag_liq_H_funcs}
+
+def calculate_fspar_liq_temp_hygr(*, liq_comps, plag_comps, equationT, equationH, iterations=10,
+                                P=None):
+
+    '''Iterates temperature and water content for Plag-liquid pairs for a user-specified number of
+    iterations. Returns calculated T and H2O, as well as change in T and H with the # of iterations.
+
+   Parameters
+    -------
+    liq_comps: DataFrame
+        liquids compositions with column headings SiO2_Liq, MgO_Liq etc.
+
+
+    plag_comps: DataFrame (optional)
+        Plag compositions with column headings SiO2_Plag, MgO_Plag etc.
+
+    equationH: str
+
+        |  H_Waters2015 (T-dependent, P-dependent)
+        |  H_Put2005_eqH (T-dependent, P-independent)
+        |  H_Put2008_eq25b (T-dependent, P-dependent)
+
+    equationT: str
+        |   T_Put2008_eq23 (Plag-Liq, P-dependent, H2O-dependent)
+        |   T_Put2008_eq24a (Plag-Liq, P-dependent, H2O-dependent)
+
+    P: float, int, series
+        Pressure (kbar)
+
+
+
+    Returns:
+    Dictionary:
+    'T_H_calc': Pandas Dataframe with calculated H2O, calculated T, plag-liq equilibrium parameters,
+    and change in T and H between second last and last iteration.
+    'T_H_Evolution' Pandas dataframes, where rows are number of iterations, and column headings show the T and H2O
+    calculated for each sample.
+
+
+    '''
+
+    #Check valid equation for T
+    try:
+        func = plag_liq_T_funcs_by_name[equationT]
+    except KeyError:
+        raise ValueError(f'{equationT} is not a valid equation for Plag-Liquid') from None
+    sig=inspect.signature(func)
+
+    # Check entered valid equation for H
+    try:
+        func = plag_liq_H_funcs_by_name[equationH]
+    except KeyError:
+        raise ValueError(f'{equationH} is not a valid equation') from None
+    sig=inspect.signature(func)
+
+
+    if P is None:
+        raise ValueError('Please enter a pressure in kbar (P=...)')
+
+    H2O_iter=np.empty(len(liq_comps), dtype=float)
+    T_iter_23_W2015=calculate_fspar_liq_temp(liq_comps=liq_comps, plag_comps=plag_comps, equationT=equationT,
+                               P=P, H2O_Liq=0)
+    T_sample=np.empty([len(T_iter_23_W2015), iterations], dtype=float)
+    H2O_sample=np.empty([len(T_iter_23_W2015), iterations], dtype=float)
+    It_sample=np.empty( iterations)
+
+    for i in range (0, iterations):
+        H2O_iter_23_W2015=calculate_fspar_liq_hygr(liq_comps=liq_comps, plag_comps=plag_comps,
+                                            equationH=equationH,
+                                               P=P, T=T_iter_23_W2015)
+        H2O_sample[:, i]=H2O_iter_23_W2015['H2O_calc']
+
+        T_iter_23_W2015=calculate_fspar_liq_temp(liq_comps=liq_comps, plag_comps=plag_comps, equationT=equationT,
+                               P=P, H2O_Liq=H2O_iter_23_W2015['H2O_calc'])
+        T_sample[:, i]=T_iter_23_W2015
+        It_sample[i]=i
+    Combined_output=H2O_iter_23_W2015.copy()
+    Combined_output.insert(0, '# of iterations', iterations)
+    Combined_output.insert(1, 'T_K_calc', T_iter_23_W2015)
+
+    # Calculating delta T
+    DeltaT=T_sample[:, -1]-T_sample[:, -2]
+    DeltaH=H2O_sample[:, -1]-H2O_sample[:, -2]
+    Combined_output.insert(2, 'Delta T (last 2 iters)', DeltaT)
+    Combined_output.insert(3, 'Delta H (last 2 iters)', DeltaH)
+
+    # Calculating a dataframe showing the evolution of temperature and H2O vs. number of iterations
+    Iter=It_sample
+    for i in range(0, len(liq_comps)):
+        if i==0:
+            T_evol=pd.DataFrame(data={'Iteration': Iter, 'Sample_0_T_calc': T_sample[0, :]})
+            T_evol.insert(i+1, 'Sample_0_H_calc', H2O_sample[0, :])
+        else:
+            new_col_name_T=('Sample_'+str(i)+ "_T_calc")
+            new_col_name_H=('Sample_'+str(i)+ "_H_calc")
+            T_evol.insert(2*i, new_col_name_T, T_sample[i, :])
+            T_evol.insert(2*i+1, new_col_name_H, H2O_sample[i, :])
+
+    return {'T_H_calc': Combined_output, 'T_H_Evolution':  T_evol}
 
 
 

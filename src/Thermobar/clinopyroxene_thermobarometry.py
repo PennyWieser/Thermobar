@@ -497,7 +497,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
             P_kbar_is_bad = (P_kbar == 0) | (P_kbar == 273.15) | (P_kbar ==  -np.inf) | (P_kbar ==  np.inf)
             P_kbar[P_kbar_is_bad] = np.nan
 
-            if equationP == "P_Petrelli2021_Cpx_Liq" and T != "Solve":
+            if equationP == "P_Petrelli2021_Cpx_Liq":
                 return df_stats
             else:
                 return P_kbar
@@ -669,7 +669,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
             T_K_is_bad = (T_K == 0) | (T_K == 273.15) | (T_K ==  -np.inf) | (T_K ==  np.inf)
             T_K[T_K_is_bad] = np.nan
 
-            if equationT == "T_Petrelli2021_Cpx_Liq" and P != "Solve":
+            if equationT == "T_Petrelli2021_Cpx_Liq":
                 return df_stats
             else:
                 return T_K
@@ -1152,19 +1152,19 @@ H2O_Liq=None, Return_All_Matches=False):
         if eq_crit is None:
             combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.copy()
         if eq_crit == "All":
-            combo_liq_cpx_fur_filt = (Combo_liq_cpxs_eq_comp.loc[filtKd & (Combo_liq_cpxs_eq_comp['Delta_DiHd'] < 0.06 * sigma) & (
-                Combo_liq_cpxs_eq_comp['Delta_EnFs'] < 0.05 * sigma) & (Combo_liq_cpxs_eq_comp['Delta_CaTs'] < 0.03 * sigma)])
+            combo_liq_cpx_fur_filt = (Combo_liq_cpxs_eq_comp.loc[filtKd & (Combo_liq_cpxs_eq_comp['Delta_DiHd_Mollo'] < 0.06 * sigma) & (
+                Combo_liq_cpxs_eq_comp['Delta_EnFs_Mollo'] < 0.05 * sigma) & (Combo_liq_cpxs_eq_comp['Delta_CaTs_P1999'] < 0.03 * sigma)])
         if eq_crit == "Kd":
             combo_liq_cpx_fur_filt = (Combo_liq_cpxs_eq_comp.loc[filtKd])
         if eq_crit == "Kd_DiHd":
             combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.loc[filtKd & (
-                Combo_liq_cpxs_eq_comp['Delta_DiHd'] < 0.06 * sigma)]
+                Combo_liq_cpxs_eq_comp['Delta_DiHd_Mollo'] < 0.06 * sigma)]
         if eq_crit == "Kd_EnFs":
             combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.loc[filtKd & (
-                Combo_liq_cpxs_eq_comp['Delta_EnFs'] < 0.05 * sigma)]
+                Combo_liq_cpxs_eq_comp['Delta_EnFs_Mollo'] < 0.05 * sigma)]
         if eq_crit == "Kd_CaTs":
             combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.loc[filtKd & (
-                Combo_liq_cpxs_eq_comp['Delta_CaTs'] < 0.03 * sigma)]
+                Combo_liq_cpxs_eq_comp['Delta_CaTs_P1999'] < 0.03 * sigma)]
 
         # This just tidies up some columns to put stuff nearer the start
         cols_to_move = ['Sample_ID_Liq', 'Sample_ID_Cpx']
@@ -1312,8 +1312,19 @@ def P_Petrelli2021_Cpx_only(T=None, *, cpx_comps):
     Machine Learning.
     |  SEE==+-3.1 kbar
     '''
-    cpx_test=cpx_comps.copy()
-    Cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+
+    })
+
     x_test=Cpx_test_noID_noT.values
 
 
@@ -1339,8 +1350,20 @@ def P_Petrelli2021_Cpx_only_withH2O(T=None, *, cpx_comps):
     Petrelli et al. (2021),
     but including the H2O content of the liquid while training the model.
     '''
-    cpx_test=cpx_comps.copy()
-    Cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+                                'H2O_Liq':cpx_comps['H2O_Liq'],
+
+    })
+
     x_test=Cpx_test_noID_noT.values
 
 
@@ -1359,6 +1382,79 @@ def P_Petrelli2021_Cpx_only_withH2O(T=None, *, cpx_comps):
 
     return df_stats
 
+
+def P_Petrelli2021_Cpx_only_noCr(T=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  barometer following the Machine learning approach of
+    Petrelli et al. (2021),
+    but including the H2O content of the liquid while training the model.
+    '''
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+
+
+    })
+    x_test=Cpx_test_noID_noT.values
+
+
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_noCr.pkl', 'rb') as f:
+        scaler_P2020_Cpx_only=load(f)
+
+    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_noCr.pkl', 'rb') as f:
+        ETR_Press_P2020_Cpx_only=load(f)
+
+
+
+    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+    Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+    return df_stats
+
+def P_Petrelli2021_Cpx_only_components(T=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  barometer following the Machine learning approach of
+    Petrelli et al. (2021),
+    but including the H2O content of the liquid while training the model.
+    '''
+    cpx_test=cpx_comps.copy()
+    Cpx_compnts_test=calculate_clinopyroxene_components(cpx_comps)
+    Cpx_test_noID_noT=pd.DataFrame(data={'MgO_Cpx_cat_6ox': Cpx_compnts_test['MgO_Cpx_cat_6ox'],
+                                      'Na2O_Cpx_cat_6ox': Cpx_compnts_test['Na2O_Cpx_cat_6ox'],
+                                      'Al_VI_cat_6ox': Cpx_compnts_test['Al_VI_cat_6ox'],
+                                       'DiHd_2003': Cpx_compnts_test['DiHd_2003'],
+                                      'EnFs': Cpx_compnts_test['EnFs'],
+                                                                           'Jd': Cpx_compnts_test['Jd'],
+                                      'CaO_Cpx_cat_6ox': Cpx_compnts_test['CaO_Cpx_cat_6ox'],
+                                      'FeOt_Cpx_cat_6ox': Cpx_compnts_test['FeOt_Cpx_cat_6ox'],
+                                        'Cr2O3_Cpx_cat_6ox': Cpx_compnts_test['Cr2O3_Cpx_cat_6ox'],
+                                       'TiO2_Cpx_cat_6ox': Cpx_compnts_test['TiO2_Cpx_cat_6ox'],
+                                       'MnO_Cpx_cat_6ox': Cpx_compnts_test['MnO_Cpx_cat_6ox'],
+                                     })
+    x_test=Cpx_test_noID_noT.values
+
+
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_Comp.pkl', 'rb') as f:
+        scaler_P2020_Cpx_only=load(f)
+
+    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_Comp.pkl', 'rb') as f:
+        ETR_Press_P2020_Cpx_only=load(f)
+
+
+
+    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+    Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+    return df_stats
 
 
 ## Clinopyroxene-only temperature equations
@@ -1428,8 +1524,19 @@ def T_Petrelli2021_Cpx_only(P=None, *, cpx_comps):
     Machine Learning.
     |  SEE==+-51°C
     '''
-    cpx_test=cpx_comps.copy()
-    Cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+
+    })
+
     x_test=Cpx_test_noID_noT.values
 
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
@@ -1453,7 +1560,19 @@ def T_Petrelli2021_Cpx_only_withH2O(P=None, *, cpx_comps):
     |  SEE==+-51°C
     '''
     cpx_test=cpx_comps.copy()
-    Cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+                                'H2O_Liq':cpx_comps['H2O_Liq'],
+
+    })
     x_test=Cpx_test_noID_noT.values
 
 
@@ -1475,7 +1594,7 @@ def T_Petrelli2021_Cpx_only_withH2O(P=None, *, cpx_comps):
 
 ## Function for calculationg Cpx-only pressure
 Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
-P_Wang2021_eq3, P_Petrelli2021_Cpx_only, P_Petrelli2021_Cpx_only_withH2O}
+P_Wang2021_eq3, P_Petrelli2021_Cpx_only, P_Petrelli2021_Cpx_only_withH2O, P_Petrelli2021_Cpx_only_noCr}
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
@@ -1548,16 +1667,21 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None):
 
 
 
-    if equationP == "P_Petrelli2021_Cpx_only":
-        df_stats=P_Petrelli2021_Cpx_only(cpx_comps=cpx_comps_c)
+    if equationP == "P_Petrelli2021_Cpx_only" or equationP == "P_Petrelli2021_Cpx_only_withH2O" or equationP == "P_Petrelli2021_Cpx_only_noCr":
+        df_stats=func(cpx_comps=cpx_comps_c)
         P_kbar=df_stats['P_kbar_calc']
 
-    elif equationP == "P_Petrelli2021_Cpx_only_withH2O":
-        df_stats=P_Petrelli2021_Cpx_only_withH2O(cpx_comps=cpx_comps_c)
-        P_kbar=df_stats['P_kbar_calc']
+        return df_stats
+
+    # if
+    #     df_stats=P_Petrelli2021_Cpx_only_withH2O(cpx_comps=cpx_comps_c)
+    #     P_kbar=df_stats['P_kbar_calc']
+    #
+    # if equationP == "
+    #     df_stats=P_Petrelli2021_Cpx_only_noCr(cpx_comps=cpx_comps_c)
+    #     P_kbar=df_stats['P_kbar_calc']
 
     else:
-
         kwargs = {name: cpx_components[name] for name, p in sig.parameters.items()
         if p.kind == inspect.Parameter.KEYWORD_ONLY}
 
@@ -1574,27 +1698,34 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None):
 
 
 
-    if equationP == "P_Petrelli2021_Cpx_only" and T != "Solve":
-        return df_stats
-    elif equationP == "P_Petrelli2021_Cpx_only_withH2O" and T != "Solve":
-        return df_stats
-    else:
         return P_kbar
 
 
-def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=None):
+def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
     import warnings
     with w.catch_warnings():
         w.simplefilter('ignore')
         cpx_comps_c=calculate_clinopyroxene_components(cpx_comps=cpx_comps)
         cpx_comps_c['P_Wang21_eq1']=calculate_cpx_only_press(cpx_comps=cpx_comps, equationP="P_Wang2021_eq1")
         cpx_comps_c['P_Wang21_eq3']=calculate_cpx_only_press(cpx_comps=cpx_comps, equationP="P_Wang2021_eq3")
+
+        cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps, equationT="T_Wang2021_eq2")
+        cpx_comps_c['T_Wang21_eq4']=calculate_cpx_only_temp(cpx_comps=cpx_comps, equationT="T_Wang2021_eq4")
+
+        cpx_comps_c['T_Petrelli21']=calculate_cpx_only_temp(cpx_comps=cpx_comps,
+        equationT="T_Petrelli2021_Cpx_only").T_K_calc
+
+        cpx_comps_c['T_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
+        equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").T_K_calc
+        cpx_comps_c['T_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
+        equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).T_K_calc
+
         cpx_comps_c['P_Petrelli21']=calculate_cpx_only_press(cpx_comps=cpx_comps,
         equationP="P_Petrelli2021_Cpx_only").P_kbar_calc
         cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
         cpx_comps_c['P_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
-        equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d").P_kbar_calc
+        equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).P_kbar_calc
         X_Wangeq1_Sorted=np.sort(cpx_comps_c['P_Wang21_eq1'])
         X_Wangeq3_Sorted=np.sort(cpx_comps_c['P_Wang21_eq3'])
         X_Pet_Sorted=np.sort(cpx_comps_c['P_Petrelli21'])
@@ -1730,9 +1861,7 @@ def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None, H2O_Liq=N
 
 
 
-    if P != "Solve" and equationT == "T_Petrelli2021_Cpx_only":
-        return df_stats
-    elif P != "Solve" and equationT == "T_Petrelli2021_Cpx_only_withH2O":
+    if equationT == "T_Petrelli2021_Cpx_only" or  equationT == "T_Petrelli2021_Cpx_only_withH2O":
         return df_stats
     else:
         return T_K

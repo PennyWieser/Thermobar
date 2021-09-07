@@ -288,7 +288,7 @@ def import_lepr_file(filename):
 
 
 # Loading Excel, returns a disctionry
-def import_excel(filename, sheet_name, sample_label=None, GEOROC=False):
+def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=None):
     '''
     Import excel sheet of oxides in wt%, headings should be of the form SiO2_Liq (for the melt/liquid), SiO2_Ol (for olivine comps), SiO2_Cpx (for clinopyroxene compositions). Order doesn't matter
 
@@ -328,7 +328,12 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False):
             my_input = pd.read_excel(filename)
             #my_input[my_input < 0] = 0
 
+
+
+
     my_input_c = my_input.copy()
+    if suffix is not None:
+        my_input_c=my_input_c.add_suffix(suffix)
 
     if any(my_input.columns.str.contains("_cpx")):
         w.warn("You've got a column heading with a lower case _cpx, this is okay if this column is for your"

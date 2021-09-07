@@ -249,8 +249,9 @@ filter_q=None, append=False):
                         variable_err_abs, Dup_Sample.shape[0])
 
                 mynoisedDataframe = Dup_Sample.copy()
+
                 mynoisedDataframe['{}'.format(
-                    ely, elx)] = mynoisedDataframe['{}'.format(ely)] + Noise
+                    ely)] = mynoisedDataframe['{}'.format(ely)] + Noise
 
             else:
                 if variable_err_type == "Abs":
@@ -358,12 +359,15 @@ filter_q=None, append=False):
             Cr2O3_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['Cr2O3_{}'.format(
                 elx)].iloc[i], scale=Err['Cr2O3_{}_Err'.format(elx)].iloc[i], size=duplicates)
 
-            # Removed after removing T_K and P_kbar from ideal dataframes
-            # P_kbar_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['P_kbar'.format(
-            #     elx)].iloc[i], scale=Err['P_kbar_Err'.format(elx)].iloc[i], size=duplicates)
-            #
-            # T_K_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['T_K'.format(
-            #     elx)].iloc[i], scale=Err['T_K_Err'.format(elx)].iloc[i], size=duplicates)
+            if variable == "P_kbar":
+
+
+                P_kbar_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['P_kbar'.format(
+                    elx)].iloc[i], scale=Err['P_kbar_Err'.format(elx)].iloc[i], size=duplicates)
+
+            if variable == "T_K":
+                T_K_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['T_K'.format(
+                    elx)].iloc[i], scale=Err['T_K_Err'.format(elx)].iloc[i], size=duplicates)
 
             if any(Data.columns.str.contains("NiO")):
                 NiO_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['NiO_{}'.format(
@@ -413,8 +417,10 @@ filter_q=None, append=False):
                 mynoisedDataframe = mynoisedDataframe.apply(
                     pd.to_numeric, errors='coerce').fillna(0)
 
-        # mynoisedDataframe['P_kbar'] = P_kbar_Err
-        # mynoisedDataframe['T_K'] = T_K_Err
+        if variable == "T_K":
+            mynoisedDataframe['P_kbar'] = P_kbar_Err
+        if variable == "P_kbar":
+            mynoisedDataframe['T_K'] = T_K_Err
 
         mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
     if positive is True:
