@@ -3077,7 +3077,7 @@ def get_amp_sites_ferric_ferrous_mutch(amp_apfu_df):
 ## Equilibrium tests clinopyroxene
 
 def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None,
-                           Fe3Fet_Liq=None, P=None, T=None, sigma=1, KdErr=0.03):
+                           Fe3Fet_Liq=None, P=None, T=None, sigma=1, Kd_Err=0.03):
     '''
     calculates Kd Fe-Mg, EnFs, DiHd, CaTs for cpx-liquid pairs
 
@@ -3108,7 +3108,7 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     sigma: int or float
         determines sigma level at which to consider the DiHd, EnFs and CaTs tests laid out by Neave et al. (2019)
 
-    KdErr: int or float
+    Kd_Err: int or float
         deviation from the Kd value of Putirka (2008) for the equilibrium tests of Neave et al. (2019)
 
    Returns
@@ -3153,13 +3153,13 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     # Di Hd equilibrium
 
     # Putirka (1999) DiHd
-    Combo_liq_cpxs['DiHd_Pred_P1999']=(np.exp(-9.8
+    Combo_liq_cpxs['DiHd_Pred_Put1999']=(np.exp(-9.8
     + 0.24*np.log(Combo_liq_cpxs['CaO_Liq_cat_frac']*(Combo_liq_cpxs['FeOt_Liq_cat_frac']+Combo_liq_cpxs['MgO_Liq_cat_frac'])*
     Combo_liq_cpxs['SiO2_Liq_cat_frac']**2)+17558/T+8.7*np.log(T/1670)-4.61*10**3*(Combo_liq_cpxs['EnFs']**2/T))
     )
-    Combo_liq_cpxs['Delta_DiHd_P1999'] = abs(
-        Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_P1999'])
-    Combo_liq_cpxs['Delta_DiHd_I_M_P1999']=Combo_liq_cpxs['DiHd_Pred_P1999']-Combo_liq_cpxs['DiHd_1996']
+    Combo_liq_cpxs['Delta_DiHd_Put1999'] = abs(
+        Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_Put1999'])
+    Combo_liq_cpxs['Delta_DiHd_I_M_Put1999']=Combo_liq_cpxs['DiHd_Pred_Put1999']-Combo_liq_cpxs['DiHd_1996']
 
     # One labelled "new", presume from Putirka (2008)
     Combo_liq_cpxs['DiHd_Pred_P2008']=(np.exp(-0.482-0.439*np.log(Combo_liq_cpxs['SiO2_Liq_cat_frac'])
@@ -3171,96 +3171,96 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
 
     # Mollo 2013 for DiHd
-    Combo_liq_cpxs['DiHd_Pred_Mollo'] = (np.exp(-2.18 - 3.16 * Combo_liq_cpxs['TiO2_Liq_cat_frac']
+    Combo_liq_cpxs['DiHd_Pred_Mollo13'] = (np.exp(-2.18 - 3.16 * Combo_liq_cpxs['TiO2_Liq_cat_frac']
     - 0.365 * np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))
      + 0.05 * np.log(Combo_liq_cpxs['MgO_Liq_cat_frac']) - 3858.2 * (
                                                     Combo_liq_cpxs['EnFs']**2 / T) + (2107.4 / T)
                                                 - 17.64 * P / T))
-    Combo_liq_cpxs['Delta_DiHd_Mollo'] = abs(
-        Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_Mollo'])
-    Combo_liq_cpxs['Delta_DiHd_I_M_Mollo']=Combo_liq_cpxs['DiHd_Pred_Mollo']-Combo_liq_cpxs['DiHd_1996']
+    Combo_liq_cpxs['Delta_DiHd_Mollo13'] = abs(
+        Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_Mollo13'])
+    Combo_liq_cpxs['Delta_DiHd_I_M_Mollo13']=Combo_liq_cpxs['DiHd_Pred_Mollo13']-Combo_liq_cpxs['DiHd_1996']
 
     # En Fs equilibrium
 
 
     # Putirka En Fs
-    Combo_liq_cpxs['EnFs_Pred_P1999']=( np.exp(-6.96+18438/T+8*np.log(T/1670)
+    Combo_liq_cpxs['EnFs_Pred_Put1999']=( np.exp(-6.96+18438/T+8*np.log(T/1670)
     +0.66*np.log((Combo_liq_cpxs['FeOt_Liq_cat_frac']+Combo_liq_cpxs['MgO_Liq_cat_frac'])**2*Combo_liq_cpxs['SiO2_Liq_cat_frac']**2)
     -5.1*10**3*(Combo_liq_cpxs['DiHd_1996']**2/T)+1.81*np.log(Combo_liq_cpxs['SiO2_Liq_cat_frac']) ))
-    Combo_liq_cpxs['Delta_EnFs_P1999'] = abs(
-        Combo_liq_cpxs['EnFs'] - Combo_liq_cpxs['EnFs_Pred_P1999'])
-    Combo_liq_cpxs['Delta_EnFs_I_M_P1999'] = Combo_liq_cpxs['EnFs_Pred_P1999']-Combo_liq_cpxs['EnFs']
+    Combo_liq_cpxs['Delta_EnFs_Put1999'] = abs(
+        Combo_liq_cpxs['EnFs'] - Combo_liq_cpxs['EnFs_Pred_Put1999'])
+    Combo_liq_cpxs['Delta_EnFs_I_M_Put1999'] = Combo_liq_cpxs['EnFs_Pred_Put1999']-Combo_liq_cpxs['EnFs']
 
 
 
 
     # En Fs Mollo
 
-    Combo_liq_cpxs['EnFs_Pred_Mollo'] = (np.exp(0.018 - 9.61 * Combo_liq_cpxs['CaO_Liq_cat_frac'] +
+    Combo_liq_cpxs['EnFs_Pred_Mollo13'] = (np.exp(0.018 - 9.61 * Combo_liq_cpxs['CaO_Liq_cat_frac'] +
                                                 7.46 *
                                                 Combo_liq_cpxs['MgO_Liq_cat_frac'] *
                                                 Combo_liq_cpxs['SiO2_Liq_cat_frac']
                                                 - 0.34 *np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))
                                                 - 3.78 * (Combo_liq_cpxs['Na2O_Liq_cat_frac'] + Combo_liq_cpxs['K2O_Liq_cat_frac']) -
                                                 3737.3 * (Combo_liq_cpxs['DiHd_1996']**2) / T - 46.8 * P / T))
-    Combo_liq_cpxs['Delta_EnFs_Mollo'] = abs(
-        Combo_liq_cpxs['EnFs'] - Combo_liq_cpxs['EnFs_Pred_Mollo'])
-    Combo_liq_cpxs['Delta_EnFs_I_M_Mollo'] = Combo_liq_cpxs['EnFs_Pred_Mollo']-Combo_liq_cpxs['EnFs']
+    Combo_liq_cpxs['Delta_EnFs_Mollo13'] = abs(
+        Combo_liq_cpxs['EnFs'] - Combo_liq_cpxs['EnFs_Pred_Mollo13'])
+    Combo_liq_cpxs['Delta_EnFs_I_M_Mollo13'] = Combo_liq_cpxs['EnFs_Pred_Mollo13']-Combo_liq_cpxs['EnFs']
 
 
     #  CaTs equilibrium (Mollo didnt release on of these)
 
-    Combo_liq_cpxs['CaTs_Pred_P1999'] = (np.exp(2.58 + 0.12 * P / T - 9 * 10**(-7) * P**2 / T
+    Combo_liq_cpxs['CaTs_Pred_Put1999'] = (np.exp(2.58 + 0.12 * P / T - 9 * 10**(-7) * P**2 / T
     + 0.78 * np.log(Combo_liq_cpxs['CaO_Liq_cat_frac'].astype(float)
     * Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float)**2
     * Combo_liq_cpxs['SiO2_Liq_cat_frac'].astype(float)) - 4.3 * 10**3 * (Combo_liq_cpxs['DiHd_1996']**2 / T)))
 
-    Combo_liq_cpxs['Delta_CaTs_P1999'] = abs(
-        Combo_liq_cpxs['CaTs'] - Combo_liq_cpxs['CaTs_Pred_P1999'])
-    Combo_liq_cpxs['Delta_CaTs_I_M_P1999'] =Combo_liq_cpxs['CaTs_Pred_P1999']-Combo_liq_cpxs['CaTs']
+    Combo_liq_cpxs['Delta_CaTs_Put1999'] = abs(
+        Combo_liq_cpxs['CaTs'] - Combo_liq_cpxs['CaTs_Pred_Put1999'])
+    Combo_liq_cpxs['Delta_CaTs_I_M_Put1999'] =Combo_liq_cpxs['CaTs_Pred_Put1999']-Combo_liq_cpxs['CaTs']
 
 
     #CrCaTs component
 
-    Combo_liq_cpxs['CrCaTs_Pred_P1999'] = (np.exp(12.8) * Combo_liq_cpxs['CaO_Liq_cat_frac'] * (
+    Combo_liq_cpxs['CrCaTs_Pred_Put1999'] = (np.exp(12.8) * Combo_liq_cpxs['CaO_Liq_cat_frac'] * (
         Combo_liq_cpxs['Cr2O3_Liq_cat_frac']**2) * Combo_liq_cpxs['SiO2_Liq_cat_frac'])
-    Combo_liq_cpxs['Delta_CrCaTs_P1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_P1999'])
-    Combo_liq_cpxs['Delta_CrCaTs_I_M_P1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_P1999'])
+    Combo_liq_cpxs['Delta_CrCaTs_Put1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_Put1999'])
+    Combo_liq_cpxs['Delta_CrCaTs_I_M_Put1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_Put1999'])
 
     # CaTi component
 
-    Combo_liq_cpxs['CaTi_Pred_P1999']=( np.exp(5.1 + 0.52*np.log(Combo_liq_cpxs['CaO_Liq_cat_frac']*Combo_liq_cpxs['TiO2_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']**2)
+    Combo_liq_cpxs['CaTi_Pred_Put1999']=( np.exp(5.1 + 0.52*np.log(Combo_liq_cpxs['CaO_Liq_cat_frac']*Combo_liq_cpxs['TiO2_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']**2)
     +2.04*10**(3)* (Combo_liq_cpxs['DiHd_1996']**2 / T)- 6.2* Combo_liq_cpxs['SiO2_Liq_cat_frac']
     +42.5*Combo_liq_cpxs['Na2O_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']
     - 45.1*(Combo_liq_cpxs['FeOt_Liq_cat_frac']
     +Combo_liq_cpxs['MgO_Liq_cat_frac'])*Combo_liq_cpxs['Al2O3_Liq_cat_frac'] ))
 
-    Combo_liq_cpxs['Delta_CaTi_P1999']=abs(Combo_liq_cpxs['CaTi']-Combo_liq_cpxs['CaTi_Pred_P1999'])
-    Combo_liq_cpxs['Delta_CaTi_I_M_P1999']=abs(Combo_liq_cpxs['CaTi']-Combo_liq_cpxs['CaTi_Pred_P1999'])
+    Combo_liq_cpxs['Delta_CaTi_Put1999']=abs(Combo_liq_cpxs['CaTi']-Combo_liq_cpxs['CaTi_Pred_Put1999'])
+    Combo_liq_cpxs['Delta_CaTi_I_M_Put1999']=abs(Combo_liq_cpxs['CaTi']-Combo_liq_cpxs['CaTi_Pred_Put1999'])
 
 
     # Jd component
-    Combo_liq_cpxs['Jd_Pred_P1999']=(np.exp(-1.06+0.23*P/T-6*10**(-7)*P**2/T
+    Combo_liq_cpxs['Jd_Pred_Put1999']=(np.exp(-1.06+0.23*P/T-6*10**(-7)*P**2/T
     +1.02*np.log(Combo_liq_cpxs['Na2O_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']*Combo_liq_cpxs['SiO2_Liq_cat_frac']**2)
     -0.8*np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'])-2.2*np.log(Combo_liq_cpxs['SiO2_Liq_cat_frac'])))
-    Combo_liq_cpxs['Delta_Jd_P1999']=abs(Combo_liq_cpxs['Jd']-Combo_liq_cpxs['Jd_Pred_P1999'])
-    Combo_liq_cpxs['Delta_Jd_I_M_P1999']=abs(Combo_liq_cpxs['Jd']-Combo_liq_cpxs['Jd_Pred_P1999'])
+    Combo_liq_cpxs['Delta_Jd_Put1999']=abs(Combo_liq_cpxs['Jd']-Combo_liq_cpxs['Jd_Pred_Put1999'])
+    Combo_liq_cpxs['Delta_Jd_I_M_Put1999']=abs(Combo_liq_cpxs['Jd']-Combo_liq_cpxs['Jd_Pred_Put1999'])
 
 
     b = np.empty(len(Combo_liq_cpxs), dtype=bool)
     for i in range(0, len(Combo_liq_cpxs)):
 
-        if ((Combo_liq_cpxs['Delta_Kd_Put2008'].iloc[i] < KdErr) & (Combo_liq_cpxs['Delta_EnFs_Mollo'].iloc[i] < 0.05 * sigma) &
-                (Combo_liq_cpxs['Delta_CaTs_P1999'].iloc[i] < 0.03 * sigma)
-                & (Combo_liq_cpxs['Delta_DiHd_Mollo'].iloc[i] < 0.06 * sigma)):
+        if ((Combo_liq_cpxs['Delta_Kd_Put2008'].iloc[i] < Kd_Err) & (Combo_liq_cpxs['Delta_EnFs_Mollo13'].iloc[i] < 0.05 * sigma) &
+                (Combo_liq_cpxs['Delta_CaTs_Put1999'].iloc[i] < 0.03 * sigma)
+                & (Combo_liq_cpxs['Delta_DiHd_Mollo13'].iloc[i] < 0.06 * sigma)):
             b[i] = True
         else:
             b[i] = False
     Combo_liq_cpxs.insert(1, "Eq Tests Neave2017?", b)
 
     cols_to_move = ['P_kbar_calc', 'T_K_calc', "Eq Tests Neave2017?",
-                    'Delta_Kd_Put2008', 'Delta_Kd_Mas2013', 'Delta_EnFs_Mollo', 'Delta_EnFs_P1999',
-                    'Delta_CaTs_P1999', 'Delta_DiHd_Mollo', 'Delta_DiHd_P1999', 'Delta_CrCaTs_P1999', 'Delta_CaTi_P1999']
+                    'Delta_Kd_Put2008', 'Delta_Kd_Mas2013', 'Delta_EnFs_Mollo13', 'Delta_EnFs_Put1999',
+                    'Delta_CaTs_Put1999', 'Delta_DiHd_Mollo13', 'Delta_DiHd_Put1999', 'Delta_CrCaTs_Put1999', 'Delta_CaTi_Put1999']
     Combo_liq_cpxs = Combo_liq_cpxs[cols_to_move +
                                     [col for col in Combo_liq_cpxs.columns if col not in cols_to_move]]
 

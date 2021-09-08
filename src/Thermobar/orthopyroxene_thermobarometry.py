@@ -598,7 +598,7 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
 
 def calculate_opx_liq_press_temp_matching(*, liq_comps, opx_comps, equationT=None,
 equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
- KdMatch=None, KdErr=None, Opx_Quality=False, Return_All_Matches=False):
+ Kd_Match=None, Kd_Err=None, Opx_Quality=False, Return_All_Matches=False):
 
     '''
     Evaluates all possible Opx-Liq pairs from  N Liquids, M opx compositions
@@ -644,11 +644,11 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         Users can set a lower pressure to save computation time
         (E.g., can set at P=10 kbar if reasonably sure shallow pressures)
 
-    KdMatch: int of float, optional
+    Kd_Match: int of float, optional
         Allows users to ovewrite the default where Kd is calculated from the
         expression in Putirka (2008) based on the Si content of the liquid.
 
-    KdError: int or float, optional
+    Kd_Error: int or float, optional
         Allows users to override the defualt 1 sigma on Kd matches of +-0.06
 
 
@@ -739,22 +739,22 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         if Opx_Quality is False:
             Combo_liq_opxs_2 = Combo_liq_opxs
 
-        # Filtering out matches which don't fit default, or user-specified KdMatch
-        # and KdErr values.
-        if KdMatch is None and KdErr is None:
+        # Filtering out matches which don't fit default, or user-specified Kd_Match
+        # and Kd_Err values.
+        if Kd_Match is None and Kd_Err is None:
             Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < 0.06].reset_index(drop=True)
             Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
 
-        if KdMatch is not None and KdErr is None:
-            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(KdMatch -
+        if Kd_Match is not None and Kd_Err is None:
+            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
             Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < 0.06].reset_index(drop=True)
-            Kd = KdMatch - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
-        if KdMatch is not None and KdErr is not None:
-            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(KdMatch -
-            Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < KdErr].reset_index(drop=True)
-            Kd = KdMatch - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
-        if KdMatch is None and KdErr is not None:
-            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < KdErr].reset_index(drop=True)
+            Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
+        if Kd_Match is not None and Kd_Err is not None:
+            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
+            Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < Kd_Err].reset_index(drop=True)
+            Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
+        if Kd_Match is None and Kd_Err is not None:
+            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < Kd_Err].reset_index(drop=True)
             Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
 
         if len(Combo_liq_opx_fur_filt) == 0:
@@ -838,7 +838,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         else:
             raise Exception(
                 'No Matches - you may need to set less strict filters, e.g.,'
-                'you could edit KdMatch is None and KdErr to get more matches')
+                'you could edit Kd_Match is None and Kd_Err to get more matches')
 
 
         # Returns all opxs-liquids that went through 1st Kd filter with

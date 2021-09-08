@@ -356,7 +356,7 @@ Cpx_Liq_P_funcs_by_name = {p.__name__: p for p in Cpx_Liq_P_funcs}
 
 def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltmatch=None,
                             T=None, eq_tests=False, Fe3Fet_Liq=None, H2O_Liq=None,
-                           sigma=1, KdErr=0.03):
+                           sigma=1, Kd_Err=0.03):
     '''
     Clinopyroxene-Liquid barometer, calculates pressure in kbar
     (and equilibrium tests as an option)
@@ -513,10 +513,10 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
 
         if meltmatch is None:
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
-            liq_comps=liq_comps_c, Fe3Fet_Liq=Fe3Fet_Liq, P=P_kbar, T=T, sigma=sigma, KdErr=KdErr)
+            liq_comps=liq_comps_c, Fe3Fet_Liq=Fe3Fet_Liq, P=P_kbar, T=T, sigma=sigma, Kd_Err=Kd_Err)
         if meltmatch is not None:
             eq_tests = calculate_cpx_liq_eq_tests(meltmatch=meltmatch,
-            Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
+            Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, Kd_Err=Kd_Err)
         eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
         return eq_tests
 
@@ -530,7 +530,7 @@ Cpx_Liq_T_funcs_by_name = {p.__name__: p for p in Cpx_Liq_T_funcs}
 
 def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmatch=None,
                            P=None, eq_tests=False, H2O_Liq=None, Fe3Fet_Liq=None,
-                           sigma=1, KdErr=0.03):
+                           sigma=1, Kd_Err=0.03):
     '''
     Clinopyroxene-Liquid thermometry, calculates temperature in Kelvin
     (and equilibrium tests as an option)
@@ -683,10 +683,10 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
             raise TypeError('You need to specify a P for equilibrium tests')
         if meltmatch is None:
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
-            liq_comps=liq_comps_c, Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
+            liq_comps=liq_comps_c, Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, Kd_Err=Kd_Err)
         if meltmatch is not None:
             eq_tests = calculate_cpx_liq_eq_tests(meltmatch=meltmatch,
-            Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, KdErr=KdErr)
+            Fe3Fet_Liq=Fe3Fet_Liq, P=P, T=T_K, sigma=sigma, Kd_Err=Kd_Err)
         eq_tests.replace([np.inf, -np.inf], np.nan, inplace=True)
         return eq_tests
 
@@ -853,8 +853,8 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
 ## Clinopyroxene melt-matching algorithm
 
 def calculate_cpx_liq_press_temp_matching(*, liq_comps, cpx_comps, equationT=None,
-equationP=None, P=None, T=None, eq_crit="All", PMax=30, sigma=1,
-Fe3Fet_Liq=None, KdErr=0.03, KdMatch=None, Cpx_Quality=False,
+equationP=None, P=None, T=None, PMax=30,
+Fe3Fet_Liq=None, Kd_Match="Putirka", Kd_Err=0.03, DiHd_Err=0.06, EnFs_Err=0.05, CaTs_Err=0.03, Cpx_Quality=False,
 H2O_Liq=None, Return_All_Matches=False):
 
     '''
@@ -907,7 +907,7 @@ H2O_Liq=None, Return_All_Matches=False):
 
         If None (default): Doesn't apply any filters
         If "All": applies the 4 equilibrium tests of Neave et al: KdFe-Mg, DiHd,
-        EnFs, CaTs. Kd Fe-Mg calculated based on what you specify in KdMatch
+        EnFs, CaTs. Kd Fe-Mg calculated based on what you specify in Kd_Match
         If "FeMg_DiHd": Filters just using KdFe-Mg and DiHd
         If "FeMg_EnFs": Filters just using KdFe-Mg and EnFs
 
@@ -919,27 +919,29 @@ H2O_Liq=None, Return_All_Matches=False):
        Users can set a lower pressure to save computation time (E.g., if
        reasonably sure crystals are forming above 10 kbar)
 
-    sigma: int or float, optional
-
-        Determins how close to the ideal equilbrium test values for DiHd,
-        EnFs and CaTs is accepted as a match.
-        Default (1 sigma) values from Neave et al. (2017) are: 0.03 for Kd Fe-Mg,
-        0.06 for DiHd, 0.05 for EnFs, 0.03 for CaTs.
-        If users specify sigma=2, will accept cpx-melt pairs within 0.12 for DiHd,
-        0.1 for EnFs, 0.06 for CaTs
-        Doesn't appply to Kd
-
-    KdErr: int or float, optional
-        Allows users to specify the error on Kd Fe-Mg (default =0.03)
-
-
-    KdMatch: int, str, optional
+    Kd_Match: int, str, optional
         allows users to override the default of calculating Kd Fe-Mg based
         on temperature using eq 35 of putirka
-        Set at fixed value (e.g., KdMatch=0.27)
+        Set at fixed value (e.g., Kd_Match=0.27)
         OR
-        specify KdMatch=Masotta to use the Kd model fo Masotta et al. (2013),
+        specify Kd_Match=Masotta to use the Kd model fo Masotta et al. (2013),
         which is also a function of Na and K, for trachytic and phonolitic magmas.
+
+
+    Kd_Err: int or float, Default=0.03
+        Allows users to specify the permitted error on Kd Fe-Mg (default=0.03 from Neave et al. 2019)
+
+    DiHd_Err: int or float, optional. Default=0.06
+        Allows users to specify the permitted error on DiHd (default=0.06 from Neave et al. 2019)
+        Compares measured and calculated values from Mollo et al. (2013)
+
+    EnFs_Err: int or float, optional. Default=0.05
+        Allows users to specify the permitted error on EnFs (default=0.05 from Neave et al. 2019)
+        Compares measured and calculated values from Mollo et al. (2013)
+
+    CaTs_Err: int or float, optional. Default=0.03
+        Allows users to specify the permitted error on CaTs (default=0.03 from Neave et al. 2019)
+        Compares measured and calculated values from Putirka (1999).
 
     Fe3Fet_Liq: float, int, series, optional
         Fe3Fet ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
@@ -963,14 +965,14 @@ H2O_Liq=None, Return_All_Matches=False):
         All_PTs: Returns output parameters for all matches (e.g, cpx1-Liq1, cpx1-Liq4) without any averaging.
 
     '''
-    if KdMatch == "Masotta":
+    if Kd_Match == "Masotta":
         print('Caution, you have selected to use the Kd-Fe-Mg model of Masotta et al. (2013)'
         'which is only valid for trachyte and phonolitic magmas. '
         ' use PutKd=True to use the Kd model of Putirka (2008)')
 
-    if isinstance(KdMatch, int) or isinstance(KdMatch, float) and KdErr is None:
-        raise ValueError('You have entered a numerical value for KdMatch, '
-        'You need to specify a KdErr to accept matches within KdMatch+-KdErr')
+    if isinstance(Kd_Match, int) or isinstance(Kd_Match, float) and Kd_Err is None:
+        raise ValueError('You have entered a numerical value for Kd_Match, '
+        'You need to specify a Kd_Err to accept matches within Kd_Match+-Kd_Err')
 
     if equationP is not None and P is not None:
         raise ValueError('You have entered an equation for P and specified a pressure. '
@@ -990,8 +992,6 @@ H2O_Liq=None, Return_All_Matches=False):
     if H2O_Liq is not None:
         liq_comps_c['H2O_Liq'] = H2O_Liq
 
-    if sigma is not None:
-        sigma = sigma
 
     # calculating Cpx and liq components.
     myCPXs1_concat = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
@@ -1069,54 +1069,52 @@ H2O_Liq=None, Return_All_Matches=False):
             # e.g, 0 and 3 Gpa. Reduces number of P-T solving
             PMin = -10
             PMax = PMax
-            KdErr = KdErr
+            Kd_Err = Kd_Err
 
         # Filter out bad analysis first off
 
 
 
-            if eq_crit is None:
-                Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs_2.copy()
-            else:
-                Combo_liq_cpxs_2['T_Liq_MinP'] = calculate_cpx_liq_temp(
-                    meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMin)
-                Combo_liq_cpxs_2['T_Liq_MaxP'] = calculate_cpx_liq_temp(
-                    meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMax)
-                # calculating Delta Kd-Fe-Mg using equation 35 of Putirka 2008
-                if KdMatch is None or KdMatch == "Putirka":
-                    Combo_liq_cpxs_2['Kd_MinP'] = np.exp(
-                        -0.107 - 1719 / Combo_liq_cpxs_2['T_Liq_MinP'])
-                    Combo_liq_cpxs_2['Kd_MaxP'] = np.exp(
-                        -0.107 - 1719 / Combo_liq_cpxs_2['T_Liq_MaxP'])
+            Combo_liq_cpxs_2['T_Liq_MinP'] = calculate_cpx_liq_temp(
+                meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMin)
+            Combo_liq_cpxs_2['T_Liq_MaxP'] = calculate_cpx_liq_temp(
+                meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMax)
+            # calculating Delta Kd-Fe-Mg using equation 35 of Putirka 2008
 
-                    Delta_Kd_T_MinP = abs(
-                        Combo_liq_cpxs_2['Kd_MinP'] - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
-                    Delta_Kd_T_MaxP = abs(
-                        Combo_liq_cpxs_2['Kd_MaxP'] - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
+            if Kd_Match == "Putirka":
+                Combo_liq_cpxs_2['Kd_MinP'] = np.exp(
+                    -0.107 - 1719 / Combo_liq_cpxs_2['T_Liq_MinP'])
+                Combo_liq_cpxs_2['Kd_MaxP'] = np.exp(
+                    -0.107 - 1719 / Combo_liq_cpxs_2['T_Liq_MaxP'])
 
-                if KdMatch is not None and KdMatch != "Masotta" and KdMatch != "Putirka":
-                    str3 = str(KdMatch)
-                    print('the code is evaluating Kd matches using Kd=' + str3)
-                    Delta_Kd_T_MinP = abs(
-                        KdMatch - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
-                    Delta_Kd_T_MaxP = abs(
-                        KdMatch - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
-                    Combo_liq_cpxs_2.insert(
-                        0, "DeltaKd_userselected=" + str3, Delta_Kd_T_MinP)
+                Delta_Kd_T_MinP = abs(
+                    Combo_liq_cpxs_2['Kd_MinP'] - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
+                Delta_Kd_T_MaxP = abs(
+                    Combo_liq_cpxs_2['Kd_MaxP'] - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
 
-                if KdMatch == "Masotta":
+            if Kd_Match != "Masotta" and Kd_Match != "Putirka":
+                str3 = str(Kd_Match)
+                print('the code is evaluating Kd matches using Kd=' + str3)
+                Delta_Kd_T_MinP = abs(
+                    Kd_Match - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
+                Delta_Kd_T_MaxP = abs(
+                    Kd_Match - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
+                Combo_liq_cpxs_2.insert(
+                    0, "DeltaKd_userselected=" + str3, Delta_Kd_T_MinP)
 
-                    ratioMasotta = Combo_liq_cpxs_2['Na2O_Liq_cat_frac'] / (
-                        Combo_liq_cpxs_2['Na2O_Liq_cat_frac'] + Combo_liq_cpxs_2['K2O_Liq_cat_frac'])
-                    Delta_Kd_T_MinP = abs(
-                        np.exp(1.735 - 3056 / Combo_liq_cpxs_2['T_Liq_MinP'] - 1.668 * ratioMasotta) - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
-                    Delta_Kd_T_MaxP = abs(
-                        np.exp(1.735 - 3056 / Combo_liq_cpxs_2['T_Liq_MaxP'] - 1.668 * ratioMasotta) - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
+            if Kd_Match == "Masotta":
 
-                # The logic here is that if Delta KD with both the max and min temperature are outside the specified KDerror,
-                # no temperature inbetween will be inequilibrium.
-                Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs_2.loc[~((Delta_Kd_T_MaxP > KdErr) &
-                                                                  (Delta_Kd_T_MinP > KdErr))].reset_index(drop = True)
+                ratioMasotta = Combo_liq_cpxs_2['Na2O_Liq_cat_frac'] / (
+                    Combo_liq_cpxs_2['Na2O_Liq_cat_frac'] + Combo_liq_cpxs_2['K2O_Liq_cat_frac'])
+                Delta_Kd_T_MinP = abs(
+                    np.exp(1.735 - 3056 / Combo_liq_cpxs_2['T_Liq_MinP'] - 1.668 * ratioMasotta) - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
+                Delta_Kd_T_MaxP = abs(
+                    np.exp(1.735 - 3056 / Combo_liq_cpxs_2['T_Liq_MaxP'] - 1.668 * ratioMasotta) - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
+
+            # The logic here is that if Delta KD with both the max and min temperature are outside the specified KDerror,
+            # no temperature inbetween will be inequilibrium.
+            Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs_2.loc[~((Delta_Kd_T_MaxP > Kd_Err) &
+                                                                (Delta_Kd_T_MinP > Kd_Err))].reset_index(drop = True)
 
             str2 = str(np.shape(Combo_liq_cpxs_FeMgMatch)[0])
             print(str2 + ' Matches remaining after initial Kd filter. '
@@ -1138,33 +1136,25 @@ H2O_Liq=None, Return_All_Matches=False):
         combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.copy()
 
         # First, make filter based on various Kd optoins
-        if KdMatch is not None and KdMatch != "Masotta" and KdMatch != "Putirka":
+        if Kd_Match != "Masotta" and Kd_Match != "Putirka":
 
-            Combo_liq_cpxs_eq_comp.loc[:, 'DeltaKd_KdMatch_userSp']= abs(
-                KdMatch - Combo_liq_cpxs_eq_comp['Kd_Fe_Mg_Fe2'])
-            filtKd = (Combo_liq_cpxs_eq_comp['DeltaKd_KdMatch_userSp'] < KdErr)
+            Combo_liq_cpxs_eq_comp.loc[:, 'DeltaKd_Kd_Match_userSp']= abs(
+                Kd_Match - Combo_liq_cpxs_eq_comp['Kd_Fe_Mg_Fe2'])
+            filtKd = (Combo_liq_cpxs_eq_comp['DeltaKd_Kd_Match_userSp'] < Kd_Err)
         else:
-            if KdMatch is None or KdMatch == "Putirka":
-                filtKd = (Combo_liq_cpxs_eq_comp['Delta_Kd_Put2008'] < KdErr)
-            if KdMatch == "Masotta":
-                filtKd = (Combo_liq_cpxs_eq_comp['Delta_Kd_Mas2013'] < KdErr)
+            if Kd_Match == "Putirka":
+                filtKd = (Combo_liq_cpxs_eq_comp['Delta_Kd_Put2008'] < Kd_Err)
+            if Kd_Match == "Masotta":
+                filtKd = (Combo_liq_cpxs_eq_comp['Delta_Kd_Mas2013'] < Kd_Err)
 
-        if eq_crit is None:
-            combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.copy()
-        if eq_crit == "All":
-            combo_liq_cpx_fur_filt = (Combo_liq_cpxs_eq_comp.loc[filtKd & (Combo_liq_cpxs_eq_comp['Delta_DiHd_Mollo'] < 0.06 * sigma) & (
-                Combo_liq_cpxs_eq_comp['Delta_EnFs_Mollo'] < 0.05 * sigma) & (Combo_liq_cpxs_eq_comp['Delta_CaTs_P1999'] < 0.03 * sigma)])
-        if eq_crit == "Kd":
-            combo_liq_cpx_fur_filt = (Combo_liq_cpxs_eq_comp.loc[filtKd])
-        if eq_crit == "Kd_DiHd":
-            combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.loc[filtKd & (
-                Combo_liq_cpxs_eq_comp['Delta_DiHd_Mollo'] < 0.06 * sigma)]
-        if eq_crit == "Kd_EnFs":
-            combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.loc[filtKd & (
-                Combo_liq_cpxs_eq_comp['Delta_EnFs_Mollo'] < 0.05 * sigma)]
-        if eq_crit == "Kd_CaTs":
-            combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.loc[filtKd & (
-                Combo_liq_cpxs_eq_comp['Delta_CaTs_P1999'] < 0.03 * sigma)]
+        # Then filter other components based on user-selected errors
+        # (default values from NEave et al. 2009)
+
+        combo_liq_cpx_fur_filt = (
+        Combo_liq_cpxs_eq_comp.loc[filtKd & (Combo_liq_cpxs_eq_comp['Delta_DiHd_Mollo13'] < DiHd_Err)
+        & (Combo_liq_cpxs_eq_comp['Delta_EnFs_Mollo13'] < EnFs_Err)
+        & (Combo_liq_cpxs_eq_comp['Delta_CaTs_Put1999'] < CaTs_Err)])
+
 
         # This just tidies up some columns to put stuff nearer the start
         cols_to_move = ['Sample_ID_Liq', 'Sample_ID_Cpx']

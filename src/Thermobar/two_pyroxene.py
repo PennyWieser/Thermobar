@@ -530,7 +530,7 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
 ## Two pyroxene matching
 
 def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=None, equationP=None,
-                                  KdMatch=None, KdErr=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None):
+                                  Kd_Match=None, Kd_Err=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None):
     '''
     Evaluates all possible Cpx-Opx pairs,
     returns P (kbar) and T (K) for those in Kd Fe-Mg equilibrium.
@@ -564,15 +564,15 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         returns temperature for equilibrium pairs.
 
 
-    KdMatch: str
+    Kd_Match: str
         |  If None, returns all cpx-opx pairs.
         |  If "HighTemp", returns all cpxs-opxs within Kd cpx-opx=1.09+-0.14 suggested by Putirka (2008)
         |  If "Subsolidus" returns all cpxs-opxs within Kd cpx-opx=0.7+-0.2 suggested by Putirka (2008)
-        |  If int or float, also need to specify KdErr. returns all matches within KdMatch +- KdErr
+        |  If int or float, also need to specify Kd_Err. returns all matches within Kd_Match +- Kd_Err
 
 
-    KdErr: float or int (optional)
-        returns all cpx-opx pairs within KdMatch+-KdErr
+    Kd_Err: float or int (optional)
+        returns all cpx-opx pairs within Kd_Match+-Kd_Err
 
     Cpx Quality: bool (optional)
         If True, filters out clinopyroxenes with cation sums outside of 4.02-3.99 (after Neave et al. 2017)
@@ -592,10 +592,10 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         All_PTs: Returns output parameters for all matches (e.g, cpx1-opx1, cpx1-opx4) without any averaging.
 
     '''
-    if (KdErr is None and isinstance(KdMatch, int)) or (KdErr is None and isinstance(KdMatch, float)):
+    if (Kd_Err is None and isinstance(Kd_Match, int)) or (Kd_Err is None and isinstance(Kd_Match, float)):
         raise Exception(
-            'You have entered a numerical value for KdMatch, but have not'
-            'specified a KdErr to accept matches within KdMatch+-KdErr')
+            'You have entered a numerical value for Kd_Match, but have not'
+            'specified a Kd_Err to accept matches within Kd_Match+-Kd_Err')
 
     # calculating Cpx and opx components. Do before duplication to save
     # computation time
@@ -635,25 +635,25 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     / Combo_opxs_cpxs['MgO_Cpx_cat_6ox'])) / (Combo_opxs_cpxs['FeOt_Opx_cat_6ox']
      / Combo_opxs_cpxs['MgO_Opx_cat_6ox'])
 
-    if KdMatch == "Subsolidus":
+    if Kd_Match == "Subsolidus":
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
             0.7 - Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'])
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.loc[np.abs(
             Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < 0.2]  # +- 0.2 suggested by Putirka spreadsheet
-    if KdMatch == "HighTemp":
+    if Kd_Match == "HighTemp":
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
             1.09 - Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'])
         # +- 0.14 suggested by Putirka spreadsheet
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.loc[np.abs(
             Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < 0.14]
-    if isinstance(KdMatch, int) or isinstance(
-            KdMatch, float) and KdErr is not None:
+    if isinstance(Kd_Match, int) or isinstance(
+            Kd_Match, float) and Kd_Err is not None:
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
-            KdMatch - Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'])
+            Kd_Match - Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'])
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.loc[np.abs(
-            Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < KdErr]  # +- 0.14 suggested by Putirka
+            Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < Kd_Err]  # +- 0.14 suggested by Putirka
 
-    if KdMatch is None and KdMatch is None and KdErr is None:
+    if Kd_Match is None and Kd_Match is None and Kd_Err is None:
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.copy()
         print('No Kd selected, all matches are shown')
 
@@ -797,7 +797,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     else:
         raise Exception(
             'No Matches - you may need to set less strict filters, e.g.,'
-            'you could edit KdMatch is None and KdErr to get more matches')
+            'you could edit Kd_Match is None and Kd_Err to get more matches')
 
 
 
