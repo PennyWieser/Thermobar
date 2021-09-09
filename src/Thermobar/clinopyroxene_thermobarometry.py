@@ -901,23 +901,15 @@ H2O_Liq=None, Return_All_Matches=False):
         |  P_Put2008_eq32c (T-dep, H2O-dep)
         |  P_Mas2013_eqalk32c (T-dep, H2O-dep, alk adaption of 32c)
 
+    Or
+
+    T: int, float
+        Can also run calculations at a fixed temperature
+    P: int, float
+        Can also run calculations at a fixed pressure
     Optional:
 
-    eq_crit: str, optional
 
-        If None (default): Doesn't apply any filters
-        If "All": applies the 4 equilibrium tests of Neave et al: KdFe-Mg, DiHd,
-        EnFs, CaTs. Kd Fe-Mg calculated based on what you specify in Kd_Match
-        If "FeMg_DiHd": Filters just using KdFe-Mg and DiHd
-        If "FeMg_EnFs": Filters just using KdFe-Mg and EnFs
-
-
-    PMax: int or float,  optional
-
-       Default value of 30 kbar. Uses to apply a preliminary KdFe-Mg filter
-       based on the T equation specified by the user.
-       Users can set a lower pressure to save computation time (E.g., if
-       reasonably sure crystals are forming above 10 kbar)
 
     Kd_Match: int, str, optional
         allows users to override the default of calculating Kd Fe-Mg based
@@ -955,6 +947,13 @@ H2O_Liq=None, Return_All_Matches=False):
         Default False. If True, filters out clinopyroxenes with cation sums outside of
         4.02-3.99 (after Neave et al. 2017)
 
+    PMax: int or float,  optional
+
+       Default value of 30 kbar. Uses to apply a preliminary KdFe-Mg filter
+       based on the T equation specified by the user.
+       Uses - 20 kbar as a lower filter.
+       Users can set a lower pressure to save computation time (E.g., if
+       reasonably sure crystals are forming above 10 kbar)
 
     Returns: dict
 
@@ -1067,7 +1066,7 @@ H2O_Liq=None, Return_All_Matches=False):
 
             # Initial Mg# filter, done by calculating temperature for extreme pressures,
             # e.g, 0 and 3 Gpa. Reduces number of P-T solving
-            PMin = -10
+            PMin = -20
             PMax = PMax
             Kd_Err = Kd_Err
 
@@ -1175,7 +1174,8 @@ H2O_Liq=None, Return_All_Matches=False):
         if len(CpxNumbers) > 0:
             df1_Mean_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).mean()
             df1_Std_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).std()
-            count=combo_liq_cpx_fur_filt.groupby('ID_CPX').count()
+            count=combo_liq_cpx_fur_filt.groupby('ID_CPX',as_index=False).count().iloc[:, 1]
+            df1_Mean_nopref['# of Liqs Averaged']=count
             Sample_ID_Cpx_Mean=df1_Mean_nopref['Sample_ID_Cpx']
             Sample_ID_Cpx_Std=df1_Std_nopref['Sample_ID_Cpx']
             df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
@@ -1183,6 +1183,7 @@ H2O_Liq=None, Return_All_Matches=False):
             df1_Mean=df1_Mean.drop(['Mean_Eq Tests Neave2017?', 'Mean_Sample_ID_Cpx'], axis=1)
             df1_Std=df1_Std.drop(['Std_Eq Tests Neave2017?','Std_Sample_ID_Cpx'], axis=1)
             df1_Mean.rename(columns={"Mean_ID_CPX": "ID_CPX"}, inplace=True)
+            df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
             df1_Std.rename(columns={"Std_ID_CPX": "ID_CPX"}, inplace=True)
 
 
@@ -1191,7 +1192,7 @@ H2O_Liq=None, Return_All_Matches=False):
             df1_M['Sample_ID_Cpx']=Sample_ID_Cpx_Mean
 
             if equationT is not None and equationP is not None:
-                cols_to_move = ['Sample_ID_Cpx',
+                cols_to_move = ['Sample_ID_Cpx', '# of Liqs Averaged',
                             'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
                             'Std_P_kbar_calc']
 
