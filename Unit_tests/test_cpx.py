@@ -162,7 +162,7 @@ class test_cpx_liq_press(unittest.TestCase):
     def test_Put32_DeltaEnFs(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
        liq_comps=LiqT, equationP="P_Put2008_eq32c", T=1300,
-       eq_tests=True).Delta_EnFs_Mollo[0], 0.073576,
+       eq_tests=True).Delta_EnFs_Mollo13[0], 0.073576,
        decimalPlace,
        "Calc Delta EnFs from  P_Put2008_eq32c not equal to test value")
 
@@ -177,7 +177,7 @@ class test_cpx_liq_press(unittest.TestCase):
     def test_Put32_DeltaDiHd(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
        liq_comps=LiqT, equationP="P_Put2008_eq32c", T=1300,
-       eq_tests=True).Delta_DiHd_Mollo[0], 0.006175,
+       eq_tests=True).Delta_DiHd_Mollo13[0], 0.006175,
        decimalPlace,
        "Calc Delta DiHd from  P_Put2008_eq32c not equal to test value")
 
@@ -235,14 +235,17 @@ Cpx2=pd.DataFrame(data={"SiO2_Cpx": 49.7147,
 class test_cpx_liq_melt_matching(unittest.TestCase):
    def test_eq33_P2017_press(self):
       self.assertAlmostEqual(pt.calculate_cpx_liq_press_temp_matching(cpx_comps=Cpx2, liq_comps=Liq2,
-      equationT="T_Put2008_eq33", equationP="P_Neave2017", Kd_Err=0.11, eq_crit="All",
-Fe3Fet_Liq=0.0, sigma=4).get("Av_PTs").Mean_P_kbar_calc[0], 5.993996633784751, decimalPlace,
+      equationT="T_Put2008_eq33", equationP="P_Neave2017", Kd_Err=0.11,  CaTs_Err=2*0.06,
+      DiHd_Err=2*0.12, EnFs_Err=2*0.1,
+Fe3Fet_Liq=0.0).get("Av_PTs").Mean_P_kbar_calc[0], 5.993996633784751, decimalPlace,
 "Calc P from melt matching eq33-N2017 not equal to test value")
 #
    def test_eq33_P2017_temp(self):
       self.assertAlmostEqual(pt.calculate_cpx_liq_press_temp_matching(cpx_comps=Cpx2, liq_comps=Liq2,
-equationT="T_Put2008_eq33", equationP="P_Neave2017", Kd_Err=0.11, eq_crit="All",
-Fe3Fet_Liq=0.0, sigma=4).get("Av_PTs").Mean_T_K_calc[0], 1480.0390069136172, decimalPlace,
+equationT="T_Put2008_eq33", equationP="P_Neave2017", Kd_Err=0.11,
+ CaTs_Err=2*0.06,
+      DiHd_Err=2*0.12, EnFs_Err=2*0.1,
+Fe3Fet_Liq=0.0).get("Av_PTs").Mean_T_K_calc[0], 1480.0390069136172, decimalPlace,
        "Calc T from melt matching eq33-N2017 not equal to test value")
 
 
@@ -263,14 +266,17 @@ class test_cpx_equilibirum(unittest.TestCase):
 
    def test_eq33_P2017_press2(self):
       self.assertAlmostEqual(pt.calculate_cpx_liq_press_temp_matching(cpx_comps=Cpx2, liq_comps=Liq2,
-      equationT="T_Put2008_eq33", equationP="P_Neave2017", Kd_Err=0.11, eq_crit="All",
-Fe3Fet_Liq=0.0, sigma=4).get("Av_PTs").Mean_P_kbar_calc[0], 5.993996633784751, decimalPlace,
+      equationT="T_Put2008_eq33", equationP="P_Neave2017", Kd_Err=0.11,
+ CaTs_Err=2*0.06,
+      DiHd_Err=2*0.12, EnFs_Err=2*0.1,
+Fe3Fet_Liq=0.0).get("Av_PTs").Mean_P_kbar_calc[0], 5.993996633784751, decimalPlace,
 "Calc P from melt matching eq33-N2017 not equal to test value")
 #
    def test_eq33_P2017_temp2(self):
       self.assertAlmostEqual(pt.calculate_cpx_liq_press_temp_matching(cpx_comps=Cpx2, liq_comps=Liq2,
-equationT="T_Put2008_eq33", equationP="P_Neave2017", Kd_Err=0.11, eq_crit="All",
-Fe3Fet_Liq=0.0, sigma=4).get("Av_PTs").Mean_T_K_calc[0], 1480.0390069136172, decimalPlace,
+equationT="T_Put2008_eq33", equationP="P_Neave2017", Kd_Err=0.11,  CaTs_Err=2*0.06,
+      DiHd_Err=2*0.12, EnFs_Err=2*0.1,
+Fe3Fet_Liq=0.0).get("Av_PTs").Mean_T_K_calc[0], 1480.0390069136172, decimalPlace,
        "Calc T from melt matching eq33-N2017 not equal to test value")
 
 
