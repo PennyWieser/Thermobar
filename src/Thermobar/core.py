@@ -1982,7 +1982,7 @@ def calculate_sites_ridolfi(amp_comps):
 
    # Other checks in Ridolfi's spreadsheet
     norm_cations['H2O_calc']=(2-norm_cations['F_Amp_13_cat']-norm_cations['Cl_Amp_13_cat'])*norm_cations['cation_sum_Si_Mg']*17/13/2
-    norm_cations.loc[(Low_sum), 'H2O_calc']=np.nan
+    norm_cations.loc[(Low_sum), 'H2O_calc']=0
 
     norm_cations['Charge']=(norm_cations['SiO2_Amp_13_cat']*4+norm_cations['TiO2_Amp_13_cat']*4+norm_cations['Al2O3_Amp_13_cat']*3+
     norm_cations['Cr2O3_Amp_13_cat']*3+norm_cations['FeOt_Amp_13_cat']*2+norm_cations['MnO_Amp_13_cat']*2+norm_cations['MgO_Amp_13_cat']*2
@@ -1996,17 +1996,17 @@ def calculate_sites_ridolfi(amp_comps):
 
 
     norm_cations['Fe2O3_calc']=norm_cations['Fe3_calc']*norm_cations['cation_sum_Si_Mg']*159.691/13/2
-    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=np.nan
+    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=0
 
     norm_cations['FeO_calc']=norm_cations['Fe2_calc']*norm_cations['cation_sum_Si_Mg']*71.846/13
-    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=np.nan
+    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=0
 
     norm_cations['O=F,Cl']=-(amp_comps_c['F_Amp']*0.421070639014633+amp_comps_c['Cl_Amp']*0.225636758525372)
-    norm_cations.loc[(Low_sum), 'O=F,Cl']=np.nan
+    norm_cations.loc[(Low_sum), 'O=F,Cl']=0
 
     norm_cations['Total_recalc']=(Sum_input-amp_comps_c['FeOt_Amp']+norm_cations['H2O_calc']+norm_cations['Fe2O3_calc']
     +norm_cations['FeO_calc']+norm_cations['O=F,Cl'])
-    norm_cations.loc[(Low_sum), 'Total']=np.nan
+    norm_cations.loc[(Low_sum), 'Total']=0
 
     # Set up a column for a fail message
     norm_cations['Fail Msg']=""
