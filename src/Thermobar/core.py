@@ -483,7 +483,7 @@ def calculate_anhydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
                             'Na2O_Liq_cat_prop': 'Na_Liq_cat_prop',
                             'K2O_Liq_cat_prop': 'K_Liq_cat_prop',
                             'Cr2O3_Liq_cat_prop': 'Cr_Liq_cat_prop',
-                            'P2O5_Liq_cat_prop': 'P_Liq_cat_frac_prop',
+                            'P2O5_Liq_cat_prop': 'P_Liq_cat_prop',
 
                             })
 
@@ -548,7 +548,7 @@ def calculate_anhydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
                             'Na2O_Liq_cat_frac': 'Na_Liq_cat_frac',
                             'K2O_Liq_cat_frac': 'K_Liq_cat_frac',
                             'Cr2O3_Liq_cat_frac': 'Cr_Liq_cat_frac',
-                            'P2O5_Liq_cat_frac': 'P_Liq_cat_frac_frac',
+                            'P2O5_Liq_cat_frac': 'P_Liq_cat_frac',
 
                             })
         return cation_frac_anhyd2
@@ -685,7 +685,7 @@ def calculate_hydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
                             'Na2O_Liq_cat_prop_hyd': 'Na_Liq_cat_prop_hyd',
                             'K2O_Liq_cat_prop_hyd': 'K_Liq_cat_prop_hyd',
                             'Cr2O3_Liq_cat_prop_hyd': 'Cr_Liq_cat_prop_hyd',
-                            'P2O5_Liq_cat_prop_hyd': 'P_Liq_cat_prop_hyd_prop_hyd',
+                            'P2O5_Liq_cat_prop_hyd': 'P_Liq_cat_prop_hyd',
                             })
 
         return cation_prop_hyd2
@@ -748,7 +748,7 @@ oxide_headers=False
                             'Na2O_Liq_cat_prop_hyd': 'Na_Liq_cat_prop_hyd',
                             'K2O_Liq_cat_prop_hyd': 'K_Liq_cat_prop_hyd',
                             'Cr2O3_Liq_cat_prop_hyd': 'Cr_Liq_cat_prop_hyd',
-                            'P2O5_Liq_cat_prop_hyd': 'P_Liq_cat_prop_hyd_prop_hyd',
+                            'P2O5_Liq_cat_prop_hyd': 'P_Liq_cat_prop_hyd',
 
                             'SiO2_Liq_cat_frac_hyd': 'Si_Liq_cat_frac_hyd',
                             'TiO2_Liq_cat_frac_hyd': 'Ti_Liq_cat_frac_hyd',
@@ -760,7 +760,7 @@ oxide_headers=False
                             'Na2O_Liq_cat_frac_hyd': 'Na_Liq_cat_frac_hyd',
                             'K2O_Liq_cat_frac_hyd': 'K_Liq_cat_frac_hyd',
                             'Cr2O3_Liq_cat_frac_hyd': 'Cr_Liq_cat_frac_hyd',
-                            'P2O5_Liq_cat_frac_hyd': 'P_Liq_cat_frac_hyd_frac_hyd',
+                            'P2O5_Liq_cat_frac_hyd': 'P_Liq_cat_frac_hyd',
 
                             })
 
@@ -1045,7 +1045,7 @@ def calculate_oxygens_orthopyroxene(opx_comps):
     return oxygens_anhyd
 
 
-def calculate_6oxygens_orthopyroxene(opx_comps):
+def calculate_6oxygens_orthopyroxene(opx_comps, oxide_headers=False):
     '''Import orthopyroxene compositions using opx_comps=My_Opxs, returns cations on the basis of 6 oxygens.
 
    Parameters
@@ -1054,12 +1054,15 @@ def calculate_6oxygens_orthopyroxene(opx_comps):
     opx_comps: DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
+    oxide_headers: bool
+        default=False, returns as Ti_Opx_..... =True returns TiO2_Opx_....
+        This is used for rapid matrix division for
+        pre-processing of data for cation fractions etc
+
     Returns
     -------
     pandas DataFrame
-        cations on the basis of 6 oxygens, with column headings of the form SiO2_Opx_cat_6ox.
-        For simplicity, and consistency of column labelling to aid calculations, oxide names are preserved,
-        so outputs are Na2O_Opx_cat_6ox rather than Na_Opx_cat_6ox.
+        cations on the basis of 6 oxygens, with column headings of the form ...Opx_cat_6ox.
 
     '''
 
@@ -1086,7 +1089,24 @@ def calculate_6oxygens_orthopyroxene(opx_comps):
     cation_6['Si_Ti_Opx_cat_6ox'] = cation_6['SiO2_Opx_cat_6ox'] + \
         cation_6['TiO2_Opx_cat_6ox']
 
-    return cation_6
+    if oxide_headers is True:
+        return cation_6
+    if oxide_headers is False:
+        cation_6_2=cation_6.rename(columns={
+                            'SiO2_Opx_cat_6ox': 'Si_Opx_cat_6ox',
+                            'TiO2_Opx_cat_6ox': 'Ti_Opx_cat_6ox',
+                            'Al2O3_Opx_cat_6ox': 'Al_Opx_cat_6ox',
+                            'FeOt_Opx_cat_6ox': 'Fet_Opx_cat_6ox',
+                            'MnO_Opx_cat_6ox': 'Mn_Opx_cat_6ox',
+                            'MgO_Opx_cat_6ox': 'Mg_Opx_cat_6ox',
+                            'CaO_Opx_cat_6ox': 'Ca_Opx_cat_6ox',
+                            'Na2O_Opx_cat_6ox': 'Na_Opx_cat_6ox',
+                            'K2O_Opx_cat_6ox': 'K_Opx_cat_6ox',
+                            'Cr2O3_Opx_cat_6ox': 'Cr_Opx_cat_6ox',
+                            'P2O5_Opx_cat_6ox': 'P_Opx_cat_6ox_frac',
+                            })
+        return cation_6_2
+
 
 
 def calculate_orthopyroxene_components(opx_comps):
@@ -1110,28 +1130,28 @@ def calculate_orthopyroxene_components(opx_comps):
 
     opx_calc = calculate_6oxygens_orthopyroxene(opx_comps=opx_comps)
     # Sum of cations, used to filter bad analyses
-    opx_calc['Cation_Sum_Opx'] = (opx_calc['SiO2_Opx_cat_6ox'] + opx_calc['TiO2_Opx_cat_6ox'] + opx_calc['Al2O3_Opx_cat_6ox'] + opx_calc['FeOt_Opx_cat_6ox']
-                                  + opx_calc['MnO_Opx_cat_6ox'] + opx_calc['MgO_Opx_cat_6ox'] +
-                                  opx_calc['CaO_Opx_cat_6ox'] +
-                                  opx_calc['Na2O_Opx_cat_6ox']
-                                  + opx_calc['K2O_Opx_cat_6ox'] + opx_calc['Cr2O3_Opx_cat_6ox'])
+    opx_calc['Cation_Sum_Opx'] = (opx_calc['Si_Opx_cat_6ox'] + opx_calc['Ti_Opx_cat_6ox']
+    + opx_calc['Al_Opx_cat_6ox'] + opx_calc['Fet_Opx_cat_6ox']
+    + opx_calc['Mn_Opx_cat_6ox'] + opx_calc['Mg_Opx_cat_6ox'] +
+    opx_calc['Ca_Opx_cat_6ox'] +opx_calc['Na_Opx_cat_6ox']
+    + opx_calc['K_Opx_cat_6ox'] + opx_calc['Cr_Opx_cat_6ox'])
 
-    opx_calc['Ca_CaMgFe']=opx_calc['CaO_Opx_cat_6ox']/(opx_calc['CaO_Opx_cat_6ox']
-    +opx_calc['FeOt_Opx_cat_6ox']+opx_calc['MgO_Opx_cat_6ox'])
+    opx_calc['Ca_CaMgFe']=opx_calc['Ca_Opx_cat_6ox']/(opx_calc['Ca_Opx_cat_6ox']
+    +opx_calc['Fet_Opx_cat_6ox']+opx_calc['Mg_Opx_cat_6ox'])
 
-    opx_calc['NaAlSi2O6'] = opx_calc['Na2O_Opx_cat_6ox']
-    opx_calc['FmTiAlSiO6'] = opx_calc['TiO2_Opx_cat_6ox']
-    opx_calc['CrAl2SiO6'] = opx_calc['Cr2O3_Opx_cat_6ox']
+    opx_calc['NaAlSi2O6'] = opx_calc['Na_Opx_cat_6ox']
+    opx_calc['FmTiAlSiO6'] = opx_calc['Ti_Opx_cat_6ox']
+    opx_calc['CrAl2SiO6'] = opx_calc['Cr_Opx_cat_6ox']
     opx_calc['FmAl2SiO6'] = opx_calc['Al_VI_Opx_cat_6ox'] - \
         opx_calc['NaAlSi2O6'] - opx_calc['CrAl2SiO6']
     opx_calc.FmAl2SiO6[opx_calc.FmAl2SiO6 < 0] = 0
-    opx_calc['CaFmSi2O6'] = opx_calc['CaO_Opx_cat_6ox']
-    opx_calc['Fm2Si2O6'] = (((opx_calc['FeOt_Opx_cat_6ox'] + opx_calc['MgO_Opx_cat_6ox'] + opx_calc['MnO_Opx_cat_6ox'])
-                             - opx_calc['FmTiAlSiO6'] - opx_calc['FmAl2SiO6'] - opx_calc['CaFmSi2O6']) / 2)
-    opx_calc['En_Opx'] = opx_calc['Fm2Si2O6'] * (opx_calc['MgO_Opx_cat_6ox'] / (
-        opx_calc['MgO_Opx_cat_6ox'] + opx_calc['FeOt_Opx_cat_6ox'] + opx_calc['MnO_Opx_cat_6ox']))
-    opx_calc['Di_Opx'] = opx_calc['CaFmSi2O6'] * (opx_calc['MgO_Opx_cat_6ox'] / (
-        opx_calc['MgO_Opx_cat_6ox'] + opx_calc['FeOt_Opx_cat_6ox'] + opx_calc['MnO_Opx_cat_6ox']))
+    opx_calc['CaFmSi2O6'] = opx_calc['Ca_Opx_cat_6ox']
+    opx_calc['Fm2Si2O6'] = (((opx_calc['Fet_Opx_cat_6ox'] + opx_calc['Mg_Opx_cat_6ox']
+    + opx_calc['Mn_Opx_cat_6ox'])- opx_calc['FmTiAlSiO6'] - opx_calc['FmAl2SiO6'] - opx_calc['CaFmSi2O6']) / 2)
+    opx_calc['En_Opx'] = opx_calc['Fm2Si2O6'] * (opx_calc['Mg_Opx_cat_6ox'] / (
+        opx_calc['Mg_Opx_cat_6ox'] + opx_calc['Fet_Opx_cat_6ox'] + opx_calc['Mn_Opx_cat_6ox']))
+    opx_calc['Di_Opx'] = opx_calc['CaFmSi2O6'] * (opx_calc['Mg_Opx_cat_6ox'] / (
+        opx_calc['Mg_Opx_cat_6ox'] + opx_calc['Fet_Opx_cat_6ox'] + opx_calc['Mn_Opx_cat_6ox']))
     opx_calc['Mgno_OPX'] = (opx_comps['MgO_Opx'] / 40.3044) / \
         (opx_comps['MgO_Opx'] / 40.3044 + opx_comps['FeOt_Opx'] / 71.844)
 
@@ -1183,15 +1203,22 @@ def calculate_orthopyroxene_liquid_components(
                 [myLiquids1_comps, myOPXs1_comp], axis=1)
 
     combo_liq_opxs['ln_Fm2Si2O6_liq'] = (np.log(combo_liq_opxs['Fm2Si2O6'].astype('float64') /
-                                                (combo_liq_opxs['Si_Liq_cat_frac']**2 * (combo_liq_opxs['Fet_Liq_cat_frac'] + combo_liq_opxs['Mn_Liq_cat_frac'] + combo_liq_opxs['Mg_Liq_cat_frac'])**2)))
+    (combo_liq_opxs['Si_Liq_cat_frac']**2 * (combo_liq_opxs['Fet_Liq_cat_frac']
+    + combo_liq_opxs['Mn_Liq_cat_frac'] + combo_liq_opxs['Mg_Liq_cat_frac'])**2)))
 
     combo_liq_opxs['ln_FmAl2SiO6_liq'] = (np.log(combo_liq_opxs['FmAl2SiO6'].astype('float64') /
-                                                 (combo_liq_opxs['Si_Liq_cat_frac'] * combo_liq_opxs['Al_Liq_cat_frac']**2 * (combo_liq_opxs['Fet_Liq_cat_frac']
+    (combo_liq_opxs['Si_Liq_cat_frac'] * combo_liq_opxs['Al_Liq_cat_frac']**2 *
+    (combo_liq_opxs['Fet_Liq_cat_frac']
                                                                                                                                    + combo_liq_opxs['Mn_Liq_cat_frac'] + combo_liq_opxs['Mg_Liq_cat_frac']))))
-    combo_liq_opxs['Kd_Fe_Mg_Fet'] = ((combo_liq_opxs['FeOt_Opx'] / 71.844) / (combo_liq_opxs['MgO_Opx'] / 40.3044)) / (
+    combo_liq_opxs['Kd_Fe_Mg_Fet'] = ((combo_liq_opxs['FeOt_Opx'] / 71.844) /
+    (combo_liq_opxs['MgO_Opx'] / 40.3044)) / (
         (combo_liq_opxs['FeOt_Liq'] / 71.844) / (combo_liq_opxs['MgO_Liq'] / 40.3044))
-    combo_liq_opxs['Kd_Fe_Mg_Fe2'] = ((combo_liq_opxs['FeOt_Opx'] / 71.844) / (combo_liq_opxs['MgO_Opx'] / 40.3044)) / (
-        ((1 - combo_liq_opxs['Fe3Fet_Liq']) * combo_liq_opxs['FeOt_Liq'] / 71.844) / (combo_liq_opxs['MgO_Liq'] / 40.3044))
+
+    combo_liq_opxs['Kd_Fe_Mg_Fe2'] = ((combo_liq_opxs['FeOt_Opx'] / 71.844) /
+    (combo_liq_opxs['MgO_Opx'] / 40.3044)) / (
+        ((1 - combo_liq_opxs['Fe3Fet_Liq']) * combo_liq_opxs['FeOt_Liq'] / 71.844) /
+        (combo_liq_opxs['MgO_Liq'] / 40.3044))
+
     combo_liq_opxs['Ideal_Kd'] = 0.4805 - 0.3733 * \
         combo_liq_opxs['Si_Liq_cat_frac']
     combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] = abs(
@@ -1206,12 +1233,14 @@ def calculate_orthopyroxene_liquid_components(
     combo_liq_opxs.insert(1, "Kd Eq (Put2008+-0.06)", b)
 
 
-    combo_liq_opxs['Mgno_Liq_noFe3']= (combo_liq_opxs['MgO_Liq'] / 40.3044) / ((combo_liq_opxs['MgO_Liq'] / 40.3044) +
-            (combo_liq_opxs['FeOt_Liq']) / 71.844)
+    combo_liq_opxs['Mgno_Liq_noFe3']= (combo_liq_opxs['MgO_Liq'] / 40.3044) /
+    ((combo_liq_opxs['MgO_Liq'] / 40.3044) +
+    (combo_liq_opxs['FeOt_Liq']) / 71.844)
 
 
-    combo_liq_opxs['Mgno_Liq_Fe2']=(combo_liq_opxs['MgO_Liq'] / 40.3044) / ((combo_liq_opxs['MgO_Liq'] / 40.3044) +
-            (combo_liq_opxs['FeOt_Liq'] * (1 - combo_liq_opxs['Fe3Fet_Liq']) / 71.844))
+    combo_liq_opxs['Mgno_Liq_Fe2']=(combo_liq_opxs['MgO_Liq'] / 40.3044) /
+    ((combo_liq_opxs['MgO_Liq'] / 40.3044) +
+    (combo_liq_opxs['FeOt_Liq'] * (1 - combo_liq_opxs['Fe3Fet_Liq']) / 71.844))
 
     return combo_liq_opxs
 
@@ -1254,6 +1283,8 @@ def calculate_oxygens_clinopyroxene(cpx_comps):
     cpx_comps: DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
+
+
     Returns
     -------
     pandas DataFrame
@@ -1282,12 +1313,16 @@ def calculate_6oxygens_clinopyroxene(cpx_comps):
     cpx_comps: DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
+    oxide_headers: bool
+        default=False, returns as Ti_Cpx_.....
+        =True returns TiO2_Cpx_....
+        This is used for rapid matrix division for
+        pre-processing of data for cation fractions etc
+
     Returns
     -------
     pandas DataFrame
-        cations on the basis of 6 oxygens, with column headings of the form SiO2_Cpx_cat_6ox.
-        For simplicity, and consistency of column labelling to aid calculations, oxide names are preserved,
-        so outputs are Na2O_Cpx_cat_6ox rather than Na_Cpx_cat_6ox.
+        cations on the basis of 6 oxygens, with column headings of the form ...Cpx_cat_6ox.
 
     '''
 
@@ -1312,7 +1347,23 @@ def calculate_6oxygens_clinopyroxene(cpx_comps):
         cation_6['Al_IV_cat_6ox']
     cation_6.Al_VI_cat_6ox[cation_6.Al_VI_cat_6ox < 0] = 0
 
-    return cation_6
+    if oxide_headers is True:
+        return cation_6
+    if oxide_headers is False:
+        cation_6_2=cation_6.rename(columns={
+                            'SiO2_Cpx_cat_6ox': 'Si_Cpx_cat_6ox',
+                            'TiO2_Cpx_cat_6ox': 'Ti_Cpx_cat_6ox',
+                            'Al2O3_Cpx_cat_6ox': 'Al_Cpx_cat_6ox',
+                            'FeOt_Cpx_cat_6ox': 'Fet_Cpx_cat_6ox',
+                            'MnO_Cpx_cat_6ox': 'Mn_Cpx_cat_6ox',
+                            'MgO_Cpx_cat_6ox': 'Mg_Cpx_cat_6ox',
+                            'CaO_Cpx_cat_6ox': 'Ca_Cpx_cat_6ox',
+                            'Na2O_Cpx_cat_6ox': 'Na_Cpx_cat_6ox',
+                            'K2O_Cpx_cat_6ox': 'K_Cpx_cat_6ox',
+                            'Cr2O3_Cpx_cat_6ox': 'Cr_Cpx_cat_6ox',
+                            'P2O5_Cpx_cat_6ox': 'P_Cpx_cat_6ox_frac',
+                            })
+        return cation_6_2
 
 # calculating Clinopyroxene components following Putirka spreadsheet
 
@@ -1336,29 +1387,29 @@ def calculate_clinopyroxene_components(cpx_comps):
 
     # Sum of cations, used by Neave and Putirka (2017) to filter out bad
     # clinopyroxene analyses
-    cpx_calc['Cation_Sum_Cpx'] = (cpx_calc['SiO2_Cpx_cat_6ox'] + cpx_calc['TiO2_Cpx_cat_6ox'] + cpx_calc['Al2O3_Cpx_cat_6ox'] + cpx_calc['FeOt_Cpx_cat_6ox']
-                                  + cpx_calc['MnO_Cpx_cat_6ox'] + cpx_calc['MgO_Cpx_cat_6ox'] +
-                                  cpx_calc['CaO_Cpx_cat_6ox'] +
-                                  cpx_calc['Na2O_Cpx_cat_6ox']
-                                  + cpx_calc['K2O_Cpx_cat_6ox'] + cpx_calc['Cr2O3_Cpx_cat_6ox'])
+    cpx_calc['Cation_Sum_Cpx'] = (cpx_calc['Si_Cpx_cat_6ox'] + cpx_calc['Ti_Cpx_cat_6ox']
+    + cpx_calc['Al_Cpx_cat_6ox'] + cpx_calc['Fet_Cpx_cat_6ox']
+    + cpx_calc['Mn_Cpx_cat_6ox'] + cpx_calc['Mg_Cpx_cat_6ox'] +
+    cpx_calc['Ca_Cpx_cat_6ox'] + cpx_calc['Na2_Cpx_cat_6ox']
+    + cpx_calc['K2O_Cpx_cat_6ox'] + cpx_calc['Cr2O3_Cpx_cat_6ox'])
 
-    cpx_calc['Ca_CaMgFe']=cpx_calc['CaO_Cpx_cat_6ox']/(cpx_calc['CaO_Cpx_cat_6ox']+cpx_calc['FeOt_Cpx_cat_6ox']
-    +cpx_calc['MgO_Cpx_cat_6ox'])
+    cpx_calc['Ca_CaMgFe']=cpx_calc['Ca_Cpx_cat_6ox']/(cpx_calc['Ca_Cpx_cat_6ox']+cpx_calc['Fet_Cpx_cat_6ox']
+    +cpx_calc['Mg_Cpx_cat_6ox'])
 
 
-    cpx_calc['Lindley_Fe3_Cpx'] = (cpx_calc['Na2O_Cpx_cat_6ox'] + cpx_calc['Al_IV_cat_6ox'] - cpx_calc['Al_VI_cat_6ox'] -
-        2 * cpx_calc['TiO2_Cpx_cat_6ox'] - cpx_calc['Cr2O3_Cpx_cat_6ox'])  # This is cell FR
+    cpx_calc['Lindley_Fe3_Cpx'] = (cpx_calc['Na_Cpx_cat_6ox'] + cpx_calc['Al_IV_cat_6ox'] - cpx_calc['Al_VI_cat_6ox'] -
+        2 * cpx_calc['Ti_Cpx_cat_6ox'] - cpx_calc['Cr_Cpx_cat_6ox'])  # This is cell FR
     cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] < 0.0000000001),  'Lindley_Fe3_Cpx'] = 0
-    cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] >= cpx_calc['FeOt_Cpx_cat_6ox'] ),  'Lindley_Fe3_Cpx'] = cpx_calc['FeOt_Cpx_cat_6ox']
-    cpx_calc['Lindley_Fe2_Cpx']=cpx_calc['FeOt_Cpx_cat_6ox']-cpx_calc['Lindley_Fe3_Cpx']
+    cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] >= cpx_calc['FeOt_Cpx_cat_6ox'] ),  'Lindley_Fe3_Cpx'] = cpx_calc['Fet_Cpx_cat_6ox']
+    cpx_calc['Lindley_Fe2_Cpx']=cpx_calc['Fet_Cpx_cat_6ox']-cpx_calc['Lindley_Fe3_Cpx']
     cpx_calc['Lindley_Fe3_Cpx_prop']=cpx_calc['Lindley_Fe3_Cpx']/cpx_calc['FeOt_Cpx_cat_6ox']
 
     # Cpx Components that don't nee if and else statements and don't rely on
     # others.
-    cpx_calc['CrCaTs'] = 0.5 * cpx_calc['Cr2O3_Cpx_cat_6ox']
-    cpx_calc['a_cpx_En'] = ((1 - cpx_calc['CaO_Cpx_cat_6ox'] - cpx_calc['Na2O_Cpx_cat_6ox'] - cpx_calc['K2O_Cpx_cat_6ox'])
-     * (1 - 0.5 * (cpx_calc['Al2O3_Cpx_cat_6ox']+ cpx_calc['Cr2O3_Cpx_cat_6ox'] + cpx_calc['Na2O_Cpx_cat_6ox']
-      + cpx_calc['K2O_Cpx_cat_6ox'])))
+    cpx_calc['CrCaTs'] = 0.5 * cpx_calc['Cr_Cpx_cat_6ox']
+    cpx_calc['a_cpx_En'] = ((1 - cpx_calc['Ca_Cpx_cat_6ox'] - cpx_calc['Na_Cpx_cat_6ox'] - cpx_calc['K_Cpx_cat_6ox'])
+     * (1 - 0.5 * (cpx_calc['Al_Cpx_cat_6ox']+ cpx_calc['Cr_Cpx_cat_6ox'] + cpx_calc['Na_Cpx_cat_6ox']
+      + cpx_calc['K_Cpx_cat_6ox'])))
     cpx_calc['Mgno_Cpx'] = (cpx_comps['MgO_Cpx'] / 40.3044) / \
         (cpx_comps['MgO_Cpx'] / 40.3044 + cpx_comps['FeOt_Cpx'] / 71.844)
 
@@ -1367,37 +1418,15 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['CaTi'] = np.empty(len(cpx_calc), dtype=float)
     cpx_calc['DiHd_1996'] = np.empty(len(cpx_calc), dtype=float)
 
-    #  Loop 1
 
-    # for i in range(0, len(cpx_calc)):
-    #
-    #     if (cpx_calc['Al_VI_cat_6ox'].iloc[i]) > (
-    #             cpx_calc['Na2O_Cpx_cat_6ox'].iloc[i]):
-    #         cpx_calc['Jd'].iloc[i] = cpx_calc['Na2O_Cpx_cat_6ox'].iloc[i]
-    #         cpx_calc['CaTs'].iloc[i] = cpx_calc['Al_VI_cat_6ox'].iloc[i] - \
-    #             cpx_calc['Na2O_Cpx_cat_6ox'].iloc[i]
-    #     else:
-    #         cpx_calc['Jd'].iloc[i] = cpx_calc['Al_VI_cat_6ox'].iloc[i]
-    #         cpx_calc['CaTs'].iloc[i] = 0
-    #If AlVi>Na cat fraction (e.g., if this value is >0, default)
-
-    AlVI_minus_Na=cpx_calc['Al_VI_cat_6ox']-cpx_calc['Na2O_Cpx_cat_6ox']
-    cpx_calc['Jd']=cpx_calc['Na2O_Cpx_cat_6ox']
-    cpx_calc['CaTs'] = cpx_calc['Al_VI_cat_6ox'] -cpx_calc['Na2O_Cpx_cat_6ox']
+    AlVI_minus_Na=cpx_calc['Al_VI_cat_6ox']-cpx_calc['Na_Cpx_cat_6ox']
+    cpx_calc['Jd']=cpx_calc['Na_Cpx_cat_6ox']
+    cpx_calc['CaTs'] = cpx_calc['Al_VI_cat_6ox'] -cpx_calc['Na_Cpx_cat_6ox']
 
     # If value of AlVI<Na cat frac
 
     cpx_calc.loc[(AlVI_minus_Na<0), 'Jd']=cpx_calc['Al_VI_cat_6ox']
     cpx_calc.loc[(AlVI_minus_Na<0), 'CaTs']=0
-
-    # Loop 2
-
-    #
-    #     if (cpx_calc['Al_IV_cat_6ox'].iloc[i]) > (cpx_calc['CaTs'].iloc[i]):
-    #         cpx_calc['CaTi'].iloc[i] = (
-    #             cpx_calc['Al_IV_cat_6ox'].iloc[i] - cpx_calc['CaTs'].iloc[i]) / 2
-    #     else:
-    #         cpx_calc['CaTi'].iloc[i] = 0
 
     # If value of AlIV>CaTs
     AlVI_minus_CaTs=cpx_calc['Al_IV_cat_6ox']-cpx_calc['CaTs']
@@ -1405,46 +1434,31 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['CaTi']= (cpx_calc['Al_IV_cat_6ox'] - cpx_calc['CaTs']) / 2
     cpx_calc.loc[(AlVI_minus_CaTs<0), 'CaTi']=0
 
-    #Loop 3
-    #     if (cpx_calc['CaO_Cpx_cat_6ox'].iloc[i] - cpx_calc['CaTs'].iloc[i] -
-    #             cpx_calc['CaTi'].iloc[i] - cpx_calc['CrCaTs'].iloc[i] > 0):
-    #         cpx_calc['DiHd_1996'].iloc[i] = (
-    #             cpx_calc['CaO_Cpx_cat_6ox'].iloc[i] - cpx_calc['CaTs'].iloc[i] - cpx_calc['CaTi'].iloc[i]
-    #- cpx_calc['CrCaTs'].iloc[i])
-    #     else:
-    #         cpx_calc['DiHd_1996'].iloc[i] = 0
 
     #  If CaO-CaTs-CaTi-CrCaTs is >0
-    Ca_CaTs_CaTi_CrCaTs=(cpx_calc['CaO_Cpx_cat_6ox'] - cpx_calc['CaTs'] -
+    Ca_CaTs_CaTi_CrCaTs=(cpx_calc['Ca_Cpx_cat_6ox'] - cpx_calc['CaTs'] -
                 cpx_calc['CaTi'] - cpx_calc['CrCaTs'])
 
-    cpx_calc['DiHd_1996']= (cpx_calc['CaO_Cpx_cat_6ox'] - cpx_calc['CaTs']
+    cpx_calc['DiHd_1996']= (cpx_calc['Ca_Cpx_cat_6ox'] - cpx_calc['CaTs']
 - cpx_calc['CaTi'] - cpx_calc['CrCaTs'] )
 
     cpx_calc.loc[(Ca_CaTs_CaTi_CrCaTs<0), 'DiHd_1996']=0
 
 
 
-
-
-
-
-
-
-
-    cpx_calc['EnFs'] = ((cpx_calc['FeOt_Cpx_cat_6ox'] +
-                        cpx_calc['MgO_Cpx_cat_6ox']) - cpx_calc['DiHd_1996']) / 2
-    cpx_calc['DiHd_2003'] = (cpx_calc['CaO_Cpx_cat_6ox'] -
+    cpx_calc['EnFs'] = ((cpx_calc['Fet_Cpx_cat_6ox'] +
+                        cpx_calc['Mg_Cpx_cat_6ox']) - cpx_calc['DiHd_1996']) / 2
+    cpx_calc['DiHd_2003'] = (cpx_calc['Ca_Cpx_cat_6ox'] -
                              cpx_calc['CaTs'] - cpx_calc['CaTi'] - cpx_calc['CrCaTs'])
-    cpx_calc['Di_Cpx'] = cpx_calc['DiHd_2003'] * (cpx_calc['MgO_Cpx_cat_6ox'] / (
-        cpx_calc['MgO_Cpx_cat_6ox'] + cpx_calc['MnO_Cpx_cat_6ox'] + cpx_calc['FeOt_Cpx_cat_6ox']))
+    cpx_calc['Di_Cpx'] = cpx_calc['DiHd_2003'] * (cpx_calc['Mg_Cpx_cat_6ox'] / (
+        cpx_calc['Mg_Cpx_cat_6ox'] + cpx_calc['Mn_Cpx_cat_6ox'] + cpx_calc['Fet_Cpx_cat_6ox']))
     cpx_calc['DiHd_1996'] = cpx_calc['DiHd_1996'].clip(lower=0)
     cpx_calc['DiHd_2003'] = cpx_calc['DiHd_2003'].clip(lower=0)
     cpx_calc['Jd'] = cpx_calc['Jd'].clip(lower=0)
 
     cpx_calc['FeIII_Wang21']=(cpx_calc['Na2O_Cpx_cat_6ox']+cpx_calc['Al_IV_cat_6ox']
-    -cpx_calc['Al_VI_cat_6ox']-2*cpx_calc['TiO2_Cpx_cat_6ox']-cpx_calc['Cr2O3_Cpx_cat_6ox'])
-    cpx_calc['FeII_Wang21']=cpx_calc['FeOt_Cpx_cat_6ox']-cpx_calc['FeIII_Wang21']
+    -cpx_calc['Al_VI_cat_6ox']-2*cpx_calc['Ti_Cpx_cat_6ox']-cpx_calc['Cr_Cpx_cat_6ox'])
+    cpx_calc['FeII_Wang21']=cpx_calc['Fet_Cpx_cat_6ox']-cpx_calc['FeIII_Wang21']
 
 
     # Merging new Cpx compnoents with inputted cpx composition
@@ -1516,16 +1530,16 @@ def calculate_clinopyroxene_liquid_components(
 
 
 # Measured Kd Fe-Mg (using 2+)
-    combo_liq_cpxs['Kd_Fe_Mg_Fe2'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
+    combo_liq_cpxs['Kd_Fe_Mg_Fe2'] = ((combo_liq_cpxs['Fet_Cpx_cat_6ox'] / combo_liq_cpxs['Mg_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['Fet_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['Mg_Liq_cat_frac'])))
 
 # Measured Kd Fe-Mg using 2+ in the liquid and Cpx based on Lindley
-    combo_liq_cpxs['Kd_Fe_Mg_Fe2_Lind'] = ((combo_liq_cpxs['Lindley_Fe2_Cpx'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
+    combo_liq_cpxs['Kd_Fe_Mg_Fe2_Lind'] = ((combo_liq_cpxs['Lindley_Fe2_Cpx'] / combo_liq_cpxs['Mg_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['Fet_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['Mg_Liq_cat_frac'])))
 
 
 # Measured Kd Fe-Mg using Fet
-    combo_liq_cpxs['Kd_Fe_Mg_Fet'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
+    combo_liq_cpxs['Kd_Fe_Mg_Fet'] = ((combo_liq_cpxs['Fet_Cpx_cat_6ox'] / combo_liq_cpxs['Mg_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['Fet_Liq_cat_frac'] / combo_liq_cpxs['Mg_Liq_cat_frac'])))
 
     combo_liq_cpxs['lnK_Jd_liq'] = np.log((combo_liq_cpxs['Jd'].astype(float)) / ((combo_liq_cpxs['Na_Liq_cat_frac']) * (
