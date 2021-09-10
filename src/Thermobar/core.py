@@ -315,6 +315,61 @@ oxide_mass_amp_df_Ridolfi = pd.DataFrame.from_dict(
 oxide_mass_amp_df_Ridolfi['Sample_ID_Amp'] = 'MolWt'
 oxide_mass_amp_df_Ridolfi.set_index('Sample_ID_Amp', inplace=True)
 
+# For oxide to wt% function
+oxide_mass_all = {'SiO2': 60.084, 'MgO': 40.304, 'FeOt': 71.846, 'CaO': 56.079, 'Al2O3': 101.961,
+                          'Na2O': 61.979, 'K2O': 94.195, 'MnO': 70.937, 'TiO2': 79.898,
+                          'Cr2O3': 151.9902, 'P2O5':141.944, 'F': 18.998, 'Cl': 35.453}
+oxide_mass_all = pd.DataFrame.from_dict(
+    oxide_mass_all, orient='index').T
+oxide_mass_all['Sample_ID'] = 'MolWt'
+oxide_mass_all.set_index('Sample_ID', inplace=True)
+
+elemental_mass_mult_all = {'SiO2': 28.0855, 'MgO': 24.305, 'FeOt': 55.845, 'CaO': 40.078, 'Al2O3': 26.981539*2,
+                          'Na2O': 22.989769*2, 'K2O': 39.0983*2, 'MnO': 54.938044, 'TiO2': 47.867,
+                          'Cr2O3': 51.9961*2, 'P2O5': 2*30.973762, 'F': 18.998, 'Cl': 35.453}
+elemental_mass_mult_all = pd.DataFrame.from_dict(
+    elemental_mass_mult_all, orient='index').T
+elemental_mass_mult_all['Sample_ID'] = 'ElWt'
+elemental_mass_mult_all.set_index('Sample_ID', inplace=True)
+
+
+
+df_ideal_all2 = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
+'FeOt', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O',
+'Cr2O3', 'P2O5', 'F', 'Cl'])
+
+def convert_oxide_percent_to_element_weight_percent(df, suffix=None):
+    df_c=df.copy()
+    if suffix is not None:
+        df_c.columns = df_c.columns.str.rstrip(suffix)
+
+    df_oxides=df_c.reindex(df_ideal_all2.columns, axis=1).fillna(0)
+    liq_wt_combo = pd.concat([oxide_mass_all, df_oxides],)
+    mol_prop_anhyd = liq_wt_combo.div(
+        liq_wt_combo.loc['MolWt', :], axis='columns').drop(['MolWt'])
+
+    el_combo=pd.concat([elemental_mass_mult_all, mol_prop_anhyd ],)
+    wt_perc = el_combo.multiply(
+        el_combo.loc['ElWt', :], axis='columns').drop(['ElWt'])
+
+    wt_perc2=pd.DataFrame(data={'Si_wt': wt_perc['SiO2'],
+                                'Mg_wt': wt_perc['MgO'],
+                                'Fe_wt':wt_perc['FeOt'],
+                                'Ca_wt':wt_perc['CaO'],
+                                'Al_wt':wt_perc['Al2O3'],
+                                'Na_wt':wt_perc['Na2O'],
+                                'K_wt':wt_perc['K2O'],
+                                'Mn_wt':wt_perc['MnO'],
+                                'Ti_wt':wt_perc['TiO2'],
+                                'Cr_wt':wt_perc['Cr2O3'],
+                                'P_wt':wt_perc['P2O5'],
+                                'F_wt':wt_perc['F'],
+                                'Cl_wt':wt_perc['Cl']
+
+
+                                })
+    return wt_perc2
+
 
 
 ## Anhydrous mole proportions, mole fractions, cation proportions, cation fractions

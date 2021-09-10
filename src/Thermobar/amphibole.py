@@ -139,7 +139,7 @@ def P_Blundy1990(T=None, *, Al2O3_Amp_cat_23ox):
 
 
 def P_Schmidt1992(T=None, *, Al2O3_Amp_cat_23ox):
-    '''
+    '''s
     Amphibole-only (Al) barometer: Schmidt 1992
     '''
     return (-3.01 + 4.76 * Al2O3_Amp_cat_23ox)
@@ -159,12 +159,22 @@ def calculate_amp_only_melt_comps(amp_comps=None, T_K=None):
     amp_sites_R=calculate_sites_ridolfi(amp_comps=amp_comps)
     # Amp Sites for Zhang
     amp_sites=get_amp_sites_avferric_zhang(amp_comps=amp_comps)
+    # For Putirka
+    amp_23ox=calculate_23oxygens_amphibole(amp_comps=amp_comps)
+
+    # Putirka 2016 equation 10
+    amp_sites['SiO2_Put2016']=751.95-0.4*(T_K-273.15)-278000/(T_K-273.15)-9.184*amp_23ox['Al2O3_Amp_cat_23ox']
+
+
+    # Calculating Delta NNO from Ridolfi 2021
 
     deltaNNO_calc= (-10.3216023230583*amp_sites_R['Al_IV_T'] + 4.47045484316415*amp_sites_R['Al_VI_C']
     + 7.55122550171372*amp_sites_R['Ti_C'] + 5.46318534905121*amp_sites_R['Fe3_C'] -4.73884449358073*amp_sites_R['Mg_C']
         -7.20328571556139*amp_sites_R['Fe2_C']-17.5610110666215*amp_sites_R['Mn_C'] + 13.762022684517*amp_sites_R['Ca_B']
         + 13.7560270877436*amp_sites_R['Na_A']  + 27.5944871599305*amp_sites_R['K_A'])
     amp_sites.insert(0, "deltaNNO_calc_Ridolfi21", deltaNNO_calc)
+
+    # Calculating H2O form Ridofli 2021
 
     H2O_calc=(np.exp(-1.374845602*amp_sites_R['Al_IV_T'] + 1.7103210931239*amp_sites_R['Al_VI_C']
     + 0.85944576818503*amp_sites_R['Ti_C'] + 1.18881568772057*amp_sites_R['Fe3_C'] -0.675980097369545*amp_sites_R['Mg_C']
@@ -719,7 +729,8 @@ def calculate_amp_only_temp(amp_comps, equationT, P=None):
 
 ## Function: PT Iterate Amphibole - only
 
-def calculate_amp_only_press_temp(amp_comps, equationT, equationP, iterations=30, T_K_guess=1300):
+def calculate_amp_only_press_temp(amp_comps, equationT, equationP, iterations=30,
+T_K_guess=1300, Ridolfi_Filter=True):
     '''
     Solves simultaneous equations for temperature and pressure using
     amphibole only thermometers and barometers.
@@ -778,8 +789,19 @@ def calculate_amp_only_press_temp(amp_comps, equationT, equationP, iterations=30
     T_func = calculate_amp_only_temp(amp_comps=amp_comps, equationT=equationT, P="Solve")
     if equationP !="P_Ridolfi2021" and equationP != "P_Mutch2016":
         P_func = calculate_amp_only_press(amp_comps=amp_comps, equationP=equationP, T="Solve")
-    else:
+
+    # If mutch, need to extract P from dataframe.
+    if equationP == "P_Mutch2016":
         P_func = calculate_amp_only_press(amp_comps=amp_comps, equationP=equationP, T="Solve").P_kbar_calc
+
+    # If Ridolfi, need to extract Pkbar, as well as warning messages.
+    if equationP == "P_Ridolfi2021":
+        P_func_all = calculate_amp_only_press(amp_comps=amp_comps, equationP=equationP,
+        T="Solve", Ridolfi_Filter=Ridolfi_Filter)
+        P_func=P_func_all.P_kbar_calc
+
+
+
     if isinstance(T_func, pd.Series) and isinstance(P_func, pd.Series):
         P_guess = P_func
         T_K_guess = T_func
@@ -798,8 +820,18 @@ def calculate_amp_only_press_temp(amp_comps, equationT, equationP, iterations=30
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
 
+    if equationP=="P_Ridolfi2021":
+        PT_out=pd.DataFrame(data={'P_kbar_calc': P_guess,
+         'T_K_calc': T_K_guess,
+         'Input_Check': P_func_all.Input_Check,
+         'Fail Msg': P_func_all['Fail Msg'],
+         'classification': P_func_all['classification'],
+         'equation': P_func_all['equation']
 
-    PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+         })
+
+    else:
+        PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
     return PT_out
 
 ## Function: Amphibole-Liquid barometer
