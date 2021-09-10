@@ -356,19 +356,19 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
         equationT == "T_Beatt93_ol" or equationT == "T_Beatt93_ol_HerzCorr" or equationT=="T_Put2008_eq19":
 
                 Liq_Ols['DMg_Meas'] = Liq_Ols['MgO_Ol_cat_frac'] / \
-                    Liq_Ols['MgO_Liq_cat_frac']
-                Liq_Ols['CNML'] = (Liq_Ols['MgO_Liq_cat_frac'] + Liq_Ols['FeOt_Liq_cat_frac'] +
-                                   Liq_Ols['CaO_Liq_cat_frac'] + Liq_Ols['MnO_Liq_cat_frac'])
-                Liq_Ols['CSiO2L'] = Liq_Ols['SiO2_Liq_cat_frac']
-                Liq_Ols['NF'] = (7 / 2) * np.log(1 - Liq_Ols['Al2O3_Liq_cat_frac']
-                                                 ) + 7 * np.log(1 - Liq_Ols['TiO2_Liq_cat_frac'])
+                    Liq_Ols['Mg_Liq_cat_frac']
+                Liq_Ols['CNML'] = (Liq_Ols['Mg_Liq_cat_frac'] + Liq_Ols['Fet_Liq_cat_frac'] +
+                                   Liq_Ols['Ca_Liq_cat_frac'] + Liq_Ols['Mn_Liq_cat_frac'])
+                Liq_Ols['CSiO2L'] = Liq_Ols['Si_Liq_cat_frac']
+                Liq_Ols['NF'] = (7 / 2) * np.log(1 - Liq_Ols['Al_Liq_cat_frac']
+                                                 ) + 7 * np.log(1 - Liq_Ols['Ti_Liq_cat_frac'])
                 Liq_Ols['Den_Beat93'] = 52.05 / 8.3144 + 2 * np.log(Liq_Ols['DMg_Meas']) + 2 * np.log(
                     1.5 * Liq_Ols['CNML']) + 2 * np.log(3 * Liq_Ols['CSiO2L']) - Liq_Ols['NF']
 
         if equationT == "T_Sisson1992":
             Liq_Ols['KdMg_TSG1992'] = (Liq_Ols['MgO_Ol_cat_frac'] /
-                (Liq_Ols['MgO_Liq_cat_frac'] *
-                    (Liq_Ols['SiO2_Liq_cat_frac']**(0.5))))
+                (Liq_Ols['Mg_Liq_cat_frac'] *
+                    (Liq_Ols['Si_Liq_cat_frac']**(0.5))))
 
 
     # Checks if P-dependent function you have entered a P

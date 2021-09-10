@@ -9,60 +9,60 @@ from Thermobar.core import *
 
 
 ## Equations: Plag-Liquid thermometers
-def T_Put2008_eq23(P, *, An_Plag, SiO2_Liq_cat_frac,
-                   Al2O3_Liq_cat_frac, CaO_Liq_cat_frac, Ab_Plag, H2O_Liq):
+def T_Put2008_eq23(P, *, An_Plag, Si_Liq_cat_frac,
+                   Al_Liq_cat_frac, Ca_Liq_cat_frac, Ab_Plag, H2O_Liq):
     '''
     Plagioclase-Liquid thermometer of Putirka (2008) eq. 23
     SEE=+-43C
     '''
-    return ((10**4 / (6.12 + 0.257 * np.log(An_Plag / (SiO2_Liq_cat_frac**2 * Al2O3_Liq_cat_frac**2 * CaO_Liq_cat_frac))
-                      - 3.166 * CaO_Liq_cat_frac - 3.137 *
-                      (Al2O3_Liq_cat_frac / (Al2O3_Liq_cat_frac + SiO2_Liq_cat_frac))
+    return ((10**4 / (6.12 + 0.257 * np.log(An_Plag / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac**2 * Ca_Liq_cat_frac))
+                      - 3.166 * Ca_Liq_cat_frac - 3.137 *
+                      (Al_Liq_cat_frac / (Al_Liq_cat_frac + Si_Liq_cat_frac))
                       + 1.216 * Ab_Plag**2 - 2.475 * 10**-2 * (P / 10) * 10 + 0.2166 * H2O_Liq)))
 
 
 
 
-def T_Put2008_eq24a(P, *, An_Plag, SiO2_Liq_cat_frac, Al2O3_Liq_cat_frac,
-                    CaO_Liq_cat_frac, K2O_Liq_cat_frac, Ab_Plag, H2O_Liq):
+def T_Put2008_eq24a(P, *, An_Plag, Si_Liq_cat_frac, Al_Liq_cat_frac,
+                    Ca_Liq_cat_frac, K_Liq_cat_frac, Ab_Plag, H2O_Liq):
     '''
     Plagioclase-Liquid thermometer of Putirka (2008) eq. 24a
     Global regression, improves equation 23 SEE by  6C
     SEE=+-36C
     '''
-    return ((10**4 / (6.4706 + 0.3128 * (np.log(An_Plag / (SiO2_Liq_cat_frac**2 * Al2O3_Liq_cat_frac**2 * CaO_Liq_cat_frac)))
-                      - 8.103 * SiO2_Liq_cat_frac + 4.872 *
-                      K2O_Liq_cat_frac + 8.661 * SiO2_Liq_cat_frac**2
+    return ((10**4 / (6.4706 + 0.3128 * (np.log(An_Plag / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac**2 * Ca_Liq_cat_frac)))
+                      - 8.103 * Si_Liq_cat_frac + 4.872 *
+                      K_Liq_cat_frac + 8.661 * Si_Liq_cat_frac**2
                       + 1.5346 * Ab_Plag**2 - 3.341 * 10**-2 * (P / 10) * 10 + 0.18047 * H2O_Liq)))
 
 
 ## Equation: Plag-Liquid barometer
 
-def P_Put2008_eq25(T, *, Ab_Plag, Al2O3_Liq_cat_frac, CaO_Liq_cat_frac,
-                   Na2O_Liq_cat_frac, SiO2_Liq_cat_frac, An_Plag, K2O_Liq_cat_frac):
+def P_Put2008_eq25(T, *, Ab_Plag, Al_Liq_cat_frac, Ca_Liq_cat_frac,
+                   Na_Liq_cat_frac, Si_Liq_cat_frac, An_Plag, K_Liq_cat_frac):
     '''
     Plagioclase-Liquid barometer of Putirka (2008) eq. 26.
     SEE=+-2.2 kbar *But in spreadsheet, Putirka warns plag is not a good barometer*
     '''
     return (-42.2 + (4.94 * (10**-2) * T) + (1.16 * (10**-2) * T) *
-    (np.log((Ab_Plag * Al2O3_Liq_cat_frac * CaO_Liq_cat_frac) / (Na2O_Liq_cat_frac * SiO2_Liq_cat_frac * An_Plag)))
-            - 19.6 * np.log(Ab_Plag) - 382.3 * SiO2_Liq_cat_frac**2 +
-            514.2 * SiO2_Liq_cat_frac**3 - 139.8 * CaO_Liq_cat_frac
-            + 287.2 * Na2O_Liq_cat_frac + 163.9 * K2O_Liq_cat_frac)
+    (np.log((Ab_Plag * Al_Liq_cat_frac * Ca_Liq_cat_frac) / (Na_Liq_cat_frac * Si_Liq_cat_frac * An_Plag)))
+            - 19.6 * np.log(Ab_Plag) - 382.3 * Si_Liq_cat_frac**2 +
+            514.2 * Si_Liq_cat_frac**3 - 139.8 * Ca_Liq_cat_frac
+            + 287.2 * Na_Liq_cat_frac + 163.9 * K_Liq_cat_frac)
 
 ## Equations - Kspar-Liquid thermometry
 
-def T_Put2008_eq24b(P, *, Ab_Kspar, Al2O3_Liq_cat_frac, Na2O_Liq_cat_frac,
-                  K2O_Liq_cat_frac, SiO2_Liq_cat_frac, CaO_Liq_cat_frac):
+def T_Put2008_eq24b(P, *, Ab_Kspar, Al_Liq_cat_frac, Na_Liq_cat_frac,
+                  K_Liq_cat_frac, Si_Liq_cat_frac, Ca_Liq_cat_frac):
     '''
     Alkali Felspar-Liquid thermometer of Putirka (2008) eq. 24b.
     SEE=+-23 C (Calibration data)
     SEE=+-25 C (All data)
 
     '''
-    return (10**4 / (17.3 - 1.03 * np.log(Ab_Kspar / (Na2O_Liq_cat_frac * Al2O3_Liq_cat_frac * SiO2_Liq_cat_frac**3))
-    - 200 * CaO_Liq_cat_frac - 2.42 * Na2O_Liq_cat_frac -29.8 * K2O_Liq_cat_frac + 13500 * (CaO_Liq_cat_frac - 0.0037)**2
-    - 550 * (K2O_Liq_cat_frac - 0.056) * (Na2O_Liq_cat_frac - 0.089) - 0.078 * (P / 10) / 10))
+    return (10**4 / (17.3 - 1.03 * np.log(Ab_Kspar / (Na_Liq_cat_frac * Al_Liq_cat_frac * Si_Liq_cat_frac**3))
+    - 200 * Ca_Liq_cat_frac - 2.42 * Na_Liq_cat_frac -29.8 * K_Liq_cat_frac + 13500 * (Ca_Liq_cat_frac - 0.0037)**2
+    - 550 * (K_Liq_cat_frac - 0.056) * (Na_Liq_cat_frac - 0.089) - 0.078 * (P / 10) / 10))
 
 
 
@@ -131,8 +131,8 @@ def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
         cat_liqs = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
         combo_fspar_Liq = pd.concat([cat_plags, cat_liqs], axis=1)
 
-        Kd_Ab_An = (combo_fspar_Liq['Ab_Plag'] * combo_fspar_Liq['Al2O3_Liq_cat_frac'] * combo_fspar_Liq['CaO_Liq_cat_frac'] /
-                    (combo_fspar_Liq['An_Plag'] * combo_fspar_Liq['Na2O_Liq_cat_frac'] * combo_fspar_Liq['SiO2_Liq_cat_frac']))
+        Kd_Ab_An = (combo_fspar_Liq['Ab_Plag'] * combo_fspar_Liq['Al_Liq_cat_frac'] * combo_fspar_Liq['Ca_Liq_cat_frac'] /
+                    (combo_fspar_Liq['An_Plag'] * combo_fspar_Liq['Na_Liq_cat_frac'] * combo_fspar_Liq['Si_Liq_cat_frac']))
         combo_fspar_Liq['Kd_Ab_An'] = Kd_Ab_An
 
         if np.min(combo_fspar_Liq['An_Plag'] < 0.05):
@@ -150,8 +150,8 @@ def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
         cat_liqs = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
         combo_fspar_Liq = pd.concat([cat_kspars, cat_liqs], axis=1)
 
-        Kd_Ab_An = (combo_fspar_Liq['Ab_Kspar'] * combo_fspar_Liq['Al2O3_Liq_cat_frac'] * combo_fspar_Liq['CaO_Liq_cat_frac'] /
-                    (combo_fspar_Liq['An_Kspar'] * combo_fspar_Liq['Na2O_Liq_cat_frac'] * combo_fspar_Liq['SiO2_Liq_cat_frac']))
+        Kd_Ab_An = (combo_fspar_Liq['Ab_Kspar'] * combo_fspar_Liq['Al_Liq_cat_frac'] * combo_fspar_Liq['Ca_Liq_cat_frac'] /
+                    (combo_fspar_Liq['An_Kspar'] * combo_fspar_Liq['Na_Liq_cat_frac'] * combo_fspar_Liq['Si_Liq_cat_frac']))
         combo_fspar_Liq['Kd_Ab_An'] = Kd_Ab_An
 
         if np.min(combo_fspar_Liq['An_Kspar'] > 0.05):
@@ -256,8 +256,8 @@ def calculate_fspar_liq_press(*, plag_comps=None, kspar_comps=None, liq_comps=No
     cat_liqs = calculate_anhydrous_cat_fractions_liquid(liq_comps)
     combo_plag_liq = pd.concat([cat_plags, cat_liqs], axis=1)
 
-    Kd_Ab_An = (combo_plag_liq['Ab_Plag'] * combo_plag_liq['Al2O3_Liq_cat_frac'] * combo_plag_liq['CaO_Liq_cat_frac'] /
-                (combo_plag_liq['An_Plag'] * combo_plag_liq['Na2O_Liq_cat_frac'] * combo_plag_liq['SiO2_Liq_cat_frac']))
+    Kd_Ab_An = (combo_plag_liq['Ab_Plag'] * combo_plag_liq['Al_Liq_cat_frac'] * combo_plag_liq['Ca_Liq_cat_frac'] /
+                (combo_plag_liq['An_Plag'] * combo_plag_liq['Na_Liq_cat_frac'] * combo_plag_liq['Si_Liq_cat_frac']))
 
     combo_plag_liq['Kd_Ab_An'] = Kd_Ab_An
 
@@ -391,26 +391,26 @@ def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_com
 
 ## Equations: Plag-Liquid hygrometry
 
-def H_Put2008_eq25b(T, *, P, An_Plag, SiO2_Liq_cat_frac,
-                    Al2O3_Liq_cat_frac, CaO_Liq_cat_frac, K2O_Liq_cat_frac, MgO_Liq_cat_frac):
+def H_Put2008_eq25b(T, *, P, An_Plag, Si_Liq_cat_frac,
+                    Al_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac, Mg_Liq_cat_frac):
     '''
     Plagioclase-Hygrometer of  Putirka (2008) eq. 25b
     Global calibration improving estimate of Putirka (2005) eq H
     SEE=+-1.1 wt%
     '''
-    LnKAn=np.log((An_Plag)/((SiO2_Liq_cat_frac**2)*(Al2O3_Liq_cat_frac**2) * CaO_Liq_cat_frac))
-    return (25.95-0.0032*(T-273.15)*LnKAn-18.9*K2O_Liq_cat_frac+14.5*MgO_Liq_cat_frac-40.3*CaO_Liq_cat_frac+5.7*An_Plag**2+0.108*(P))
+    LnKAn=np.log((An_Plag)/((Si_Liq_cat_frac**2)*(Al_Liq_cat_frac**2) * Ca_Liq_cat_frac))
+    return (25.95-0.0032*(T-273.15)*LnKAn-18.9*K_Liq_cat_frac+14.5*Mg_Liq_cat_frac-40.3*Ca_Liq_cat_frac+5.7*An_Plag**2+0.108*(P))
 
 
-def H_Put2005_eqH(T, *, An_Plag, SiO2_Liq_cat_frac, Al2O3_Liq_cat_frac, Na2O_Liq_cat_frac,
-                  CaO_Liq_cat_frac, Pred_Ab_EqF, Pred_An_EqE, K2O_Liq_cat_frac, MgO_Liq_cat_frac):
+def H_Put2005_eqH(T, *, An_Plag, Si_Liq_cat_frac, Al_Liq_cat_frac, Na_Liq_cat_frac,
+                  Ca_Liq_cat_frac, Pred_Ab_EqF, Pred_An_EqE, K_Liq_cat_frac, Mg_Liq_cat_frac):
     '''
     Plagioclase-Hygrometer of  Putirka (2005) eq. H
     Tends to overpredict water in global datasets
     '''
 
-    return (24.757 - 2.26 * 10**(-3) * (T) * (np.log(An_Plag / (SiO2_Liq_cat_frac**2 * Al2O3_Liq_cat_frac**2 * CaO_Liq_cat_frac)))
-            - 3.847 * Pred_Ab_EqF + 1.927 * Pred_An_EqE / (CaO_Liq_cat_frac / (CaO_Liq_cat_frac + Na2O_Liq_cat_frac)))
+    return (24.757 - 2.26 * 10**(-3) * (T) * (np.log(An_Plag / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac**2 * Ca_Liq_cat_frac)))
+            - 3.847 * Pred_Ab_EqF + 1.927 * Pred_An_EqE / (Ca_Liq_cat_frac / (Ca_Liq_cat_frac + Na_Liq_cat_frac)))
 
 
 def H_Waters2015(T, *, liq_comps=None, plag_comps=None,

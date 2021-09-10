@@ -14,8 +14,8 @@ from Thermobar.liquid_thermometers import*
 
 
 
-def P_Put2008_eq29a(T, *, SiO2_Liq_cat_frac, MgO_Liq_cat_frac, FeOt_Opx_cat_6ox, FmAl2SiO6,
-                    Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac, K2O_Liq_cat_frac, H2O_Liq, NaAlSi2O6):
+def P_Put2008_eq29a(T, *, Si_Liq_cat_frac, Mg_Liq_cat_frac, FeOt_Opx_cat_6ox, FmAl2SiO6,
+                    Na_Liq_cat_frac, Al_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq, NaAlSi2O6):
     '''
     Orthopyroxene-Liquid barometer of Putirka, (2008) eq 29a. Global calibration of experiments.
 
@@ -23,28 +23,28 @@ def P_Put2008_eq29a(T, *, SiO2_Liq_cat_frac, MgO_Liq_cat_frac, FeOt_Opx_cat_6ox,
     |  SEE=+-2.1 kbar for hydrous data
 
     '''
-    Na_Si_Al_Na=(NaAlSi2O6 / (SiO2_Liq_cat_frac**2 * Al2O3_Liq_cat_frac * Na2O_Liq_cat_frac)).astype(float)
+    Na_Si_Al_Na=(NaAlSi2O6 / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac * Na_Liq_cat_frac)).astype(float)
     log_Na_Si_Al_Na=np.log(Na_Si_Al_Na)
-    return (-13.97 + 0.0129 * (T - 273.15) - 19.64 * SiO2_Liq_cat_frac + 47.49 * MgO_Liq_cat_frac + 6.99 * FeOt_Opx_cat_6ox
-            + 37.37 * FmAl2SiO6 + 0.748 * H2O_Liq + 79.67 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) +
+    return (-13.97 + 0.0129 * (T - 273.15) - 19.64 * Si_Liq_cat_frac + 47.49 * Mg_Liq_cat_frac + 6.99 * FeOt_Opx_cat_6ox
+            + 37.37 * FmAl2SiO6 + 0.748 * H2O_Liq + 79.67 * (Na_Liq_cat_frac + K_Liq_cat_frac) +
             0.001416 * (T - 273.15)*log_Na_Si_Al_Na)
 
 
 
-def P_Put2008_eq29b(T, *, ln_FmAl2SiO6_liq, Al2O3_Liq_cat_frac, MgO_Liq_cat_frac,
-FeOt_Liq_cat_frac, SiO2_Opx_cat_6ox, FeOt_Opx_cat_6ox,
-Na2O_Liq_cat_frac, K2O_Liq_cat_frac, H2O_Liq):
+def P_Put2008_eq29b(T, *, ln_FmAl2SiO6_liq, Al_Liq_cat_frac, Mg_Liq_cat_frac,
+Fet_Liq_cat_frac, SiO2_Opx_cat_6ox, FeOt_Opx_cat_6ox,
+Na_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
     '''
     Orthopyroxene-Liquid barometer of Putirka, (2008) eq 29b. Global calibration of experiments.
 
     |  Exact SEE not given, but ~2-3 kbar.
 
     '''
-    return (1.788 + 0.0375 * (T - 273.15) + 0.001295 * (T - 273.15) * ln_FmAl2SiO6_liq - 33.42 * Al2O3_Liq_cat_frac
-            + 9.795 * MgO_Liq_cat_frac /
-            (MgO_Liq_cat_frac + FeOt_Liq_cat_frac) - 26.2 *
+    return (1.788 + 0.0375 * (T - 273.15) + 0.001295 * (T - 273.15) * ln_FmAl2SiO6_liq - 33.42 * Al_Liq_cat_frac
+            + 9.795 * Mg_Liq_cat_frac /
+            (Mg_Liq_cat_frac + Fet_Liq_cat_frac) - 26.2 *
             SiO2_Opx_cat_6ox + 14.21 * FeOt_Opx_cat_6ox
-            + 36.08 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) + 0.784 * H2O_Liq)
+            + 36.08 * (Na_Liq_cat_frac + K_Liq_cat_frac) + 0.784 * H2O_Liq)
 
 
 def P_Put_Global_Opx(T=None, *, MgO_Liq, Al2O3_Opx, Al2O3_Liq, Na2O_Liq, K2O_Liq):
@@ -94,8 +94,8 @@ def P_Put2008_eq29c(T, *, Al2O3_Opx_cat_6ox,
 
 
 
-def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, MgO_Liq_cat_frac,
-                    K2O_Liq_cat_frac, FeOt_Liq_cat_frac, FeOt_Opx_cat_6ox):
+def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, Mg_Liq_cat_frac,
+                    K_Liq_cat_frac, Fet_Liq_cat_frac, FeOt_Opx_cat_6ox):
     """
     Putirka (2008) Equation 28a.
     Global calibration: T=750-1600°C, SiO2=33-77 wt%, P=atm-11 GPa. H2O=0-14.2 wt%.
@@ -104,38 +104,38 @@ def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, MgO_Liq_cat_frac,
     |  SEE=± 41°C for testing data
     """
     return (273.15 + 10**4 / (4.07 - 0.329 * (0.1 * P) + 0.12 * H2O_Liq +
-    0.567 * ln_Fm2Si2O6_liq.astype(float) - 3.06 * MgO_Liq_cat_frac -
-    6.17 * K2O_Liq_cat_frac + 1.89 * MgO_Liq_cat_frac /
-    (MgO_Liq_cat_frac + FeOt_Liq_cat_frac) + 2.57 * FeOt_Opx_cat_6ox))
+    0.567 * ln_Fm2Si2O6_liq.astype(float) - 3.06 * Mg_Liq_cat_frac -
+    6.17 * K_Liq_cat_frac + 1.89 * Mg_Liq_cat_frac /
+    (Mg_Liq_cat_frac + Fet_Liq_cat_frac) + 2.57 * FeOt_Opx_cat_6ox))
 
-def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, MgO_Liq_cat_frac, CaO_Liq_cat_frac, K2O_Liq_cat_frac, MnO_Liq_cat_frac,
-                            FeOt_Liq_cat_frac, FeOt_Opx_cat_6ox, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac, Mg_Number_Liq_NoFe3):
+def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac, Mn_Liq_cat_frac,
+                            Fet_Liq_cat_frac, FeOt_Opx_cat_6ox, Al_Liq_cat_frac, Ti_Liq_cat_frac, Mg_Number_Liq_NoFe3):
     '''
     Orthopyroxene-liquid thermometer- temperature at which a liquid is saturated in orhopyroxene (for a given P). Equation 28b of Putirka et al. (2008)
     '''
-    Cl_NM = MgO_Liq_cat_frac + FeOt_Liq_cat_frac + \
-        CaO_Liq_cat_frac + MnO_Liq_cat_frac
-    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac.astype(float)) + \
-        7 * np.log(1 - TiO2_Liq_cat_frac.astype(float))
+    Cl_NM = Mg_Liq_cat_frac + Fet_Liq_cat_frac + \
+        Ca_Liq_cat_frac + Mn_Liq_cat_frac
+    NF = (7 / 2) * np.log(1 - Al_Liq_cat_frac.astype(float)) + \
+        7 * np.log(1 - Ti_Liq_cat_frac.astype(float))
     return (273.15 + (5573.8 + 587.9 * (P / 10) - 61 * (P / 10)**2) / (5.3 - 0.633 * np.log(Mg_Number_Liq_NoFe3.astype(float)) - 3.97 * Cl_NM +
-            0.06 * NF + 24.7 * CaO_Liq_cat_frac**2 + 0.081 * H2O_Liq + 0.156 * (P / 10)))
+            0.06 * NF + 24.7 * Ca_Liq_cat_frac**2 + 0.081 * H2O_Liq + 0.156 * (P / 10)))
 
 
-def T_Beatt1993_opx(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
-                    MnO_Liq_cat_frac, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac):
+def T_Beatt1993_opx(P, *, Ca_Liq_cat_frac, Fet_Liq_cat_frac, Mg_Liq_cat_frac,
+                    Mn_Liq_cat_frac, Al_Liq_cat_frac, Ti_Liq_cat_frac):
     '''
     Opx-Liquid thermometer of Beattie (1993). Only uses liquid composition.
     Putirka (2008) warn that overpredicts for hydrous compositions at <1200°C, and anhydrous compositions at <1100°C
     '''
     Num_B1993 = 125.9 * 1000 / 8.3144 + \
         ((0.1 * P) * 10**9 - 10**5) * 6.5 * (10**(-6)) / 8.3144
-    D_Mg_opx_li1 = (0.5 - (-0.089 * CaO_Liq_cat_frac - 0.025 * MnO_Liq_cat_frac + 0.129 * FeOt_Liq_cat_frac)) / \
-        (MgO_Liq_cat_frac + 0.072 * CaO_Liq_cat_frac +
-         0.352 * MnO_Liq_cat_frac + 0.264 * FeOt_Liq_cat_frac)
-    Cl_NM = MgO_Liq_cat_frac + FeOt_Liq_cat_frac + \
-        CaO_Liq_cat_frac + MnO_Liq_cat_frac
-    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac.astype(float)) + \
-        7 * np.log(1 - TiO2_Liq_cat_frac.astype(float))
+    D_Mg_opx_li1 = (0.5 - (-0.089 * Ca_Liq_cat_frac - 0.025 * Mn_Liq_cat_frac + 0.129 * Fet_Liq_cat_frac)) / \
+        (Mg_Liq_cat_frac + 0.072 * Ca_Liq_cat_frac +
+         0.352 * Mn_Liq_cat_frac + 0.264 * Fet_Liq_cat_frac)
+    Cl_NM = Mg_Liq_cat_frac + Fet_Liq_cat_frac + \
+        Ca_Liq_cat_frac + Mn_Liq_cat_frac
+    NF = (7 / 2) * np.log(1 - Al_Liq_cat_frac.astype(float)) + \
+        7 * np.log(1 - Ti_Liq_cat_frac.astype(float))
     Den_B1993 = 67.92 / 8.3144 + 2 * \
         np.log(D_Mg_opx_li1.astype(float)) + 2 * np.log(2 * Cl_NM.astype(float)) - NF
     return Num_B1993 / Den_B1993

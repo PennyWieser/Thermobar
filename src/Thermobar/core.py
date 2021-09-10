@@ -339,6 +339,19 @@ df_ideal_all2 = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
 'Cr2O3', 'P2O5', 'F', 'Cl'])
 
 def convert_oxide_percent_to_element_weight_percent(df, suffix=None):
+    """
+    Converts oxide wt% to elemental wt%
+
+   Parameters
+    -------
+
+    df: DataFrame
+        Data frame of oxide compositions. Can have suffixes like "_Amp"
+        in which case you need to specify suffix="_Amp"
+
+    returns: Dataframe
+    wt% of elements
+    """
     df_c=df.copy()
     if suffix is not None:
         df_c.columns = df_c.columns.str.rstrip(suffix)
@@ -426,7 +439,7 @@ def calculate_anhydrous_mol_fractions_liquid(liq_comps):
     return mol_frac_anhyd
 
 
-def calculate_anhydrous_cat_proportions_liquid(liq_comps):
+def calculate_anhydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
     '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous cation proportions (e.g., mole proportions * no of cations)
 
    Parameters
@@ -435,10 +448,15 @@ def calculate_anhydrous_cat_proportions_liquid(liq_comps):
     liq_comps: DataFrame
                 Panda DataFrame of liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
+    oxide_headers: bool
+        default=False, returns as Ti_Liq_cat_prop. =True returns Ti_Liq_cat_prop.
+        This is used for rapid matrix division for
+        pre-processing of data for cation fractions etc
+
     Returns
     -------
     pandas DataFrame
-        anhydrous cation proportions for the liquid with column headings of the form SiO2_Liq_cat_prop
+        anhydrous cation proportions for the liquid with column headings of the form S_Liq_cat_prop
 
     '''
     mol_prop_no_cat_num = calculate_anhydrous_mol_proportions_liquid(liq_comps)
@@ -451,10 +469,30 @@ def calculate_anhydrous_cat_proportions_liquid(liq_comps):
         df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
     cation_prop_anhyd.columns = [
         str(col) + '_cat_prop' for col in cation_prop_anhyd.columns]
-    return cation_prop_anhyd
+
+    if oxide_headers is False:
+
+        cation_prop_anhyd2=cation_prop_anhyd.rename(columns={
+                            'SiO2_Liq_cat_prop': 'Si_Liq_cat_prop',
+                            'TiO2_Liq_cat_prop': 'Ti_Liq_cat_prop',
+                            'Al2O3_Liq_cat_prop': 'Al_Liq_cat_prop',
+                            'FeOt_Liq_cat_prop': 'Fet_Liq_cat_prop',
+                            'MnO_Liq_cat_prop': 'Mn_Liq_cat_prop',
+                            'MgO_Liq_cat_prop': 'Mg_Liq_cat_prop',
+                            'CaO_Liq_cat_prop': 'Ca_Liq_cat_prop',
+                            'Na2O_Liq_cat_prop': 'Na_Liq_cat_prop',
+                            'K2O_Liq_cat_prop': 'K_Liq_cat_prop',
+                            'Cr2O3_Liq_cat_prop': 'Cr_Liq_cat_prop',
+                            'P2O5_Liq_cat_prop': 'P_Liq_cat_frac_prop',
+
+                            })
+
+        return cation_prop_anhyd2
+    else:
+        return cation_prop_anhyd
 
 
-def calculate_anhydrous_cat_fractions_liquid(liq_comps):
+def calculate_anhydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
     '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous cation fractions
 
    Parameters
@@ -463,14 +501,21 @@ def calculate_anhydrous_cat_fractions_liquid(liq_comps):
     liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
+    oxide_headers: bool
+        default=False, returns as Ti_Liq_cat_frac.
+        =True returns Ti_Liq_cat_frac.
+        This is used for rapid matrix division for
+        pre-processing of data for cation fractions etc
+
     Returns
     -------
     pandas DataFrame
-        anhydrous cation fractions for the liquid with column headings of the form SiO2_Liq_cat_frac, as well as the initial dataframe of liquid compositions.
-        For simplicity, and consistency of column heading types, oxide names are preserved,
-        so outputs are Na2O_Liq_cat_frac rather than Na_Liq_cat_frac.
+        anhydrous cation fractions for the liquid with column headings of the form _Liq_cat_frac,
+        as well as the initial dataframe of liquid compositions.
+
+
     '''
-    cat_prop = calculate_anhydrous_cat_proportions_liquid(liq_comps=liq_comps)
+    cat_prop = calculate_anhydrous_cat_proportions_liquid(liq_comps=liq_comps, oxide_headers=True)
     mol_prop = calculate_anhydrous_mol_fractions_liquid(liq_comps=liq_comps)
     cat_prop['sum'] = cat_prop.sum(axis='columns')
     cat_frac_anhyd = cat_prop.div(cat_prop['sum'], axis='rows')
@@ -478,7 +523,7 @@ def calculate_anhydrous_cat_fractions_liquid(liq_comps):
     cat_frac_anhyd.columns = [str(col).replace('prop', 'frac')
                               for col in cat_frac_anhyd.columns]
     cat_frac_anhyd = pd.concat([liq_comps, mol_prop, cat_frac_anhyd], axis=1)
-    cat_frac_anhyd['FeO_Liq_cat_frac'] = cat_frac_anhyd['FeOt_Liq_cat_frac'] * \
+    cat_frac_anhyd['Fe2_Liq_cat_frac'] = cat_frac_anhyd['FeOt_Liq_cat_frac'] * \
         (1 - liq_comps['Fe3Fet_Liq'])
     if "Fe3Fet_Liq" in cat_frac_anhyd:
         cat_frac_anhyd['Mg_Number_Liq_NoFe3'] = (cat_frac_anhyd['MgO_Liq'] / 40.3044) / (
@@ -490,7 +535,25 @@ def calculate_anhydrous_cat_fractions_liquid(liq_comps):
             (cat_frac_anhyd['MgO_Liq'] / 40.3044) + (cat_frac_anhyd['FeOt_Liq'] / 71.844))
         cat_frac_anhyd['Mg_Number_Liq_NoFe3'] = (cat_frac_anhyd['MgO_Liq'] / 40.3044) / (
             (cat_frac_anhyd['MgO_Liq'] / 40.3044) + (cat_frac_anhyd['FeOt_Liq'] / 71.844))
-    return cat_frac_anhyd
+
+    if oxide_headers is False:
+        cation_frac_anhyd2=cat_frac_anhyd.rename(columns={
+                            'SiO2_Liq_cat_frac': 'Si_Liq_cat_frac',
+                            'TiO2_Liq_cat_frac': 'Ti_Liq_cat_frac',
+                            'Al2O3_Liq_cat_frac': 'Al_Liq_cat_frac',
+                            'FeOt_Liq_cat_frac': 'Fet_Liq_cat_frac',
+                            'MnO_Liq_cat_frac': 'Mn_Liq_cat_frac',
+                            'MgO_Liq_cat_frac': 'Mg_Liq_cat_frac',
+                            'CaO_Liq_cat_frac': 'Ca_Liq_cat_frac',
+                            'Na2O_Liq_cat_frac': 'Na_Liq_cat_frac',
+                            'K2O_Liq_cat_frac': 'K_Liq_cat_frac',
+                            'Cr2O3_Liq_cat_frac': 'Cr_Liq_cat_frac',
+                            'P2O5_Liq_cat_frac': 'P_Liq_cat_frac_frac',
+
+                            })
+        return cation_frac_anhyd2
+    else:
+        return cat_frac_anhyd
 
 # Liquid Mgno function
 
@@ -536,7 +599,7 @@ def calculate_hydrous_mol_proportions_liquid(liq_comps):
     Returns
     -------
     pandas DataFrame
-        anhydrous mole proportions for the liquid with column headings of the form SiO2_Liq_mol_prop
+        anhydrous mole proportions for the liquid with column headings of the ..Liq_mol_prop
 
     '''
     # This makes the input match the columns in the oxide mass dataframe
@@ -560,6 +623,8 @@ def calculate_hydrous_mol_fractions_liquid(liq_comps):
     liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
+
+
     Returns
     -------
     pandas DataFrame
@@ -575,7 +640,7 @@ def calculate_hydrous_mol_fractions_liquid(liq_comps):
     return mol_frac_hyd
 
 
-def calculate_hydrous_cat_proportions_liquid(liq_comps):
+def calculate_hydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
     '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous cation proportions (e.g., mole proportions * no of cations)
 
    Parameters
@@ -584,10 +649,15 @@ def calculate_hydrous_cat_proportions_liquid(liq_comps):
     liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
+    oxide_headers: bool
+        default=False, returns as Ti_Liq_..... =True returns TiO2_Liq_....
+        This is used for rapid matrix division for
+        pre-processing of data for cation fractions etc
+
     Returns
     -------
     pandas DataFrame
-        anhydrous cation proportions for the liquid with column headings of the form SiO2_Liq_cat_prop
+        hydrous cation proportions for the liquid with column headings of the form ...Liq_cat_prop_hyd
 
     '''
     mol_prop_no_cat_num = calculate_hydrous_mol_proportions_liquid(liq_comps)
@@ -600,10 +670,27 @@ def calculate_hydrous_cat_proportions_liquid(liq_comps):
         df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
     cation_prop_hyd.columns = [
         str(col) + '_cat_prop_hyd' for col in cation_prop_hyd.columns]
-    return cation_prop_hyd
+    if oxide_headers is True:
+        return cation_prop_hyd
+    if oxide_headers is False:
 
+        cation_prop_hyd2=cation_prop_hyd.rename(columns={
+                            'SiO2_Liq_cat_prop_hyd': 'Si_Liq_cat_prop_hyd',
+                            'TiO2_Liq_cat_prop_hyd': 'Ti_Liq_cat_prop_hyd',
+                            'Al2O3_Liq_cat_prop_hyd': 'Al_Liq_cat_prop_hyd',
+                            'FeOt_Liq_cat_prop_hyd': 'Fet_Liq_cat_prop_hyd',
+                            'MnO_Liq_cat_prop_hyd': 'Mn_Liq_cat_prop_hyd',
+                            'MgO_Liq_cat_prop_hyd': 'Mg_Liq_cat_prop_hyd',
+                            'CaO_Liq_cat_prop_hyd': 'Ca_Liq_cat_prop_hyd',
+                            'Na2O_Liq_cat_prop_hyd': 'Na_Liq_cat_prop_hyd',
+                            'K2O_Liq_cat_prop_hyd': 'K_Liq_cat_prop_hyd',
+                            'Cr2O3_Liq_cat_prop_hyd': 'Cr_Liq_cat_prop_hyd',
+                            'P2O5_Liq_cat_prop_hyd': 'P_Liq_cat_prop_hyd_prop_hyd',
+                            })
 
-def calculate_hydrous_cat_fractions_liquid(liq_comps):
+        return cation_prop_hyd2
+
+def calculate_hydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
     '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous cation fractions
 
    Parameters
@@ -612,14 +699,19 @@ def calculate_hydrous_cat_fractions_liquid(liq_comps):
     liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
+oxide_headers=False
+    oxide_headers: bool
+        default=False, returns as Ti_Liq_cat_prop. =True returns Ti_Liq_cat_prop.
+        This is used for rapid matrix division for
+        pre-processing of data for cation fractions etc
+
     Returns
     -------
     pandas DataFrame
-        anhydrous cation fractions for the liquid with column headings of the form SiO2_Liq_cat_frac, as well as the initial dataframe of liquid compositions.
-        For simplicity, and consistency of column heading types, oxide names are preserved,
-        so outputs are Na2O_Liq_cat_frac rather than Na_Liq_cat_frac.
+        anhydrous cation fractions for the liquid with column headings of the form ..Liq_cat_frac
+
     '''
-    cat_prop = calculate_hydrous_cat_proportions_liquid(liq_comps=liq_comps)
+    cat_prop = calculate_hydrous_cat_proportions_liquid(liq_comps=liq_comps, oxide_headers=True)
     mol_prop = calculate_hydrous_mol_fractions_liquid(liq_comps=liq_comps)
     cat_prop['sum'] = cat_prop.sum(axis='columns')
     cat_frac_hyd = cat_prop.div(cat_prop['sum'], axis='rows')
@@ -627,7 +719,9 @@ def calculate_hydrous_cat_fractions_liquid(liq_comps):
     cat_frac_hyd.columns = [str(col).replace('prop', 'frac')
                             for col in cat_frac_hyd.columns]
     cat_frac_hyd = pd.concat([liq_comps, mol_prop, cat_frac_hyd], axis=1)
-    cat_frac_hyd['FeO_Liq_cat_frac_hyd'] = cat_frac_hyd['FeOt_Liq_cat_frac_hyd'] * \
+
+
+    cat_frac_hyd['Fe2_Liq_cat_frac_hyd'] = cat_frac_hyd['FeOt_Liq_cat_frac_hyd'] * \
         (1 - liq_comps['Fe3Fet_Liq'])
     if "Fe3Fet_Liq" in cat_frac_hyd:
         cat_frac_hyd['Mg_Number_Liq_NoFe3'] = (cat_frac_hyd['MgO_Liq'] / 40.3044) / (
@@ -641,12 +735,38 @@ def calculate_hydrous_cat_fractions_liquid(liq_comps):
         cat_frac_hyd['Mg_Number_Liq_NoFe3'] = (cat_frac_hyd['MgO_Liq'] / 40.3044) / (
             (cat_frac_hyd['MgO_Liq'] / 40.3044) + (cat_frac_hyd['FeOt_Liq'] / 71.844))
 
-        #         myLiquids1['Mg_Number_Liq']=(myLiquids1['MgO_Liq']/40.3044)/( (myLiquids1['MgO_Liq']/40.3044)+ (myLiquids1['FeO_Liq']/71.844))
-#         myLiquids1['Mg_Number_Liq_NoFe3']=(myLiquids1['MgO_Liq']/40.3044)/( (myLiquids1['MgO_Liq']/40.3044)+ (myLiquids1['FeOt_Liq']/71.844))
-#     else:
-#         myLiquids1['Mg_Number_Liq']=(myLiquids1['MgO_Liq']/40.3044)/( (myLiquids1['MgO_Liq']/40.3044)+ (myLiquids1['FeOt_Liq']/71.844))
 
-    return cat_frac_hyd
+    if oxide_headers is False:
+        cat_frac_hyd2=cat_frac_hyd.rename(columns={
+                            'SiO2_Liq_cat_prop_hyd': 'Si_Liq_cat_prop_hyd',
+                            'TiO2_Liq_cat_prop_hyd': 'Ti_Liq_cat_prop_hyd',
+                            'Al2O3_Liq_cat_prop_hyd': 'Al_Liq_cat_prop_hyd',
+                            'FeOt_Liq_cat_prop_hyd': 'Fet_Liq_cat_prop_hyd',
+                            'MnO_Liq_cat_prop_hyd': 'Mn_Liq_cat_prop_hyd',
+                            'MgO_Liq_cat_prop_hyd': 'Mg_Liq_cat_prop_hyd',
+                            'CaO_Liq_cat_prop_hyd': 'Ca_Liq_cat_prop_hyd',
+                            'Na2O_Liq_cat_prop_hyd': 'Na_Liq_cat_prop_hyd',
+                            'K2O_Liq_cat_prop_hyd': 'K_Liq_cat_prop_hyd',
+                            'Cr2O3_Liq_cat_prop_hyd': 'Cr_Liq_cat_prop_hyd',
+                            'P2O5_Liq_cat_prop_hyd': 'P_Liq_cat_prop_hyd_prop_hyd',
+
+                            'SiO2_Liq_cat_frac_hyd': 'Si_Liq_cat_frac_hyd',
+                            'TiO2_Liq_cat_frac_hyd': 'Ti_Liq_cat_frac_hyd',
+                            'Al2O3_Liq_cat_frac_hyd': 'Al_Liq_cat_frac_hyd',
+                            'FeOt_Liq_cat_frac_hyd': 'Fet_Liq_cat_frac_hyd',
+                            'MnO_Liq_cat_frac_hyd': 'Mn_Liq_cat_frac_hyd',
+                            'MgO_Liq_cat_frac_hyd': 'Mg_Liq_cat_frac_hyd',
+                            'CaO_Liq_cat_frac_hyd': 'Ca_Liq_cat_frac_hyd',
+                            'Na2O_Liq_cat_frac_hyd': 'Na_Liq_cat_frac_hyd',
+                            'K2O_Liq_cat_frac_hyd': 'K_Liq_cat_frac_hyd',
+                            'Cr2O3_Liq_cat_frac_hyd': 'Cr_Liq_cat_frac_hyd',
+                            'P2O5_Liq_cat_frac_hyd': 'P_Liq_cat_frac_hyd_frac_hyd',
+
+                            })
+
+        return cat_frac_hyd2
+    else:
+        return cat_frac_hyd
 
 # calculating Liquid mole and cation fractions including Ni for Pu et al.
 # 2017 and 2019
@@ -1063,17 +1183,17 @@ def calculate_orthopyroxene_liquid_components(
                 [myLiquids1_comps, myOPXs1_comp], axis=1)
 
     combo_liq_opxs['ln_Fm2Si2O6_liq'] = (np.log(combo_liq_opxs['Fm2Si2O6'].astype('float64') /
-                                                (combo_liq_opxs['SiO2_Liq_cat_frac']**2 * (combo_liq_opxs['FeOt_Liq_cat_frac'] + combo_liq_opxs['MnO_Liq_cat_frac'] + combo_liq_opxs['MgO_Liq_cat_frac'])**2)))
+                                                (combo_liq_opxs['Si_Liq_cat_frac']**2 * (combo_liq_opxs['Fet_Liq_cat_frac'] + combo_liq_opxs['Mn_Liq_cat_frac'] + combo_liq_opxs['Mg_Liq_cat_frac'])**2)))
 
     combo_liq_opxs['ln_FmAl2SiO6_liq'] = (np.log(combo_liq_opxs['FmAl2SiO6'].astype('float64') /
-                                                 (combo_liq_opxs['SiO2_Liq_cat_frac'] * combo_liq_opxs['Al2O3_Liq_cat_frac']**2 * (combo_liq_opxs['FeOt_Liq_cat_frac']
-                                                                                                                                   + combo_liq_opxs['MnO_Liq_cat_frac'] + combo_liq_opxs['MgO_Liq_cat_frac']))))
+                                                 (combo_liq_opxs['Si_Liq_cat_frac'] * combo_liq_opxs['Al_Liq_cat_frac']**2 * (combo_liq_opxs['Fet_Liq_cat_frac']
+                                                                                                                                   + combo_liq_opxs['Mn_Liq_cat_frac'] + combo_liq_opxs['Mg_Liq_cat_frac']))))
     combo_liq_opxs['Kd_Fe_Mg_Fet'] = ((combo_liq_opxs['FeOt_Opx'] / 71.844) / (combo_liq_opxs['MgO_Opx'] / 40.3044)) / (
         (combo_liq_opxs['FeOt_Liq'] / 71.844) / (combo_liq_opxs['MgO_Liq'] / 40.3044))
     combo_liq_opxs['Kd_Fe_Mg_Fe2'] = ((combo_liq_opxs['FeOt_Opx'] / 71.844) / (combo_liq_opxs['MgO_Opx'] / 40.3044)) / (
         ((1 - combo_liq_opxs['Fe3Fet_Liq']) * combo_liq_opxs['FeOt_Liq'] / 71.844) / (combo_liq_opxs['MgO_Liq'] / 40.3044))
     combo_liq_opxs['Ideal_Kd'] = 0.4805 - 0.3733 * \
-        combo_liq_opxs['SiO2_Liq_cat_frac']
+        combo_liq_opxs['Si_Liq_cat_frac']
     combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] = abs(
         combo_liq_opxs['Ideal_Kd'] - combo_liq_opxs['Kd_Fe_Mg_Fe2'])
     b = np.empty(len(combo_liq_opxs), dtype=str)
@@ -1397,26 +1517,26 @@ def calculate_clinopyroxene_liquid_components(
 
 # Measured Kd Fe-Mg (using 2+)
     combo_liq_cpxs['Kd_Fe_Mg_Fe2'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
-        (combo_liq_cpxs['FeOt_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['MgO_Liq_cat_frac'])))
+        (combo_liq_cpxs['Fet_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['Mg_Liq_cat_frac'])))
 
 # Measured Kd Fe-Mg using 2+ in the liquid and Cpx based on Lindley
     combo_liq_cpxs['Kd_Fe_Mg_Fe2_Lind'] = ((combo_liq_cpxs['Lindley_Fe2_Cpx'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
-        (combo_liq_cpxs['FeOt_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['MgO_Liq_cat_frac'])))
+        (combo_liq_cpxs['Fet_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['Mg_Liq_cat_frac'])))
 
 
 # Measured Kd Fe-Mg using Fet
     combo_liq_cpxs['Kd_Fe_Mg_Fet'] = ((combo_liq_cpxs['FeOt_Cpx_cat_6ox'] / combo_liq_cpxs['MgO_Cpx_cat_6ox']) / (
-        (combo_liq_cpxs['FeOt_Liq_cat_frac'] / combo_liq_cpxs['MgO_Liq_cat_frac'])))
+        (combo_liq_cpxs['Fet_Liq_cat_frac'] / combo_liq_cpxs['Mg_Liq_cat_frac'])))
 
-    combo_liq_cpxs['lnK_Jd_liq'] = np.log((combo_liq_cpxs['Jd'].astype(float)) / ((combo_liq_cpxs['Na2O_Liq_cat_frac']) * (
-        combo_liq_cpxs['Al2O3_Liq_cat_frac']) * ((combo_liq_cpxs['SiO2_Liq_cat_frac'])**2)))
+    combo_liq_cpxs['lnK_Jd_liq'] = np.log((combo_liq_cpxs['Jd'].astype(float)) / ((combo_liq_cpxs['Na_Liq_cat_frac']) * (
+        combo_liq_cpxs['Al_Liq_cat_frac']) * ((combo_liq_cpxs['Si_Liq_cat_frac'])**2)))
 
     combo_liq_cpxs['lnK_Jd_DiHd_liq_1996'] = np.log((combo_liq_cpxs['Jd'].astype(float))
-    * (combo_liq_cpxs['CaO_Liq_cat_frac'].astype(float)) * ((combo_liq_cpxs['FeOt_Liq_cat_frac'].astype(float)) + (
-        combo_liq_cpxs['MgO_Liq_cat_frac'].astype(float))) / ((combo_liq_cpxs['DiHd_1996'].astype(float)) * (combo_liq_cpxs['Na2O_Liq_cat_frac'].astype(float)) * (combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))))
+    * (combo_liq_cpxs['Ca_Liq_cat_frac'].astype(float)) * ((combo_liq_cpxs['Fet_Liq_cat_frac'].astype(float)) + (
+        combo_liq_cpxs['Mg_Liq_cat_frac'].astype(float))) / ((combo_liq_cpxs['DiHd_1996'].astype(float)) * (combo_liq_cpxs['Na_Liq_cat_frac'].astype(float)) * (combo_liq_cpxs['Al_Liq_cat_frac'].astype(float))))
 
-    combo_liq_cpxs['lnK_Jd_DiHd_liq_2003'] = np.log((combo_liq_cpxs['Jd'].astype(float)) * (combo_liq_cpxs['CaO_Liq_cat_frac'].astype(float)) * ((combo_liq_cpxs['FeOt_Liq_cat_frac'].astype(float)) + (
-        combo_liq_cpxs['MgO_Liq_cat_frac'].astype(float))) / ((combo_liq_cpxs['DiHd_2003'].astype(float)) * (combo_liq_cpxs['Na2O_Liq_cat_frac'].astype(float)) * (combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))))
+    combo_liq_cpxs['lnK_Jd_DiHd_liq_2003'] = np.log((combo_liq_cpxs['Jd'].astype(float)) * (combo_liq_cpxs['Ca_Liq_cat_frac'].astype(float)) * ((combo_liq_cpxs['Fet_Liq_cat_frac'].astype(float)) + (
+        combo_liq_cpxs['Mg_Liq_cat_frac'].astype(float))) / ((combo_liq_cpxs['DiHd_2003'].astype(float)) * (combo_liq_cpxs['Na_Liq_cat_frac'].astype(float)) * (combo_liq_cpxs['Al_Liq_cat_frac'].astype(float))))
 
     combo_liq_cpxs['Kd_Fe_Mg_IdealWB'] = 0.109 + 0.186 * \
         combo_liq_cpxs['Mgno_Cpx']  # equation 35 of wood and blundy
@@ -3193,8 +3313,8 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
      # Equation 35 of Putirka 2008 - theoretical Kd-Mg exchange coefficient
     Combo_liq_cpxs['Kd_Ideal_Put'] = np.exp(-0.107 - 1719 / T)  # eq 35
-    ratioMasotta = Combo_liq_cpxs['Na2O_Liq_cat_frac'] / (
-        Combo_liq_cpxs['Na2O_Liq_cat_frac'] + Combo_liq_cpxs['K2O_Liq_cat_frac'])
+    ratioMasotta = Combo_liq_cpxs['Na_Liq_cat_frac'] / (
+        Combo_liq_cpxs['Na_Liq_cat_frac'] + Combo_liq_cpxs['K_Liq_cat_frac'])
 
     # Masotta et al. For Alkali basalts
     Combo_liq_cpxs['Kd_Ideal_Masotta'] = np.exp(
@@ -3209,16 +3329,16 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
     # Putirka (1999) DiHd
     Combo_liq_cpxs['DiHd_Pred_Put1999']=(np.exp(-9.8
-    + 0.24*np.log(Combo_liq_cpxs['CaO_Liq_cat_frac']*(Combo_liq_cpxs['FeOt_Liq_cat_frac']+Combo_liq_cpxs['MgO_Liq_cat_frac'])*
-    Combo_liq_cpxs['SiO2_Liq_cat_frac']**2)+17558/T+8.7*np.log(T/1670)-4.61*10**3*(Combo_liq_cpxs['EnFs']**2/T))
+    + 0.24*np.log(Combo_liq_cpxs['Ca_Liq_cat_frac']*(Combo_liq_cpxs['Fet_Liq_cat_frac']+Combo_liq_cpxs['Mg_Liq_cat_frac'])*
+    Combo_liq_cpxs['Si_Liq_cat_frac']**2)+17558/T+8.7*np.log(T/1670)-4.61*10**3*(Combo_liq_cpxs['EnFs']**2/T))
     )
     Combo_liq_cpxs['Delta_DiHd_Put1999'] = abs(
         Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_Put1999'])
     Combo_liq_cpxs['Delta_DiHd_I_M_Put1999']=Combo_liq_cpxs['DiHd_Pred_Put1999']-Combo_liq_cpxs['DiHd_1996']
 
     # One labelled "new", presume from Putirka (2008)
-    Combo_liq_cpxs['DiHd_Pred_P2008']=(np.exp(-0.482-0.439*np.log(Combo_liq_cpxs['SiO2_Liq_cat_frac'])
-    +101.03*(Combo_liq_cpxs['Na2O_Liq_cat_frac']+Combo_liq_cpxs['K2O_Liq_cat_frac'])**3
+    Combo_liq_cpxs['DiHd_Pred_P2008']=(np.exp(-0.482-0.439*np.log(Combo_liq_cpxs['Si_Liq_cat_frac'])
+    +101.03*(Combo_liq_cpxs['Na_Liq_cat_frac']+Combo_liq_cpxs['K_Liq_cat_frac'])**3
     -51.69*P/T-3742.5*Combo_liq_cpxs['EnFs']**2/T) )
     Combo_liq_cpxs['Delta_DiHd_P2008'] = abs(
         Combo_liq_cpxs['DiHd_1996'] - Combo_liq_cpxs['DiHd_Pred_P2008'])
@@ -3226,9 +3346,9 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
 
     # Mollo 2013 for DiHd
-    Combo_liq_cpxs['DiHd_Pred_Mollo13'] = (np.exp(-2.18 - 3.16 * Combo_liq_cpxs['TiO2_Liq_cat_frac']
-    - 0.365 * np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))
-     + 0.05 * np.log(Combo_liq_cpxs['MgO_Liq_cat_frac']) - 3858.2 * (
+    Combo_liq_cpxs['DiHd_Pred_Mollo13'] = (np.exp(-2.18 - 3.16 * Combo_liq_cpxs['Ti_Liq_cat_frac']
+    - 0.365 * np.log(Combo_liq_cpxs['Al_Liq_cat_frac'].astype(float))
+     + 0.05 * np.log(Combo_liq_cpxs['Mg_Liq_cat_frac']) - 3858.2 * (
                                                     Combo_liq_cpxs['EnFs']**2 / T) + (2107.4 / T)
                                                 - 17.64 * P / T))
     Combo_liq_cpxs['Delta_DiHd_Mollo13'] = abs(
@@ -3240,8 +3360,8 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
     # Putirka En Fs
     Combo_liq_cpxs['EnFs_Pred_Put1999']=( np.exp(-6.96+18438/T+8*np.log(T/1670)
-    +0.66*np.log((Combo_liq_cpxs['FeOt_Liq_cat_frac']+Combo_liq_cpxs['MgO_Liq_cat_frac'])**2*Combo_liq_cpxs['SiO2_Liq_cat_frac']**2)
-    -5.1*10**3*(Combo_liq_cpxs['DiHd_1996']**2/T)+1.81*np.log(Combo_liq_cpxs['SiO2_Liq_cat_frac']) ))
+    +0.66*np.log((Combo_liq_cpxs['Fet_Liq_cat_frac']+Combo_liq_cpxs['Mg_Liq_cat_frac'])**2*Combo_liq_cpxs['Si_Liq_cat_frac']**2)
+    -5.1*10**3*(Combo_liq_cpxs['DiHd_1996']**2/T)+1.81*np.log(Combo_liq_cpxs['Si_Liq_cat_frac']) ))
     Combo_liq_cpxs['Delta_EnFs_Put1999'] = abs(
         Combo_liq_cpxs['EnFs'] - Combo_liq_cpxs['EnFs_Pred_Put1999'])
     Combo_liq_cpxs['Delta_EnFs_I_M_Put1999'] = Combo_liq_cpxs['EnFs_Pred_Put1999']-Combo_liq_cpxs['EnFs']
@@ -3251,12 +3371,12 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
     # En Fs Mollo
 
-    Combo_liq_cpxs['EnFs_Pred_Mollo13'] = (np.exp(0.018 - 9.61 * Combo_liq_cpxs['CaO_Liq_cat_frac'] +
+    Combo_liq_cpxs['EnFs_Pred_Mollo13'] = (np.exp(0.018 - 9.61 * Combo_liq_cpxs['Ca_Liq_cat_frac'] +
                                                 7.46 *
-                                                Combo_liq_cpxs['MgO_Liq_cat_frac'] *
-                                                Combo_liq_cpxs['SiO2_Liq_cat_frac']
-                                                - 0.34 *np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float))
-                                                - 3.78 * (Combo_liq_cpxs['Na2O_Liq_cat_frac'] + Combo_liq_cpxs['K2O_Liq_cat_frac']) -
+                                                Combo_liq_cpxs['Mg_Liq_cat_frac'] *
+                                                Combo_liq_cpxs['Si_Liq_cat_frac']
+                                                - 0.34 *np.log(Combo_liq_cpxs['Al_Liq_cat_frac'].astype(float))
+                                                - 3.78 * (Combo_liq_cpxs['Na_Liq_cat_frac'] + Combo_liq_cpxs['K_Liq_cat_frac']) -
                                                 3737.3 * (Combo_liq_cpxs['DiHd_1996']**2) / T - 46.8 * P / T))
     Combo_liq_cpxs['Delta_EnFs_Mollo13'] = abs(
         Combo_liq_cpxs['EnFs'] - Combo_liq_cpxs['EnFs_Pred_Mollo13'])
@@ -3266,9 +3386,9 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     #  CaTs equilibrium (Mollo didnt release on of these)
 
     Combo_liq_cpxs['CaTs_Pred_Put1999'] = (np.exp(2.58 + 0.12 * P / T - 9 * 10**(-7) * P**2 / T
-    + 0.78 * np.log(Combo_liq_cpxs['CaO_Liq_cat_frac'].astype(float)
-    * Combo_liq_cpxs['Al2O3_Liq_cat_frac'].astype(float)**2
-    * Combo_liq_cpxs['SiO2_Liq_cat_frac'].astype(float)) - 4.3 * 10**3 * (Combo_liq_cpxs['DiHd_1996']**2 / T)))
+    + 0.78 * np.log(Combo_liq_cpxs['Ca_Liq_cat_frac'].astype(float)
+    * Combo_liq_cpxs['Al_Liq_cat_frac'].astype(float)**2
+    * Combo_liq_cpxs['Si_Liq_cat_frac'].astype(float)) - 4.3 * 10**3 * (Combo_liq_cpxs['DiHd_1996']**2 / T)))
 
     Combo_liq_cpxs['Delta_CaTs_Put1999'] = abs(
         Combo_liq_cpxs['CaTs'] - Combo_liq_cpxs['CaTs_Pred_Put1999'])
@@ -3277,18 +3397,18 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
     #CrCaTs component
 
-    Combo_liq_cpxs['CrCaTs_Pred_Put1999'] = (np.exp(12.8) * Combo_liq_cpxs['CaO_Liq_cat_frac'] * (
-        Combo_liq_cpxs['Cr2O3_Liq_cat_frac']**2) * Combo_liq_cpxs['SiO2_Liq_cat_frac'])
+    Combo_liq_cpxs['CrCaTs_Pred_Put1999'] = (np.exp(12.8) * Combo_liq_cpxs['Ca_Liq_cat_frac'] * (
+        Combo_liq_cpxs['Cr2O3_Liq_cat_frac']**2) * Combo_liq_cpxs['Si_Liq_cat_frac'])
     Combo_liq_cpxs['Delta_CrCaTs_Put1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_Put1999'])
     Combo_liq_cpxs['Delta_CrCaTs_I_M_Put1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_Put1999'])
 
     # CaTi component
 
-    Combo_liq_cpxs['CaTi_Pred_Put1999']=( np.exp(5.1 + 0.52*np.log(Combo_liq_cpxs['CaO_Liq_cat_frac']*Combo_liq_cpxs['TiO2_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']**2)
-    +2.04*10**(3)* (Combo_liq_cpxs['DiHd_1996']**2 / T)- 6.2* Combo_liq_cpxs['SiO2_Liq_cat_frac']
-    +42.5*Combo_liq_cpxs['Na2O_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']
-    - 45.1*(Combo_liq_cpxs['FeOt_Liq_cat_frac']
-    +Combo_liq_cpxs['MgO_Liq_cat_frac'])*Combo_liq_cpxs['Al2O3_Liq_cat_frac'] ))
+    Combo_liq_cpxs['CaTi_Pred_Put1999']=( np.exp(5.1 + 0.52*np.log(Combo_liq_cpxs['Ca_Liq_cat_frac']*Combo_liq_cpxs['Ti_Liq_cat_frac']*Combo_liq_cpxs['Al_Liq_cat_frac']**2)
+    +2.04*10**(3)* (Combo_liq_cpxs['DiHd_1996']**2 / T)- 6.2* Combo_liq_cpxs['Si_Liq_cat_frac']
+    +42.5*Combo_liq_cpxs['Na_Liq_cat_frac']*Combo_liq_cpxs['Al_Liq_cat_frac']
+    - 45.1*(Combo_liq_cpxs['Fet_Liq_cat_frac']
+    +Combo_liq_cpxs['Mg_Liq_cat_frac'])*Combo_liq_cpxs['Al_Liq_cat_frac'] ))
 
     Combo_liq_cpxs['Delta_CaTi_Put1999']=abs(Combo_liq_cpxs['CaTi']-Combo_liq_cpxs['CaTi_Pred_Put1999'])
     Combo_liq_cpxs['Delta_CaTi_I_M_Put1999']=abs(Combo_liq_cpxs['CaTi']-Combo_liq_cpxs['CaTi_Pred_Put1999'])
@@ -3296,8 +3416,8 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
     # Jd component
     Combo_liq_cpxs['Jd_Pred_Put1999']=(np.exp(-1.06+0.23*P/T-6*10**(-7)*P**2/T
-    +1.02*np.log(Combo_liq_cpxs['Na2O_Liq_cat_frac']*Combo_liq_cpxs['Al2O3_Liq_cat_frac']*Combo_liq_cpxs['SiO2_Liq_cat_frac']**2)
-    -0.8*np.log(Combo_liq_cpxs['Al2O3_Liq_cat_frac'])-2.2*np.log(Combo_liq_cpxs['SiO2_Liq_cat_frac'])))
+    +1.02*np.log(Combo_liq_cpxs['Na_Liq_cat_frac']*Combo_liq_cpxs['Al_Liq_cat_frac']*Combo_liq_cpxs['Si_Liq_cat_frac']**2)
+    -0.8*np.log(Combo_liq_cpxs['Al_Liq_cat_frac'])-2.2*np.log(Combo_liq_cpxs['Si_Liq_cat_frac'])))
     Combo_liq_cpxs['Delta_Jd_Put1999']=abs(Combo_liq_cpxs['Jd']-Combo_liq_cpxs['Jd_Pred_Put1999'])
     Combo_liq_cpxs['Delta_Jd_I_M_Put1999']=abs(Combo_liq_cpxs['Jd']-Combo_liq_cpxs['Jd_Pred_Put1999'])
 
@@ -3436,36 +3556,36 @@ P, T):
 
     combo_plag_liq['P'] = P
     combo_plag_liq['T'] = T
-    Pred_An_EqE = (np.exp(-3.485 + 22.93 * combo_plag_liq['CaO_Liq_cat_frac'] + 0.0805 * combo_plag_liq['H2O_Liq']
-                          + 1.0925 * combo_plag_liq['CaO_Liq_cat_frac'] / (combo_plag_liq['CaO_Liq_cat_frac'] + combo_plag_liq['Na2O_Liq_cat_frac']) +
-                          13.11 * combo_plag_liq['Al2O3_Liq_cat_frac'] / (
-                              combo_plag_liq['Al2O3_Liq_cat_frac'] + combo_plag_liq['SiO2_Liq_cat_frac'])
+    Pred_An_EqE = (np.exp(-3.485 + 22.93 * combo_plag_liq['Ca_Liq_cat_frac'] + 0.0805 * combo_plag_liq['H2O_Liq']
+                          + 1.0925 * combo_plag_liq['Ca_Liq_cat_frac'] / (combo_plag_liq['Ca_Liq_cat_frac'] + combo_plag_liq['Na_Liq_cat_frac']) +
+                          13.11 * combo_plag_liq['Al_Liq_cat_frac'] / (
+                              combo_plag_liq['Al_Liq_cat_frac'] + combo_plag_liq['Si_Liq_cat_frac'])
                           + 5.59258 *
-                          combo_plag_liq['SiO2_Liq_cat_frac']**3 -
+                          combo_plag_liq['Si_Liq_cat_frac']**3 -
                           38.786 * P / (T)
                           - 125.04 *
-                          combo_plag_liq['CaO_Liq_cat_frac'] *
-                          combo_plag_liq['Al2O3_Liq_cat_frac']
-                          + 8.958 * combo_plag_liq['SiO2_Liq_cat_frac'] * combo_plag_liq['K2O_Liq_cat_frac'] - 2589.27 / (T)))
+                          combo_plag_liq['Ca_Liq_cat_frac'] *
+                          combo_plag_liq['Al_Liq_cat_frac']
+                          + 8.958 * combo_plag_liq['Si_Liq_cat_frac'] * combo_plag_liq['K_Liq_cat_frac'] - 2589.27 / (T)))
 
-    Pred_Ab_EqF = (np.exp(-2.748 - 0.1553 * combo_plag_liq['H2O_Liq'] + 1.017 * combo_plag_liq['Mg_Number_Liq_NoFe3'] - 1.997 * combo_plag_liq['SiO2_Liq_cat_frac']**3 + 54.556 * P / T
+    Pred_Ab_EqF = (np.exp(-2.748 - 0.1553 * combo_plag_liq['H2O_Liq'] + 1.017 * combo_plag_liq['Mg_Number_Liq_NoFe3'] - 1.997 * combo_plag_liq['Si_Liq_cat_frac']**3 + 54.556 * P / T
                           - 67.878 *
-                          combo_plag_liq['K2O_Liq_cat_frac'] *
-                          combo_plag_liq['Al2O3_Liq_cat_frac']
-                          - 99.03 * combo_plag_liq['CaO_Liq_cat_frac'] * combo_plag_liq['Al2O3_Liq_cat_frac'] + 4175.307 / T))
+                          combo_plag_liq['K_Liq_cat_frac'] *
+                          combo_plag_liq['Al_Liq_cat_frac']
+                          - 99.03 * combo_plag_liq['Ca_Liq_cat_frac'] * combo_plag_liq['Al_Liq_cat_frac'] + 4175.307 / T))
 
-    Pred_Or_EqG = (np.exp(19.42 - 12.5 * combo_plag_liq['MgO_Liq_cat_frac'] - 161.4 * combo_plag_liq['Na2O_Liq_cat_frac']
-                          - 16.65 * combo_plag_liq['CaO_Liq_cat_frac'] / (
-                              combo_plag_liq['CaO_Liq_cat_frac'] + combo_plag_liq['Na2O_Liq_cat_frac'])
-                          - 528.1 * combo_plag_liq['K2O_Liq_cat_frac'] * combo_plag_liq['Al2O3_Liq_cat_frac'] -
-                          19.38 * combo_plag_liq['SiO2_Liq_cat_frac']**3
+    Pred_Or_EqG = (np.exp(19.42 - 12.5 * combo_plag_liq['Mg_Liq_cat_frac'] - 161.4 * combo_plag_liq['Na_Liq_cat_frac']
+                          - 16.65 * combo_plag_liq['Ca_Liq_cat_frac'] / (
+                              combo_plag_liq['Ca_Liq_cat_frac'] + combo_plag_liq['Na_Liq_cat_frac'])
+                          - 528.1 * combo_plag_liq['K_Liq_cat_frac'] * combo_plag_liq['Al_Liq_cat_frac'] -
+                          19.38 * combo_plag_liq['Si_Liq_cat_frac']**3
                           + 168.2 *
-                          combo_plag_liq['SiO2_Liq_cat_frac'] *
-                          combo_plag_liq['Na2O_Liq_cat_frac']
-                          - 1951.2 * combo_plag_liq['CaO_Liq_cat_frac'] * combo_plag_liq['K2O_Liq_cat_frac'] - 10190 / T))
+                          combo_plag_liq['Si_Liq_cat_frac'] *
+                          combo_plag_liq['Na_Liq_cat_frac']
+                          - 1951.2 * combo_plag_liq['Ca_Liq_cat_frac'] * combo_plag_liq['K_Liq_cat_frac'] - 10190 / T))
 
-    Obs_Kd_Ab_An=(combo_plag_liq['Ab_Plag']*combo_plag_liq['Al2O3_Liq_cat_frac']*combo_plag_liq['CaO_Liq_cat_frac']/
-    (combo_plag_liq['An_Plag']*combo_plag_liq['Na2O_Liq_cat_frac']*combo_plag_liq['SiO2_Liq_cat_frac']))
+    Obs_Kd_Ab_An=(combo_plag_liq['Ab_Plag']*combo_plag_liq['Al_Liq_cat_frac']*combo_plag_liq['Ca_Liq_cat_frac']/
+    (combo_plag_liq['An_Plag']*combo_plag_liq['Na_Liq_cat_frac']*combo_plag_liq['Si_Liq_cat_frac']))
 
     relevantT=np.empty(len(combo_plag_liq), dtype=object)
     if isinstance(T, pd.Series):
@@ -3578,18 +3698,18 @@ def calculate_fspar_activity_components(*, Ab_Plag, Or_Plag, An_Plag, Ab_Kspar, 
     return Components
 
 
-def calculate_plag_components(*, CaO_Liq_cat_frac, H2O_Liq, Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac,
-    SiO2_Liq_cat_frac, K2O_Liq_cat_frac, T, P, An_Plag, Ab_Plag, Mg_Number_Liq_NoFe3, MgO_Liq_cat_frac):
+def calculate_plag_components(*, Ca_Liq_cat_frac, H2O_Liq, Na_Liq_cat_frac, Al_Liq_cat_frac,
+    Si_Liq_cat_frac, K_Liq_cat_frac, T, P, An_Plag, Ab_Plag, Mg_Number_Liq_NoFe3, Mg_Liq_cat_frac):
 
-    An_Pred=np.exp(-3.485+22.93*CaO_Liq_cat_frac+0.0805*H2O_Liq+1.0925*CaO_Liq_cat_frac/(CaO_Liq_cat_frac+Na2O_Liq_cat_frac)
-    +13.11*Al2O3_Liq_cat_frac/(Al2O3_Liq_cat_frac+SiO2_Liq_cat_frac)+5.59258*SiO2_Liq_cat_frac**3-
-    38.786*P/(T)-125.04*CaO_Liq_cat_frac*Al2O3_Liq_cat_frac+8.958*SiO2_Liq_cat_frac*K2O_Liq_cat_frac-2589.27/(T))
-    Ab_Pred=np.exp(-2.748-0.1553*H2O_Liq+1.017*Mg_Number_Liq_NoFe3-1.997*SiO2_Liq_cat_frac**3+54.556*P/T-67.878*K2O_Liq_cat_frac*Al2O3_Liq_cat_frac
-    -99.03*CaO_Liq_cat_frac*Al2O3_Liq_cat_frac+4175.307/T)
-    Or_Pred=np.exp(19.42-12.5*MgO_Liq_cat_frac--161.4*Na2O_Liq_cat_frac-16.65*CaO_Liq_cat_frac/(CaO_Liq_cat_frac+Na2O_Liq_cat_frac)
-    -528.1*K2O_Liq_cat_frac*Al2O3_Liq_cat_frac-19.38*SiO2_Liq_cat_frac**3+168.2*SiO2_Liq_cat_frac*Na2O_Liq_cat_frac
-    -1951.2*CaO_Liq_cat_frac*K2O_Liq_cat_frac-10190/T)
-    Obs_Kd_Ab_An=Ab_Plag*Al2O3_Liq_cat_frac*CaO_Liq_cat_frac/(An_Plag*Na2O_Liq_cat_frac*SiO2_Liq_cat_frac)
+    An_Pred=np.exp(-3.485+22.93*Ca_Liq_cat_frac+0.0805*H2O_Liq+1.0925*Ca_Liq_cat_frac/(Ca_Liq_cat_frac+Na_Liq_cat_frac)
+    +13.11*Al_Liq_cat_frac/(Al_Liq_cat_frac+Si_Liq_cat_frac)+5.59258*Si_Liq_cat_frac**3-
+    38.786*P/(T)-125.04*Ca_Liq_cat_frac*Al_Liq_cat_frac+8.958*Si_Liq_cat_frac*K_Liq_cat_frac-2589.27/(T))
+    Ab_Pred=np.exp(-2.748-0.1553*H2O_Liq+1.017*Mg_Number_Liq_NoFe3-1.997*Si_Liq_cat_frac**3+54.556*P/T-67.878*K_Liq_cat_frac*Al_Liq_cat_frac
+    -99.03*Ca_Liq_cat_frac*Al_Liq_cat_frac+4175.307/T)
+    Or_Pred=np.exp(19.42-12.5*Mg_Liq_cat_frac--161.4*Na_Liq_cat_frac-16.65*Ca_Liq_cat_frac/(Ca_Liq_cat_frac+Na_Liq_cat_frac)
+    -528.1*K_Liq_cat_frac*Al_Liq_cat_frac-19.38*Si_Liq_cat_frac**3+168.2*Si_Liq_cat_frac*Na_Liq_cat_frac
+    -1951.2*Ca_Liq_cat_frac*K_Liq_cat_frac-10190/T)
+    Obs_Kd_Ab_An=Ab_Plag*Al_Liq_cat_frac*Ca_Liq_cat_frac/(An_Plag*Na_Liq_cat_frac*Si_Liq_cat_frac)
     Components=pd.DataFrame(data={'An_Pred': An_Pred, 'Ab_Pred': Ab_Pred, 'Or_Pred': Or_Pred})
 
     return Components

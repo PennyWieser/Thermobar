@@ -15,7 +15,7 @@ from Thermobar.core import *
 
 ## Equations for Cpx-Liquid Barometry written as functions
 
-def P_Put1996_eqP1(T, *, lnK_Jd_liq, Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac):
+def P_Put1996_eqP1(T, *, lnK_Jd_liq, Na_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Clinopyroxene-liquid barometer of Putirka (1996) EqP1
 
@@ -24,11 +24,11 @@ def P_Put1996_eqP1(T, *, lnK_Jd_liq, Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac):
 
     '''
     return - 54.3 + 299 * T / 10 ** 4 + 36.4 * T * lnK_Jd_liq / \
-        10 ** 4 + 367 * Na2O_Liq_cat_frac * Al2O3_Liq_cat_frac
+        10 ** 4 + 367 * Na_Liq_cat_frac * Al_Liq_cat_frac
 
 
 def P_Mas2013_eqPalk1(T, *, lnK_Jd_liq,
-                      Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac):
+                      Na_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid barometer of Putirka (1996) EqP1 by Masotta et al. (2013) for alkaline melts
     | SEE=+-1.71 kbar
@@ -36,21 +36,21 @@ def P_Mas2013_eqPalk1(T, *, lnK_Jd_liq,
     '''
     return - 8.83763538032322 + 79.0497715060127 * T / 10 ** 4 + 11.6474409456619 * \
         T * lnK_Jd_liq / 10 ** 4 + 8.63312603541135 * \
-        Na2O_Liq_cat_frac * Al2O3_Liq_cat_frac
+        Na_Liq_cat_frac * Al_Liq_cat_frac
 
 
-def P_Put1996_eqP2(T, *, lnK_Jd_liq, Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac):
+def P_Put1996_eqP2(T, *, lnK_Jd_liq, Na_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Clinopyroxene-liquid barometer of Putirka (1996) EqP2
 
 
     '''
     return (-50.7 + 394 * T / 10 ** 4 + 36.4 * T * lnK_Jd_liq / 10 ** 4 -
-            20 * (T / 10**4) * np.log(1 / (Na2O_Liq_cat_frac.astype(float) * Al2O3_Liq_cat_frac.astype(float))))
+            20 * (T / 10**4) * np.log(1 / (Na_Liq_cat_frac.astype(float) * Al_Liq_cat_frac.astype(float))))
 
 
 def P_Mas2013_eqPalk2(T, *, lnK_Jd_liq,
-                      Na2O_Liq_cat_frac, Al2O3_Liq_cat_frac):
+                      Na_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid barometer of Putirka (1996)
     EqP2 by Masotta et al. (2013) for alkaline melts
@@ -59,12 +59,12 @@ def P_Mas2013_eqPalk2(T, *, lnK_Jd_liq,
     '''
     return (-6.28332277837751 + 38.1796219610587 * T / 10 ** 4
     + 9.42105316105869 * T * lnK_Jd_liq /
-    10 ** 4 + 6.15641875019196 * (T / 10**4) * np.log(1 / (Na2O_Liq_cat_frac.astype(float)
-    * Al2O3_Liq_cat_frac.astype(float))))
+    10 ** 4 + 6.15641875019196 * (T / 10**4) * np.log(1 / (Na_Liq_cat_frac.astype(float)
+    * Al_Liq_cat_frac.astype(float))))
 
 
-def P_Put2003(T, *, lnK_Jd_liq, CaO_Liq_cat_frac,
-              SiO2_Liq_cat_frac, Mg_Number_Liq_NoFe3):
+def P_Put2003(T, *, lnK_Jd_liq, Ca_Liq_cat_frac,
+              Si_Liq_cat_frac, Mg_Number_Liq_NoFe3):
     '''
     Clinopyroxene-liquid barometer of Putirka (2003) Eq1
 
@@ -73,13 +73,13 @@ def P_Put2003(T, *, lnK_Jd_liq, CaO_Liq_cat_frac,
 
     '''
     return (- 88.3 + 0.00282 * T * lnK_Jd_liq + 0.0219 * T
-    - 25.1 * np.log(CaO_Liq_cat_frac.astype(float) *
-    SiO2_Liq_cat_frac.astype(float))
-    + 12.4 * np.log(CaO_Liq_cat_frac.astype(float)) + 7.03 * Mg_Number_Liq_NoFe3)
+    - 25.1 * np.log(Ca_Liq_cat_frac.astype(float) *
+    Si_Liq_cat_frac.astype(float))
+    + 12.4 * np.log(Ca_Liq_cat_frac.astype(float)) + 7.03 * Mg_Number_Liq_NoFe3)
 
 
-def P_Put2008_eq30(T, *, lnK_Jd_liq, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
-                   DiHd_2003, Mg_Number_Liq_NoFe3, Na2O_Liq_cat_frac, K2O_Liq_cat_frac, H2O_Liq):
+def P_Put2008_eq30(T, *, lnK_Jd_liq, Fet_Liq_cat_frac, Mg_Liq_cat_frac,
+                   DiHd_2003, Mg_Number_Liq_NoFe3, Na_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
     '''
     Clinopyroxene-liquid barometer of Putirka (2008) Eq30
 
@@ -87,77 +87,77 @@ def P_Put2008_eq30(T, *, lnK_Jd_liq, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
     | SEE=+-1.6 kbar (calibration data)
 
     '''
-    return (-48.7 + 271.3 * (T / 10**4) + 31.96 * (T / 10**4) * lnK_Jd_liq - 8.2 * np.log(FeOt_Liq_cat_frac.astype(float))
-            + 4.6 * np.log(MgO_Liq_cat_frac.astype(float)) - 0.96 * np.log(K2O_Liq_cat_frac.astype(float))
-            - 2.2 * np.log(DiHd_2003.astype(float)) - 31 * Mg_Number_Liq_NoFe3 + 56.2 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) + 0.76 * H2O_Liq)
+    return (-48.7 + 271.3 * (T / 10**4) + 31.96 * (T / 10**4) * lnK_Jd_liq - 8.2 * np.log(Fet_Liq_cat_frac.astype(float))
+            + 4.6 * np.log(Mg_Liq_cat_frac.astype(float)) - 0.96 * np.log(K_Liq_cat_frac.astype(float))
+            - 2.2 * np.log(DiHd_2003.astype(float)) - 31 * Mg_Number_Liq_NoFe3 + 56.2 * (Na_Liq_cat_frac + K_Liq_cat_frac) + 0.76 * H2O_Liq)
 
 
-def P_Put2008_eq31(T, *, lnK_Jd_liq, CaO_Liq_cat_frac, Na2O_Liq_cat_frac, K2O_Liq_cat_frac, SiO2_Liq_cat_frac, MgO_Liq_cat_frac,
-                   FeOt_Liq_cat_frac, DiHd_2003, EnFs, Al2O3_Cpx_cat_6ox, H2O_Liq):
+def P_Put2008_eq31(T, *, lnK_Jd_liq, Ca_Liq_cat_frac, Na_Liq_cat_frac, K_Liq_cat_frac, Si_Liq_cat_frac, Mg_Liq_cat_frac,
+                   Fet_Liq_cat_frac, DiHd_2003, EnFs, Al2O3_Cpx_cat_6ox, H2O_Liq):
     '''
     Clinopyroxene-liquid barometer of Putirka (2008) Eq31
 
     | SEE=+-2.9 kbar (all data)
     '''
-    return (-40.73 + 358 * (T / 10**4) + 21.7 * (T / 10**4) * lnK_Jd_liq - 106 * CaO_Liq_cat_frac - 166 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac)**2
-            - 50.2 * SiO2_Liq_cat_frac *
-            (MgO_Liq_cat_frac + FeOt_Liq_cat_frac) -
+    return (-40.73 + 358 * (T / 10**4) + 21.7 * (T / 10**4) * lnK_Jd_liq - 106 * Ca_Liq_cat_frac - 166 * (Na_Liq_cat_frac + K_Liq_cat_frac)**2
+            - 50.2 * Si_Liq_cat_frac *
+            (Mg_Liq_cat_frac + Fet_Liq_cat_frac) -
             3.2 * np.log(DiHd_2003.astype(float)) - 2.2 * np.log(EnFs.astype(float))
             + 0.86 * np.log(Al2O3_Cpx_cat_6ox.astype(float)) + 0.4 * H2O_Liq)
 
 
-def P_Put2008_eq32c(T, *, FeOt_Liq_cat_frac, CaTs, H2O_Liq, CaO_Liq_cat_frac,
-                    SiO2_Liq_cat_frac, Al2O3_Cpx_cat_6ox, Al2O3_Liq_cat_frac):
+def P_Put2008_eq32c(T, *, Fet_Liq_cat_frac, CaTs, H2O_Liq, Ca_Liq_cat_frac,
+                    Si_Liq_cat_frac, Al2O3_Cpx_cat_6ox, Al_Liq_cat_frac):
     '''
     Clinopyroxene-liquid barometer of Putirka (2008) Eq32c based on partitioning of Al between cpx and liquid
 
     | SEE=+-5 kbar (all data)
     | SEE=+-1.5 kbar (calibration data)
     '''
-    return (-57.9 + 0.0475 * (T) - 40.6 * FeOt_Liq_cat_frac - 47.7 * CaTs + 0.67 * H2O_Liq -
-            153 * CaO_Liq_cat_frac * SiO2_Liq_cat_frac + 6.89 * (Al2O3_Cpx_cat_6ox / Al2O3_Liq_cat_frac))
+    return (-57.9 + 0.0475 * (T) - 40.6 * Fet_Liq_cat_frac - 47.7 * CaTs + 0.67 * H2O_Liq -
+            153 * Ca_Liq_cat_frac * Si_Liq_cat_frac + 6.89 * (Al2O3_Cpx_cat_6ox / Al_Liq_cat_frac))
 
 
-def P_Mas2013_eqalk32c(T, *, FeOt_Liq_cat_frac, CaTs, H2O_Liq, CaO_Liq_cat_frac,
-                       SiO2_Liq_cat_frac, Al2O3_Cpx_cat_6ox, Al2O3_Liq_cat_frac):
+def P_Mas2013_eqalk32c(T, *, Fet_Liq_cat_frac, CaTs, H2O_Liq, Ca_Liq_cat_frac,
+                       Si_Liq_cat_frac, Al2O3_Cpx_cat_6ox, Al_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid barometer of Putirka (2008) Eq32c by Masotta et al. (2013) for alkaline melts
     | SEE=+-1.67 kbar
     '''
     return (-16.3446543551989 + 0.0141435837038975 * (T)
-    - 12.3909508275802 * FeOt_Liq_cat_frac - 9.19220692402416 * CaTs
-    + 0.214041799294945 * H2O_Liq + 38.734045560859 * CaO_Liq_cat_frac * SiO2_Liq_cat_frac
-    + 1.5944198112849 * (Al2O3_Cpx_cat_6ox / Al2O3_Liq_cat_frac))
+    - 12.3909508275802 * Fet_Liq_cat_frac - 9.19220692402416 * CaTs
+    + 0.214041799294945 * H2O_Liq + 38.734045560859 * Ca_Liq_cat_frac * Si_Liq_cat_frac
+    + 1.5944198112849 * (Al2O3_Cpx_cat_6ox / Al_Liq_cat_frac))
 
 
 def P_Mas2013_Palk2012(T=None, *, lnK_Jd_liq, H2O_Liq,
-                       Na2O_Liq_cat_frac, K2O_Liq_cat_frac, Kd_Fe_Mg_Fet):
+                       Na_Liq_cat_frac, K_Liq_cat_frac, Kd_Fe_Mg_Fet):
     '''
     Clinopyroxene-liquid barometer of Masotta et al. (2013) for alkaline melts
     | SEE=+-1.15 kbar
     '''
     return (-3.88903951262765 + 0.277651046511846 * np.exp(lnK_Jd_liq)
-    + 0.0740292491471828 * H2O_Liq + 5.00912129248619 * (Na2O_Liq_cat_frac)
-    / (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) + 6.39451438456963 * Kd_Fe_Mg_Fet)
+    + 0.0740292491471828 * H2O_Liq + 5.00912129248619 * (Na_Liq_cat_frac)
+    / (Na_Liq_cat_frac + K_Liq_cat_frac) + 6.39451438456963 * Kd_Fe_Mg_Fet)
 
 
-def P_Wieser2021_H2O_indep(T=None, *, MgO_Liq, CaO_Liq_cat_frac, lnK_Jd_liq, Jd,
-                           CaTs, Na2O_Liq_cat_frac, FeOt_Liq_cat_frac, Al2O3_Cpx_cat_6ox, Mg_Number_Liq_NoFe3):
-    return (3.204423282096874 + 1.21811674 * MgO_Liq - 168.80037558 * CaO_Liq_cat_frac
+def P_Wieser2021_H2O_indep(T=None, *, MgO_Liq, Ca_Liq_cat_frac, lnK_Jd_liq, Jd,
+                           CaTs, Na_Liq_cat_frac, Fet_Liq_cat_frac, Al2O3_Cpx_cat_6ox, Mg_Number_Liq_NoFe3):
+    return (3.204423282096874 + 1.21811674 * MgO_Liq - 168.80037558 * Ca_Liq_cat_frac
     + 1.49243994 * lnK_Jd_liq + 58.22419473 * Jd + 76.11682662 * CaTs
-    - 29.27503912 * Na2O_Liq_cat_frac + 33.34059394 * FeOt_Liq_cat_frac
+    - 29.27503912 * Na_Liq_cat_frac + 33.34059394 * Fet_Liq_cat_frac
     - 8.50428995 * Al2O3_Cpx_cat_6ox + 4.98260164 * Mg_Number_Liq_NoFe3)
 
 
-def P_Neave2017(T, *, lnK_Jd_liq, DiHd_2003, Al2O3_Liq_cat_frac,
-                Na2O_Liq_cat_frac, K2O_Liq_cat_frac):
+def P_Neave2017(T, *, lnK_Jd_liq, DiHd_2003, Al_Liq_cat_frac,
+                Na_Liq_cat_frac, K_Liq_cat_frac):
     '''
     Clinopyroxene-liquid barometer of Neave and Putirka (2017) Putirka (2008)  based on Jd in pyroxene
 
     | SEE=+-1.4 kbar
     '''
     return (-26.2712 + 39.16138 * T * lnK_Jd_liq / 10**4 - 4.21676 * np.log(DiHd_2003.astype(float))
-            + 78.43463 * Al2O3_Liq_cat_frac + 393.8126 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac)**2)
+            + 78.43463 * Al_Liq_cat_frac + 393.8126 * (Na_Liq_cat_frac + K_Liq_cat_frac)**2)
 
 def P_Petrelli2021_Cpx_Liq(T=None, *, cpx_comps, liq_comps):
     '''
@@ -193,87 +193,87 @@ def P_Petrelli2021_Cpx_Liq(T=None, *, cpx_comps, liq_comps):
 
 
 def T_Put1996_eqT1(P=None, *, lnK_Jd_DiHd_liq_1996,
-                   Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac):
+                   Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac):
     '''
     Clinopyroxene-liquid thermometer of Putirka (1996) EqT1 (pressure-independent)
 
     '''
     return (10 ** 4 / (6.73 - 0.26 * lnK_Jd_DiHd_liq_1996 - 0.86 * np.log(Mg_Number_Liq_NoFe3.astype(float))
-                       + 0.52 * np.log(CaO_Liq_cat_frac.astype(float))))
+                       + 0.52 * np.log(Ca_Liq_cat_frac.astype(float))))
 
 
 def T_Mas2013_eqTalk1(P=None, *, lnK_Jd_DiHd_liq_1996,
-                      Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac):
+                      Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid thermometer of Putirka (1996) EqT1 by Masotta et al. (2013) for alkaline melts
     |  SEE=+-31.6°C
     '''
     return (10 ** 4 / (6.7423126317975 - 0.023236627691972 * lnK_Jd_DiHd_liq_1996 -
-            0.68839419999351 * np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.153193056441978 * np.log(CaO_Liq_cat_frac.astype(float))))
+            0.68839419999351 * np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.153193056441978 * np.log(Ca_Liq_cat_frac.astype(float))))
 
 
 def T_Put1996_eqT2(P, *, lnK_Jd_DiHd_liq_1996,
-                   Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac):
+                   Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac):
     '''
     Clinopyroxene-liquid thermometer of Putirka (1996) EqT2 (pressure-dependent)
 
     '''
     return (10 ** 4 / (6.59 - 0.16 * lnK_Jd_DiHd_liq_1996 - 0.65 * np.log(Mg_Number_Liq_NoFe3.astype(float))
-                       + 0.23 * np.log(CaO_Liq_cat_frac.astype(float)) - 0.02 * P))
+                       + 0.23 * np.log(Ca_Liq_cat_frac.astype(float)) - 0.02 * P))
 
 
 def T_Mas2013_eqTalk2(P, *, lnK_Jd_DiHd_liq_1996,
-                      Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac):
+                      Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid thermometer of Putirka (1996) EqT2 by Masotta et al. (2013) for alkaline melts
     |  SEE=+-31.2°C
     '''
     return (10 ** 4 / (6.52396326315485 - 0.0396542787609402 * lnK_Jd_DiHd_liq_1996 - 0.680638985726502 *
-            np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.145757123805013 * np.log(CaO_Liq_cat_frac.astype(float)) + 0.0790582631912926 * P))
+            np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.145757123805013 * np.log(Ca_Liq_cat_frac.astype(float)) + 0.0790582631912926 * P))
 
 
-def T_Put1999(P, *, MgO_Liq_cat_frac, FeOt_Liq_cat_frac,
-              CaO_Liq_cat_frac, SiO2_Liq_cat_frac, Al2O3_Liq_cat_frac):
+def T_Put1999(P, *, Mg_Liq_cat_frac, Fet_Liq_cat_frac,
+              Ca_Liq_cat_frac, Si_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Equation in Keith's Cpx-Liquid spreadsheet labelled "Putirka 1999".
 
     '''
 
-    return (10 ** 4 / (3.12 - 0.0259 * P - 0.37 * np.log(MgO_Liq_cat_frac.astype(float) / (MgO_Liq_cat_frac.astype(float) + FeOt_Liq_cat_frac.astype(float)))
-                       + 0.47 * np.log(CaO_Liq_cat_frac.astype(float) * (MgO_Liq_cat_frac.astype(float) +
-                        FeOt_Liq_cat_frac.astype(float)) * (SiO2_Liq_cat_frac.astype(float))**2)
-                       - 0.78 * np.log((MgO_Liq_cat_frac.astype(float) + FeOt_Liq_cat_frac.astype(float))
-                                       ** 2 * (SiO2_Liq_cat_frac.astype(float))**2)
-                       - 0.34 * np.log(CaO_Liq_cat_frac.astype(float) * (Al2O3_Liq_cat_frac.astype(float))**2 * SiO2_Liq_cat_frac.astype(float))))
+    return (10 ** 4 / (3.12 - 0.0259 * P - 0.37 * np.log(Mg_Liq_cat_frac.astype(float) / (Mg_Liq_cat_frac.astype(float) + Fet_Liq_cat_frac.astype(float)))
+                       + 0.47 * np.log(Ca_Liq_cat_frac.astype(float) * (Mg_Liq_cat_frac.astype(float) +
+                        Fet_Liq_cat_frac.astype(float)) * (Si_Liq_cat_frac.astype(float))**2)
+                       - 0.78 * np.log((Mg_Liq_cat_frac.astype(float) + Fet_Liq_cat_frac.astype(float))
+                                       ** 2 * (Si_Liq_cat_frac.astype(float))**2)
+                       - 0.34 * np.log(Ca_Liq_cat_frac.astype(float) * (Al_Liq_cat_frac.astype(float))**2 * Si_Liq_cat_frac.astype(float))))
 
 
 def T_Put2003(P, *, lnK_Jd_DiHd_liq_2003, Mg_Number_Liq_NoFe3,
-              Na2O_Liq_cat_frac, SiO2_Liq_cat_frac, Jd):
+              Na_Liq_cat_frac, Si_Liq_cat_frac, Jd):
     '''
     Clinopyroxene-liquid thermometer of Putirka (2003)
 
     '''
     return (10 ** 4 / (4.6 - 0.437 * lnK_Jd_DiHd_liq_2003 - 0.654 * np.log(Mg_Number_Liq_NoFe3.astype(float))
-    - 0.326 * np.log(Na2O_Liq_cat_frac.astype(float)) -0.92 * np.log(SiO2_Liq_cat_frac.astype(float))
+    - 0.326 * np.log(Na_Liq_cat_frac.astype(float)) -0.92 * np.log(Si_Liq_cat_frac.astype(float))
     + 0.274 * np.log(Jd.astype(float)) - 0.00632 * P))
 
 
-def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2_Liq_cat_frac,
-                   TiO2_Liq_cat_frac, Na2O_Liq_cat_frac, K2O_Liq_cat_frac, EnFs, lnK_Jd_DiHd_liq_2003):
+def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_Liq_cat_frac,
+                   Ti_Liq_cat_frac, Na_Liq_cat_frac, K_Liq_cat_frac, EnFs, lnK_Jd_DiHd_liq_2003):
     '''
     Clinopyroxene-liquid  thermometer of Putirka (2008) Eq 33.
 
     |  SEE=+-45°C (all data)
     '''
     return (10 ** 4 / (7.53 + 0.07 * H2O_Liq - 1.1 * Mg_Number_Liq_NoFe3
-    - 14.9 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac) -
-    0.08 * np.log(TiO2_Liq_cat_frac.astype(float))
-    - 3.62 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac) - 0.18 * np.log(EnFs.astype(float))
+    - 14.9 * (Ca_Liq_cat_frac * Si_Liq_cat_frac) -
+    0.08 * np.log(Ti_Liq_cat_frac.astype(float))
+    - 3.62 * (Na_Liq_cat_frac + K_Liq_cat_frac) - 0.18 * np.log(EnFs.astype(float))
     - 0.14 * lnK_Jd_DiHd_liq_2003 - 0.027 * P))
 
 
-def T_Mas2013_eqalk33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2_Liq_cat_frac,
-                      TiO2_Liq_cat_frac, Na2O_Liq_cat_frac, K2O_Liq_cat_frac, EnFs, lnK_Jd_DiHd_liq_2003):
+def T_Mas2013_eqalk33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_Liq_cat_frac,
+                      Ti_Liq_cat_frac, Na_Liq_cat_frac, K_Liq_cat_frac, EnFs, lnK_Jd_DiHd_liq_2003):
     '''
     Recalibration of the clinopyroxene-liquid thermometer of Putirka (2008)
     Eq 33 by Masotta et al. (2013) for alkaline melts
@@ -281,9 +281,9 @@ def T_Mas2013_eqalk33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2
     '''
     return (10 ** 4 / (6.80728851520843 + 0.0500993963259582 * H2O_Liq
     - 1.91449550102791 * Mg_Number_Liq_NoFe3
-    - 25.0429785936576 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac) -
-    0.304200646919069 * np.log(TiO2_Liq_cat_frac.astype(float))
-    + 2.25444204541222 * (Na2O_Liq_cat_frac + K2O_Liq_cat_frac)
+    - 25.0429785936576 * (Ca_Liq_cat_frac * Si_Liq_cat_frac) -
+    0.304200646919069 * np.log(Ti_Liq_cat_frac.astype(float))
+    + 2.25444204541222 * (Na_Liq_cat_frac + K_Liq_cat_frac)
     - 0.021072700182831 * np.log(EnFs.astype(float))
     + 0.00268252978603778 * lnK_Jd_DiHd_liq_2003
     + 0.0614725514133312 * P))
@@ -291,8 +291,8 @@ def T_Mas2013_eqalk33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, CaO_Liq_cat_frac, SiO2
 
 # ones without P in the function
 def T_Mas2013_Talk2012(P=None, *, H2O_Liq, Kd_Fe_Mg_Fet, lnK_Jd_DiHd_liq_2003,
-Mg_Number_Liq_NoFe3, DiHd_2003, Na2O_Liq_cat_frac, K2O_Liq_cat_frac,
-TiO2_Liq_cat_frac, lnK_Jd_liq, CaO_Liq_cat_frac, SiO2_Liq_cat_frac):
+Mg_Number_Liq_NoFe3, DiHd_2003, Na_Liq_cat_frac, K_Liq_cat_frac,
+Ti_Liq_cat_frac, lnK_Jd_liq, Ca_Liq_cat_frac, Si_Liq_cat_frac):
     '''
     Clinopyroxene-liquid thermometer of Masotta et al. (2013) for alkaline melts
     | SEE=+-18.2C
@@ -300,22 +300,22 @@ TiO2_Liq_cat_frac, lnK_Jd_liq, CaO_Liq_cat_frac, SiO2_Liq_cat_frac):
     return (10**4 / (2.90815635794002 - 0.400827676578132 * lnK_Jd_DiHd_liq_2003
         + 0.0375720784518263 * H2O_Liq - 1.6383282971929 *
         (Mg_Number_Liq_NoFe3 / DiHd_2003) + 1.01129776262724 *
-        ((Na2O_Liq_cat_frac) / (Na2O_Liq_cat_frac + K2O_Liq_cat_frac))
-        - 0.21766733252629 * np.log(TiO2_Liq_cat_frac.astype(float)) + 0.466149612620683
-        * lnK_Jd_liq + 1.61626798988239 * Kd_Fe_Mg_Fet + 23.3855047471225 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac)))
+        ((Na_Liq_cat_frac) / (Na_Liq_cat_frac + K_Liq_cat_frac))
+        - 0.21766733252629 * np.log(Ti_Liq_cat_frac.astype(float)) + 0.466149612620683
+        * lnK_Jd_liq + 1.61626798988239 * Kd_Fe_Mg_Fet + 23.3855047471225 * (Ca_Liq_cat_frac * Si_Liq_cat_frac)))
 
 
-def T_Brug2019(P=None, *, CaTs, DiHd_2003, SiO2_Liq_cat_frac, TiO2_Liq_cat_frac,
-FeOt_Liq_cat_frac, MgO_Liq_cat_frac, CaO_Liq_cat_frac, K2O_Liq_cat_frac):
+def T_Brug2019(P=None, *, CaTs, DiHd_2003, Si_Liq_cat_frac, Ti_Liq_cat_frac,
+Fet_Liq_cat_frac, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac):
     '''
     Clinopyroxene-liquid  thermometer of Brugmann and Till (2019) for evolved systems (Cpx Mg#>64, Al2O3 Cpx<7 wt%, SiO2_Liq>70 wt%)
 
     |  SEE==+-20°C
     '''
     return (273.15 + 300 * (-1.8946098 - 0.6010197 * CaTs - 0.1856423 * DiHd_2003
-+ 4.71248858 * SiO2_Liq_cat_frac + 77.5861878 * TiO2_Liq_cat_frac +
-10.8503727 * FeOt_Liq_cat_frac + 33.6303471 * MgO_Liq_cat_frac
-+ 15.4532888 * CaO_Liq_cat_frac + 15.6390115 * K2O_Liq_cat_frac))
++ 4.71248858 * Si_Liq_cat_frac + 77.5861878 * Ti_Liq_cat_frac +
+10.8503727 * Fet_Liq_cat_frac + 33.6303471 * Mg_Liq_cat_frac
++ 15.4532888 * Ca_Liq_cat_frac + 15.6390115 * K_Liq_cat_frac))
 
 
 
@@ -1103,8 +1103,8 @@ H2O_Liq=None, Return_All_Matches=False):
 
             if Kd_Match == "Masotta":
 
-                ratioMasotta = Combo_liq_cpxs_2['Na2O_Liq_cat_frac'] / (
-                    Combo_liq_cpxs_2['Na2O_Liq_cat_frac'] + Combo_liq_cpxs_2['K2O_Liq_cat_frac'])
+                ratioMasotta = Combo_liq_cpxs_2['Na_Liq_cat_frac'] / (
+                    Combo_liq_cpxs_2['Na_Liq_cat_frac'] + Combo_liq_cpxs_2['K_Liq_cat_frac'])
                 Delta_Kd_T_MinP = abs(
                     np.exp(1.735 - 3056 / Combo_liq_cpxs_2['T_Liq_MinP'] - 1.668 * ratioMasotta) - Combo_liq_cpxs_2['Kd_Fe_Mg_Fe2'])
                 Delta_Kd_T_MaxP = abs(

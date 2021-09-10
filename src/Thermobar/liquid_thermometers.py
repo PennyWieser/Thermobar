@@ -227,14 +227,14 @@ def T_Put2008_eq22_BeattDMg(P, *, calcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_N
 ## Functions for saturation surfaces of minerals based just on liquids
 
 
-def T_Molina2015_amp_sat(P=None, *, MgO_Liq_cat_frac,
-                         CaO_Liq_cat_frac, Al2O3_Liq_cat_frac):
+def T_Molina2015_amp_sat(P=None, *, Mg_Liq_cat_frac,
+                         Ca_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Amphibole-saturation thermometer from Molina et al. (2015)
     '''
 
-    return (273.15 + 107 * np.log(MgO_Liq_cat_frac) - 108 *
-            np.log(CaO_Liq_cat_frac / (CaO_Liq_cat_frac + Al2O3_Liq_cat_frac)) + 1184)
+    return (273.15 + 107 * np.log(Mg_Liq_cat_frac) - 108 *
+            np.log(Ca_Liq_cat_frac / (Ca_Liq_cat_frac + Al_Liq_cat_frac)) + 1184)
 
 def T_Put2016_eq3_amp_sat(P=None, *, FeOt_Liq_mol_frac_hyd, CaO_Liq_mol_frac_hyd, SiO2_Liq_mol_frac_hyd,
                           TiO2_Liq_mol_frac_hyd, MgO_Liq_mol_frac_hyd, MnO_Liq_mol_frac_hyd, Al2O3_Liq_mol_frac_hyd):
@@ -247,43 +247,43 @@ def T_Put2016_eq3_amp_sat(P=None, *, FeOt_Liq_mol_frac_hyd, CaO_Liq_mol_frac_hyd
     - 2.666 * np.log((FeOt_Liq_mol_frac_hyd + MgO_Liq_mol_frac_hyd) * Al2O3_Liq_mol_frac_hyd)))
 
 
-def T_Put1999_cpx_sat(P, *, MgO_Liq_cat_frac, FeOt_Liq_cat_frac,
-                      CaO_Liq_cat_frac, SiO2_Liq_cat_frac, Al2O3_Liq_cat_frac):
+def T_Put1999_cpx_sat(P, *, Mg_Liq_cat_frac, Fet_Liq_cat_frac,
+                      Ca_Liq_cat_frac, Si_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Liquid-only thermometer, Putirka (1999). temperature at which a liquid is saturated
     in clinopyroxene (for a given P).
     '''
-    return (10 ** 4 / (3.12 - 0.0259 * P - 0.37 * np.log(MgO_Liq_cat_frac / (MgO_Liq_cat_frac + FeOt_Liq_cat_frac))
-                       + 0.47 * np.log(CaO_Liq_cat_frac * (MgO_Liq_cat_frac +
-                                                           FeOt_Liq_cat_frac) * (SiO2_Liq_cat_frac)**2)
-                       - 0.78 * np.log((MgO_Liq_cat_frac + FeOt_Liq_cat_frac)
-                                       ** 2 * (SiO2_Liq_cat_frac)**2)
-                       - 0.34 * np.log(CaO_Liq_cat_frac * (Al2O3_Liq_cat_frac)**2 * SiO2_Liq_cat_frac)))
+    return (10 ** 4 / (3.12 - 0.0259 * P - 0.37 * np.log(Mg_Liq_cat_frac / (Mg_Liq_cat_frac + Fet_Liq_cat_frac))
+                       + 0.47 * np.log(Ca_Liq_cat_frac * (Mg_Liq_cat_frac +
+                                                           Fet_Liq_cat_frac) * (Si_Liq_cat_frac)**2)
+                       - 0.78 * np.log((Mg_Liq_cat_frac + Fet_Liq_cat_frac)
+                                       ** 2 * (Si_Liq_cat_frac)**2)
+                       - 0.34 * np.log(Ca_Liq_cat_frac * (Al_Liq_cat_frac)**2 * Si_Liq_cat_frac)))
 
 
-def T_Put2008_eq34_cpx_sat(P, *, H2O_Liq, CaO_Liq_cat_frac, SiO2_Liq_cat_frac, MgO_Liq_cat_frac):
+def T_Put2008_eq34_cpx_sat(P, *, H2O_Liq, Ca_Liq_cat_frac, Si_Liq_cat_frac, Mg_Liq_cat_frac):
     '''
     Liquid-only thermometer- temperature at which a liquid is saturated in clinopyroxene (for a given P). Equation 34 of Putirka et al. (2008)
     '''
-    return (10 ** 4 / (6.39 + 0.076 * H2O_Liq - 5.55 * (CaO_Liq_cat_frac * SiO2_Liq_cat_frac)
-            - 0.386 * np.log(MgO_Liq_cat_frac) - 0.046 * P + 2.2 * (10 ** (-4)) * P**2))
+    return (10 ** 4 / (6.39 + 0.076 * H2O_Liq - 5.55 * (Ca_Liq_cat_frac * Si_Liq_cat_frac)
+            - 0.386 * np.log(Mg_Liq_cat_frac) - 0.046 * P + 2.2 * (10 ** (-4)) * P**2))
 
 
-def T_Beatt1993_opx(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
-                    MnO_Liq_cat_frac, Al2O3_Liq_cat_frac, TiO2_Liq_cat_frac):
+def T_Beatt1993_opx(P, *, Ca_Liq_cat_frac, Fet_Liq_cat_frac, Mg_Liq_cat_frac,
+                    Mn_Liq_cat_frac, Al_Liq_cat_frac, Ti_Liq_cat_frac):
     '''
     Opx-Liquid thermometer of Beattie (1993). Only uses liquid composition.
     Putirka (2008) warn that overpredicts for hydrous compositions at <1200°C, and anhydrous compositions at <1100°C
     '''
     Num_B1993 = 125.9 * 1000 / 8.3144 + \
         ((0.1 * P) * 10**9 - 10**5) * 6.5 * (10**(-6)) / 8.3144
-    D_Mg_opx_li1 = (0.5 - (-0.089 * CaO_Liq_cat_frac - 0.025 * MnO_Liq_cat_frac + 0.129 * FeOt_Liq_cat_frac)) / \
-        (MgO_Liq_cat_frac + 0.072 * CaO_Liq_cat_frac +
-         0.352 * MnO_Liq_cat_frac + 0.264 * FeOt_Liq_cat_frac)
-    Cl_NM = MgO_Liq_cat_frac + FeOt_Liq_cat_frac + \
-        CaO_Liq_cat_frac + MnO_Liq_cat_frac
-    NF = (7 / 2) * np.log(1 - Al2O3_Liq_cat_frac) + \
-        7 * np.log(1 - TiO2_Liq_cat_frac)
+    D_Mg_opx_li1 = (0.5 - (-0.089 * Ca_Liq_cat_frac - 0.025 * Mn_Liq_cat_frac + 0.129 * Fet_Liq_cat_frac)) / \
+        (Mg_Liq_cat_frac + 0.072 * Ca_Liq_cat_frac +
+         0.352 * Mn_Liq_cat_frac + 0.264 * Fet_Liq_cat_frac)
+    Cl_NM = Mg_Liq_cat_frac + Fet_Liq_cat_frac + \
+        Ca_Liq_cat_frac + Mn_Liq_cat_frac
+    NF = (7 / 2) * np.log(1 - Al_Liq_cat_frac) + \
+        7 * np.log(1 - Ti_Liq_cat_frac)
     Den_B1993 = 67.92 / 8.3144 + 2 * \
         np.log(D_Mg_opx_li1) + 2 * np.log(2 * Cl_NM) - NF
     return Num_B1993 / Den_B1993
@@ -291,37 +291,37 @@ def T_Beatt1993_opx(P, *, CaO_Liq_cat_frac, FeOt_Liq_cat_frac, MgO_Liq_cat_frac,
 
 
 
-def T_Put2005_eqD_plag_sat(P, *, CaO_Liq_cat_frac,
-                           H2O_Liq, SiO2_Liq_cat_frac, Al2O3_Liq_cat_frac):
+def T_Put2005_eqD_plag_sat(P, *, Ca_Liq_cat_frac,
+                           H2O_Liq, Si_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Plagioclase-Liquid saturation temperature thermometer of Putirka (2005) eq. D
     '''
-    return ((10**4 / (8.759 - 6.396 * CaO_Liq_cat_frac + 0.2147 * H2O_Liq + 1.221 *
-            SiO2_Liq_cat_frac**3 - 1.751 * 10**-2 * P - 8.043 * Al2O3_Liq_cat_frac)))
+    return ((10**4 / (8.759 - 6.396 * Ca_Liq_cat_frac + 0.2147 * H2O_Liq + 1.221 *
+            Si_Liq_cat_frac**3 - 1.751 * 10**-2 * P - 8.043 * Al_Liq_cat_frac)))
 
 
-def T_Put2008_eq26_plag_sat(P, *, SiO2_Liq_cat_frac,
-                            CaO_Liq_cat_frac, Al2O3_Liq_cat_frac, K2O_Liq_cat_frac, H2O_Liq):
+def T_Put2008_eq26_plag_sat(P, *, Si_Liq_cat_frac,
+                            Ca_Liq_cat_frac, Al_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
     '''
     Plagioclase-Liquid saturation temperature thermometer of Putirka (2008) eq. 26. Update of P2005_eqD
     SEE=+-37C
     '''
-    return (10**4 / (10.86 - 9.7654 * SiO2_Liq_cat_frac + 4.241 * CaO_Liq_cat_frac
-                     - 55.56 * CaO_Liq_cat_frac * Al2O3_Liq_cat_frac +
-                     37.5 * K2O_Liq_cat_frac * Al2O3_Liq_cat_frac
-                     + 11.206 * SiO2_Liq_cat_frac**3 - 3.151 * 10**(-2) * (P / 10) * 10 + 0.1709 * H2O_Liq))
+    return (10**4 / (10.86 - 9.7654 * Si_Liq_cat_frac + 4.241 * Ca_Liq_cat_frac
+                     - 55.56 * Ca_Liq_cat_frac * Al_Liq_cat_frac +
+                     37.5 * K_Liq_cat_frac * Al_Liq_cat_frac
+                     + 11.206 * Si_Liq_cat_frac**3 - 3.151 * 10**(-2) * (P / 10) * 10 + 0.1709 * H2O_Liq))
 
-def T_Put2008_eq24c_kspar_sat(P, *, Al2O3_Liq_cat_frac, Na2O_Liq_cat_frac,
-                  K2O_Liq_cat_frac, SiO2_Liq_cat_frac, CaO_Liq_cat_frac, H2O_Liq):
+def T_Put2008_eq24c_kspar_sat(P, *, Al_Liq_cat_frac, Na_Liq_cat_frac,
+                  K_Liq_cat_frac, Si_Liq_cat_frac, Ca_Liq_cat_frac, H2O_Liq):
     '''
     Alkali Felspar saturation thermometer of Putirka (2008) eq. 24b.
     SEE=+-23 C (Calibration data)
     SEE=+-25 C (All data)
 
     '''
-    return (10**4 / (14.6 + 0.055 * H2O_Liq - 0.06 * (P / 10) / 10 - 99.6 * Na2O_Liq_cat_frac * Al2O3_Liq_cat_frac
-    - 2313 * CaO_Liq_cat_frac *Al2O3_Liq_cat_frac + 395 * K2O_Liq_cat_frac * Al2O3_Liq_cat_frac
-    - 151 * K2O_Liq_cat_frac * SiO2_Liq_cat_frac + 15037 * CaO_Liq_cat_frac**2))
+    return (10**4 / (14.6 + 0.055 * H2O_Liq - 0.06 * (P / 10) / 10 - 99.6 * Na_Liq_cat_frac * Al_Liq_cat_frac
+    - 2313 * Ca_Liq_cat_frac *Al_Liq_cat_frac + 395 * K_Liq_cat_frac * Al_Liq_cat_frac
+    - 151 * K_Liq_cat_frac * Si_Liq_cat_frac + 15037 * Ca_Liq_cat_frac**2))
 
 ## Listing them all to check for invalid inputs- add new ones into this list so they become recognised.
 
@@ -456,15 +456,15 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
 # This performs extra calculation steps for Beattie equations
     if equationT == "T_Beatt93_BeattDMg" or equationT == "T_Beatt93_BeattDMg_HerzCorr" or equationT == "T_Put2008_eq19_BeattDMg" \
     or equationT == "T_Put2008_eq21_BeattDMg" or equationT == "T_Put2008_eq22_BeattDMg":
-        anhyd_cat_frac['calcDMg_Beat93'] = (0.666 - (-0.049 * anhyd_cat_frac['MnO_Liq_cat_frac']
-        + 0.027 * anhyd_cat_frac['FeOt_Liq_cat_frac'])) / (
-        1 * anhyd_cat_frac['MgO_Liq_cat_frac'] + 0.259 * anhyd_cat_frac['MnO_Liq_cat_frac']
-        + 0.299 * anhyd_cat_frac['FeOt_Liq_cat_frac'])
+        anhyd_cat_frac['calcDMg_Beat93'] = (0.666 - (-0.049 * anhyd_cat_frac['Mn_Liq_cat_frac']
+        + 0.027 * anhyd_cat_frac['Fet_Liq_cat_frac'])) / (
+        1 * anhyd_cat_frac['Mg_Liq_cat_frac'] + 0.259 * anhyd_cat_frac['Mn_Liq_cat_frac']
+        + 0.299 * anhyd_cat_frac['Fet_Liq_cat_frac'])
 
-        anhyd_cat_frac['Beat_CNML'] = (anhyd_cat_frac['MgO_Liq_cat_frac'] + anhyd_cat_frac['FeOt_Liq_cat_frac'] +
-            anhyd_cat_frac['CaO_Liq_cat_frac'] + anhyd_cat_frac['MnO_Liq_cat_frac'])
-        anhyd_cat_frac['Beat_CSiO2L'] = anhyd_cat_frac['SiO2_Liq_cat_frac']
-        anhyd_cat_frac['Beat_NF'] = ( 7 / 2) * np.log(1 - anhyd_cat_frac['Al2O3_Liq_cat_frac']) + 7 * np.log(1 - anhyd_cat_frac['TiO2_Liq_cat_frac'])
+        anhyd_cat_frac['Beat_CNML'] = (anhyd_cat_frac['Mg_Liq_cat_frac'] + anhyd_cat_frac['Fet_Liq_cat_frac'] +
+            anhyd_cat_frac['Ca_Liq_cat_frac'] + anhyd_cat_frac['Mn_Liq_cat_frac'])
+        anhyd_cat_frac['Beat_CSiO2L'] = anhyd_cat_frac['Si_Liq_cat_frac']
+        anhyd_cat_frac['Beat_NF'] = ( 7 / 2) * np.log(1 - anhyd_cat_frac['Al_Liq_cat_frac']) + 7 * np.log(1 - anhyd_cat_frac['Ti_Liq_cat_frac'])
         anhyd_cat_frac['Den_Beat93'] = 52.05 / 8.3144 + 2 * np.log(anhyd_cat_frac['calcDMg_Beat93']) + 2 * np.log(
             1.5 * anhyd_cat_frac['Beat_CNML']) + 2 * np.log(3 * anhyd_cat_frac['Beat_CSiO2L']) - anhyd_cat_frac['Beat_NF']
 

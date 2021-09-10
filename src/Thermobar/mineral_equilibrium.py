@@ -381,7 +381,7 @@ def calculate_opx_rhodes_diagram_lines(
     if liq_comps is not None:
         liq_comps_c=liq_comps.copy()
         cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
-        Si_mean_frac = np.nanmean(cat_frac['SiO2_Liq_cat_frac'])
+        Si_mean_frac = np.nanmean(cat_frac['Si_Liq_cat_frac'])
         Kd = 0.4805 - 0.3733 * Si_mean_frac
         Eq_Opx = 1 / ((Kd / Mgno) + (1 - Kd))
         Kd_p_1_s = Kd + 0.06
