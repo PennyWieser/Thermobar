@@ -14,7 +14,7 @@ from Thermobar.liquid_thermometers import*
 
 
 
-def P_Put2008_eq29a(T, *, Si_Liq_cat_frac, Mg_Liq_cat_frac, FeOt_Opx_cat_6ox, FmAl2SiO6,
+def P_Put2008_eq29a(T, *, Si_Liq_cat_frac, Mg_Liq_cat_frac, Fet_Opx_cat_6ox, FmAl2SiO6,
                     Na_Liq_cat_frac, Al_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq, NaAlSi2O6):
     '''
     Orthopyroxene-Liquid barometer of Putirka, (2008) eq 29a. Global calibration of experiments.
@@ -25,14 +25,14 @@ def P_Put2008_eq29a(T, *, Si_Liq_cat_frac, Mg_Liq_cat_frac, FeOt_Opx_cat_6ox, Fm
     '''
     Na_Si_Al_Na=(NaAlSi2O6 / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac * Na_Liq_cat_frac)).astype(float)
     log_Na_Si_Al_Na=np.log(Na_Si_Al_Na)
-    return (-13.97 + 0.0129 * (T - 273.15) - 19.64 * Si_Liq_cat_frac + 47.49 * Mg_Liq_cat_frac + 6.99 * FeOt_Opx_cat_6ox
+    return (-13.97 + 0.0129 * (T - 273.15) - 19.64 * Si_Liq_cat_frac + 47.49 * Mg_Liq_cat_frac + 6.99 * Fet_Opx_cat_6ox
             + 37.37 * FmAl2SiO6 + 0.748 * H2O_Liq + 79.67 * (Na_Liq_cat_frac + K_Liq_cat_frac) +
             0.001416 * (T - 273.15)*log_Na_Si_Al_Na)
 
 
 
 def P_Put2008_eq29b(T, *, ln_FmAl2SiO6_liq, Al_Liq_cat_frac, Mg_Liq_cat_frac,
-Fet_Liq_cat_frac, SiO2_Opx_cat_6ox, FeOt_Opx_cat_6ox,
+Fet_Liq_cat_frac, Si_Opx_cat_6ox, Fet_Opx_cat_6ox,
 Na_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
     '''
     Orthopyroxene-Liquid barometer of Putirka, (2008) eq 29b. Global calibration of experiments.
@@ -43,7 +43,7 @@ Na_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
     return (1.788 + 0.0375 * (T - 273.15) + 0.001295 * (T - 273.15) * ln_FmAl2SiO6_liq - 33.42 * Al_Liq_cat_frac
             + 9.795 * Mg_Liq_cat_frac /
             (Mg_Liq_cat_frac + Fet_Liq_cat_frac) - 26.2 *
-            SiO2_Opx_cat_6ox + 14.21 * FeOt_Opx_cat_6ox
+            Si_Opx_cat_6ox + 14.21 * Fet_Opx_cat_6ox
             + 36.08 * (Na_Liq_cat_frac + K_Liq_cat_frac) + 0.784 * H2O_Liq)
 
 
@@ -71,8 +71,8 @@ def P_Put_Felsic_Opx(T=None, *, Al2O3_Opx, Al2O3_Liq):
 
 ## Opx-Only Barometers
 
-def P_Put2008_eq29c(T, *, Al2O3_Opx_cat_6ox,
-                    CaO_Opx_cat_6ox, Cr2O3_Opx_cat_6ox):
+def P_Put2008_eq29c(T, *, Al_Opx_cat_6ox,
+                    Ca_Opx_cat_6ox, Cr_Opx_cat_6ox):
     '''
     Orthopyroxene-only barometer of Putirka, (2008) eq 29c. Doesn't require liquid composition.  Global calibration of experiments.
     Has systematic error for hydrous data.
@@ -81,13 +81,13 @@ def P_Put2008_eq29c(T, *, Al2O3_Opx_cat_6ox,
     |  SEE=+-4.1 kbar (hydrous)
 
     '''
-    logCr2O3 = np.log(Cr2O3_Opx_cat_6ox.astype(float))
+    logCr2O3 = np.log(Cr_Opx_cat_6ox.astype(float))
 
 
-    return (2064 + 0.321 * (T - 273.15) - 343.4 * np.log((T - 273.15)) + 31.52 * Al2O3_Opx_cat_6ox - 12.28 * CaO_Opx_cat_6ox
-            - 290 * Cr2O3_Opx_cat_6ox - 177.2 *
-            (Al2O3_Opx_cat_6ox - 0.1715)**2 - 372 *
-            (Al2O3_Opx_cat_6ox - 0.1715) * (CaO_Opx_cat_6ox - 0.0736)
+    return (2064 + 0.321 * (T - 273.15) - 343.4 * np.log((T - 273.15)) + 31.52 * Al_Opx_cat_6ox - 12.28 * Ca_Opx_cat_6ox
+            - 290 * Cr_Opx_cat_6ox - 177.2 *
+            (Al_Opx_cat_6ox - 0.1715)**2 - 372 *
+            (Al_Opx_cat_6ox - 0.1715) * (Ca_Opx_cat_6ox - 0.0736)
             + 1.54 * logCr2O3)
 
 ## Opx-Liquid thermometers
@@ -95,7 +95,7 @@ def P_Put2008_eq29c(T, *, Al2O3_Opx_cat_6ox,
 
 
 def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, Mg_Liq_cat_frac,
-                    K_Liq_cat_frac, Fet_Liq_cat_frac, FeOt_Opx_cat_6ox):
+                    K_Liq_cat_frac, Fet_Liq_cat_frac, Fet_Opx_cat_6ox):
     """
     Putirka (2008) Equation 28a.
     Global calibration: T=750-1600°C, SiO2=33-77 wt%, P=atm-11 GPa. H2O=0-14.2 wt%.
@@ -106,10 +106,10 @@ def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, Mg_Liq_cat_frac,
     return (273.15 + 10**4 / (4.07 - 0.329 * (0.1 * P) + 0.12 * H2O_Liq +
     0.567 * ln_Fm2Si2O6_liq.astype(float) - 3.06 * Mg_Liq_cat_frac -
     6.17 * K_Liq_cat_frac + 1.89 * Mg_Liq_cat_frac /
-    (Mg_Liq_cat_frac + Fet_Liq_cat_frac) + 2.57 * FeOt_Opx_cat_6ox))
+    (Mg_Liq_cat_frac + Fet_Liq_cat_frac) + 2.57 * Fet_Opx_cat_6ox))
 
 def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac, Mn_Liq_cat_frac,
-                            Fet_Liq_cat_frac, FeOt_Opx_cat_6ox, Al_Liq_cat_frac, Ti_Liq_cat_frac, Mg_Number_Liq_NoFe3):
+                            Fet_Liq_cat_frac, Fet_Opx_cat_6ox, Al_Liq_cat_frac, Ti_Liq_cat_frac, Mg_Number_Liq_NoFe3):
     '''
     Orthopyroxene-liquid thermometer- temperature at which a liquid is saturated in orhopyroxene (for a given P). Equation 28b of Putirka et al. (2008)
     '''
@@ -174,7 +174,7 @@ def calculate_opx_only_press(*, opx_comps, equationP, T=None):
         raise ValueError('Equation not recognised, at the moment the only choice is P_Put2008_eq29c')
 
     P_func = P_Put2008_eq29c
-    if any(opx_comps['Cr2O3_Opx_cat_6ox'] == 0):
+    if any(opx_comps['Cr_Opx_cat_6ox'] == 0):
         w.warn('The selected barometer uses the log of Cr2O3 component of '
         'Opx, which is zero for some of your compositions. '
          'This means the function will return infinity.')
