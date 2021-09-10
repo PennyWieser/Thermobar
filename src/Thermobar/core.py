@@ -1826,9 +1826,9 @@ def calculate_cat_proportions_kspar(*, kspar_comps=None, oxide_headers=False):
         df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
     cation_prop_anhyd.columns = [
         str(col) + '_cat_prop' for col in cation_prop_anhyd.columns]
-    if oxide_headers is False:
-        return cation_prop_anhyd
     if oxide_headers is True:
+        return cation_prop_anhyd
+    if oxide_headers is False:
         cation_prop_anhyd2=cation_prop_anhyd.rename(columns={
 
                             'SiO2_Kspar_cat_prop': 'Si_Kspar_cat_prop',
@@ -1870,12 +1870,12 @@ def calculate_cat_fractions_kspar(*, kspar_comps=None):
     cat_frac_anhyd.drop(['sum'], axis='columns', inplace=True)
     cat_frac_anhyd.columns = [str(col).replace('prop', 'frac')
                               for col in cat_frac_anhyd.columns]
-    cat_frac_anhyd['An_Kspar'] = cat_frac_anhyd['CaO_Kspar_cat_frac'] / \
-        (cat_frac_anhyd['CaO_Kspar_cat_frac'] +
-         cat_frac_anhyd['Na2O_Kspar_cat_frac'] + cat_frac_anhyd['K2O_Kspar_cat_frac'])
-    cat_frac_anhyd['Ab_Kspar'] = cat_frac_anhyd['Na2O_Kspar_cat_frac'] / \
-        (cat_frac_anhyd['CaO_Kspar_cat_frac'] +
-         cat_frac_anhyd['Na2O_Kspar_cat_frac'] + cat_frac_anhyd['K2O_Kspar_cat_frac'])
+    cat_frac_anhyd['An_Kspar'] = cat_frac_anhyd['Ca_Kspar_cat_frac'] / \
+        (cat_frac_anhyd['Ca_Kspar_cat_frac'] +
+         cat_frac_anhyd['Na_Kspar_cat_frac'] + cat_frac_anhyd['K_Kspar_cat_frac'])
+    cat_frac_anhyd['Ab_Kspar'] = cat_frac_anhyd['Na_Kspar_cat_frac'] / \
+        (cat_frac_anhyd['Ca_Kspar_cat_frac'] +
+         cat_frac_anhyd['Na_Kspar_cat_frac'] + cat_frac_anhyd['K_Kspar_cat_frac'])
     cat_frac_anhyd['Or_Kspar'] = 1 - \
         cat_frac_anhyd['An_Kspar'] - cat_frac_anhyd['Ab_Kspar']
     cat_frac_anhyd2 = pd.concat(

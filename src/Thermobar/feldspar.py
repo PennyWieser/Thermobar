@@ -846,20 +846,20 @@ def calculate_fspar_liq_temp_hygr(*, liq_comps, plag_comps, equationT, equationH
 ## Equations: Two feldspar thermometers
 
 
-def T_Put2008_eq27a(P, *, K_Barth, SiO2_Kspar_cat_frac,
-                    CaO_Kspar_cat_frac, An_Kspar, An_Plag, Ab_Plag):
+def T_Put2008_eq27a(P, *, K_Barth, Si_Kspar_cat_frac,
+                    Ca_Kspar_cat_frac, An_Kspar, An_Plag, Ab_Plag):
     '''
     Two feldspar thermometer: Equation 27a of Putirka (2008).
     SEE±23°C for calibration
     SEE±44°C for test data
     '''
 
-    return (273.15 + 10**4 / (9.8 - 0.0976 * P - 2.46 * np.log(K_Barth) - 14.2 * SiO2_Kspar_cat_frac +
-            423.4 * CaO_Kspar_cat_frac - 2.42 * np.log(An_Kspar) - 11.4 * An_Plag * Ab_Plag))
+    return (273.15 + 10**4 / (9.8 - 0.0976 * P - 2.46 * np.log(K_Barth) - 14.2 * Si_Kspar_cat_frac +
+            423.4 * Ca_Kspar_cat_frac - 2.42 * np.log(An_Kspar) - 11.4 * An_Plag * Ab_Plag))
 
 
-def T_Put2008_eq27b(P, *, K_Barth, SiO2_Kspar_cat_frac,
-                    CaO_Kspar_cat_frac, An_Kspar, An_Plag, Ab_Plag):
+def T_Put2008_eq27b(P, *, K_Barth, Si_Kspar_cat_frac,
+                    Ca_Kspar_cat_frac, An_Kspar, An_Plag, Ab_Plag):
     '''
     Two feldspar thermometer: Equation 27b of Putirka (2008).
     Putirka recomends using this thermometer over 27a, with preference
@@ -871,15 +871,15 @@ def T_Put2008_eq27b(P, *, K_Barth, SiO2_Kspar_cat_frac,
             3.27 * An_Kspar + 0.098 * np.log(An_Kspar) + 0.52 * An_Plag * Ab_Plag))
 
 
-def T_Put_Global_2Fspar(P, *, K_Barth, SiO2_Kspar_cat_frac, CaO_Kspar_cat_frac,
-Ab_Kspar, Or_Kspar, Na2O_Plag_cat_frac, An_Kspar, An_Plag, Ab_Plag):
+def T_Put_Global_2Fspar(P, *, K_Barth, Si_Kspar_cat_frac, Ca_Kspar_cat_frac,
+Ab_Kspar, Or_Kspar, Na_Plag_cat_frac, An_Kspar, An_Plag, Ab_Plag):
     '''
     Two feldspar thermometer from supporting spreadsheet of Putirka (2008)
     Global calibration
     '''
     return (273.15 + 10**4 / (100.638 - 0.0975 * P - 4.9825 * An_Plag
     - 115.03 * Ab_Kspar - 95.745 * Or_Kspar
-    + 45.68 * Na2O_Plag_cat_frac - 2.5182 * np.log(An_Kspar)
+    + 45.68 * Na_Plag_cat_frac - 2.5182 * np.log(An_Kspar)
     + 3.7522 * np.log(K_Barth) - 15.503 * (Ab_Kspar - 0.3136) * (Or_Kspar - 0.6625)))
 
 
