@@ -699,11 +699,12 @@ def calculate_hydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
     liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
-oxide_headers=False
-    oxide_headers: bool
-        default=False, returns as Ti_Liq_cat_prop. =True returns Ti_Liq_cat_prop.
-        This is used for rapid matrix division for
-        pre-processing of data for cation fractions etc
+    oxide_headers=False
+        oxide_headers: bool
+            default=False, returns as Ti_Liq_cat_prop.
+            =True returns Ti_Liq_cat_prop.
+            This is used for rapid matrix division for
+            pre-processing of data for cation fractions etc
 
     Returns
     -------
@@ -1045,7 +1046,7 @@ def calculate_oxygens_orthopyroxene(opx_comps):
     return oxygens_anhyd
 
 
-def calculate_6oxygens_orthopyroxene(opx_comps, oxide_headers=False):
+def calculate_6oxygens_orthopyroxene(opx_comps):
     '''Import orthopyroxene compositions using opx_comps=My_Opxs, returns cations on the basis of 6 oxygens.
 
    Parameters
@@ -1053,11 +1054,6 @@ def calculate_6oxygens_orthopyroxene(opx_comps, oxide_headers=False):
 
     opx_comps: DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
-
-    oxide_headers: bool
-        default=False, returns as Ti_Opx_..... =True returns TiO2_Opx_....
-        This is used for rapid matrix division for
-        pre-processing of data for cation fractions etc
 
     Returns
     -------
@@ -1089,10 +1085,7 @@ def calculate_6oxygens_orthopyroxene(opx_comps, oxide_headers=False):
     cation_6['Si_Ti_Opx_cat_6ox'] = cation_6['SiO2_Opx_cat_6ox'] + \
         cation_6['TiO2_Opx_cat_6ox']
 
-    if oxide_headers is True:
-        return cation_6
-    if oxide_headers is False:
-        cation_6_2=cation_6.rename(columns={
+    cation_6_2=cation_6.rename(columns={
                             'SiO2_Opx_cat_6ox': 'Si_Opx_cat_6ox',
                             'TiO2_Opx_cat_6ox': 'Ti_Opx_cat_6ox',
                             'Al2O3_Opx_cat_6ox': 'Al_Opx_cat_6ox',
@@ -1105,7 +1098,7 @@ def calculate_6oxygens_orthopyroxene(opx_comps, oxide_headers=False):
                             'Cr2O3_Opx_cat_6ox': 'Cr_Opx_cat_6ox',
                             'P2O5_Opx_cat_6ox': 'P_Opx_cat_6ox_frac',
                             })
-        return cation_6_2
+    return cation_6_2
 
 
 
@@ -1233,14 +1226,14 @@ def calculate_orthopyroxene_liquid_components(
     combo_liq_opxs.insert(1, "Kd Eq (Put2008+-0.06)", b)
 
 
-    combo_liq_opxs['Mgno_Liq_noFe3']= (combo_liq_opxs['MgO_Liq'] / 40.3044) /
+    combo_liq_opxs['Mgno_Liq_noFe3']= ((combo_liq_opxs['MgO_Liq'] / 40.3044) /
     ((combo_liq_opxs['MgO_Liq'] / 40.3044) +
-    (combo_liq_opxs['FeOt_Liq']) / 71.844)
+    (combo_liq_opxs['FeOt_Liq']) / 71.844))
 
 
-    combo_liq_opxs['Mgno_Liq_Fe2']=(combo_liq_opxs['MgO_Liq'] / 40.3044) /
+    combo_liq_opxs['Mgno_Liq_Fe2']=((combo_liq_opxs['MgO_Liq'] / 40.3044) /
     ((combo_liq_opxs['MgO_Liq'] / 40.3044) +
-    (combo_liq_opxs['FeOt_Liq'] * (1 - combo_liq_opxs['Fe3Fet_Liq']) / 71.844))
+    (combo_liq_opxs['FeOt_Liq'] * (1 - combo_liq_opxs['Fe3Fet_Liq']) / 71.844)))
 
     return combo_liq_opxs
 
@@ -1313,11 +1306,6 @@ def calculate_6oxygens_clinopyroxene(cpx_comps):
     cpx_comps: DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    oxide_headers: bool
-        default=False, returns as Ti_Cpx_.....
-        =True returns TiO2_Cpx_....
-        This is used for rapid matrix division for
-        pre-processing of data for cation fractions etc
 
     Returns
     -------
@@ -1649,7 +1637,7 @@ def calculate_mol_fractions_plagioclase(*, plag_comps=None):
         return plag_frac_anhyd
 
 
-def calculate_cat_proportions_plagioclase(*, plag_comps=None):
+def calculate_cat_proportions_plagioclase(*, plag_comps=None, oxide_headers=False):
     '''Import plagioclase compositions using plag_comps=My_plagioclases, returns cation proportions
 
    Parameters
@@ -1658,12 +1646,17 @@ def calculate_cat_proportions_plagioclase(*, plag_comps=None):
     plag_comps: DataFrame
             plagioclase compositions with column headings SiO2_Plag, MgO_Plag etc.
 
+    oxide_headers: bool
+        default=False, returns as Ti_Plag_cat_prop.
+        =True returns Ti_Plag_cat_prop.
+        This is used for rapid matrix division for
+        pre-processing of data for cation fractions etc
+
+
     Returns
     -------
     pandas DataFrame
-        cation proportions for plagioclase with column headings of the form SiO2_Plag_cat_prop
-        For simplicity, and consistency of column heading types, oxide names are preserved,
-        so outputs are Na2O_Plag_cat_prop rather than Na_Plag_cat_prop.
+        cation proportions for plagioclase with column headings of the form ...Plag_cat_prop
     '''
 
     plag_prop_no_cat_num = calculate_mol_proportions_plagioclase(
@@ -1677,10 +1670,28 @@ def calculate_cat_proportions_plagioclase(*, plag_comps=None):
         df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
     cation_prop_anhyd.columns = [
         str(col) + '_cat_prop' for col in cation_prop_anhyd.columns]
-    return cation_prop_anhyd
+    if oxide_headers is True:
+        return cation_prop_anhyd
+    if oxide_headers is False:
+        cation_prop_anhyd2=cation_prop_anhyd.rename(columns={
+
+                            'SiO2_Plag_cat_prop': 'Si_Plag_cat_prop',
+                            'TiO2_Plag_cat_prop': 'Ti_Plag_cat_prop',
+                            'Al2O3_Plag_cat_prop': 'Al_Plag_cat_prop',
+                            'FeOt_Plag_cat_prop': 'Fet_Plag_cat_prop',
+                            'MnO_Plag_cat_prop': 'Mn_Plag_cat_prop',
+                            'MgO_Plag_cat_prop': 'Mg_Plag_cat_prop',
+                            'CaO_Plag_cat_prop': 'Ca_Plag_cat_prop',
+                            'Na2O_Plag_cat_prop': 'Na_Plag_cat_prop',
+                            'K2O_Plag_cat_prop': 'K_Plag_cat_prop',
+                            'Cr2O3_Plag_cat_prop': 'Cr_Plag_cat_prop',
+                            'P2O5_Plag_cat_prop': 'P_Plag_cat_prop',
+                            })
+
+        return cation_prop_anhyd2
 
 
-def calculate_cat_fractions_plagioclase(*, plag_comps=None):
+def calculate_cat_fractions_plagioclase(plag_comps):
     '''Import plagioclase compositions using plag_comps=My_plagioclases, returns cation fractions
 
    Parameters
@@ -1692,9 +1703,8 @@ def calculate_cat_fractions_plagioclase(*, plag_comps=None):
     Returns
     -------
     pandas DataFrame
-        cation fractions for plagioclase with column headings of the form SiO2_Plag_cat_frac.
-        For simplicity, and consistency of column heading types, oxide names are preserved,
-        so outputs are Na2O_Plag_cat_frac rather than Na_Plag_cat_frac.
+        cation fractions for plagioclase with column headings of the form ...Plag_cat_frac.
+
 
     '''
 
@@ -1704,17 +1714,18 @@ def calculate_cat_fractions_plagioclase(*, plag_comps=None):
     cat_frac_anhyd.drop(['sum'], axis='columns', inplace=True)
     cat_frac_anhyd.columns = [str(col).replace('prop', 'frac')
                               for col in cat_frac_anhyd.columns]
-    cat_frac_anhyd['An_Plag'] = cat_frac_anhyd['CaO_Plag_cat_frac'] / \
-        (cat_frac_anhyd['CaO_Plag_cat_frac'] +
-         cat_frac_anhyd['Na2O_Plag_cat_frac'] + cat_frac_anhyd['K2O_Plag_cat_frac'])
-    cat_frac_anhyd['Ab_Plag'] = cat_frac_anhyd['Na2O_Plag_cat_frac'] / \
-        (cat_frac_anhyd['CaO_Plag_cat_frac'] +
-         cat_frac_anhyd['Na2O_Plag_cat_frac'] + cat_frac_anhyd['K2O_Plag_cat_frac'])
+    cat_frac_anhyd['An_Plag'] = cat_frac_anhyd['Ca_Plag_cat_frac'] / \
+        (cat_frac_anhyd['Ca_Plag_cat_frac'] +
+         cat_frac_anhyd['Na_Plag_cat_frac'] + cat_frac_anhyd['K_Plag_cat_frac'])
+    cat_frac_anhyd['Ab_Plag'] = cat_frac_anhyd['Na_Plag_cat_frac'] / \
+        (cat_frac_anhyd['Ca_Plag_cat_frac'] +
+         cat_frac_anhyd['Na_Plag_cat_frac'] + cat_frac_anhyd['K_Plag_cat_frac'])
     cat_frac_anhyd['Or_Plag'] = 1 - \
         cat_frac_anhyd['An_Plag'] - cat_frac_anhyd['Ab_Plag']
     cat_frac_anhyd2 = pd.concat([plag_comps, cat_prop, cat_frac_anhyd], axis=1)
-
     return cat_frac_anhyd2
+
+
 
 # calculating alkali feldspar components
 
@@ -1750,7 +1761,7 @@ def calculate_mol_proportions_kspar(*, kspar_comps=None):
         return alk_prop_anhyd
 
 
-def calculate_mol_fractions_kspar(*, kspar_comps=None):
+def calculate_mol_fractions_kspar(kspar_comps):
     '''Import AlkaliFspar compositions using kspar_comps=My_kspars, returns mole fractions
 
    Parameters
@@ -1762,52 +1773,78 @@ def calculate_mol_fractions_kspar(*, kspar_comps=None):
     Returns
     -------
     pandas DataFrame
-        mole fractions for AlkaliFspars with column headings of the form SiO2_Kspar_mol_frac
+        mole fractions for AlkaliFspars with column headings of the form ...Kspar_mol_frac
 
 
     '''
 
-    if kspar_comps is not None:
-        alk_comps = kspar_comps
-        alk_prop = calculate_mol_proportions_kspar(kspar_comps=alk_comps)
-        alk_prop['sum'] = alk_prop.sum(axis='columns')
-        alk_frac_anhyd = alk_prop.div(alk_prop['sum'], axis='rows')
-        alk_frac_anhyd.drop(['sum'], axis='columns', inplace=True)
-        alk_frac_anhyd.columns = [str(col).replace(
-            'prop', 'frac') for col in alk_frac_anhyd.columns]
-        return alk_frac_anhyd
+
+    alk_comps = kspar_comps
+    alk_prop = calculate_mol_proportions_kspar(kspar_comps=alk_comps)
+    alk_prop['sum'] = alk_prop.sum(axis='columns')
+    alk_frac_anhyd = alk_prop.div(alk_prop['sum'], axis='rows')
+    alk_frac_anhyd.drop(['sum'], axis='columns', inplace=True)
+    alk_frac_anhyd.columns = [str(col).replace(
+        'prop', 'frac') for col in alk_frac_anhyd.columns]
 
 
-def calculate_cat_proportions_kspar(*, kspar_comps=None):
-    '''Import AlkaliFspar compositions using kspar_comps=My_kspars, returns cation proportions
+    return alk_frac_anhyd
+
+
+def calculate_cat_proportions_kspar(*, kspar_comps=None, oxide_headers=False):
+    '''Import kspar compositions using kspar_comps=My_kspars, returns cation proportions
 
    Parameters
     -------
 
     kspar_comps: DataFrame
-            AlkaliFspar compositions with column headings SiO2_Kspar, MgO_Kspar etc.
+            kspar compositions with column headings SiO2_Kspar, MgO_Kspar etc.
+
+    oxide_headers: bool
+        default=False, returns as Ti_Kspar_cat_prop.
+        =True returns Ti_Kspar_cat_prop.
+        This is used for rapid matrix division for
+        pre-processing of data for cation fractions etc
+
 
     Returns
     -------
     pandas DataFrame
-        cation proportions for AlkaliFspar with column headings of the form SiO2_Kspar_cat_prop
+        cation proportions for kspar with column headings of the form SiO2_Kspar_cat_prop
         For simplicity, and consistency of column heading types, oxide names are preserved,
         so outputs are Na2O_Kspar_cat_prop rather than Na_Kspar_cat_prop.
     '''
 
-    alk_prop_no_cat_num = calculate_mol_proportions_kspar(
+    kspar_prop_no_cat_num = calculate_mol_proportions_kspar(
         kspar_comps=kspar_comps)
-    alk_prop_no_cat_num.columns = [str(col).replace(
-        '_mol_prop', '') for col in alk_prop_no_cat_num.columns]
+    kspar_prop_no_cat_num.columns = [str(col).replace(
+        '_mol_prop', '') for col in kspar_prop_no_cat_num.columns]
     ox_num_reindex = cation_num_kspar_df.reindex(
         oxide_mass_kspar_df.columns, axis=1).fillna(0)
-    df_calc_comb = pd.concat([ox_num_reindex, alk_prop_no_cat_num])
+    df_calc_comb = pd.concat([ox_num_reindex, kspar_prop_no_cat_num])
     cation_prop_anhyd = df_calc_comb.multiply(
         df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
     cation_prop_anhyd.columns = [
         str(col) + '_cat_prop' for col in cation_prop_anhyd.columns]
-    return cation_prop_anhyd
+    if oxide_headers is False:
+        return cation_prop_anhyd
+    if oxide_headers is True:
+        cation_prop_anhyd2=cation_prop_anhyd.rename(columns={
 
+                            'SiO2_Kspar_cat_prop': 'Si_Kspar_cat_prop',
+                            'TiO2_Kspar_cat_prop': 'Ti_Kspar_cat_prop',
+                            'Al2O3_Kspar_cat_prop': 'Al_Kspar_cat_prop',
+                            'FeOt_Kspar_cat_prop': 'Fet_Kspar_cat_prop',
+                            'MnO_Kspar_cat_prop': 'Mn_Kspar_cat_prop',
+                            'MgO_Kspar_cat_prop': 'Mg_Kspar_cat_prop',
+                            'CaO_Kspar_cat_prop': 'Ca_Kspar_cat_prop',
+                            'Na2O_Kspar_cat_prop': 'Na_Kspar_cat_prop',
+                            'K2O_Kspar_cat_prop': 'K_Kspar_cat_prop',
+                            'Cr2O3_Kspar_cat_prop': 'Cr_Kspar_cat_prop',
+                            'P2O5_Kspar_cat_prop': 'P_Kspar_cat_prop',
+                            })
+
+        return cation_prop_anhyd2
 
 def calculate_cat_fractions_kspar(*, kspar_comps=None):
     '''Import AlkaliFspar compositions using kspar_comps=My_kspars, returns cation fractions
