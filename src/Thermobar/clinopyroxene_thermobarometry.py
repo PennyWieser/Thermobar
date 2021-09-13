@@ -1223,21 +1223,21 @@ H2O_Liq=None, Return_All_Matches=False):
 ## Clinopyroxene-only pressure equations
 
 def P_Wang2021_eq1(T=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
+Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
     '''
     Clinopyroxene-only barometer of Wang et al. (2021) equation 1
     Uses NCT
     - currently on Zenodo - 10.5281/zenodo.4727870
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
-    +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*MgO_Cpx_cat_6ox))
+    +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
 
     return (-7.6551*NCT*np.log(Al_VI_cat_6ox.astype(float))-10.2203*Si_Cpx_cat_6ox+4.8343*Fet_Cpx_cat_6ox
-+0.7397*MgO_Cpx_cat_6ox-13.1746*Ca_Cpx_cat_6ox+122.1294*Na_Cpx_cat_6ox+23.35)
++0.7397*Mg_Cpx_cat_6ox-13.1746*Ca_Cpx_cat_6ox+122.1294*Na_Cpx_cat_6ox+23.35)
 
 
 def P_Wang2021_eq3(T=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
+Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
 FeII_Wang21, FeIII_Wang21, Ca_Cpx_cat_6ox, Al_Cpx_cat_6ox):
     '''
     Clinopyroxene-only barometer of Wang et al. (2021) equation 3
@@ -1247,13 +1247,13 @@ FeII_Wang21, FeIII_Wang21, Ca_Cpx_cat_6ox, Al_Cpx_cat_6ox):
 
 
     return (-1105.84-18.6052*Ti_Cpx_cat_6ox+252.1033*Al_Cpx_cat_6ox+311.0123*Cr_Cpx_cat_6ox+550.2534*Fet_Cpx_cat_6ox+
-451.6495*Mn_Cpx_cat_6ox+554.0535*MgO_Cpx_cat_6ox+540.2934*Ca_Cpx_cat_6ox
+451.6495*Mn_Cpx_cat_6ox+554.0535*Mg_Cpx_cat_6ox+540.2934*Ca_Cpx_cat_6ox
 +902.6805*Na_Cpx_cat_6ox-535.305*FeIII_Wang21-70.1424*Al_VI_cat_6ox*np.log(Al_VI_cat_6ox.astype(float))
 -1.74473*np.log(Al_VI_cat_6ox.astype(float)))
 
 
 
-def P_Put2008_eq32a(T, *, MgO_Cpx_cat_6ox, Na_Cpx_cat_6ox,
+def P_Put2008_eq32a(T, *, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox,
                     Al_VI_cat_6ox, DiHd_2003, EnFs):
     '''
     Clinopyroxene-only barometer of Putirka (2008) Eq32a
@@ -1261,14 +1261,14 @@ def P_Put2008_eq32a(T, *, MgO_Cpx_cat_6ox, Na_Cpx_cat_6ox,
     | SEE=+-3.1 kbar (anhydrous)
 
     '''
-    return (3205 - 5.62 * MgO_Cpx_cat_6ox + 83.2 * Na_Cpx_cat_6ox + 68.2 * DiHd_2003
+    return (3205 - 5.62 * Mg_Cpx_cat_6ox + 83.2 * Na_Cpx_cat_6ox + 68.2 * DiHd_2003
     + 2.52 * np.log(Al_VI_cat_6ox.astype(float)) - 51.1 * DiHd_2003**2 + 34.8 * EnFs**2
     + 0.384 * T - 518 * np.log(T))
 
 
 def P_Put2008_eq32b(T, *, H2O_Liq, Ca_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Na_Cpx_cat_6ox,
 Al_Cpx_cat_6ox, K_Cpx_cat_6ox, Al_IV_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-                    Al_VI_cat_6ox, Fet_Cpx_cat_6ox, DiHd_1996, MgO_Cpx_cat_6ox, Jd):
+                    Al_VI_cat_6ox, Fet_Cpx_cat_6ox, DiHd_1996, Mg_Cpx_cat_6ox, Jd):
     '''
     Clinopyroxene-only barometer of Putirka (2008) Eq32b. Unlike 32a, requires H2O_Liq to be specified.
 
@@ -1284,7 +1284,7 @@ Al_Cpx_cat_6ox, K_Cpx_cat_6ox, Al_IV_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
         Cr_Cpx_cat_6ox + Lindley_Fe3_Cpx  # This is cell GR
     M1_M2_KD_Fe_Mg = np.exp(0.238 * R3_plus + 0.289 * CNM - 2.3315)
     M1_M1_Fe2_tot = Fet_Cpx_cat_6ox - Lindley_Fe3_Cpx  # GV15
-    b = (M1_M2_KD_Fe_Mg * MgO_Cpx_cat_6ox) - \
+    b = (M1_M2_KD_Fe_Mg * Mg_Cpx_cat_6ox) - \
         (M1_M2_KD_Fe_Mg * (1 - CNM)) + M1_M1_Fe2_tot + (1 - CNM)  # GX
     a_Kd_1 = 1 - M1_M2_KD_Fe_Mg  # GW
     c = -M1_M1_Fe2_tot * (1 - CNM)  # GY
@@ -1417,7 +1417,7 @@ def P_Petrelli2021_Cpx_only_components(T=None, *, cpx_comps):
     '''
     cpx_test=cpx_comps.copy()
     Cpx_compnts_test=calculate_clinopyroxene_components(cpx_comps)
-    Cpx_test_noID_noT=pd.DataFrame(data={'MgO_Cpx_cat_6ox': Cpx_compnts_test['MgO_Cpx_cat_6ox'],
+    Cpx_test_noID_noT=pd.DataFrame(data={'Mg_Cpx_cat_6ox': Cpx_compnts_test['Mg_Cpx_cat_6ox'],
                                       'Na_Cpx_cat_6ox': Cpx_compnts_test['Na_Cpx_cat_6ox'],
                                       'Al_VI_cat_6ox': Cpx_compnts_test['Al_VI_cat_6ox'],
                                        'DiHd_2003': Cpx_compnts_test['DiHd_2003'],
@@ -1450,28 +1450,28 @@ def P_Petrelli2021_Cpx_only_components(T=None, *, cpx_comps):
 
 ## Clinopyroxene-only temperature equations
 def T_Wang2021_eq2(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
+Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
 FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
     '''
     Clinopyroxene-only thermometer of Wang et al. (2021) equation 2 - currently on Zenodo - 10.5281/zenodo.4727870
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
-    +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*MgO_Cpx_cat_6ox))
+    +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
 
 
     return (273.15+226.3499*NCT-444.507*Ti_Cpx_cat_6ox-550.66*Al_Cpx_cat_6ox
-    -4290.88*Mn_Cpx_cat_6ox-580.33*MgO_Cpx_cat_6ox-760.789*Ca_Cpx_cat_6ox
+    -4290.88*Mn_Cpx_cat_6ox-580.33*Mg_Cpx_cat_6ox-760.789*Ca_Cpx_cat_6ox
     -3612.82*K_Cpx_cat_6ox-732.13*FeII_Wang21-23.6413*H2O_Liq+2513.694)
 
 
 def T_Wang2021_eq4(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
+Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
 FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox):
     '''
     Clinopyroxene-only thermometer of Wang et al. (2021) equation 2 - currently on Zenodo - 10.5281/zenodo.4727870
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
-    +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*MgO_Cpx_cat_6ox))
+    +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
 
 
     return (273.15+1270.004-1362.6*Al_Cpx_cat_6ox+2087.355*Cr_Cpx_cat_6ox

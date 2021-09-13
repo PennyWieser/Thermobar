@@ -37,7 +37,7 @@ Fet_Opx_cat_6ox, Mn_Opx_cat_6ox, Ca_Cpx_cat_6ox, Fm2Si2O6, En_Opx, Di_Opx):
 def P_Put2008_eq39(T, *, Na_Opx_cat_6ox, Al_IV_Opx_cat_6ox, Al_VI_Opx_cat_6ox,
 Ti_Opx_cat_6ox, Cr_Opx_cat_6ox, Fet_Opx_cat_6ox, Mn_Opx_cat_6ox, Ca_Opx_cat_6ox,
 Mg_Opx_cat_6ox, Na_Cpx_cat_6ox, Al_IV_cat_6ox, Al_VI_cat_6ox, Ti_Cpx_cat_6ox,
-Ca_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
+Ca_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
 Fm2Si2O6, En_Opx, EnFs):
     '''
 
@@ -57,7 +57,7 @@ Fm2Si2O6, En_Opx, EnFs):
     Lindley_Fe3_Cpx = Na_Cpx_cat_6ox + Al_IV_cat_6ox - \
         Al_VI_cat_6ox - 2 * Ti_Cpx_cat_6ox - Cr_Cpx_cat_6ox
     Lindley_Fe3_Cpx[Lindley_Fe3_Cpx < 0] = 0
-    a_Di_cpx = Ca_Cpx_cat_6ox / (Ca_Cpx_cat_6ox + 0.5 * MgO_Cpx_cat_6ox + 0.5 * (
+    a_Di_cpx = Ca_Cpx_cat_6ox / (Ca_Cpx_cat_6ox + 0.5 * Mg_Cpx_cat_6ox + 0.5 * (
         Fet_Cpx_cat_6ox - Lindley_Fe3_Cpx) + Mn_Cpx_cat_6ox + Na_Cpx_cat_6ox)
     Kf = Ca_Opx_cat_6ox / (1 - Ca_Cpx_cat_6ox)
     return (-94.25 + 0.045 * (T - 273.15) + 187.7 * Al_VI_Opx_cat_6ox + 246.8 * Fm2Si2O6 -
@@ -77,34 +77,34 @@ def T_Put2008_eq36(P, *, EnFs, Fm2Si2O6, Ca_Cpx_cat_6ox,
             CrCaTs + 33.2 * Mn_Opx_cat_6ox - 23.6 * Na_Opx_cat_6ox - 2.08 * En_Opx - 8.33 * Di_Opx - 0.05 * P))
 
 
-def T_Brey1990(P, *, Fet_Cpx_cat_6ox, Ca_Cpx_cat_6ox, MgO_Cpx_cat_6ox, Na_Cpx_cat_6ox,
+def T_Brey1990(P, *, Fet_Cpx_cat_6ox, Ca_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox,
                Fet_Opx_cat_6ox, Mg_Opx_cat_6ox, Ca_Opx_cat_6ox, Na_Opx_cat_6ox):
     '''
     Two-pyroxene thermometer of Brey and Kohler (1990).
     SEE=+-50C for Cpx Mg#>0.75
     SEE=+-70C for all data
     '''
-    return ((23664 + (24.9 + 126.3 * Fet_Cpx_cat_6ox / (Fet_Cpx_cat_6ox + MgO_Cpx_cat_6ox)) * P)
+    return ((23664 + (24.9 + 126.3 * Fet_Cpx_cat_6ox / (Fet_Cpx_cat_6ox + Mg_Cpx_cat_6ox)) * P)
     / (13.38 + (np.log((1 - Ca_Cpx_cat_6ox.astype(float) /(1 - Na_Cpx_cat_6ox.astype(float))) /
     (1 - Ca_Opx_cat_6ox.astype(float) / (1 - Na_Opx_cat_6ox.astype(float)))))**2
     + 11.59 * Fet_Opx_cat_6ox / (Fet_Opx_cat_6ox + Mg_Opx_cat_6ox)))
 
 
 def T_Put2008_eq37(P, *, EnFs, Di_Cpx, Fm2Si2O6, Mn_Opx_cat_6ox,
-                   FmAl2SiO6, MgO_Cpx_cat_6ox, Fet_Cpx_cat_6ox):
+                   FmAl2SiO6, Mg_Cpx_cat_6ox, Fet_Cpx_cat_6ox):
     '''
     Two-pyroxene thermometer of Putirka (2008) eq 37. For Cpx with Mg#<0.75
     SEE=+-38C for Cpx Mg#>0.75
     SEE=+-60C for all data
     '''
-    return (273.15 + 10**4 / (13.4 - 3.4 * np.log(EnFs.astype(float) / Fm2Si2O6.astype(float)) + 5.59 * np.log(MgO_Cpx_cat_6ox.astype(float))
+    return (273.15 + 10**4 / (13.4 - 3.4 * np.log(EnFs.astype(float) / Fm2Si2O6.astype(float)) + 5.59 * np.log(Mg_Cpx_cat_6ox.astype(float))
     + 23.85 * Mn_Opx_cat_6ox +6.48 * FmAl2SiO6 - 2.38 * Di_Cpx - 0.044 * P
-    - 8.8 * MgO_Cpx_cat_6ox / (MgO_Cpx_cat_6ox + Fet_Cpx_cat_6ox)))
+    - 8.8 * Mg_Cpx_cat_6ox / (Mg_Cpx_cat_6ox + Fet_Cpx_cat_6ox)))
 
 
 def T_Wood1973(P=None, *, Mg_Opx_cat_6ox, Ca_Opx_cat_6ox, Mn_Opx_cat_6ox,
 Fet_Opx_cat_6ox, Na_Opx_cat_6ox, Al_IV_Opx_cat_6ox, Al_VI_Opx_cat_6ox,
-Ti_Opx_cat_6ox, Cr_Opx_cat_6ox, MgO_Cpx_cat_6ox, Ca_Cpx_cat_6ox,
+Ti_Opx_cat_6ox, Cr_Opx_cat_6ox, Mg_Cpx_cat_6ox, Ca_Cpx_cat_6ox,
 Mn_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Na_Cpx_cat_6ox, Al_IV_cat_6ox,
 Al_VI_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox):
     '''
@@ -135,7 +135,7 @@ Al_VI_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox):
         2 * Ti_Cpx_cat_6ox - Cr_Cpx_cat_6ox  # This is cell FR
     Lindley_Fe3_Cpx[Lindley_Fe3_Cpx < 0] = 0
     Fe2_WB_Cpx = Fet_Cpx_cat_6ox - Lindley_Fe3_Cpx
-    MgNo_WB_Cpx = MgO_Cpx_cat_6ox / (MgO_Cpx_cat_6ox + Fe2_WB_Cpx)
+    MgNo_WB_Cpx = Mg_Cpx_cat_6ox / (Mg_Cpx_cat_6ox + Fe2_WB_Cpx)
     X_Mg_M2_Cpx = (1 - Ca_Cpx_cat_6ox - Na_Cpx_cat_6ox -
                    Mn_Cpx_cat_6ox) * MgNo_WB_Cpx  # FL
     X_Fe_M2_Cpx = (1 - Ca_Cpx_cat_6ox - Na_Cpx_cat_6ox -
@@ -155,7 +155,7 @@ Al_VI_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox):
 
 def T_Wells1977(P=None, *, Mg_Opx_cat_6ox, Ca_Opx_cat_6ox, Mn_Opx_cat_6ox,
 Fet_Opx_cat_6ox, Na_Opx_cat_6ox, Al_IV_Opx_cat_6ox, Al_VI_Opx_cat_6ox,
- Ti_Opx_cat_6ox, Cr_Opx_cat_6ox, MgO_Cpx_cat_6ox, Ca_Cpx_cat_6ox,
+ Ti_Opx_cat_6ox, Cr_Opx_cat_6ox, Mg_Cpx_cat_6ox, Ca_Cpx_cat_6ox,
  Mn_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Na_Cpx_cat_6ox, Al_IV_cat_6ox,
  Al_VI_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox):
     '''
@@ -186,7 +186,7 @@ Fet_Opx_cat_6ox, Na_Opx_cat_6ox, Al_IV_Opx_cat_6ox, Al_VI_Opx_cat_6ox,
         2 * Ti_Cpx_cat_6ox - Cr_Cpx_cat_6ox  # This is cell FR
     Lindley_Fe3_Cpx[Lindley_Fe3_Cpx < 0] = 0
     Fe2_WB_Cpx = Fet_Cpx_cat_6ox - Lindley_Fe3_Cpx
-    MgNo_WB_Cpx = MgO_Cpx_cat_6ox / (MgO_Cpx_cat_6ox + Fe2_WB_Cpx)
+    MgNo_WB_Cpx = Mg_Cpx_cat_6ox / (Mg_Cpx_cat_6ox + Fe2_WB_Cpx)
     X_Mg_M2_Cpx = (1 - Ca_Cpx_cat_6ox - Na_Cpx_cat_6ox -
                    Mn_Cpx_cat_6ox) * MgNo_WB_Cpx  # FL
     X_Fe_M2_Cpx = (1 - Ca_Cpx_cat_6ox - Na_Cpx_cat_6ox -
@@ -632,7 +632,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     En = (Combo_opxs_cpxs.Fm2Si2O6 * (Combo_opxs_cpxs.Mg_Opx_cat_6ox /
     (Combo_opxs_cpxs.Mg_Opx_cat_6ox +Combo_opxs_cpxs.Fet_Cpx_cat_6ox + Combo_opxs_cpxs.Mn_Cpx_cat_6ox)))
     Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'] = ((Combo_opxs_cpxs['Fet_Cpx_cat_6ox']
-    / Combo_opxs_cpxs['MgO_Cpx_cat_6ox'])) / (Combo_opxs_cpxs['Fet_Opx_cat_6ox']
+    / Combo_opxs_cpxs['Mg_Cpx_cat_6ox'])) / (Combo_opxs_cpxs['Fet_Opx_cat_6ox']
      / Combo_opxs_cpxs['Mg_Opx_cat_6ox'])
 
     if Kd_Match == "Subsolidus":

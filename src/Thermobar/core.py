@@ -1289,23 +1289,21 @@ def calculate_6oxygens_clinopyroxene(cpx_comps):
         cation_6['Al_IV_cat_6ox']
     cation_6.Al_VI_cat_6ox[cation_6.Al_VI_cat_6ox < 0] = 0
 
-    if oxide_headers is True:
-        return cation_6
-    if oxide_headers is False:
-        cation_6_2=cation_6.rename(columns={
-                            'SiO2_Cpx_cat_6ox': 'Si_Cpx_cat_6ox',
-                            'TiO2_Cpx_cat_6ox': 'Ti_Cpx_cat_6ox',
-                            'Al2O3_Cpx_cat_6ox': 'Al_Cpx_cat_6ox',
-                            'FeOt_Cpx_cat_6ox': 'Fet_Cpx_cat_6ox',
-                            'MnO_Cpx_cat_6ox': 'Mn_Cpx_cat_6ox',
-                            'MgO_Cpx_cat_6ox': 'Mg_Cpx_cat_6ox',
-                            'CaO_Cpx_cat_6ox': 'Ca_Cpx_cat_6ox',
-                            'Na2O_Cpx_cat_6ox': 'Na_Cpx_cat_6ox',
-                            'K2O_Cpx_cat_6ox': 'K_Cpx_cat_6ox',
-                            'Cr2O3_Cpx_cat_6ox': 'Cr_Cpx_cat_6ox',
-                            'P2O5_Cpx_cat_6ox': 'P_Cpx_cat_6ox_frac',
-                            })
-        return cation_6_2
+
+    cation_6_2=cation_6.rename(columns={
+                        'SiO2_Cpx_cat_6ox': 'Si_Cpx_cat_6ox',
+                        'TiO2_Cpx_cat_6ox': 'Ti_Cpx_cat_6ox',
+                        'Al2O3_Cpx_cat_6ox': 'Al_Cpx_cat_6ox',
+                        'FeOt_Cpx_cat_6ox': 'Fet_Cpx_cat_6ox',
+                        'MnO_Cpx_cat_6ox': 'Mn_Cpx_cat_6ox',
+                        'MgO_Cpx_cat_6ox': 'Mg_Cpx_cat_6ox',
+                        'CaO_Cpx_cat_6ox': 'Ca_Cpx_cat_6ox',
+                        'Na2O_Cpx_cat_6ox': 'Na_Cpx_cat_6ox',
+                        'K2O_Cpx_cat_6ox': 'K_Cpx_cat_6ox',
+                        'Cr2O3_Cpx_cat_6ox': 'Cr_Cpx_cat_6ox',
+                        'P2O5_Cpx_cat_6ox': 'P_Cpx_cat_6ox_frac',
+                        })
+    return cation_6_2
 
 # calculating Clinopyroxene components following Putirka spreadsheet
 
@@ -1332,8 +1330,8 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['Cation_Sum_Cpx'] = (cpx_calc['Si_Cpx_cat_6ox'] + cpx_calc['Ti_Cpx_cat_6ox']
     + cpx_calc['Al_Cpx_cat_6ox'] + cpx_calc['Fet_Cpx_cat_6ox']
     + cpx_calc['Mn_Cpx_cat_6ox'] + cpx_calc['Mg_Cpx_cat_6ox'] +
-    cpx_calc['Ca_Cpx_cat_6ox'] + cpx_calc['Na2_Cpx_cat_6ox']
-    + cpx_calc['K2O_Cpx_cat_6ox'] + cpx_calc['Cr2O3_Cpx_cat_6ox'])
+    cpx_calc['Ca_Cpx_cat_6ox'] + cpx_calc['Na_Cpx_cat_6ox']
+    + cpx_calc['K_Cpx_cat_6ox'] + cpx_calc['Cr_Cpx_cat_6ox'])
 
     cpx_calc['Ca_CaMgFe']=cpx_calc['Ca_Cpx_cat_6ox']/(cpx_calc['Ca_Cpx_cat_6ox']+cpx_calc['Fet_Cpx_cat_6ox']
     +cpx_calc['Mg_Cpx_cat_6ox'])
@@ -1342,9 +1340,10 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['Lindley_Fe3_Cpx'] = (cpx_calc['Na_Cpx_cat_6ox'] + cpx_calc['Al_IV_cat_6ox'] - cpx_calc['Al_VI_cat_6ox'] -
         2 * cpx_calc['Ti_Cpx_cat_6ox'] - cpx_calc['Cr_Cpx_cat_6ox'])  # This is cell FR
     cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] < 0.0000000001),  'Lindley_Fe3_Cpx'] = 0
-    cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] >= cpx_calc['FeOt_Cpx_cat_6ox'] ),  'Lindley_Fe3_Cpx'] = cpx_calc['Fet_Cpx_cat_6ox']
+    cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] >= cpx_calc['Fet_Cpx_cat_6ox'] ),  'Lindley_Fe3_Cpx'] = (
+    cpx_calc['Fet_Cpx_cat_6ox'])
     cpx_calc['Lindley_Fe2_Cpx']=cpx_calc['Fet_Cpx_cat_6ox']-cpx_calc['Lindley_Fe3_Cpx']
-    cpx_calc['Lindley_Fe3_Cpx_prop']=cpx_calc['Lindley_Fe3_Cpx']/cpx_calc['FeOt_Cpx_cat_6ox']
+    cpx_calc['Lindley_Fe3_Cpx_prop']=cpx_calc['Lindley_Fe3_Cpx']/cpx_calc['Fet_Cpx_cat_6ox']
 
     # Cpx Components that don't nee if and else statements and don't rely on
     # others.
@@ -1398,7 +1397,7 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['DiHd_2003'] = cpx_calc['DiHd_2003'].clip(lower=0)
     cpx_calc['Jd'] = cpx_calc['Jd'].clip(lower=0)
 
-    cpx_calc['FeIII_Wang21']=(cpx_calc['Na2O_Cpx_cat_6ox']+cpx_calc['Al_IV_cat_6ox']
+    cpx_calc['FeIII_Wang21']=(cpx_calc['Na_Cpx_cat_6ox']+cpx_calc['Al_IV_cat_6ox']
     -cpx_calc['Al_VI_cat_6ox']-2*cpx_calc['Ti_Cpx_cat_6ox']-cpx_calc['Cr_Cpx_cat_6ox'])
     cpx_calc['FeII_Wang21']=cpx_calc['Fet_Cpx_cat_6ox']-cpx_calc['FeIII_Wang21']
 
@@ -3435,7 +3434,7 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     #CrCaTs component
 
     Combo_liq_cpxs['CrCaTs_Pred_Put1999'] = (np.exp(12.8) * Combo_liq_cpxs['Ca_Liq_cat_frac'] * (
-        Combo_liq_cpxs['Cr2O3_Liq_cat_frac']**2) * Combo_liq_cpxs['Si_Liq_cat_frac'])
+        Combo_liq_cpxs['Cr_Liq_cat_frac']**2) * Combo_liq_cpxs['Si_Liq_cat_frac'])
     Combo_liq_cpxs['Delta_CrCaTs_Put1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_Put1999'])
     Combo_liq_cpxs['Delta_CrCaTs_I_M_Put1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_Put1999'])
 
@@ -3498,32 +3497,36 @@ def calculate_cpx_opx_eq_tests(cpx_comps, opx_comps):
     cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
     opx_components = calculate_orthopyroxene_components(opx_comps=opx_comps)
     two_pyx = pd.concat([cpx_components, opx_components], axis=1)
-    two_pyx['En'] = (two_pyx['Fm2Si2O6'] * (two_pyx['MgO_Opx_cat_6ox'] / (two_pyx['MgO_Opx_cat_6ox'] +
-                                                               two_pyx['FeOt_Cpx_cat_6ox'] + two_pyx['MnO_Cpx_cat_6ox'])))
-    two_pyx['Kd_Fe_Mg_Cpx_Opx'] = ((two_pyx['FeOt_Cpx_cat_6ox'] / two_pyx['MgO_Cpx_cat_6ox'])) / (
-        two_pyx['FeOt_Opx_cat_6ox'] / two_pyx['MgO_Opx_cat_6ox'])
+    two_pyx['En'] = (two_pyx['Fm2Si2O6'] * (two_pyx['Mg_Opx_cat_6ox'] / (two_pyx['Mg_Opx_cat_6ox'] +
+                    two_pyx['Fet_Cpx_cat_6ox'] + two_pyx['Mn_Cpx_cat_6ox'])))
+    two_pyx['Kd_Fe_Mg_Cpx_Opx'] = ((two_pyx['Fet_Cpx_cat_6ox'] / two_pyx['Mg_Cpx_cat_6ox'])) / (
+        two_pyx['Fet_Opx_cat_6ox'] / two_pyx['Mg_Opx_cat_6ox'])
 
-    Lindley_Fe3_Opx = (two_pyx['Na2O_Opx_cat_6ox'] + two_pyx['Al_IV_Opx_cat_6ox'] -
-        two_pyx['Al_VI_Opx_cat_6ox'] - 2 * two_pyx['TiO2_Opx_cat_6ox'] - two_pyx['Cr2O3_Opx_cat_6ox'])
+    Lindley_Fe3_Opx = (two_pyx['Na_Opx_cat_6ox'] + two_pyx['Al_IV_Opx_cat_6ox'] -
+        two_pyx['Al_VI_Opx_cat_6ox'] - 2 * two_pyx['Ti_Opx_cat_6ox'] - two_pyx['Cr_Opx_cat_6ox'])
     Lindley_Fe3_Opx[Lindley_Fe3_Opx < 0] = 0
     two_pyx['Lindley_Fe3_Opx']=Lindley_Fe3_Opx
-    a_En_opx_mod = (((0.5 * two_pyx['MgO_Opx_cat_6ox'] / (0.5 * (two_pyx['FeOt_Opx_cat_6ox'] - two_pyx['Lindley_Fe3_Opx'])
-    + 0.5 * two_pyx['MgO_Opx_cat_6ox'] + two_pyx['Na2O_Opx_cat_6ox'] +two_pyx['CaO_Opx_cat_6ox'] + two_pyx['MnO_Opx_cat_6ox'])))
-    * (0.5 * two_pyx['MgO_Opx_cat_6ox'] / (0.5 * two_pyx['MgO_Opx_cat_6ox'] + 0.5 * (two_pyx['FeOt_Opx_cat_6ox'] - two_pyx['Lindley_Fe3_Opx'])
-    + two_pyx['TiO2_Opx_cat_6ox'] + two_pyx['Al_VI_Opx_cat_6ox'] + two_pyx['Cr2O3_Opx_cat_6ox'] + two_pyx['Lindley_Fe3_Opx'])))
+    a_En_opx_mod = (((0.5 * two_pyx['Mg_Opx_cat_6ox'] / (0.5 * (two_pyx['Fet_Opx_cat_6ox'] - two_pyx['Lindley_Fe3_Opx'])
+    + 0.5 * two_pyx['Mg_Opx_cat_6ox'] + two_pyx['Na_Opx_cat_6ox'] +two_pyx['Ca_Opx_cat_6ox'] + two_pyx['Mn_Opx_cat_6ox'])))
+    * (0.5 * two_pyx['Mg_Opx_cat_6ox'] / (0.5 * two_pyx['Mg_Opx_cat_6ox'] + 0.5 * (two_pyx['Fet_Opx_cat_6ox']
+    - two_pyx['Lindley_Fe3_Opx'])+ two_pyx['Ti_Opx_cat_6ox'] + two_pyx['Al_VI_Opx_cat_6ox']
+    + two_pyx['Cr_Opx_cat_6ox'] + two_pyx['Lindley_Fe3_Opx'])))
 
-    Lindley_Fe3_Cpx = two_pyx['Na2O_Cpx_cat_6ox'] + two_pyx['Al_IV_cat_6ox'] - \
-        two_pyx['Al_VI_cat_6ox'] - 2 * two_pyx['TiO2_Cpx_cat_6ox'] - two_pyx['Cr2O3_Cpx_cat_6ox']
+    Lindley_Fe3_Cpx = two_pyx['Na_Cpx_cat_6ox'] + two_pyx['Al_IV_cat_6ox'] - \
+        two_pyx['Al_VI_cat_6ox'] - 2 * two_pyx['Ti_Cpx_cat_6ox'] - two_pyx['Cr_Cpx_cat_6ox']
     Lindley_Fe3_Cpx[Lindley_Fe3_Cpx < 0] = 0
     two_pyx['Lindley_Fe3_Cpx']=Lindley_Fe3_Cpx
-    two_pyx['a_Di_cpx'] = two_pyx['CaO_Cpx_cat_6ox'] / (two_pyx['CaO_Cpx_cat_6ox'] + 0.5 * two_pyx['MgO_Cpx_cat_6ox'] + 0.5 * (
-        two_pyx['FeOt_Cpx_cat_6ox'] - two_pyx['Lindley_Fe3_Cpx']) + two_pyx['MnO_Cpx_cat_6ox'] + two_pyx['Na2O_Cpx_cat_6ox'])
-    two_pyx['Kf'] = two_pyx['CaO_Opx_cat_6ox'] / (1 - two_pyx['CaO_Cpx_cat_6ox'])
+    two_pyx['a_Di_cpx'] = two_pyx['Ca_Cpx_cat_6ox'] / (two_pyx['Ca_Cpx_cat_6ox'] + 0.5 * two_pyx['Mg_Cpx_cat_6ox']
+    + 0.5 * (two_pyx['Fet_Cpx_cat_6ox'] - two_pyx['Lindley_Fe3_Cpx']) + two_pyx['Mn_Cpx_cat_6ox']
+    + two_pyx['Na_Cpx_cat_6ox'])
+    two_pyx['Kf'] = two_pyx['Ca_Opx_cat_6ox'] / (1 - two_pyx['Ca_Cpx_cat_6ox'])
 
-    two_pyx['a_En_opx_mod'] = (((0.5 * two_pyx['MgO_Opx_cat_6ox'] / (0.5 * (two_pyx['FeOt_Opx_cat_6ox'] - two_pyx['Lindley_Fe3_Opx'])
-    + 0.5 * two_pyx['MgO_Opx_cat_6ox'] + two_pyx['Na2O_Opx_cat_6ox'] +two_pyx['CaO_Opx_cat_6ox'] + two_pyx['MnO_Opx_cat_6ox'])))
-    * (0.5 * two_pyx['MgO_Opx_cat_6ox'] / (0.5 * two_pyx['MgO_Opx_cat_6ox'] + 0.5 * (two_pyx['FeOt_Opx_cat_6ox'] - two_pyx['Lindley_Fe3_Opx'])
-    + two_pyx['TiO2_Opx_cat_6ox'] + two_pyx['Al_VI_Opx_cat_6ox'] + two_pyx['Cr2O3_Opx_cat_6ox'] + two_pyx['Lindley_Fe3_Opx'])))
+    two_pyx['a_En_opx_mod'] = (((0.5 * two_pyx['Mg_Opx_cat_6ox'] / (0.5 * (two_pyx['Fet_Opx_cat_6ox']
+    - two_pyx['Lindley_Fe3_Opx'])+ 0.5 * two_pyx['Mg_Opx_cat_6ox'] + two_pyx['Na_Opx_cat_6ox']
+    +two_pyx['Ca_Opx_cat_6ox'] + two_pyx['Mn_Opx_cat_6ox'])))
+    * (0.5 * two_pyx['Mg_Opx_cat_6ox'] / (0.5 * two_pyx['Mg_Opx_cat_6ox'] + 0.5 * (two_pyx['Fet_Opx_cat_6ox']
+    - two_pyx['Lindley_Fe3_Opx'])+ two_pyx['Ti_Opx_cat_6ox'] + two_pyx['Al_VI_Opx_cat_6ox']
+    + two_pyx['Cr_Opx_cat_6ox'] + two_pyx['Lindley_Fe3_Opx'])))
 
 
 
