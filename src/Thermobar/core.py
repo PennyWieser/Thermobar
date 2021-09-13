@@ -439,7 +439,7 @@ def calculate_anhydrous_mol_fractions_liquid(liq_comps):
     return mol_frac_anhyd
 
 
-def calculate_anhydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
+def calculate_anhydrous_cat_proportions_liquid(liq_comps):
     '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous cation proportions (e.g., mole proportions * no of cations)
 
    Parameters
@@ -448,10 +448,6 @@ def calculate_anhydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
     liq_comps: DataFrame
                 Panda DataFrame of liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
-    oxide_headers: bool
-        default=False, returns as Ti_Liq_cat_prop. =True returns Ti_Liq_cat_prop.
-        This is used for rapid matrix division for
-        pre-processing of data for cation fractions etc
 
     Returns
     -------
@@ -470,29 +466,13 @@ def calculate_anhydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
     cation_prop_anhyd.columns = [
         str(col) + '_cat_prop' for col in cation_prop_anhyd.columns]
 
-    if oxide_headers is False:
-
-        cation_prop_anhyd2=cation_prop_anhyd.rename(columns={
-                            'SiO2_Liq_cat_prop': 'Si_Liq_cat_prop',
-                            'TiO2_Liq_cat_prop': 'Ti_Liq_cat_prop',
-                            'Al2O3_Liq_cat_prop': 'Al_Liq_cat_prop',
-                            'FeOt_Liq_cat_prop': 'Fet_Liq_cat_prop',
-                            'MnO_Liq_cat_prop': 'Mn_Liq_cat_prop',
-                            'MgO_Liq_cat_prop': 'Mg_Liq_cat_prop',
-                            'CaO_Liq_cat_prop': 'Ca_Liq_cat_prop',
-                            'Na2O_Liq_cat_prop': 'Na_Liq_cat_prop',
-                            'K2O_Liq_cat_prop': 'K_Liq_cat_prop',
-                            'Cr2O3_Liq_cat_prop': 'Cr_Liq_cat_prop',
-                            'P2O5_Liq_cat_prop': 'P_Liq_cat_prop',
-
-                            })
-
-        return cation_prop_anhyd2
-    else:
-        return cation_prop_anhyd
 
 
-def calculate_anhydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
+    return cation_prop_anhyd
+
+
+
+def calculate_anhydrous_cat_fractions_liquid(liq_comps):
     '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous cation fractions
 
    Parameters
@@ -501,11 +481,6 @@ def calculate_anhydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
     liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
-    oxide_headers: bool
-        default=False, returns as Ti_Liq_cat_frac.
-        =True returns Ti_Liq_cat_frac.
-        This is used for rapid matrix division for
-        pre-processing of data for cation fractions etc
 
     Returns
     -------
@@ -515,7 +490,7 @@ def calculate_anhydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
 
 
     '''
-    cat_prop = calculate_anhydrous_cat_proportions_liquid(liq_comps=liq_comps, oxide_headers=True)
+    cat_prop = calculate_anhydrous_cat_proportions_liquid(liq_comps=liq_comps)
     mol_prop = calculate_anhydrous_mol_fractions_liquid(liq_comps=liq_comps)
     cat_prop['sum'] = cat_prop.sum(axis='columns')
     cat_frac_anhyd = cat_prop.div(cat_prop['sum'], axis='rows')
@@ -536,24 +511,22 @@ def calculate_anhydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
         cat_frac_anhyd['Mg_Number_Liq_NoFe3'] = (cat_frac_anhyd['MgO_Liq'] / 40.3044) / (
             (cat_frac_anhyd['MgO_Liq'] / 40.3044) + (cat_frac_anhyd['FeOt_Liq'] / 71.844))
 
-    if oxide_headers is False:
-        cation_frac_anhyd2=cat_frac_anhyd.rename(columns={
-                            'SiO2_Liq_cat_frac': 'Si_Liq_cat_frac',
-                            'TiO2_Liq_cat_frac': 'Ti_Liq_cat_frac',
-                            'Al2O3_Liq_cat_frac': 'Al_Liq_cat_frac',
-                            'FeOt_Liq_cat_frac': 'Fet_Liq_cat_frac',
-                            'MnO_Liq_cat_frac': 'Mn_Liq_cat_frac',
-                            'MgO_Liq_cat_frac': 'Mg_Liq_cat_frac',
-                            'CaO_Liq_cat_frac': 'Ca_Liq_cat_frac',
-                            'Na2O_Liq_cat_frac': 'Na_Liq_cat_frac',
-                            'K2O_Liq_cat_frac': 'K_Liq_cat_frac',
-                            'Cr2O3_Liq_cat_frac': 'Cr_Liq_cat_frac',
-                            'P2O5_Liq_cat_frac': 'P_Liq_cat_frac',
 
-                            })
-        return cation_frac_anhyd2
-    else:
-        return cat_frac_anhyd
+    cation_frac_anhyd2=cat_frac_anhyd.rename(columns={
+                        'SiO2_Liq_cat_frac': 'Si_Liq_cat_frac',
+                        'TiO2_Liq_cat_frac': 'Ti_Liq_cat_frac',
+                        'Al2O3_Liq_cat_frac': 'Al_Liq_cat_frac',
+                        'FeOt_Liq_cat_frac': 'Fet_Liq_cat_frac',
+                        'MnO_Liq_cat_frac': 'Mn_Liq_cat_frac',
+                        'MgO_Liq_cat_frac': 'Mg_Liq_cat_frac',
+                        'CaO_Liq_cat_frac': 'Ca_Liq_cat_frac',
+                        'Na2O_Liq_cat_frac': 'Na_Liq_cat_frac',
+                        'K2O_Liq_cat_frac': 'K_Liq_cat_frac',
+                        'Cr2O3_Liq_cat_frac': 'Cr_Liq_cat_frac',
+                        'P2O5_Liq_cat_frac': 'P_Liq_cat_frac',
+
+                        })
+    return cation_frac_anhyd2
 
 # Liquid Mgno function
 
@@ -640,7 +613,7 @@ def calculate_hydrous_mol_fractions_liquid(liq_comps):
     return mol_frac_hyd
 
 
-def calculate_hydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
+def calculate_hydrous_cat_proportions_liquid(liq_comps):
     '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous cation proportions (e.g., mole proportions * no of cations)
 
    Parameters
@@ -649,10 +622,6 @@ def calculate_hydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
     liq_comps: DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
-    oxide_headers: bool
-        default=False, returns as Ti_Liq_..... =True returns TiO2_Liq_....
-        This is used for rapid matrix division for
-        pre-processing of data for cation fractions etc
 
     Returns
     -------
@@ -670,25 +639,23 @@ def calculate_hydrous_cat_proportions_liquid(liq_comps, oxide_headers=False):
         df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
     cation_prop_hyd.columns = [
         str(col) + '_cat_prop_hyd' for col in cation_prop_hyd.columns]
-    if oxide_headers is True:
-        return cation_prop_hyd
-    if oxide_headers is False:
 
-        cation_prop_hyd2=cation_prop_hyd.rename(columns={
-                            'SiO2_Liq_cat_prop_hyd': 'Si_Liq_cat_prop_hyd',
-                            'TiO2_Liq_cat_prop_hyd': 'Ti_Liq_cat_prop_hyd',
-                            'Al2O3_Liq_cat_prop_hyd': 'Al_Liq_cat_prop_hyd',
-                            'FeOt_Liq_cat_prop_hyd': 'Fet_Liq_cat_prop_hyd',
-                            'MnO_Liq_cat_prop_hyd': 'Mn_Liq_cat_prop_hyd',
-                            'MgO_Liq_cat_prop_hyd': 'Mg_Liq_cat_prop_hyd',
-                            'CaO_Liq_cat_prop_hyd': 'Ca_Liq_cat_prop_hyd',
-                            'Na2O_Liq_cat_prop_hyd': 'Na_Liq_cat_prop_hyd',
-                            'K2O_Liq_cat_prop_hyd': 'K_Liq_cat_prop_hyd',
-                            'Cr2O3_Liq_cat_prop_hyd': 'Cr_Liq_cat_prop_hyd',
-                            'P2O5_Liq_cat_prop_hyd': 'P_Liq_cat_prop_hyd',
-                            })
 
-        return cation_prop_hyd2
+    cation_prop_hyd2=cation_prop_hyd.rename(columns={
+                        'SiO2_Liq_cat_prop_hyd': 'Si_Liq_cat_prop_hyd',
+                        'TiO2_Liq_cat_prop_hyd': 'Ti_Liq_cat_prop_hyd',
+                        'Al2O3_Liq_cat_prop_hyd': 'Al_Liq_cat_prop_hyd',
+                        'FeOt_Liq_cat_prop_hyd': 'Fet_Liq_cat_prop_hyd',
+                        'MnO_Liq_cat_prop_hyd': 'Mn_Liq_cat_prop_hyd',
+                        'MgO_Liq_cat_prop_hyd': 'Mg_Liq_cat_prop_hyd',
+                        'CaO_Liq_cat_prop_hyd': 'Ca_Liq_cat_prop_hyd',
+                        'Na2O_Liq_cat_prop_hyd': 'Na_Liq_cat_prop_hyd',
+                        'K2O_Liq_cat_prop_hyd': 'K_Liq_cat_prop_hyd',
+                        'Cr2O3_Liq_cat_prop_hyd': 'Cr_Liq_cat_prop_hyd',
+                        'P2O5_Liq_cat_prop_hyd': 'P_Liq_cat_prop_hyd',
+                        })
+
+    return cation_prop_hyd2
 
 def calculate_hydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
     '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous cation fractions
@@ -712,7 +679,7 @@ def calculate_hydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
         anhydrous cation fractions for the liquid with column headings of the form ..Liq_cat_frac
 
     '''
-    cat_prop = calculate_hydrous_cat_proportions_liquid(liq_comps=liq_comps, oxide_headers=True)
+    cat_prop = calculate_hydrous_cat_proportions_liquid(liq_comps=liq_comps)
     mol_prop = calculate_hydrous_mol_fractions_liquid(liq_comps=liq_comps)
     cat_prop['sum'] = cat_prop.sum(axis='columns')
     cat_frac_hyd = cat_prop.div(cat_prop['sum'], axis='rows')
@@ -722,7 +689,7 @@ def calculate_hydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
     cat_frac_hyd = pd.concat([liq_comps, mol_prop, cat_frac_hyd], axis=1)
 
 
-    cat_frac_hyd['Fe2_Liq_cat_frac_hyd'] = cat_frac_hyd['FeOt_Liq_cat_frac_hyd'] * \
+    cat_frac_hyd['Fe2_Liq_cat_frac_hyd'] = cat_frac_hyd['Fet_Liq_cat_frac_hyd'] * \
         (1 - liq_comps['Fe3Fet_Liq'])
     if "Fe3Fet_Liq" in cat_frac_hyd:
         cat_frac_hyd['Mg_Number_Liq_NoFe3'] = (cat_frac_hyd['MgO_Liq'] / 40.3044) / (
@@ -737,37 +704,8 @@ def calculate_hydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
             (cat_frac_hyd['MgO_Liq'] / 40.3044) + (cat_frac_hyd['FeOt_Liq'] / 71.844))
 
 
-    if oxide_headers is False:
-        cat_frac_hyd2=cat_frac_hyd.rename(columns={
-                            'SiO2_Liq_cat_prop_hyd': 'Si_Liq_cat_prop_hyd',
-                            'TiO2_Liq_cat_prop_hyd': 'Ti_Liq_cat_prop_hyd',
-                            'Al2O3_Liq_cat_prop_hyd': 'Al_Liq_cat_prop_hyd',
-                            'FeOt_Liq_cat_prop_hyd': 'Fet_Liq_cat_prop_hyd',
-                            'MnO_Liq_cat_prop_hyd': 'Mn_Liq_cat_prop_hyd',
-                            'MgO_Liq_cat_prop_hyd': 'Mg_Liq_cat_prop_hyd',
-                            'CaO_Liq_cat_prop_hyd': 'Ca_Liq_cat_prop_hyd',
-                            'Na2O_Liq_cat_prop_hyd': 'Na_Liq_cat_prop_hyd',
-                            'K2O_Liq_cat_prop_hyd': 'K_Liq_cat_prop_hyd',
-                            'Cr2O3_Liq_cat_prop_hyd': 'Cr_Liq_cat_prop_hyd',
-                            'P2O5_Liq_cat_prop_hyd': 'P_Liq_cat_prop_hyd',
 
-                            'SiO2_Liq_cat_frac_hyd': 'Si_Liq_cat_frac_hyd',
-                            'TiO2_Liq_cat_frac_hyd': 'Ti_Liq_cat_frac_hyd',
-                            'Al2O3_Liq_cat_frac_hyd': 'Al_Liq_cat_frac_hyd',
-                            'FeOt_Liq_cat_frac_hyd': 'Fet_Liq_cat_frac_hyd',
-                            'MnO_Liq_cat_frac_hyd': 'Mn_Liq_cat_frac_hyd',
-                            'MgO_Liq_cat_frac_hyd': 'Mg_Liq_cat_frac_hyd',
-                            'CaO_Liq_cat_frac_hyd': 'Ca_Liq_cat_frac_hyd',
-                            'Na2O_Liq_cat_frac_hyd': 'Na_Liq_cat_frac_hyd',
-                            'K2O_Liq_cat_frac_hyd': 'K_Liq_cat_frac_hyd',
-                            'Cr2O3_Liq_cat_frac_hyd': 'Cr_Liq_cat_frac_hyd',
-                            'P2O5_Liq_cat_frac_hyd': 'P_Liq_cat_frac_hyd',
-
-                            })
-
-        return cat_frac_hyd2
-    else:
-        return cat_frac_hyd
+    return cat_frac_hyd
 
 # calculating Liquid mole and cation fractions including Ni for Pu et al.
 # 2017 and 2019
@@ -958,7 +896,23 @@ def calculate_cat_proportions_olivine(ol_comps):
         df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
     cation_prop_anhyd.columns = [
         str(col) + '_cat_prop' for col in cation_prop_anhyd.columns]
-    return cation_prop_anhyd
+
+    cation_prop_anhyd2=cation_prop_anhyd.rename(columns={
+
+                        'SiO2_Ol_cat_prop': 'Si_Ol_cat_prop',
+                        'TiO2_Ol_cat_prop': 'Ti_Ol_cat_prop',
+                        'Al2O3_Ol_cat_prop': 'Al_Ol_cat_prop',
+                        'FeOt_Ol_cat_prop': 'Fet_Ol_cat_prop',
+                        'MnO_Ol_cat_prop': 'Mn_Ol_cat_prop',
+                        'MgO_Ol_cat_prop': 'Mg_Ol_cat_prop',
+                        'CaO_Ol_cat_prop': 'Ca_Ol_cat_prop',
+                        'Na2O_Ol_cat_prop': 'Na_Ol_cat_prop',
+                        'K2O_Ol_cat_prop': 'K_Ol_cat_prop',
+                        'Cr2O3_Ol_cat_prop': 'Cr_Ol_cat_prop',
+                        'P2O5_Ol_cat_prop': 'P_Ol_cat_prop',
+                        })
+
+    return cation_prop_anhyd2
 
 
 def calculate_cat_fractions_olivine(ol_comps):
@@ -1930,7 +1884,7 @@ def calculate_mol_fractions_amphibole(amp_comps):
     '''
 
 
-def calculate_cat_proportions_amphibole(*, amp_comps=None):
+def calculate_cat_proportions_amphibole(*, amp_comps=None, oxide_headers=False):
     '''Import amphibole compositions using amp_comps=My_amphiboles, returns cation proportions
 
    Parameters
@@ -1939,13 +1893,11 @@ def calculate_cat_proportions_amphibole(*, amp_comps=None):
     amp_comps: DataFrame
             amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
+
     Returns
     -------
     pandas DataFrame
-        cation proportions for amphibole with column headings of the form SiO2_Amp_cat_prop
-        For simplicity, and consistency of column heading types, oxide names are preserved,
-        so outputs are Na2O_Amp_cat_prop rather than Na_Amp_cat_prop.
-
+        cation proportions for amphibole with column headings of the form ...Amp_cat_prop
     '''
 
     amp_prop_no_cat_num = calculate_mol_proportions_amphibole(
@@ -1959,7 +1911,27 @@ def calculate_cat_proportions_amphibole(*, amp_comps=None):
         df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
     cation_prop_anhyd.columns = [
         str(col) + '_cat_prop' for col in cation_prop_anhyd.columns]
-    return cation_prop_anhyd
+
+    cation_prop_anhyd2=cation_prop_anhyd.rename(columns={
+
+                        'SiO2_Amp_cat_prop': 'Si_Amp_cat_prop',
+                        'TiO2_Amp_cat_prop': 'Ti_Amp_cat_prop',
+                        'Al2O3_Amp_cat_prop': 'Al_Amp_cat_prop',
+                        'FeOt_Amp_cat_prop': 'Fet_Amp_cat_prop',
+                        'MnO_Amp_cat_prop': 'Mn_Amp_cat_prop',
+                        'MgO_Amp_cat_prop': 'Mg_Amp_cat_prop',
+                        'CaO_Amp_cat_prop': 'Ca_Amp_cat_prop',
+                        'Na2O_Amp_cat_prop': 'Na_Amp_cat_prop',
+                        'K2O_Amp_cat_prop': 'K_Amp_cat_prop',
+                        'Cr2O3_Amp_cat_prop': 'Cr_Amp_cat_prop',
+                        'P2O5_Amp_cat_prop': 'P_Amp_cat_prop',
+                        })
+
+
+
+
+
+    return cation_prop_anhyd2
 
 
 def calculate_oxygens_amphibole(amp_comps):
@@ -2002,9 +1974,9 @@ def calculate_23oxygens_amphibole(amp_comps):
     Returns
     -------
     pandas DataFrame
-        cations on the basis of 23 oxygens, with column headings of the form SiO2_Amp_cat_23ox.
+        cations on the basis of 23 oxygens, with column headings of the form Si_Amp_cat_23ox.
         For simplicity, and consistency of column labelling to aid calculations, oxide names are preserved,
-        so outputs are Na2O_Amp_cat_23ox rather than Na_Amp_cat_23ox.
+        so outputs are Na_Amp_cat_23ox rather than Na_Amp_cat_23ox.
 
     '''
 
@@ -2019,21 +1991,35 @@ def calculate_23oxygens_amphibole(amp_comps):
     ox_num_reindex = cation_num_amp_df.reindex(
         mol_prop_23.columns, axis=1).fillna(0)
     df_calc_comb = pd.concat([ox_num_reindex, mol_prop_23])
-    cation_23 = df_calc_comb.multiply(
+    cation_23_ox = df_calc_comb.multiply(
         df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
 
-    cation_23.columns = [str(col).replace('_mol_prop', '_cat_23ox')
+    cation_23_ox.columns = [str(col).replace('_mol_prop', '_cat_23ox')
                          for col in mol_prop.columns]
-    cation_23['cation_sum_Si_Mg'] = (cation_23['SiO2_Amp_cat_23ox']
-    + cation_23['TiO2_Amp_cat_23ox'] + cation_23['Al2O3_Amp_cat_23ox'] +
-        cation_23['Cr2O3_Amp_cat_23ox'] + cation_23['FeOt_Amp_cat_23ox'] +
-        cation_23['MnO_Amp_cat_23ox'] + cation_23['MgO_Amp_cat_23ox'])
+
+    cation_23=cation_23_ox.rename(columns={
+                            'SiO2_Amp_cat_23ox': 'Si_Amp_cat_23ox',
+                            'TiO2_Amp_cat_23ox': 'Ti_Amp_cat_23ox',
+                            'Al2O3_Amp_cat_23ox': 'Al_Amp_cat_23ox',
+                            'FeOt_Amp_cat_23ox': 'Fet_Amp_cat_23ox',
+                            'MnO_Amp_cat_23ox': 'Mn_Amp_cat_23ox',
+                            'MgO_Amp_cat_23ox': 'Mg_Amp_cat_23ox',
+                            'CaO_Amp_cat_23ox': 'Ca_Amp_cat_23ox',
+                            'Na2O_Amp_cat_23ox': 'Na_Amp_cat_23ox',
+                            'K2O_Amp_cat_23ox': 'K_Amp_cat_23ox',
+                            'Cr2O3_Amp_cat_23ox': 'Cr_Amp_cat_23ox',
+                            'P2O5_Amp_cat_23ox': 'P_Amp_cat_23ox_frac',})
+
+    cation_23['cation_sum_Si_Mg'] = (cation_23['Si_Amp_cat_23ox']
+    + cation_23['Ti_Amp_cat_23ox'] + cation_23['Al_Amp_cat_23ox'] +
+        cation_23['Cr_Amp_cat_23ox'] + cation_23['Fet_Amp_cat_23ox'] +
+        cation_23['Mn_Amp_cat_23ox'] + cation_23['Mg_Amp_cat_23ox'])
     cation_23['cation_sum_Si_Ca'] = (cation_23['cation_sum_Si_Mg'] +
-        cation_23['CaO_Amp_cat_23ox'])
+        cation_23['Ca_Amp_cat_23ox'])
     cation_23['cation_sum_All'] = cation_23['cation_sum_Si_Ca'] + \
-        cation_23['Na2O_Amp_cat_23ox'] + +cation_23['K2O_Amp_cat_23ox']
-    cation_23['Mgno_Amp']=cation_23['MgO_Amp_cat_23ox']/(cation_23['MgO_Amp_cat_23ox']
-    +cation_23['FeOt_Amp_cat_23ox'])
+        cation_23['Na_Amp_cat_23ox'] + +cation_23['K_Amp_cat_23ox']
+    cation_23['Mgno_Amp']=cation_23['Mg_Amp_cat_23ox']/(cation_23['Mg_Amp_cat_23ox']
+    +cation_23['Fet_Amp_cat_23ox'])
 
     return cation_23
 # Ridolfi Amphiboles, using Cl and F, does on 13 cations.
@@ -2415,32 +2401,32 @@ def get_amp_sites_leake(amp_apfu_df):
     # Take unambigous ones and allocate them, set everything else to zero
 
 
-    norm_cations['Si_T']=norm_cations['SiO2_Amp_cat_23ox']
+    norm_cations['Si_T']=norm_cations['Si_Amp_cat_23ox']
     norm_cations['Al_T']=0
     norm_cations['Al_C']=0
-    norm_cations['Ti_C']=norm_cations['TiO2_Amp_cat_23ox']
+    norm_cations['Ti_C']=norm_cations['Ti_Amp_cat_23ox']
     norm_cations['Mg_C']=0
     norm_cations['Fe_C']=0
     norm_cations['Mn_C']=0
-    norm_cations['Cr_C']=norm_cations['Cr2O3_Amp_cat_23ox']
+    norm_cations['Cr_C']=norm_cations['Cr_Amp_cat_23ox']
     norm_cations['Mg_B']=0
     norm_cations['Fe_B']=0
     norm_cations['Mn_B']=0
     norm_cations['Na_B']=0
-    norm_cations['Ca_B']=norm_cations['CaO_Amp_cat_23ox']
+    norm_cations['Ca_B']=norm_cations['Ca_Amp_cat_23ox']
     norm_cations['Na_A']=0
-    norm_cations['K_A']=norm_cations['K2O_Amp_cat_23ox']
+    norm_cations['K_A']=norm_cations['K_Amp_cat_23ox']
 
 
     # 5a) Leake T Sites. Place all Si here, if Si<8, fill rest of T with Al.
 
     #If Si + Al is greater than 8, need to split Al between Al_T and Al_C as it can't all go here
-    Si_Ti_sum_gr8=(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['Al2O3_Amp_cat_23ox'])>8
+    Si_Ti_sum_gr8=(norm_cations['Si_Amp_cat_23ox']+norm_cations['Al_Amp_cat_23ox'])>8
     # Calculate the amount of Ti sites left to fill after putting Si in. dont need to worry
     # about overallocating Ti, as already know they sum to more than 8.
-    Al_T_Si_Ti_sum_gr8=8-norm_cations['SiO2_Amp_cat_23ox']
+    Al_T_Si_Ti_sum_gr8=8-norm_cations['Si_Amp_cat_23ox']
     # Got to be careful here, if Si on 23ox is >8, Al_T_Si_Ti_sum_gr8 ends up negative. Add another check
-    Si_l_8=(norm_cations['SiO2_Amp_cat_23ox']<=8)
+    Si_l_8=(norm_cations['Si_Amp_cat_23ox']<=8)
     # If Si is less than 8 already, set Ti to the difference
     norm_cations.loc[(Si_Ti_sum_gr8&Si_l_8), 'Al_T']=Al_T_Si_Ti_sum_gr8
     # If Si is greater than 8, set Al_T to zero
@@ -2448,11 +2434,11 @@ def get_amp_sites_leake(amp_apfu_df):
 
 
     # Put remaining Al
-    norm_cations.loc[(Si_Ti_sum_gr8), 'Al_C']=norm_cations['Al2O3_Amp_cat_23ox']-norm_cations['Al_T']
+    norm_cations.loc[(Si_Ti_sum_gr8), 'Al_C']=norm_cations['Al_Amp_cat_23ox']-norm_cations['Al_T']
 
     #If Si+Al<8, put all Al in tetrahedlra sites
-    Si_Ti_sum_less8=(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['Al2O3_Amp_cat_23ox'])<8
-    norm_cations.loc[(Si_Ti_sum_less8), 'Al_T']=norm_cations['Al2O3_Amp_cat_23ox']
+    Si_Ti_sum_less8=(norm_cations['Si_Amp_cat_23ox']+norm_cations['Al_Amp_cat_23ox'])<8
+    norm_cations.loc[(Si_Ti_sum_less8), 'Al_T']=norm_cations['Al_Amp_cat_23ox']
     norm_cations.loc[(Si_Ti_sum_less8), 'Al_C']=0
 
     # 5b) Leake Octaherdal C sites.
@@ -2460,22 +2446,22 @@ def get_amp_sites_leake(amp_apfu_df):
     # Fill sites with Mg, Fe, and Mn to bring total to 5.
 
     # If Sites sum to less than 5, place all elements here
-    Al_Ti_Cr_Mg_Fe_Mn_less5=(norm_cations['Al_C']+norm_cations['TiO2_Amp_cat_23ox']+norm_cations['FeOt_Amp_cat_23ox']
-    +norm_cations['Cr2O3_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']+norm_cations['MgO_Amp_cat_23ox'])<5
+    Al_Ti_Cr_Mg_Fe_Mn_less5=(norm_cations['Al_C']+norm_cations['Ti_Amp_cat_23ox']+norm_cations['Fet_Amp_cat_23ox']
+    +norm_cations['Cr_Amp_cat_23ox']+norm_cations['Mn_Amp_cat_23ox']+norm_cations['Mg_Amp_cat_23ox'])<5
 
-    norm_cations.loc[(Al_Ti_Cr_Mg_Fe_Mn_less5), 'Fe_C']=norm_cations['FeOt_Amp_cat_23ox']
-    norm_cations.loc[(Al_Ti_Cr_Mg_Fe_Mn_less5), 'Mn_C']=norm_cations['MnO_Amp_cat_23ox']
-    norm_cations.loc[(Al_Ti_Cr_Mg_Fe_Mn_less5), 'Mg_C']=norm_cations['MgO_Amp_cat_23ox']
+    norm_cations.loc[(Al_Ti_Cr_Mg_Fe_Mn_less5), 'Fe_C']=norm_cations['Fet_Amp_cat_23ox']
+    norm_cations.loc[(Al_Ti_Cr_Mg_Fe_Mn_less5), 'Mn_C']=norm_cations['Mn_Amp_cat_23ox']
+    norm_cations.loc[(Al_Ti_Cr_Mg_Fe_Mn_less5), 'Mg_C']=norm_cations['Mg_Amp_cat_23ox']
 
 
     #If sites sum to more than 5, after placing Ti and Cr here, fill rest with Mg, Fe and Mn
-    Al_Ti_Cr_Mg_Fe_Mn_more5=(norm_cations['Al_C']+norm_cations['TiO2_Amp_cat_23ox']+norm_cations['FeOt_Amp_cat_23ox']
-    +norm_cations['Cr2O3_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']+norm_cations['MgO_Amp_cat_23ox'])>5
+    Al_Ti_Cr_Mg_Fe_Mn_more5=(norm_cations['Al_C']+norm_cations['Ti_Amp_cat_23ox']+norm_cations['Fet_Amp_cat_23ox']
+    +norm_cations['Cr_Amp_cat_23ox']+norm_cations['Mn_Amp_cat_23ox']+norm_cations['Mg_Amp_cat_23ox'])>5
 
     # First, check if Al+Cr+Ti sum to 5. If not, allocate Mg
     sum_C_Al_Cr_Ti=norm_cations['Al_C']+norm_cations['Cr_C']+norm_cations['Ti_C']
     check_C_Al_Cr_Ti=sum_C_Al_Cr_Ti<5
-    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti)), 'Mg_C']=norm_cations['MgO_Amp_cat_23ox']
+    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti)), 'Mg_C']=norm_cations['Mg_Amp_cat_23ox']
 
     # Now check you haven't added too much MgO to take you over 5
     sum_C_Al_Cr_Ti_Mg=norm_cations['Al_C']+norm_cations['Cr_C']+norm_cations['Ti_C']+norm_cations['Mg_C']
@@ -2487,7 +2473,7 @@ def get_amp_sites_leake(amp_apfu_df):
     # Now check if you are back under 5 again,  ready to allocate Fe
     sum_C_Al_Cr_Ti_Mg2=norm_cations['Al_C']+norm_cations['Cr_C']+norm_cations['Ti_C']+norm_cations['Mg_C']
     check_C_Al_Cr_Ti_Mg_low2=sum_C_Al_Cr_Ti_Mg2<5
-    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti_Mg_low2)), 'Fe_C']=norm_cations['FeOt_Amp_cat_23ox']
+    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti_Mg_low2)), 'Fe_C']=norm_cations['Fet_Amp_cat_23ox']
 
     # Now check you haven't added too much FeO to take you over 5
     sum_C_Al_Cr_Ti_Mg_Fe=(norm_cations['Al_C']+norm_cations['Cr_C']
@@ -2501,7 +2487,7 @@ def get_amp_sites_leake(amp_apfu_df):
     sum_C_Al_Cr_Ti_Mg_Fe2=(norm_cations['Al_C']+norm_cations['Cr_C']+norm_cations['Ti_C']
     +norm_cations['Mg_C']+norm_cations['Fe_C'])
     check_C_Al_Cr_Ti_Mg_Fe_low2=sum_C_Al_Cr_Ti_Mg_Fe2<5
-    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti_Mg_Fe_low2)), 'Mn_C']=norm_cations['MnO_Amp_cat_23ox']
+    norm_cations.loc[((Al_Ti_Cr_Mg_Fe_Mn_more5)&(check_C_Al_Cr_Ti_Mg_Fe_low2)), 'Mn_C']=norm_cations['Mn_Amp_cat_23ox']
 
     # Now check you haven't added too much Mn to take you over 5
     sum_C_Al_Cr_Ti_Mg_Fe_Mn=(norm_cations['Al_C']+norm_cations['Cr_C']
@@ -2515,9 +2501,9 @@ def get_amp_sites_leake(amp_apfu_df):
 
     # 5c) Leake. B Sites-
     # if any Mg, Fe, Mn or Ca remaining put here;
-    Mg_remaining=norm_cations['MgO_Amp_cat_23ox']-norm_cations['Mg_C']
-    Fe_remaining=norm_cations['FeOt_Amp_cat_23ox']-norm_cations['Fe_C']
-    Mn_remaining=norm_cations['MnO_Amp_cat_23ox']-norm_cations['Mn_C']
+    Mg_remaining=norm_cations['Mg_Amp_cat_23ox']-norm_cations['Mg_C']
+    Fe_remaining=norm_cations['Fet_Amp_cat_23ox']-norm_cations['Fe_C']
+    Mn_remaining=norm_cations['Mn_Amp_cat_23ox']-norm_cations['Mn_C']
 
     norm_cations['Mg_B']= Mg_remaining
     norm_cations['Fe_B']= Fe_remaining
@@ -2530,14 +2516,14 @@ def get_amp_sites_leake(amp_apfu_df):
     Sum_B=norm_cations['Mg_B']+norm_cations['Fe_B']+norm_cations['Mn_B']+norm_cations['Ca_B']
     Left_to_fill_B=2- Sum_B
     # Check there is actually enough Na to fill B this way fully, if so allocate the amount you need
-    Enough_Na=norm_cations['Na2O_Amp_cat_23ox']>=Left_to_fill_B
+    Enough_Na=norm_cations['Na_Amp_cat_23ox']>=Left_to_fill_B
     norm_cations.loc[((Sum_B<2)&(Enough_Na)), 'Na_B']=Left_to_fill_B
     #  If there isn't enough Na2O, allocate all Na2O you have
-    norm_cations.loc[((Sum_B<2)&(~Enough_Na)), 'Na_B']=norm_cations['Na2O_Amp_cat_23ox']
-    Na_left_AfterB=norm_cations['Na2O_Amp_cat_23ox']-norm_cations['Na_B']
+    norm_cations.loc[((Sum_B<2)&(~Enough_Na)), 'Na_B']=norm_cations['Na_Amp_cat_23ox']
+    Na_left_AfterB=norm_cations['Na_Amp_cat_23ox']-norm_cations['Na_B']
 
     # A sites
-    norm_cations['K_A']=norm_cations['K2O_Amp_cat_23ox']
+    norm_cations['K_A']=norm_cations['K_Amp_cat_23ox']
     norm_cations['Na_A']=Na_left_AfterB
 
     norm_cations['Sum_T']=norm_cations['Al_T']+norm_cations['Si_T']
@@ -2548,9 +2534,9 @@ def get_amp_sites_leake(amp_apfu_df):
     norm_cations['Sum_A']=norm_cations['K_A']+norm_cations['Na_A']
 
     norm_cations['cation_sum_All'] = norm_cations['cation_sum_Si_Ca'] + \
-        norm_cations['Na2O_Amp_cat_23ox'] + +norm_cations['K2O_Amp_cat_23ox']
-    norm_cations['Mgno_Amp']=norm_cations['MgO_Amp_cat_23ox']/(norm_cations['MgO_Amp_cat_23ox']
-    +norm_cations['FeOt_Amp_cat_23ox'])
+        norm_cations['Na_Amp_cat_23ox'] + +norm_cations['K_Amp_cat_23ox']
+    norm_cations['Mgno_Amp']=norm_cations['Mg_Amp_cat_23ox']/(norm_cations['Mg_Amp_cat_23ox']
+    +norm_cations['Fet_Amp_cat_23ox'])
 
     #norm_cations['factor']=np.max()
     # Ones being used, uses FW for Si, Fy,
@@ -2560,30 +2546,30 @@ def get_amp_sites_avferric_zhang(amp_comps):
     norm_cations=get_amp_sites_from_input(amp_comps)
 
     # Taken from Zhang et al. 2017 Supplement
-    norm_cations['factor_8SiAl']=8/(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['Al2O3_Amp_cat_23ox'])
+    norm_cations['factor_8SiAl']=8/(norm_cations['Si_Amp_cat_23ox']+norm_cations['Al_Amp_cat_23ox'])
 
-    norm_cations['factor_15eK']=(15/(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['TiO2_Amp_cat_23ox']
-    +norm_cations['Al2O3_Amp_cat_23ox']+norm_cations['Cr2O3_Amp_cat_23ox']++norm_cations['FeOt_Amp_cat_23ox']
-    +norm_cations['MgO_Amp_cat_23ox']+norm_cations['CaO_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']
-    +norm_cations['Na2O_Amp_cat_23ox']))
+    norm_cations['factor_15eK']=(15/(norm_cations['Si_Amp_cat_23ox']+norm_cations['Ti_Amp_cat_23ox']
+    +norm_cations['Al_Amp_cat_23ox']+norm_cations['Cr_Amp_cat_23ox']++norm_cations['Fet_Amp_cat_23ox']
+    +norm_cations['Mg_Amp_cat_23ox']+norm_cations['Ca_Amp_cat_23ox']+norm_cations['Mn_Amp_cat_23ox']
+    +norm_cations['Na_Amp_cat_23ox']))
 
-    norm_cations['factor_13eCNK']=13/((norm_cations['SiO2_Amp_cat_23ox']+norm_cations['TiO2_Amp_cat_23ox']
-    +norm_cations['Al2O3_Amp_cat_23ox']+norm_cations['Cr2O3_Amp_cat_23ox']+norm_cations['FeOt_Amp_cat_23ox']
-    +norm_cations['MgO_Amp_cat_23ox']+norm_cations['CaO_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']))
+    norm_cations['factor_13eCNK']=13/((norm_cations['Si_Amp_cat_23ox']+norm_cations['Ti_Amp_cat_23ox']
+    +norm_cations['Al_Amp_cat_23ox']+norm_cations['Cr_Amp_cat_23ox']+norm_cations['Fet_Amp_cat_23ox']
+    +norm_cations['Mg_Amp_cat_23ox']+norm_cations['Ca_Amp_cat_23ox']+norm_cations['Mn_Amp_cat_23ox']))
 
-    norm_cations['All ferric']=23/(23+(0.5*norm_cations['FeOt_Amp_cat_23ox']))
+    norm_cations['All ferric']=23/(23+(0.5*norm_cations['Fet_Amp_cat_23ox']))
 
     # Minimum Factors
-    norm_cations['8Si_Min']=8/norm_cations['SiO2_Amp_cat_23ox']
+    norm_cations['8Si_Min']=8/norm_cations['Si_Amp_cat_23ox']
 
-    norm_cations['16CAT_Min']=(16/(norm_cations['SiO2_Amp_cat_23ox']+norm_cations['TiO2_Amp_cat_23ox']
-    +norm_cations['Al2O3_Amp_cat_23ox']+norm_cations['Cr2O3_Amp_cat_23ox']++norm_cations['FeOt_Amp_cat_23ox']
-    +norm_cations['MgO_Amp_cat_23ox']+norm_cations['CaO_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']
-    +norm_cations['Na2O_Amp_cat_23ox']+norm_cations['K2O_Amp_cat_23ox']))
+    norm_cations['16CAT_Min']=(16/(norm_cations['Si_Amp_cat_23ox']+norm_cations['Ti_Amp_cat_23ox']
+    +norm_cations['Al_Amp_cat_23ox']+norm_cations['Cr_Amp_cat_23ox']++norm_cations['Fet_Amp_cat_23ox']
+    +norm_cations['Mg_Amp_cat_23ox']+norm_cations['Ca_Amp_cat_23ox']+norm_cations['Mn_Amp_cat_23ox']
+    +norm_cations['Na_Amp_cat_23ox']+norm_cations['K_Amp_cat_23ox']))
 
-    norm_cations['15eNK_Min']=15/((norm_cations['SiO2_Amp_cat_23ox']+norm_cations['TiO2_Amp_cat_23ox']
-    +norm_cations['Al2O3_Amp_cat_23ox']+norm_cations['Cr2O3_Amp_cat_23ox']+norm_cations['FeOt_Amp_cat_23ox']
-    +norm_cations['MgO_Amp_cat_23ox']+norm_cations['CaO_Amp_cat_23ox']+norm_cations['MnO_Amp_cat_23ox']))
+    norm_cations['15eNK_Min']=15/((norm_cations['Si_Amp_cat_23ox']+norm_cations['Ti_Amp_cat_23ox']
+    +norm_cations['Al_Amp_cat_23ox']+norm_cations['Cr_Amp_cat_23ox']+norm_cations['Fet_Amp_cat_23ox']
+    +norm_cations['Mg_Amp_cat_23ox']+norm_cations['Ca_Amp_cat_23ox']+norm_cations['Mn_Amp_cat_23ox']))
 
     norm_cations['Min_MinFactor']=norm_cations[['8Si_Min', '16CAT_Min', '15eNK_Min']].min(axis=1)
 
@@ -2600,19 +2586,19 @@ def get_amp_sites_avferric_zhang(amp_comps):
 
 
     # Then things times by factors
-    Si_factor=norm_cations['Av_factor']*norm_cations['SiO2_Amp_cat_23ox']
-    Ti_factor=norm_cations['Av_factor']*norm_cations['TiO2_Amp_cat_23ox']
-    Al_factor=norm_cations['Av_factor']*norm_cations['Al2O3_Amp_cat_23ox']
-    Cr_factor=norm_cations['Av_factor']*norm_cations['Cr2O3_Amp_cat_23ox']
-    Fe_factor=norm_cations['Av_factor']*norm_cations['FeOt_Amp_cat_23ox']
-    Mg_factor=norm_cations['Av_factor']*norm_cations['MgO_Amp_cat_23ox']
-    Ca_factor=norm_cations['Av_factor']*norm_cations['CaO_Amp_cat_23ox']
-    Mn_factor=norm_cations['Av_factor']*norm_cations['MnO_Amp_cat_23ox']
-    Na_factor=norm_cations['Av_factor']*norm_cations['Na2O_Amp_cat_23ox']
-    K_factor=norm_cations['Av_factor']*norm_cations['K2O_Amp_cat_23ox']
+    Si_factor=norm_cations['Av_factor']*norm_cations['Si_Amp_cat_23ox']
+    Ti_factor=norm_cations['Av_factor']*norm_cations['Ti_Amp_cat_23ox']
+    Al_factor=norm_cations['Av_factor']*norm_cations['Al_Amp_cat_23ox']
+    Cr_factor=norm_cations['Av_factor']*norm_cations['Cr_Amp_cat_23ox']
+    Fe_factor=norm_cations['Av_factor']*norm_cations['Fet_Amp_cat_23ox']
+    Mg_factor=norm_cations['Av_factor']*norm_cations['Mg_Amp_cat_23ox']
+    Ca_factor=norm_cations['Av_factor']*norm_cations['Ca_Amp_cat_23ox']
+    Mn_factor=norm_cations['Av_factor']*norm_cations['Mn_Amp_cat_23ox']
+    Na_factor=norm_cations['Av_factor']*norm_cations['Na_Amp_cat_23ox']
+    K_factor=norm_cations['Av_factor']*norm_cations['K_Amp_cat_23ox']
 
 
-    norm_cations['Si_T_ideal']=norm_cations['Av_factor']*norm_cations['SiO2_Amp_cat_23ox']
+    norm_cations['Si_T_ideal']=norm_cations['Av_factor']*norm_cations['Si_Amp_cat_23ox']
     # Allocate Al to Tetrahedral. If 8-Si_T< Al_factor, equal to 8-Si_T
 
     norm_cations['Al_IV_T_ideal']=8-norm_cations['Si_T_ideal']
@@ -2907,9 +2893,9 @@ def amp_components_ferric_ferrous(sites_df, norm_cations):
 
     norm_cations_hb = norm_cations.multiply(f_ave, axis='rows')
     norm_cations_hb['Fe2O3_Amp_cat_23ox'] = 46 * (1 - f_ave)
-    norm_cations_hb['FeO_Amp_cat_23ox'] = norm_cations_hb['FeOt_Amp_cat_23ox'] - \
+    norm_cations_hb['FeO_Amp_cat_23ox'] = norm_cations_hb['Fet_Amp_cat_23ox'] - \
         norm_cations_hb['Fe2O3_Amp_cat_23ox']
-    norm_cations_hb.drop(columns=['FeOt_Amp_cat_23ox', 'oxy_renorm_factor',
+    norm_cations_hb.drop(columns=['Fet_Amp_cat_23ox', 'oxy_renorm_factor',
                          'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All'], inplace=True)
     newnames = []
     for name in norm_cations_hb.columns.tolist():
@@ -2967,27 +2953,27 @@ def get_amp_sites_ferric_ferrous(amp_apfu_df):
     Fe3_C = np.empty(len(samples))
 
     for sample, i in zip(samples, range(len(samples))):
-        Si_T[i] = amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox']
-        K_A[i] = amp_apfu_df.loc[sample, 'K2O_Amp_cat_23ox']
-        Ti_C[i] = amp_apfu_df.loc[sample, 'TiO2_Amp_cat_23ox']
-        Ca_B[i] = amp_apfu_df.loc[sample, 'CaO_Amp_cat_23ox']
-        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr2O3_Amp_cat_23ox']
+        Si_T[i] = amp_apfu_df.loc[sample, 'Si_Amp_cat_23ox']
+        K_A[i] = amp_apfu_df.loc[sample, 'K_Amp_cat_23ox']
+        Ti_C[i] = amp_apfu_df.loc[sample, 'Ti_Amp_cat_23ox']
+        Ca_B[i] = amp_apfu_df.loc[sample, 'Ca_Amp_cat_23ox']
+        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr_Amp_cat_23ox']
         Fe3_C[i] = amp_apfu_df.loc[sample, 'Fe2O3_Amp_cat_23ox']
 
-        if Si_T[i] + amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox'] > 8:
-            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox']
-            Al_C[i] = amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox'] + \
-                amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox'] - 8
+        if Si_T[i] + amp_apfu_df.loc[sample, 'Al_Amp_cat_23ox'] > 8:
+            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'Si_Amp_cat_23ox']
+            Al_C[i] = amp_apfu_df.loc[sample, 'Si_Amp_cat_23ox'] + \
+                amp_apfu_df.loc[sample, 'Al_Amp_cat_23ox'] - 8
         else:
-            Al_T[i] = amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox']
+            Al_T[i] = amp_apfu_df.loc[sample, 'Al_Amp_cat_23ox']
             Al_C[i] = 0
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + \
-                amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox'] > 5:
+                amp_apfu_df.loc[sample, 'Mg_Amp_cat_23ox'] > 5:
             Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i]
             Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
-                Fe3_C[i] + amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox'] - 5
+                Fe3_C[i] + amp_apfu_df.loc[sample, 'Mg_Amp_cat_23ox'] - 5
         else:
-            Mg_C[i] = amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox']
+            Mg_C[i] = amp_apfu_df.loc[sample, 'Mg_Amp_cat_23ox']
             Mg_B[i] = 0
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i] > 5:
@@ -2999,18 +2985,18 @@ def get_amp_sites_ferric_ferrous(amp_apfu_df):
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe3_C[i] + Fe2_C[i] > 5:
             Mn_C[i] = 0
-            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO_Amp_cat_23ox']
+            Mn_B[i] = amp_apfu_df.loc[sample, 'Mn_Amp_cat_23ox']
         else:
             Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] +
                            Mg_C[i] + Fe2_C[i] + Fe3_C[i])
-            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO_Amp_cat_23ox'] - Mn_C[i]
+            Mn_B[i] = amp_apfu_df.loc[sample, 'Mn_Amp_cat_23ox'] - Mn_C[i]
 
         if Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i] > 2:
             Na_B[i] = 0
-            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox']
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na_Amp_cat_23ox']
         else:
             Na_B[i] = 2 - (Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i])
-            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox'] - Na_B[i]
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na_Amp_cat_23ox'] - Na_B[i]
 
     site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe3_C, Fe2_C, Mn_C, Cr_C,
     Mg_B, Fe2_B, Mn_B, Na_B, Ca_B, Na_A, K_A])
@@ -3070,52 +3056,52 @@ def get_amp_sites_mutch(amp_apfu_df):
 
     for sample, i in zip(samples, range(len(samples))):
         # these are all the cations that have no site ambiguity
-        Si_T[i] = norm_cations.loc[sample, 'SiO2_Amp_cat_23ox']
-        K_A[i] = norm_cations.loc[sample, 'K2O_Amp_cat_23ox']
-        Ti_C[i] = norm_cations.loc[sample, 'TiO2_Amp_cat_23ox']
-        Ca_B[i] = norm_cations.loc[sample, 'CaO_Amp_cat_23ox']
-        Cr_C[i] = norm_cations.loc[sample, 'Cr2O3_Amp_cat_23ox']
+        Si_T[i] = norm_cations.loc[sample, 'Si_Amp_cat_23ox']
+        K_A[i] = norm_cations.loc[sample, 'K_Amp_cat_23ox']
+        Ti_C[i] = norm_cations.loc[sample, 'Ti_Amp_cat_23ox']
+        Ca_B[i] = norm_cations.loc[sample, 'Ca_Amp_cat_23ox']
+        Cr_C[i] = norm_cations.loc[sample, 'Cr_Amp_cat_23ox']
 
         # site ambiguous cations. Follows Leake et al., (1997) logic
-        if Si_T[i] + norm_cations.loc[sample, 'Al2O3_Amp_cat_23ox'] > 8:
-            Al_T[i] = 8 - norm_cations.loc[sample, 'SiO2_Amp_cat_23ox']
-            Al_C[i] = norm_cations.loc[sample, 'SiO2_Amp_cat_23ox'] + \
-                norm_cations.loc[sample, 'Al2O3_Amp_cat_23ox'] - 8
+        if Si_T[i] + norm_cations.loc[sample, 'Al_Amp_cat_23ox'] > 8:
+            Al_T[i] = 8 - norm_cations.loc[sample, 'Si_Amp_cat_23ox']
+            Al_C[i] = norm_cations.loc[sample, 'Si_Amp_cat_23ox'] + \
+                norm_cations.loc[sample, 'Al_Amp_cat_23ox'] - 8
         else:
-            Al_T[i] = norm_cations.loc[sample, 'Al2O3_Amp_cat_23ox']
+            Al_T[i] = norm_cations.loc[sample, 'Al_Amp_cat_23ox']
             Al_C[i] = 0
 
-        if Al_C[i] + Ti_C[i] + Cr_C[i] + norm_cations.loc[sample, 'MgO_Amp_cat_23ox'] > 5:
+        if Al_C[i] + Ti_C[i] + Cr_C[i] + norm_cations.loc[sample, 'Mg_Amp_cat_23ox'] > 5:
             Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i]
             Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
-                norm_cations.loc[sample, 'MgO_Amp_cat_23ox'] - 5
+                norm_cations.loc[sample, 'Mg_Amp_cat_23ox'] - 5
         else:
-            Mg_C[i] = norm_cations.loc[sample, 'MgO_Amp_cat_23ox']
+            Mg_C[i] = norm_cations.loc[sample, 'Mg_Amp_cat_23ox']
             Mg_B[i] = 0
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] > 5:
             Fe_C[i] = 0
-            Fe_B[i] = norm_cations.loc[sample, 'FeOt_Amp_cat_23ox']
+            Fe_B[i] = norm_cations.loc[sample, 'Fet_Amp_cat_23ox']
         else:
             Fe_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i])
-            Fe_B[i] = norm_cations.loc[sample, 'FeOt_Amp_cat_23ox'] - Fe_C[i]
+            Fe_B[i] = norm_cations.loc[sample, 'Fet_Amp_cat_23ox'] - Fe_C[i]
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe_C[i] > 5:
             Mn_C[i] = 0
-            Mn_B[i] = norm_cations.loc[sample, 'MnO_Amp_cat_23ox']
+            Mn_B[i] = norm_cations.loc[sample, 'Mn_Amp_cat_23ox']
         else:
             Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe_C[i])
-            Mn_B[i] = norm_cations.loc[sample, 'MnO_Amp_cat_23ox'] - Mn_C[i]
+            Mn_B[i] = norm_cations.loc[sample, 'Mn_Amp_cat_23ox'] - Mn_C[i]
 
         if Mg_B[i] + Fe_B[i] + Mn_B[i] + Ca_B[i] + \
-                amp_apfu_df['Na2O_Amp_cat_23ox'].iloc[i] > 2:
+                amp_apfu_df['Na_Amp_cat_23ox'].iloc[i] > 2:
             Na_B[i] = 2 - (Mg_B[i] + Fe_B[i] + Mn_B[i] + Ca_B[i])
-            Na_A[i] = amp_apfu_df['Na2O_Amp_cat_23ox'].iloc[i] - Na_B[i]
+            Na_A[i] = amp_apfu_df['Na_Amp_cat_23ox'].iloc[i] - Na_B[i]
         else:
-            Na_B[i] = amp_apfu_df['Na2O_Amp_cat_23ox'].iloc[i]
+            Na_B[i] = amp_apfu_df['Na_Amp_cat_23ox'].iloc[i]
             # Euan has as if Na A >0, set as 0, otherwise, =Na cations 23 O -
             # Na from A site. Ask jordan where he got this from.
-            Na_A[i] = amp_apfu_df['Na2O_Amp_cat_23ox'].iloc[i] - Na_B[i]
+            Na_A[i] = amp_apfu_df['Na_Amp_cat_23ox'].iloc[i] - Na_B[i]
 
 
     site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe_C, Mn_C, Cr_C, Mg_B,
@@ -3181,9 +3167,9 @@ def amp_components_ferric_ferrous_mutch(sites_df, norm_cations):
 
     norm_cations_hb = norm_cations.multiply(f_ave, axis='rows')
     norm_cations_hb['Fe2O3_Amp_cat_23ox'] = 46 * (1 - f_ave)
-    norm_cations_hb['FeO_Amp_cat_23ox'] = norm_cations_hb['FeOt_Amp_cat_23ox'] - \
+    norm_cations_hb['FeO_Amp_cat_23ox'] = norm_cations_hb['Fet_Amp_cat_23ox'] - \
         norm_cations_hb['Fe2O3_Amp_cat_23ox']
-    norm_cations_hb.drop(columns=['FeOt_Amp_cat_23ox', 'oxy_renorm_factor',
+    norm_cations_hb.drop(columns=['Fet_Amp_cat_23ox', 'oxy_renorm_factor',
                          'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All'], inplace=True)
 
 
@@ -3239,27 +3225,27 @@ def get_amp_sites_ferric_ferrous_mutch(amp_apfu_df):
     Fe3_C = np.empty(len(samples))
 
     for sample, i in zip(samples, range(len(samples))):
-        Si_T[i] = amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox']
-        K_A[i] = amp_apfu_df.loc[sample, 'K2O_Amp_cat_23ox']
-        Ti_C[i] = amp_apfu_df.loc[sample, 'TiO2_Amp_cat_23ox']
-        Ca_B[i] = amp_apfu_df.loc[sample, 'CaO_Amp_cat_23ox']
-        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr2O3_Amp_cat_23ox']
+        Si_T[i] = amp_apfu_df.loc[sample, 'Si_Amp_cat_23ox']
+        K_A[i] = amp_apfu_df.loc[sample, 'K_Amp_cat_23ox']
+        Ti_C[i] = amp_apfu_df.loc[sample, 'Ti_Amp_cat_23ox']
+        Ca_B[i] = amp_apfu_df.loc[sample, 'Ca_Amp_cat_23ox']
+        Cr_C[i] = amp_apfu_df.loc[sample, 'Cr_Amp_cat_23ox']
         Fe3_C[i] = amp_apfu_df.loc[sample, 'Fe2O3_Amp_cat_23ox']
 
-        if Si_T[i] + amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox'] > 8:
-            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox']
-            Al_C[i] = amp_apfu_df.loc[sample, 'SiO2_Amp_cat_23ox'] + \
-                amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox'] - 8
+        if Si_T[i] + amp_apfu_df.loc[sample, 'Al_Amp_cat_23ox'] > 8:
+            Al_T[i] = 8 - amp_apfu_df.loc[sample, 'Si_Amp_cat_23ox']
+            Al_C[i] = amp_apfu_df.loc[sample, 'Si_Amp_cat_23ox'] + \
+                amp_apfu_df.loc[sample, 'Al_Amp_cat_23ox'] - 8
         else:
-            Al_T[i] = amp_apfu_df.loc[sample, 'Al2O3_Amp_cat_23ox']
+            Al_T[i] = amp_apfu_df.loc[sample, 'Al_Amp_cat_23ox']
             Al_C[i] = 0
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + \
-                amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox'] > 5:
+                amp_apfu_df.loc[sample, 'Mg_Amp_cat_23ox'] > 5:
             Mg_C[i] = 5 - Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i]
             Mg_B[i] = Al_C[i] + Ti_C[i] + Cr_C[i] + \
-                Fe3_C[i] + amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox'] - 5
+                Fe3_C[i] + amp_apfu_df.loc[sample, 'Mg_Amp_cat_23ox'] - 5
         else:
-            Mg_C[i] = amp_apfu_df.loc[sample, 'MgO_Amp_cat_23ox']
+            Mg_C[i] = amp_apfu_df.loc[sample, 'Mg_Amp_cat_23ox']
             Mg_B[i] = 0
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Fe3_C[i] + Mg_C[i] > 5:
@@ -3271,22 +3257,22 @@ def get_amp_sites_ferric_ferrous_mutch(amp_apfu_df):
 
         if Al_C[i] + Ti_C[i] + Cr_C[i] + Mg_C[i] + Fe3_C[i] + Fe2_C[i] > 5:
             Mn_C[i] = 0
-            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO_Amp_cat_23ox']
+            Mn_B[i] = amp_apfu_df.loc[sample, 'Mn_Amp_cat_23ox']
         else:
             Mn_C[i] = 5 - (Al_C[i] + Ti_C[i] + Cr_C[i] +
                            Mg_C[i] + Fe2_C[i] + Fe3_C[i])
-            Mn_B[i] = amp_apfu_df.loc[sample, 'MnO_Amp_cat_23ox'] - Mn_C[i]
+            Mn_B[i] = amp_apfu_df.loc[sample, 'Mn_Amp_cat_23ox'] - Mn_C[i]
 
         if Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i] + \
-                amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox'] > 2:
+                amp_apfu_df.loc[sample, 'Na_Amp_cat_23ox'] > 2:
             Na_B[i] = 2 - (Mg_B[i] + Fe2_B[i] + Mn_B[i] + Ca_B[i])
-            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox'] - Na_B[i]
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na_Amp_cat_23ox'] - Na_B[i]
 
         else:
-            Na_B[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox']
+            Na_B[i] = amp_apfu_df.loc[sample, 'Na_Amp_cat_23ox']
             # Euan has as if Na A >0, set as 0, otherwise, =Na cations 23 O -
             # Na from A site. Ask jordan where he got this from.
-            Na_A[i] = amp_apfu_df.loc[sample, 'Na2O_Amp_cat_23ox'] - Na_B[i]
+            Na_A[i] = amp_apfu_df.loc[sample, 'Na_Amp_cat_23ox'] - Na_B[i]
 
     site_vals = np.array([Si_T, Al_T, Al_C, Ti_C, Mg_C, Fe3_C, Fe2_C, Mn_C, Cr_C, Mg_B,
     Fe2_B, Mn_B, Na_B, Ca_B, Na_A, K_A])

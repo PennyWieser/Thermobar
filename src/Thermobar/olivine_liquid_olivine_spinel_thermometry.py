@@ -355,7 +355,7 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
         if equationT == "T_Put2008_eq22" or equationT == "T_Put2008_eq21" or \
         equationT == "T_Beatt93_ol" or equationT == "T_Beatt93_ol_HerzCorr" or equationT=="T_Put2008_eq19":
 
-                Liq_Ols['DMg_Meas'] = Liq_Ols['MgO_Ol_cat_frac'] / \
+                Liq_Ols['DMg_Meas'] = Liq_Ols['Mg_Ol_cat_frac'] / \
                     Liq_Ols['Mg_Liq_cat_frac']
                 Liq_Ols['CNML'] = (Liq_Ols['Mg_Liq_cat_frac'] + Liq_Ols['Fet_Liq_cat_frac'] +
                                    Liq_Ols['Ca_Liq_cat_frac'] + Liq_Ols['Mn_Liq_cat_frac'])
@@ -366,7 +366,7 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
                     1.5 * Liq_Ols['CNML']) + 2 * np.log(3 * Liq_Ols['CSiO2L']) - Liq_Ols['NF']
 
         if equationT == "T_Sisson1992":
-            Liq_Ols['KdMg_TSG1992'] = (Liq_Ols['MgO_Ol_cat_frac'] /
+            Liq_Ols['KdMg_TSG1992'] = (Liq_Ols['Mg_Ol_cat_frac'] /
                 (Liq_Ols['Mg_Liq_cat_frac'] *
                     (Liq_Ols['Si_Liq_cat_frac']**(0.5))))
 
