@@ -83,7 +83,6 @@ class test_liq_ol_temp(unittest.TestCase):
         decimalPlace, "T from eq19 not equal to test value")
 
 
-
     def test_19_Kd_Fe3(self):
         self.assertAlmostEqual(pt.calculate_ol_liq_temp(liq_comps=LiqT, ol_comps=OlT,
         equationT="T_Put2008_eq19", P=5, H2O_Liq=0, Fe3Fet_Liq=0.5).get("Kd (Fe-Mg) Meas")[0], 0.4442321471220445,
@@ -119,6 +118,20 @@ class test_liq_ol_eq(unittest.TestCase):
         self.assertAlmostEqual(pt.calculate_eq_ol_content(liq_comps=LiqT,
         Kd_model="Toplis2005", Fe3Fet_Liq=0.2, P=5, T=1300).get("Eq Fo (Toplis, Iter)")[0], 0.862883,
         decimalPlace, "Calculated Kd from Toplis Iter not equal to test value")
+
+class test_ol_sp_temp(unittest.TestCase):
+    def test_Wan2008(self):
+        self.assertAlmostEqual(pt.calculate_ol_sp_temp(ol_comps=OlT, sp_comps=SpT, equationT="T_Wan2008")[0], 1552.345914,
+        decimalPlace, "Calculated T from Wan2008 not equal to test value ")
+
+    def test_Coogan2014(self):
+        self.assertAlmostEqual(pt.calculate_ol_sp_temp(ol_comps=OlT, sp_comps=SpT, equationT="T_Coogan2014")[0], 1555.821477,
+        decimalPlace, "Calculated T from Coogan 2014 not equal to test value ")
+
+
+
+
+
 
 if __name__ == '__main__':
      unittest.main()

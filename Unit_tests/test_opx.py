@@ -71,21 +71,21 @@ with w.catch_warnings():
         def test_Global_Kdcalc2(self):
             self.assertAlmostEqual(pt.calculate_opx_liq_press(opx_comps=OpxT,
         liq_comps=LiqT, equationP="P_Put_Global_Opx", T=1300, eq_tests=True, Fe3Fet_Liq=0.6)
-        .Eq_Test_Kd_Fe_Mg_Fe2[0], 0.781298,
+        .eq_tests_Kd_Fe_Mg_Fe2[0], 0.781298,
         decimalPlace,
         "Calc Kd Fe2 not equal to test value")
 
         def test_Global_Kdcalc2_60Fe3(self):
             self.assertAlmostEqual(pt.calculate_opx_liq_press(opx_comps=OpxT,
         liq_comps=LiqT, equationP="P_Put_Global_Opx", T=1300, eq_tests=True)
-        .Eq_Test_Kd_Fe_Mg_Fe2[0], 0.347244,
+        .eq_tests_Kd_Fe_Mg_Fe2[0], 0.347244,
         decimalPlace,
         "Calc Kd Fe2 not equal to test value")
 
         def test_Global_KdcalcT(self):
             self.assertAlmostEqual(pt.calculate_opx_liq_press(opx_comps=OpxT,
         liq_comps=LiqT, equationP="P_Put_Global_Opx", T=1300, eq_tests=True)
-        .Eq_Test_Kd_Fe_Mg_Fet[0], 0.312519,
+        .eq_tests_Kd_Fe_Mg_Fet[0], 0.312519,
         decimalPlace,
         "Calc Kd Fet not equal to test value")
 
