@@ -154,7 +154,31 @@ P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995, P_Kraw2012} # put on
 
 Amp_only_P_funcs_by_name= {p.__name__: p for p in Amp_only_P_funcs}
 
-def calculate_amp_only_melt_comps(amp_comps=None, T_K=None):
+def calculate_amp_only_melt_comps(amp_comps=None, T=None):
+    '''
+    Calculates melt compositions from Amphibole compositions using Zhang et al. (2017),
+    Ridolfi et al. 2021 and Putirka (2016).
+
+   Parameters
+    -------
+
+    amp_comps: DataFrame
+        Amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
+
+    T: optional, float, int
+        Temperature in Kelvin, needed for equation3 and 5 of Zhang et al. (2017), and
+        SiO2 from Putirka (2017)
+
+    Returns
+    -------
+    DataFrame:
+        Contains calculated melt compositions, and all amphibole components used
+        in the calculation.
+
+    '''
+
+
+
     # Calculations for Ridolfi
     amp_sites_R=calculate_sites_ridolfi(amp_comps=amp_comps)
     # Amp Sites for Zhang
@@ -162,8 +186,6 @@ def calculate_amp_only_melt_comps(amp_comps=None, T_K=None):
     # For Putirka
     amp_23ox=calculate_23oxygens_amphibole(amp_comps=amp_comps)
 
-    # Putirka 2016 equation 10
-    amp_sites['SiO2_Put2016']=751.95-0.4*(T_K-273.15)-278000/(T_K-273.15)-9.184*amp_23ox['Al_Amp_cat_23ox']
 
 
     # Calculating Delta NNO from Ridolfi 2021
@@ -183,8 +205,8 @@ def calculate_amp_only_melt_comps(amp_comps=None, T_K=None):
     amp_sites.insert(0, "H2O_calc_Ridolfi21", H2O_calc)
 
 
-    if T_K is None:
-        w.warn('You must enter a value for T in Kelvin to get results from equation3')
+    if T is None:
+        w.warn('You must enter a value for T in Kelvin to get results from equation3 and 5 from Zhang, and SiO2 from Putrka (2016)')
 
     amp_sites['SiO2_Eq1_Zhang17']=(-736.7170+288.733*np.log(amp_sites['Si_T_ideal'])+56.536*amp_sites['Al_VI_C_ideal']
     +27.169*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal'])
@@ -238,15 +260,19 @@ def calculate_amp_only_melt_comps(amp_comps=None, T_K=None):
                                     [col for col in amp_sites.columns if col not in cols_to_move]]
 
 
-    if T_K is not None:
-        SiO2_Eq3=(-228 + 0.01065*(T_K-273.15) + 165*np.log(amp_sites['Si_T_ideal'])
+    if T is not None:
+        SiO2_Eq3=(-228 + 0.01065*(T-273.15) + 165*np.log(amp_sites['Si_T_ideal'])
         -7.219*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal']))
         amp_sites.insert(4, "SiO2_Eq3_Zhang17", SiO2_Eq3)
 
-        TiO2_Eq5=(np.exp( 23.4870 -0.0011*(T_K-273.15) +-2.5692*amp_sites['Si_T_ideal']
+        TiO2_Eq5=(np.exp( 23.4870 -0.0011*(T-273.15) +-2.5692*amp_sites['Si_T_ideal']
         -1.3919*amp_sites['Al_VI_C_ideal'] -2.1195361*amp_sites['Fe3_C_ideal'] -1.0510775*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal'])
         -2.0634034*amp_sites['Ca_B_ideal']-1.5960633*amp_sites['Na_A_ideal']))
         amp_sites.insert(6, "TiO2_Eq5_Zhang17", TiO2_Eq5)
+
+        # Putirka 2016 equation 10
+        SiO2_Put2016=751.95-0.4*(T-273.15)-278000/(T-273.15)-9.184*amp_23ox['Al_Amp_cat_23ox']
+        amp_sites.insert(0, 'SiO2_Put2016', SiO2_Put2016)
 
 
 
@@ -257,6 +283,7 @@ def calculate_amp_only_melt_comps(amp_comps=None, T_K=None):
 
 def calculate_amp_only_press(amp_comps=None, equationP=None, T=None, deltaNNO=None,
 classification=False, Ridolfi_Filter=True):
+
     """
     Amphibole-only barometry, returns pressure in kbar.
 
@@ -434,7 +461,7 @@ classification=False, Ridolfi_Filter=True):
             Calcs_R.loc[(High_APE), 'Input_Check']=False
             Calcs_R.loc[(High_APE), 'Fail Msg']="APE >60"
 
-            if Ridolfi_Filter==True:
+            if Ridolfi_Filter is True:
                 Failed_input=Calcs_R['Input_Check']==False
                 Calcs_R.loc[Failed_input, 'P_kbar_calc']=np.nan
 
@@ -867,7 +894,7 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
         Else, enter an integer, float, or panda series
 
 
-    Eq_Test: bool. Default False
+    eq_tests: bool. Default False
         If True, also calcualtes Kd Fe-Mg, which Putirka (2016) suggest
         as an equilibrium test.
 
@@ -969,7 +996,7 @@ P=None, H2O_Liq=None, eq_tests=False):
         If enter P="Solve", returns a partial function
         Else, enter an integer, float, or panda series
 
-    Eq_Test: bool. Default False
+    eq_tests: bool. Default False
         If True, also calcualtes Kd Fe-Mg, which Putirka (2016) suggest
         as an equilibrium test.
 
@@ -1076,7 +1103,7 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
     T_K_guess: int or float. Default is 1300 K
          Initial guess of temperature.
 
-    Eq_Test: bool. Default False
+    eq_tests: bool. Default False
         If True, also calcualtes Kd Fe-Mg, which Putirka (2016) suggest
         as an equilibrium test.
 
@@ -1084,7 +1111,7 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
 
     Returns:
     -------
-    panda.dataframe: Pressure in Kbar, Temperature in K, Kd-Fe-Mg if Eq_Test=True
+    panda.dataframe: Pressure in Kbar, Temperature in K, Kd-Fe-Mg if eq_tests=True
     '''
     liq_comps_c=liq_comps.copy()
     if H2O_Liq is not None:

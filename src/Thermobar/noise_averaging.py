@@ -270,6 +270,7 @@ filter_q=None, append=False):
                     if err_dist == "uniform":
                         Noise = np.random.uniform(- variable_err_abs, +
                                                   variable_err_abs, Dup_Sample.shape[0])
+
                 mynoisedDataframe = Dup_Sample.copy()
                 mynoisedDataframe['{}_{}'.format(
                     ely, elx)] = mynoisedDataframe['{}_{}'.format(ely, elx)] + Noise
@@ -282,7 +283,7 @@ filter_q=None, append=False):
             noise = np.random.normal(0, noise_percent / 100, Dup_Sample.shape)
             mynoisedDataframe = Dup_Sample + Dup_Sample * noise
 
-        mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
+
 
         if phase_err is not None and err_dist == "uniform":
             Sample_Err = phase_err.copy()
@@ -422,7 +423,8 @@ filter_q=None, append=False):
         if variable == "P_kbar":
             mynoisedDataframe['T_K'] = T_K_Err
 
-        mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
+    mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
+
     if positive is True:
         mynoisedDataframe[mynoisedDataframe < 0] = 0
         print('All negative numbers replaced with zeros. '\

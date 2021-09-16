@@ -701,16 +701,9 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
             eq_tests=calculate_plag_liq_eq_tests(plag_comps=plag_comps,
                 liq_comps=liq_comps, P=P, T=T)
 
-        Combo_Out.insert(1, "Pass An-Ab Eq Test Put2008?", eq_tests['Pass An-Ab Eq Test Put2008?'])
+        eq_tests.insert(0, 'H2O_calc', Combo_Out['H2O_calc'])
 
-        Combo_Out.insert(2, 'Delta_An', eq_tests['Delta_An'])
-        Combo_Out.insert(3, 'Delta_Ab', eq_tests['Delta_Ab'])
-        Combo_Out.insert(4, 'Delta_Or', eq_tests['Delta_Or'])
-        Combo_Out.insert(5, 'Pred_An_EqE', eq_tests['Pred_An_EqE'])
-        Combo_Out.insert(6, 'Pred_Ab_EqF', eq_tests['Pred_Ab_EqF'])
-        Combo_Out.insert(7, 'Pred_Or_EqG', eq_tests['Pred_Or_EqG'])
-        Combo_Out.insert(8, 'Obs_Kd_Ab_An', eq_tests['Obs_Kd_Ab_An'])
-        return Combo_Out
+        return eq_tests
 
 
     if equationH == "H_Put2008_eq25b" or equationH == "H_Put2005_eqH":
@@ -722,7 +715,7 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
                 liq_comps=liq_comps, plag_comps=plag_comps, T=T, P=P)
         if plag_comps is None:
             combo_plag_liq = calculate_plag_liq_eq_tests(
-                liq_comps=liq_comps, T=T, P=P)
+                liq_comps=liq_comps, T=T, P=P, XAn=XAn, XAb=XAb)
             combo_plag_liq['An_Plag'] = XAn
             combo_plag_liq['Ab_Plag'] = XAb
 
@@ -891,7 +884,8 @@ Plag_Kspar_T_funcs = {T_Put2008_eq27a, T_Put2008_eq27b, T_Put_Global_2Fspar}
 Plag_Kspar_T_funcs_by_name = {p.__name__: p for p in Plag_Kspar_T_funcs}
 
 
-def calculate_plag_kspar_temp(*, plag_comps=None, kspar_comps=None, Two_Fspar_Match=None, equationT=None, P=None, eq_tests=False):
+def calculate_plag_kspar_temp(*, plag_comps=None, kspar_comps=None, Two_Fspar_Match=None,
+equationT=None, P=None, eq_tests=False):
     '''
     Two feldspar thermometer (Kspar-Plag)
     Returns temperature in Kelvin
@@ -979,11 +973,11 @@ def calculate_plag_kspar_temp(*, plag_comps=None, kspar_comps=None, Two_Fspar_Ma
         combo_fspars['T']=T_K
         combo_fspars['P']=P
         kwargs = {name: combo_fspars[name] for name, p in inspect.signature(func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
-        print('got to Kwargs')
-        Eq_Test=func(**kwargs)
+        eq_tests=func(**kwargs)
 
-        Eq_Test.insert(0, "T_K_calc", T_K)
-        return Eq_Test
+        eq_tests.insert(0, "T_K_calc", T_K)
+        eq_tests_final=pd.concat([eq_tests, combo_fspars], axis=1)
+        return eq_tests_final
 
 
 ## Plag Kspar matching
@@ -1065,9 +1059,8 @@ def calculate_plag_kspar_temp_matching(*, kspar_comps, plag_comps, equationT=Non
     Combo_plags_kspars_1['T']=T_K_calc
     Combo_plags_kspars_1['P']=P
     kwargs = {name: Combo_plags_kspars_1[name].astype('float64') for name, p in inspect.signature(func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
-    print('got to Kwargs')
-    Eq_Test=func(**kwargs)
-    out=pd.concat([Eq_Test, Combo_plags_kspars_1], axis=1)
+    eq_tests=func(**kwargs)
+    out=pd.concat([eq_tests, Combo_plags_kspars_1], axis=1)
 
     return out# Combo_plags_kspars_1
 

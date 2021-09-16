@@ -326,9 +326,9 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
     if eq_tests is True:
         P_kbar.replace([np.inf, -np.inf], np.nan, inplace=True)
         Combo_liq_opxs.insert(1, "P_kbar_calc", P_kbar)
-        Combo_liq_opxs.insert(2, "Eq_Test_Kd_Fe_Mg_Fet",
+        Combo_liq_opxs.insert(2, "eq_tests_Kd_Fe_Mg_Fet",
                               Combo_liq_opxs['Kd_Fe_Mg_Fet'])
-        Combo_liq_opxs.insert(3, "Eq_Test_Kd_Fe_Mg_Fe2",
+        Combo_liq_opxs.insert(3, "eq_tests_Kd_Fe_Mg_Fe2",
                               Combo_liq_opxs['Kd_Fe_Mg_Fe2'])
         Combo_liq_opxs.replace([np.inf, -np.inf], np.nan, inplace=True)
 
@@ -444,9 +444,9 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmat
     if eq_tests is True:
 
         Combo_liq_opxs.insert(0, "T_K_calc", T_K)
-        Combo_liq_opxs.insert(1, "Eq_Test_Kd_Fe_Mg_Fet",
+        Combo_liq_opxs.insert(1, "eq_tests_Kd_Fe_Mg_Fet",
                               Combo_liq_opxs['Kd_Fe_Mg_Fet'])
-        Combo_liq_opxs.insert(2, "Eq_Test_Kd_Fe_Mg_Fe2",
+        Combo_liq_opxs.insert(2, "eq_tests_Kd_Fe_Mg_Fe2",
                               Combo_liq_opxs['Kd_Fe_Mg_Fe2'])
         Combo_liq_opxs.replace([np.inf, -np.inf], np.nan, inplace=True)
 
@@ -579,17 +579,17 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
             opx_comps=opx_comps, liq_comps=liq_comps_c)
         Combo_liq_opxs.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_opxs.insert(1, "T_K_calc", T_K_guess)
-        Combo_liq_opxs.insert(3, "Eq_Test_Kd_Fe_Mg_Fet",
+        Combo_liq_opxs.insert(3, "eq_tests_Kd_Fe_Mg_Fet",
                               Combo_liq_opxs['Kd_Fe_Mg_Fet'])
-        Combo_liq_opxs.insert(4, "Eq_Test_Kd_Fe_Mg_Fe2",
+        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fe2",
                               Combo_liq_opxs['Kd_Fe_Mg_Fe2'])
     if eq_tests is True and meltmatch is not None:
         Combo_liq_opxs = meltmatch.copy()
         Combo_liq_opxs.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_opxs.insert(1, "T_K_calc", T_K_guess)
-        Combo_liq_opxs.insert(3, "Eq_Test_Kd_Fe_Mg_Fet",
+        Combo_liq_opxs.insert(3, "eq_tests_Kd_Fe_Mg_Fet",
                               meltmatch['Kd_Fe_Mg_Fet'])
-        Combo_liq_opxs.insert(4, "Eq_Test_Kd_Fe_Mg_Fe2",
+        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fe2",
                               meltmatch['Kd_Fe_Mg_Fe2'])
 
     return Combo_liq_opxs
