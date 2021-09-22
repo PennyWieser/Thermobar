@@ -802,10 +802,19 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
 
-        T_func = calculate_cpx_liq_temp(
-            cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
-        P_func = calculate_cpx_liq_press(
-            cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
+        if "Petrelli" in equationT:
+            T_func = calculate_cpx_liq_temp(
+                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve").T_K_calc
+        else:
+            T_func = calculate_cpx_liq_temp(
+                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
+
+        if "Petrelli" in equationP:
+            P_func = calculate_cpx_liq_press(
+                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve").P_kbar_calc
+        else:
+            P_func = calculate_cpx_liq_press(
+                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
 
     if meltmatch is not None:
         T_func = calculate_cpx_liq_temp(
@@ -964,6 +973,7 @@ H2O_Liq=None, Return_All_Matches=False):
         All_PTs: Returns output parameters for all matches (e.g, cpx1-Liq1, cpx1-Liq4) without any averaging.
 
     '''
+
     if Kd_Match == "Masotta":
         print('Caution, you have selected to use the Kd-Fe-Mg model of Masotta et al. (2013)'
         'which is only valid for trachyte and phonolitic magmas. '
@@ -981,19 +991,22 @@ H2O_Liq=None, Return_All_Matches=False):
         'Either enter a T equation, or choose a temperature, not both  ')
 
     # This allows users to overwrite H2O and Fe3Fet
-    liq_comps_c = liq_comps.copy()
+    liq_comps_c = liq_comps.copy().reset_index(drop=True)
+    cpx_comps_c = cpx_comps.copy().reset_index(drop=True)
+
+
     if Fe3Fet_Liq is not None:
         liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
     if "Fe3Fet_Liq" not in liq_comps:
         liq_comps_c['Fe3Fet_Liq'] = 0
     if "Sample_ID_Liq" not in liq_comps:
-        liq_comps_c['Sample_ID_Liq'] = liq_comps.index
+        liq_comps_c['Sample_ID_Liq'] = liq_comps_c.index
     if H2O_Liq is not None:
         liq_comps_c['H2O_Liq'] = H2O_Liq
 
 
     # calculating Cpx and liq components.
-    myCPXs1_concat = calculate_clinopyroxene_components(cpx_comps=cpx_comps)
+    myCPXs1_concat = calculate_clinopyroxene_components(cpx_comps=cpx_comps_c)
     myLiquids1_concat = calculate_anhydrous_cat_fractions_liquid(
         liq_comps=liq_comps_c)
 
@@ -1002,7 +1015,7 @@ H2O_Liq=None, Return_All_Matches=False):
     if "Sample_ID_Cpx" not in cpx_comps:
         myCPXs1_concat['Sample_ID_Cpx'] = myCPXs1_concat.index
     else:
-        myCPXs1_concat['Sample_ID_Cpx']=cpx_comps['Sample_ID_Cpx']
+        myCPXs1_concat['Sample_ID_Cpx']=cpx_comps_c['Sample_ID_Cpx']
 
     myCPXs1_concat['ID_CPX']=myCPXs1_concat.index
     myLiquids1_concat['ID_Liq'] = myLiquids1_concat.index
@@ -1227,6 +1240,7 @@ Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, 
     '''
     Clinopyroxene-only barometer of Wang et al. (2021) equation 1
     Uses NCT
+    SEE=
     - currently on Zenodo - 10.5281/zenodo.4727870
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
@@ -1589,7 +1603,8 @@ P_Wang2021_eq3, P_Petrelli2021_Cpx_only, P_Petrelli2021_Cpx_only_withH2O, P_Petr
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
-def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None):
+def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None,
+return_input=False):
     '''
     Clinopyroxene only barometry. Enter a panda dataframe with Cpx compositions,
     returns a pressure in kbar.
@@ -1614,6 +1629,9 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None):
         Only needed for T-sensitive barometers.
         If enter T="Solve", returns a partial function
         Else, enter an integer, float, or panda series
+
+    return_input: bool
+        If True, returns cpx_comps as well.
 
     Returns
     -------
@@ -1658,11 +1676,7 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None):
 
 
 
-    if equationP == "P_Petrelli2021_Cpx_only" or equationP == "P_Petrelli2021_Cpx_only_withH2O" or equationP == "P_Petrelli2021_Cpx_only_noCr":
-        df_stats=func(cpx_comps=cpx_comps_c)
-        P_kbar=df_stats['P_kbar_calc']
 
-        return df_stats
 
     # if
     #     df_stats=P_Petrelli2021_Cpx_only_withH2O(cpx_comps=cpx_comps_c)
@@ -1671,6 +1685,8 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None):
     # if equationP == "
     #     df_stats=P_Petrelli2021_Cpx_only_noCr(cpx_comps=cpx_comps_c)
     #     P_kbar=df_stats['P_kbar_calc']
+    if equationP == "P_Petrelli2021_Cpx_only" or equationP == "P_Petrelli2021_Cpx_only_withH2O" or equationP == "P_Petrelli2021_Cpx_only_noCr":
+        df_stats=func(cpx_comps=cpx_comps_c)
 
     else:
         kwargs = {name: cpx_components[name] for name, p in sig.parameters.items()
@@ -1688,8 +1704,21 @@ def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None):
             P_kbar.replace([np.inf, -np.inf], np.nan, inplace=True)
 
 
+    if return_input is False:
+        if equationP == "P_Petrelli2021_Cpx_only" or equationP == "P_Petrelli2021_Cpx_only_withH2O" or equationP == "P_Petrelli2021_Cpx_only_noCr":
+            P_kbar=df_stats['P_kbar_calc']
+            return df_stats
+        else:
+            return P_kbar
 
-        return P_kbar
+    if return_input is True:
+        if equationP == "P_Petrelli2021_Cpx_only" or equationP == "P_Petrelli2021_Cpx_only_withH2O" or equationP == "P_Petrelli2021_Cpx_only_noCr":
+            out=pd.concat([df_stats, cpx_comps],axis=0)
+            return out
+        else:
+            cpx_comps_c.insert(0, 'P_kbar_calc', P_kbar)
+            return cpx_comps_c
+
 
 
 def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
@@ -1755,7 +1784,8 @@ T_Wang2021_eq2, T_Petrelli2021_Cpx_only, T_Petrelli2021_Cpx_only_withH2O}
 Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
-def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None, H2O_Liq=None):
+def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None,
+H2O_Liq=None, return_input=False):
     '''
     Clinopyroxene only thermometer. Enter a panda dataframe with Cpx compositions,
     returns a temperature in Kelvin.
@@ -1781,6 +1811,9 @@ def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None, H2O_Liq=N
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
         Else, enter an integer, float, or panda series
+
+    return_input: bool
+        if True, also returns cpx_comps
 
     Returns
     -------
@@ -1850,16 +1883,23 @@ def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None, H2O_Liq=N
         if not isinstance(T_K, partial):
             T_K.replace([np.inf, -np.inf], np.nan, inplace=True)
 
+    if return_input is False:
+        if equationT == "T_Petrelli2021_Cpx_only" or  equationT == "T_Petrelli2021_Cpx_only_withH2O":
+            return df_stats
+        else:
+            return T_K
+    if return_input is True:
+        if equationT == "T_Petrelli2021_Cpx_only" or equationT == "T_Petrelli2021_Cpx_only_withH2O":
+            out=pd.concat([df_stats, cpx_comps],axis=1)
+            return out
+        else:
+            cpx_comps_c.insert(0, 'T_K_calc', T_K)
+            return cpx_comps_c
 
-
-    if equationT == "T_Petrelli2021_Cpx_only" or  equationT == "T_Petrelli2021_Cpx_only_withH2O":
-        return df_stats
-    else:
-        return T_K
 
 ## Iterating PT- Cpx only
 def calculate_cpx_only_press_temp(*, cpx_comps=None, equationP=None,
-                               equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None):
+equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
 
 
     '''
@@ -1887,11 +1927,14 @@ def calculate_cpx_only_press_temp(*, cpx_comps=None, equationP=None,
     Optional:
 
 
-     iterations: int, default=30
+    iterations: int, default=30
          Number of iterations used to converge to solution.
 
-     T_K_guess: int or float. Default is 1300 K
+    T_K_guess: int or float. Default is 1300 K
          Initial guess of temperature.
+
+    return_input: bool
+        if True, also returns cpx_comps
 
 
     Returns:
@@ -1938,6 +1981,10 @@ def calculate_cpx_only_press_temp(*, cpx_comps=None, equationP=None,
             data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
     PT_out.replace([np.inf, -np.inf], np.nan, inplace=True)
 
-    return PT_out
+    if return_input is False:
+        return PT_out
+    if return_input is True:
+        out=pd.concat([PT_out, cpx_comps_c],axis=1)
+        return out
 
 

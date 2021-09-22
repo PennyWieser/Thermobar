@@ -76,6 +76,51 @@ plag_liq_T_funcs_by_name = {p.__name__: p for p in plag_liq_T_funcs}
 Kspar_Liq_T_funcs = {T_Put2008_eq24b}
 Kspar_Liq_T_funcs_by_name = {p.__name__: p for p in Kspar_Liq_T_funcs}
 
+def calculate_plag_liq_temp_all_eqs(*, plag_comps=None,
+    liq_comps=None, equationT=None, P=None, H2O_Liq=None):
+
+    '''
+    Plag-Liquid thermometery
+    returns temperature in Kelvin for equation 23 and 24a
+
+    Parameters
+    -------
+
+    liq_comps: DataFrame
+        liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
+
+    plag_comps (DataFrame)
+        Specify plag_comps=... Dataframe from import_excel (with column headings SiO2_Plag, MgO_Plag) etc
+
+
+    P: float, int, series
+        Pressure in kbar
+
+
+    H2O_Liq: optional.
+        If None, uses H2O_Liq column from input.
+        If int, float, series, uses this instead of H2O_Liq Column
+
+    Returns
+    -------
+    DataFrame
+        Temperatures in Kelvin
+
+    '''
+
+    Eq_23=calculate_fspar_liq_temp(plag_comps=plag_comps,
+    liq_comps=liq_comps, equationT="T_Put2008_eq23",
+    P=P, H2O_Liq=H2O_Liq)
+
+    Eq_24a=calculate_fspar_liq_temp(plag_comps=plag_comps,
+    liq_comps=liq_comps, equationT="T_Put2008_eq24a",
+    P=P, H2O_Liq=H2O_Liq)
+
+    Out=pd.DataFrame(data={'Put2008_eq23':  Eq_23,
+                           'Put2008_eq24a': Eq_24a})
+    Out2=pd.concat([Out, plag_comps, liq_comps], axis=1)
+
+    return Out2
 
 def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
     liq_comps=None, equationT=None, P=None, H2O_Liq=None, eq_tests=False):
@@ -818,7 +863,7 @@ def calculate_fspar_liq_temp_hygr(*, liq_comps, plag_comps, equationT, equationH
     DeltaT=T_sample[:, -1]-T_sample[:, -2]
     DeltaH=H2O_sample[:, -1]-H2O_sample[:, -2]
     Combined_output.insert(2, 'Delta T (last 2 iters)', DeltaT)
-    Combined_output.insert(3, 'Delta H (last 2 iters)', DeltaH)
+    Combined_output.insert(4, 'Delta H (last 2 iters)', DeltaH)
 
     # Calculating a dataframe showing the evolution of temperature and H2O vs. number of iterations
     Iter=It_sample

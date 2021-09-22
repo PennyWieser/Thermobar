@@ -314,6 +314,8 @@ filter_q=None, append=False):
         H2O_Err = np.empty((duplicates * len(Data)), dtype=float)
         P_kbar_Err = np.empty((duplicates * len(Data)), dtype=float)
         T_K_Err = np.empty((duplicates * len(Data)), dtype=float)
+        F_Err = np.empty((duplicates * len(Data)), dtype=float)
+        Cl_Err = np.empty((duplicates * len(Data)), dtype=float)
         Sample_name_num = np.empty((duplicates * len(Data)), dtype=float)
 
         if phase_err_type == "Abs":
