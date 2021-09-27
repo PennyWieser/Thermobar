@@ -159,19 +159,48 @@ def P_Neave2017(T, *, lnK_Jd_liq, DiHd_2003, Al_Liq_cat_frac,
     return (-26.2712 + 39.16138 * T * lnK_Jd_liq / 10**4 - 4.21676 * np.log(DiHd_2003.astype(float))
             + 78.43463 * Al_Liq_cat_frac + 393.8126 * (Na_Liq_cat_frac + K_Liq_cat_frac)**2)
 
-def P_Petrelli2021_Cpx_Liq(T=None, *, cpx_comps, liq_comps):
+def P_Petrelli2021_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
     Clinopyroxene-liquid  barometer of Petrelli et al. (2021) based on
     Machine Learning.
     |  SEE==+-2.9 kbar
     '''
-    cpx_test=cpx_comps.copy()
-    liq_test=liq_comps.copy()
-    cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
-    liq_test_noID_noT=liq_test.drop(['Sample_ID_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq', 'CO2_Liq'], axis=1)
-    cpx_liq_combo_test=pd.concat([cpx_test_noID_noT, liq_test_noID_noT], axis=1)
-    x_test=cpx_liq_combo_test.values
+    if meltmatch is None:
+        cpx_test=cpx_comps.copy()
+        liq_test=liq_comps.copy()
+        cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
 
+    if meltmatch is not None:
+        cpx_liq_combo=meltmatch
+
+
+
+    Cpx_Liq_ML_in=pd.DataFrame(data={'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
+                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
+                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
+                                'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
+                                'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
+                                'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
+                                'FeOt_Liq': cpx_liq_combo['FeOt_Liq'],
+                                'MnO_Liq': cpx_liq_combo['MnO_Liq'],
+                                'MgO_Liq': cpx_liq_combo['MgO_Liq'],
+                                'CaO_Liq': cpx_liq_combo['CaO_Liq'],
+                                'Na2O_Liq': cpx_liq_combo['Na2O_Liq'],
+                                'K2O_Liq': cpx_liq_combo['K2O_Liq'],
+                                'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
+                                'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
+                                'H2O_Liq': cpx_liq_combo['H2O_Liq']
+    })
+
+
+    x_test=Cpx_Liq_ML_in.values
 
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq.pkl', 'rb') as f:
         scaler_P2020_Cpx_Liq=load(f)
@@ -319,18 +348,48 @@ Fet_Liq_cat_frac, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac):
 
 
 
-def T_Petrelli2021_Cpx_Liq(P=None, *, cpx_comps, liq_comps):
+def T_Petrelli2021_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
     Clinopyroxene-liquid  thermometer of Petrelli et al. (2021) based on
     Machine Learning.
     |  SEE==+-51°C
     '''
-    cpx_test=cpx_comps.copy()
-    liq_test=liq_comps.copy()
-    cpx_test_noID_noT=cpx_test.drop(['Sample_ID_Cpx'], axis=1)
-    liq_test_noID_noT=liq_test.drop(['Sample_ID_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq', 'CO2_Liq'], axis=1)
-    cpx_liq_combo_test=pd.concat([cpx_test_noID_noT, liq_test_noID_noT], axis=1)
-    x_test=cpx_liq_combo_test.values
+    if meltmatch is None:
+        cpx_test=cpx_comps.copy()
+        liq_test=liq_comps.copy()
+        cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
+
+    if meltmatch is not None:
+        cpx_liq_combo=meltmatch
+
+
+
+    Cpx_Liq_ML_in=pd.DataFrame(data={'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
+                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
+                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
+                                'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
+                                'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
+                                'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
+                                'FeOt_Liq': cpx_liq_combo['FeOt_Liq'],
+                                'MnO_Liq': cpx_liq_combo['MnO_Liq'],
+                                'MgO_Liq': cpx_liq_combo['MgO_Liq'],
+                                'CaO_Liq': cpx_liq_combo['CaO_Liq'],
+                                'Na2O_Liq': cpx_liq_combo['Na2O_Liq'],
+                                'K2O_Liq': cpx_liq_combo['K2O_Liq'],
+                                'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
+                                'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
+                                'H2O_Liq': cpx_liq_combo['H2O_Liq']
+    })
+
+
+    x_test=Cpx_Liq_ML_in.values
 
 
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq.pkl', 'rb') as f:
@@ -473,7 +532,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
 
 
     if equationP == "P_Petrelli2021_Cpx_Liq":
-        df_stats=P_Petrelli2021_Cpx_Liq(cpx_comps=cpx_comps, liq_comps=liq_comps_c)
+        df_stats=P_Petrelli2021_Cpx_Liq(meltmatch=Combo_liq_cpxs)
         P_kbar=df_stats['P_kbar_calc']
 
     else:
@@ -615,6 +674,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
 
     if liq_comps is not None:
         liq_comps_c = liq_comps.copy()
+
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
         if Fe3Fet_Liq is not None:
@@ -644,7 +704,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
 
     # Easiest to treat Machine Learning ones differently
     if equationT == "T_Petrelli2021_Cpx_Liq":
-        df_stats=T_Petrelli2021_Cpx_Liq(cpx_comps=cpx_comps, liq_comps=liq_comps_c)
+        df_stats=T_Petrelli2021_Cpx_Liq(meltmatch=Combo_liq_cpxs)
         T_K=df_stats['T_K_calc']
     else:
         kwargs = {name: Combo_liq_cpxs[name] for name, p in sig.parameters.items()
@@ -802,9 +862,15 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
 
+
+
         if "Petrelli" in equationT:
-            T_func = calculate_cpx_liq_temp(
-                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve").T_K_calc
+            T_func_all=calculate_cpx_liq_temp(
+                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
+            T_func = T_func_all.T_K_calc
+            Median_T=T_func_all.Median_Trees
+            Std_T=T_func_all.Std_Trees
+            IQR_T=T_func_all.IQR_Trees
         else:
             T_func = calculate_cpx_liq_temp(
                 cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
@@ -812,6 +878,12 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         if "Petrelli" in equationP:
             P_func = calculate_cpx_liq_press(
                 cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve").P_kbar_calc
+            P_func_all=calculate_cpx_liq_press(
+                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
+            P_func = P_func_all.P_kbar_calc
+            Median_P=P_func_all.Median_Trees
+            Std_P=P_func_all.Std_Trees
+            IQR_P=P_func_all.IQR_Trees
         else:
             P_func = calculate_cpx_liq_press(
                 cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
