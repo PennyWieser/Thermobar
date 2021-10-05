@@ -368,7 +368,11 @@ classification=False, Ridolfi_Filter=True):
         amp_comps['Sample_ID_Amp'] = amp_comps.index
 
     if equationP == "P_Mutch2016":
-        ox23 = calculate_23oxygens_amphibole(amp_comps)
+        # In spreadsheet provided by Mutch, doesnt use Cl and F for calcs.
+        amp_comps_noHalogens=amp_comps.copy()
+        amp_comps_noHalogens['Cl_Amp']=0
+        amp_comps_noHalogens['F_Amp']=0
+        ox23 = calculate_23oxygens_amphibole(amp_comps_noHalogens)
         Amp_sites_initial = get_amp_sites_mutch(ox23)
         norm_cat = amp_components_ferric_ferrous_mutch(Amp_sites_initial, ox23)
         final_cat = get_amp_sites_ferric_ferrous_mutch(norm_cat)
@@ -575,6 +579,7 @@ def T_Ridolfi2012(P, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
                   MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
     '''
     Amphibole-only thermometer of Ridolfi and Renzuli, 2012
+    SEE=22C
     '''
     return (273.15 + 8899.682 - 691.423 * SiO2_Amp_13_cat - 391.548 * TiO2_Amp_13_cat - 666.149 * Al2O3_Amp_13_cat
     - 636.484 * FeOt_Amp_13_cat -584.021 * MgO_Amp_13_cat - 23.215 * CaO_Amp_13_cat
