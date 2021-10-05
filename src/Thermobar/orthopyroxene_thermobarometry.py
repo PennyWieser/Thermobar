@@ -141,6 +141,9 @@ def T_Beatt1993_opx(P, *, Ca_Liq_cat_frac, Fet_Liq_cat_frac, Mg_Liq_cat_frac,
     return Num_B1993 / Den_B1993
 
 ##  Opx-Only barometry function
+Opx_only_P_funcs = {P_Put2008_eq29c} # put on outside
+
+Opx_only_P_funcs_by_name = {p.__name__: p for p in Opx_only_P_funcs}
 
 
 def calculate_opx_only_press(*, opx_comps, equationP, T=None):
@@ -169,9 +172,24 @@ def calculate_opx_only_press(*, opx_comps, equationP, T=None):
 
 
     '''
+    try:
+        func = Opx_only_P_funcs_by_name[equationP]
+    except KeyError:
+        raise ValueError(f'{equationP} is not a valid equation') from None
+
+    sig=inspect.signature(func)
+
+    if sig.parameters['T'].default is not None:
+        if T is None:
+            raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
+    else:
+        if T is not None:
+            print('Youve selected a T-independent function')
+
     opx_comps = calculate_orthopyroxene_components(opx_comps=opx_comps)
     if equationP != "P_Put2008_eq29c":
         raise ValueError('Equation not recognised, at the moment the only choice is P_Put2008_eq29c')
+
 
     P_func = P_Put2008_eq29c
     if any(opx_comps['Cr_Opx_cat_6ox'] == 0):
@@ -648,7 +666,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         Allows users to ovewrite the default where Kd is calculated from the
         expression in Putirka (2008) based on the Si content of the liquid.
 
-    Kd_Error: int or float, optional
+    Kd_Err: int or float, optional
         Allows users to override the defualt 1 sigma on Kd matches of +-0.06
 
 

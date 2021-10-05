@@ -849,6 +849,9 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
     else:
         iterations = 30
 
+    if meltmatch is not None:
+        Combo_liq_cpxs = meltmatch
+
     if meltmatch is None:
         liq_comps_c = liq_comps.copy()
         # This overwrites the Fe3Fet in their inputted dataframe
@@ -862,37 +865,32 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
 
+        Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(liq_comps=liq_comps_c,
+        cpx_comps=cpx_comps)
 
 
-        if "Petrelli" in equationT:
-            T_func_all=calculate_cpx_liq_temp(
-                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
-            T_func = T_func_all.T_K_calc
-            Median_T=T_func_all.Median_Trees
-            Std_T=T_func_all.Std_Trees
-            IQR_T=T_func_all.IQR_Trees
-        else:
-            T_func = calculate_cpx_liq_temp(
-                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationT=equationT, P="Solve")
+    if "Petrelli" in equationT:
+        T_func_all=calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs,
+        equationT=equationT, P="Solve")
+        T_func = T_func_all.T_K_calc
+        Median_T=T_func_all.Median_Trees
+        Std_T=T_func_all.Std_Trees
+        IQR_T=T_func_all.IQR_Trees
+    else:
+        T_func = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs, equationT=equationT, P="Solve")
 
-        if "Petrelli" in equationP:
-            P_func = calculate_cpx_liq_press(
-                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve").P_kbar_calc
-            P_func_all=calculate_cpx_liq_press(
-                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
-            P_func = P_func_all.P_kbar_calc
-            Median_P=P_func_all.Median_Trees
-            Std_P=P_func_all.Std_Trees
-            IQR_P=P_func_all.IQR_Trees
-        else:
-            P_func = calculate_cpx_liq_press(
-                cpx_comps=cpx_comps, liq_comps=liq_comps_c, equationP=equationP, T="Solve")
+    if "Petrelli" in equationP:
+        P_func_all=calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs,
+            equationP=equationP, T="Solve")
+        P_func = P_func_all.P_kbar_calc
+        Median_P=P_func_all.Median_Trees
+        Std_P=P_func_all.Std_Trees
+        IQR_P=P_func_all.IQR_Trees
+    else:
+        P_func = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs,
+        equationP=equationP, T="Solve")
 
-    if meltmatch is not None:
-        T_func = calculate_cpx_liq_temp(
-            meltmatch=meltmatch, equationT=equationT, eq_tests=False, P="Solve")
-        P_func = calculate_cpx_liq_press(
-            meltmatch=meltmatch, equationP=equationP, eq_tests=False, T="Solve")
+
 
     if isinstance(P_func, pd.Series) and isinstance(T_func, partial):
         P_guess = P_func
@@ -910,17 +908,26 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
 
-    if equationT != "T_Petrelli2021_Cpx_Liq":
-        T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
-        T_K_guess[T_K_guess_is_bad] = np.nan
-    if equationP != "P_Petrelli2021_Cpx_Liq":
-        P_guess[T_K_guess_is_bad] = np.nan
+    #if equationT != "T_Petrelli2021_Cpx_Liq":
+    T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
+    T_K_guess[T_K_guess_is_bad] = np.nan
+    #if equationP != "P_Petrelli2021_Cpx_Liq":
+    P_guess[T_K_guess_is_bad] = np.nan
 
 
     # calculates equilibrium tests of Neave and Putirka if eq_tests="True"
     if eq_tests is False:
         PT_out = pd.DataFrame(
             data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+        if "Petrelli" in equationP:
+            PT_out.insert(2, "Median_Trees_P", Median_P)
+            PT_out.insert(3, "Std_Trees_P", Std_P)
+            PT_out.insert(4, "IQR_Trees_P", Std_P)
+
+        if "Petrelli" in equationP:
+            PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
+            PT_out.insert(len(PT_out.columns), "Std_Trees_T", Std_T)
+            PT_out.insert(len(PT_out.columns), "IQR_Trees_T", Std_T)
         return PT_out
     if eq_tests is True:
         if meltmatch is not None:
@@ -929,6 +936,19 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         if meltmatch is None:
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps, P=P_guess, T=T_K_guess)
+        if "Petrelli" in equationP:
+            eq_tests.insert(2, "Median_Trees_P", Median_P)
+            eq_tests.insert(3, "Std_Trees_P", Std_P)
+            eq_tests.insert(4, "IQR_Trees_P", Std_P)
+        if "Petrelli" in equationT:
+            if "Petrelli" in equationP:
+                a=4
+            else:
+                a=0
+            eq_tests.insert(a+1, "Median_Trees_T", Median_T)
+            eq_tests.insert(a+2, "Std_Trees_T", Std_T)
+            eq_tests.insert(a+3, "IQR_Trees_T", Std_T)
+
         return eq_tests
 
 ## Clinopyroxene melt-matching algorithm
@@ -1158,11 +1178,18 @@ H2O_Liq=None, Return_All_Matches=False):
         # Filter out bad analysis first off
 
 
-
-            Combo_liq_cpxs_2['T_Liq_MinP'] = calculate_cpx_liq_temp(
-                meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMin)
-            Combo_liq_cpxs_2['T_Liq_MaxP'] = calculate_cpx_liq_temp(
+            if "Petrelli" in equationT:
+                Combo_liq_cpxs_2['T_Liq_MinP'] = calculate_cpx_liq_temp(
+                    meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMin).T_K_calc
+                Combo_liq_cpxs_2['T_Liq_MaxP'] = calculate_cpx_liq_temp(
+                meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMax).T_K_calc
+            else:
+                Combo_liq_cpxs_2['T_Liq_MinP'] = calculate_cpx_liq_temp(
+                    meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMin)
+                Combo_liq_cpxs_2['T_Liq_MaxP'] = calculate_cpx_liq_temp(
                 meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMax)
+
+
             # calculating Delta Kd-Fe-Mg using equation 35 of Putirka 2008
 
             if Kd_Match == "Putirka":
@@ -1312,14 +1339,13 @@ Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, 
     '''
     Clinopyroxene-only barometer of Wang et al. (2021) equation 1
     Uses NCT
-    SEE=
+    SEE=1.52
     - currently on Zenodo - 10.5281/zenodo.4727870
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
     +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
 
-    return (-7.6551*NCT*np.log(Al_VI_cat_6ox.astype(float))-10.2203*Si_Cpx_cat_6ox+4.8343*Fet_Cpx_cat_6ox
-+0.7397*Mg_Cpx_cat_6ox-13.1746*Ca_Cpx_cat_6ox+122.1294*Na_Cpx_cat_6ox+23.35)
+    return (-7.6551*NCT*np.log(Al_VI_cat_6ox.astype(float))-10.2203*Si_Cpx_cat_6ox+4.8343*Fet_Cpx_cat_6ox+0.7397*Mg_Cpx_cat_6ox-13.1746*Ca_Cpx_cat_6ox+122.1294*Na_Cpx_cat_6ox+23.35)
 
 
 def P_Wang2021_eq3(T=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
@@ -1539,7 +1565,9 @@ def T_Wang2021_eq2(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_
 Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
 FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
     '''
-    Clinopyroxene-only thermometer of Wang et al. (2021) equation 2 - currently on Zenodo - 10.5281/zenodo.4727870
+    Clinopyroxene-only thermometer of Wang et al. (2021) e
+    equation 2 - currently on Zenodo - 10.5281/zenodo.4727870
+    SEE=35.2 C
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
     +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
@@ -1554,7 +1582,9 @@ def T_Wang2021_eq4(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_
 Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
 FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox):
     '''
-    Clinopyroxene-only thermometer of Wang et al. (2021) equation 2 - currently on Zenodo - 10.5281/zenodo.4727870
+    Clinopyroxene-only thermometer of Wang et al. (2021)
+    equation 4 - currently on Zenodo - 10.5281/zenodo.4727870
+    SEE=
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
     +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
@@ -1797,26 +1827,27 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
     import warnings
     with w.catch_warnings():
         w.simplefilter('ignore')
-        cpx_comps_c=calculate_clinopyroxene_components(cpx_comps=cpx_comps)
-        cpx_comps_c['P_Wang21_eq1']=calculate_cpx_only_press(cpx_comps=cpx_comps, equationP="P_Wang2021_eq1")
-        cpx_comps_c['P_Wang21_eq3']=calculate_cpx_only_press(cpx_comps=cpx_comps, equationP="P_Wang2021_eq3")
+        cpx_comps_copy=cpx_comps.copy()
+        cpx_comps_c=calculate_clinopyroxene_components(cpx_comps=cpx_comps_copy)
+        cpx_comps_c['P_Wang21_eq1']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy, equationP="P_Wang2021_eq1")
+        cpx_comps_c['P_Wang21_eq3']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy, equationP="P_Wang2021_eq3")
 
-        cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps, equationT="T_Wang2021_eq2")
-        cpx_comps_c['T_Wang21_eq4']=calculate_cpx_only_temp(cpx_comps=cpx_comps, equationT="T_Wang2021_eq4")
+        cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq2")
+        cpx_comps_c['T_Wang21_eq4']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq4")
 
-        cpx_comps_c['T_Petrelli21']=calculate_cpx_only_temp(cpx_comps=cpx_comps,
+        cpx_comps_c['T_Petrelli21']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
         equationT="T_Petrelli2021_Cpx_only").T_K_calc
 
-        cpx_comps_c['T_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
+        cpx_comps_c['T_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").T_K_calc
-        cpx_comps_c['T_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
+        cpx_comps_c['T_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).T_K_calc
 
-        cpx_comps_c['P_Petrelli21']=calculate_cpx_only_press(cpx_comps=cpx_comps,
+        cpx_comps_c['P_Petrelli21']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
         equationP="P_Petrelli2021_Cpx_only").P_kbar_calc
-        cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
+        cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
-        cpx_comps_c['P_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps,
+        cpx_comps_c['P_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).P_kbar_calc
         X_Wangeq1_Sorted=np.sort(cpx_comps_c['P_Wang21_eq1'])
         X_Wangeq3_Sorted=np.sort(cpx_comps_c['P_Wang21_eq3'])

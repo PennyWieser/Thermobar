@@ -1354,11 +1354,11 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['Mgno_Cpx'] = (cpx_comps['MgO_Cpx'] / 40.3044) / \
         (cpx_comps['MgO_Cpx'] / 40.3044 + cpx_comps['FeOt_Cpx'] / 71.844)
 
-    cpx_calc['Jd'] = np.empty(len(cpx_calc), dtype=float)
-    cpx_calc['CaTs'] = np.empty(len(cpx_calc), dtype=float)
-    cpx_calc['CaTi'] = np.empty(len(cpx_calc), dtype=float)
-    cpx_calc['DiHd_1996'] = np.empty(len(cpx_calc), dtype=float)
-
+    # cpx_calc['Jd'] = np.empty(len(cpx_calc), dtype=float)
+    # cpx_calc['CaTs'] = np.empty(len(cpx_calc), dtype=float)
+    # cpx_calc['CaTi'] = np.empty(len(cpx_calc), dtype=float)
+    # cpx_calc['DiHd_1996'] = np.empty(len(cpx_calc), dtype=float)
+    print('new')
 
     AlVI_minus_Na=cpx_calc['Al_VI_cat_6ox']-cpx_calc['Na_Cpx_cat_6ox']
     cpx_calc['Jd']=cpx_calc['Na_Cpx_cat_6ox']
@@ -1393,9 +1393,9 @@ def calculate_clinopyroxene_components(cpx_comps):
                              cpx_calc['CaTs'] - cpx_calc['CaTi'] - cpx_calc['CrCaTs'])
     cpx_calc['Di_Cpx'] = cpx_calc['DiHd_2003'] * (cpx_calc['Mg_Cpx_cat_6ox'] / (
         cpx_calc['Mg_Cpx_cat_6ox'] + cpx_calc['Mn_Cpx_cat_6ox'] + cpx_calc['Fet_Cpx_cat_6ox']))
-    cpx_calc['DiHd_1996'] = cpx_calc['DiHd_1996'].clip(lower=0)
-    cpx_calc['DiHd_2003'] = cpx_calc['DiHd_2003'].clip(lower=0)
-    cpx_calc['Jd'] = cpx_calc['Jd'].clip(lower=0)
+    cpx_calc['DiHd_1996'].clip(lower=0, inplace=True)
+    cpx_calc['DiHd_2003'].clip(lower=0, inplace=True)
+    cpx_calc['Jd'].clip(lower=0, inplace=True)
 
     cpx_calc['FeIII_Wang21']=(cpx_calc['Na_Cpx_cat_6ox']+cpx_calc['Al_IV_cat_6ox']
     -cpx_calc['Al_VI_cat_6ox']-2*cpx_calc['Ti_Cpx_cat_6ox']-cpx_calc['Cr_Cpx_cat_6ox'])
