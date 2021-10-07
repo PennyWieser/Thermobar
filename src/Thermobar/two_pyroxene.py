@@ -226,8 +226,8 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     calculates pressure in kbar for Opx-Cpx pairs
 
     The function requires inputs of cpx_comps and opx_comps, or input of a
-    combined dataframe of cpx-opx compositions (this is used for the matching
-    algorithm).
+    combined dataframe of cpx-opx compositions (this is used for the
+    calculate_cpx_opx_press_temp_matching function)
 
     Parameters
     -----------
@@ -332,8 +332,8 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
     calculates Temperature in K for Opx-Cpx pairs.
 
     The function requires inputs of cpx_comps and opx_comps, or input of a
-    combined dataframe of cpx-opx compositions (this is used for the matching
-    algorithm).
+    combined dataframe of cpx-opx compositions (this is used for the
+    calculate_cpx_opx_press_temp_matching function).
 
     Parameters
     ------------
@@ -435,8 +435,8 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     thermometers and barometers.
 
     The function requires inputs of cpx_comps and opx_comps, or input of a
-    combined dataframe of cpx-opx compositions (this is used for the matching
-    algorithm).
+    combined dataframe of cpx-opx compositions (this is used for the
+    calculate_cpx_opx_press_temp_matching function).
 
     Parameters
     -----------
@@ -447,11 +447,9 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     cpx_comps: DataFrame
         Cpxuid compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-
     meltmatch: DataFrame
         Combined dataframe of Opx-Cpx compositions (headings SiO2_Cpx, SiO2_Opx etc.).
         Used for calculate cpx_opx_press_temp_matching function.
-
 
     equationP: str
         Choose from:
