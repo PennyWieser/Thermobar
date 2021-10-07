@@ -10,7 +10,9 @@ Welcome to Thermobar's documentation!
    :maxdepth: 3
    :caption: Contents:
 
+   otherfuncs
    api
+
    references
 
 

@@ -60,7 +60,7 @@ def normalize_anhydrous_to_100_incF_mol_prop(liq_comps, F2O_content=0):
 
 
 
-def calculate_viscosity_giordano_2008(liq_comps, T=None, F2O_content=0):
+def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_content=0):
     '''
     Calculates viscosity parameters A, B, C from Giordano et al. 2008.
     If a temperature is supplied, calculates viscosity.
@@ -75,9 +75,13 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, F2O_content=0):
         F2O content of the liquid (wt%), by default is set at zero.
 
     Optional:
+
     T: int, flt, pd.Series
         Temperature in Kelvin.
         If specified, returns viscosity and log viscosity
+
+    H2O_Liq: int, flt, pd.Series
+        Water content in wt%, overwrites that in input spreadsheet
 
     Returns
     -------
@@ -85,10 +89,14 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, F2O_content=0):
         viscosity parameters, viscosity (if T supplied), as well user-entered
         liquid composition.
     '''
-
-
     liq_comps_c=liq_comps.copy()
-    mol_percents=normalize_anhydrous_to_100_incF_mol_prop(liq_comps=liq_comps,
+    if H2O_Liq is not None:
+        liq_comps_c['H2O_Liq']=H2O_Liq
+        print('Water content from input overridden')
+
+
+
+    mol_percents=normalize_anhydrous_to_100_incF_mol_prop(liq_comps=liq_comps_c,
     F2O_content=F2O_content)
 
     V = mol_percents["H2O_Liq_mol_frac_hyd"] + mol_percents["F2O_Liq_mol_frac_hyd"]
