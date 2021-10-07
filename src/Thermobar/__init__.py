@@ -35,6 +35,8 @@ from Thermobar.feldspar import *
 from Thermobar.amphibole import *
 # plotting, R2 etc
 from Thermobar.plotting import *
+# Viscosity
+from Thermobar.viscosity import *
 # version
 from ._version import __version__
 
