@@ -518,11 +518,16 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     if eq_tests is True:
         two_pyx = calculate_cpx_opx_eq_tests(
             cpx_comps=cpx_comps, opx_comps=opx_comps)
-
+        DeltaKd_HighT= np.abs(
+            1.09 - two_pyx['Kd_Fe_Mg_Cpx_Opx'])
+        DeltaKd_SubSol= np.abs(
+            0.7 - two_pyx['Kd_Fe_Mg_Cpx_Opx'])
         two_pyx.insert(0, "T_K_calc", T_K_guess)
         two_pyx.insert(1, "P_kbar_calc", P_guess)
         two_pyx.insert(2, "Equation Choice (T)", str(equationT))
         two_pyx.insert(3, "Equation Choice (P)", str(equationP))
+        two_pyx.insert(4, 'Delta Kd High T', DeltaKd_HighT)
+        two_pyx.insert(6, 'Delta Kd Low T', DeltaKd_LowT)
         two_pyx.replace([np.inf, -np.inf], np.nan, inplace=True)
     return two_pyx
    # return P_func
