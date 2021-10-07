@@ -963,8 +963,8 @@ H2O_Liq=None, Return_All_Matches=False):
     returns P (kbar) and T (K) for those in equilibrium.
 
 
-   Parameters
-    -------
+    Parameters
+    -----------
 
     liq_comps: DataFrame
         Panda DataFrame of liquid compositions with column headings SiO2_Liq etc.
