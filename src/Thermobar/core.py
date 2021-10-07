@@ -338,6 +338,8 @@ df_ideal_all2 = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
 'FeOt', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O',
 'Cr2O3', 'P2O5', 'F', 'Cl'])
 
+
+
 def convert_oxide_percent_to_element_weight_percent(df, suffix=None):
     """
     Converts oxide wt% to elemental wt%
@@ -1358,7 +1360,7 @@ def calculate_clinopyroxene_components(cpx_comps):
     # cpx_calc['CaTs'] = np.empty(len(cpx_calc), dtype=float)
     # cpx_calc['CaTi'] = np.empty(len(cpx_calc), dtype=float)
     # cpx_calc['DiHd_1996'] = np.empty(len(cpx_calc), dtype=float)
-    print('new')
+
 
     AlVI_minus_Na=cpx_calc['Al_VI_cat_6ox']-cpx_calc['Na_Cpx_cat_6ox']
     cpx_calc['Jd']=cpx_calc['Na_Cpx_cat_6ox']
