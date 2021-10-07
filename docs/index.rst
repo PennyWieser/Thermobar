@@ -11,6 +11,7 @@ Welcome to Thermobar's documentation!
    :caption: Contents:
 
    api
+   references
 
 
 Indices and tables
@@ -20,5 +21,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. automodule:: Thermobar
-   :members:
+

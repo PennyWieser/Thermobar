@@ -19,6 +19,7 @@ Fet_Opx_cat_6ox, Mn_Opx_cat_6ox, Ca_Cpx_cat_6ox, Fm2Si2O6, En_Opx, Di_Opx):
     '''
 
     Two pyroxene barometer of Putirka (2008) Eq38. Calibrated on Mg#-rich systems (>0.75)
+    :cite:`putirka2008thermometers`
 
     | SEE=+-3.7 kbar
     '''
@@ -528,7 +529,7 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
         two_pyx.insert(3, "Equation Choice (P)", str(equationP))
         two_pyx.insert(4, 'Delta Kd High T', DeltaKd_HighT)
         two_pyx.insert(6, 'Delta Kd Low T', DeltaKd_LowT)
-        two_pyx.replace([np.inf, -np.inf], np.nan, inplace=True)
+        two_pyfax.replace([np.inf, -np.inf], np.nan, inplace=True)
     return two_pyx
    # return P_func
 
