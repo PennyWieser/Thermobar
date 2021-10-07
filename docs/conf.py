@@ -59,6 +59,7 @@ extensions = ["sphinx_rtd_theme",
     'sphinxcontrib.bibtex',
 ]
 bibtex_bibfiles=['references.bib']
+bibtex_reference_style = 'author_year'
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -171,3 +172,10 @@ texinfo_documents = [
      author, 'Thermobar', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'pandas': ('https://pandas.pydata.org/en/latest', None),
+    'numpy': ('https://docs.scipy.org/doc/numpy', None),
+}

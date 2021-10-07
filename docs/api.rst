@@ -5,5 +5,9 @@ Available mineral-melt equilibrium
 .. toctree::
 
 
-   api/Cpx_liq
-   api/two_pyroxene
+    api/Cpx
+    api/Opx
+    api/Two_Px
+    api/Amp
+    api/Fspar
+    api/Liq
