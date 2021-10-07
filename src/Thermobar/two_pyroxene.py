@@ -229,7 +229,7 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     -------
     The function requires inputs of cpx_comps and opx_comps, or input of a
     combined dataframe of cpx-opx compositions (this is used for the matching
-    algorithm.
+    algorithm).
 
     cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
@@ -241,13 +241,13 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
         Combined Cpx-Opx compositions instead of separate dataframes.
         Used for calculate Cpx_Opx_press_temp_matching function.
 
-    EquationP: str
-        options:
+    equationP: str
+        Choose from:
 
-        |  P_Put2008_eq38
-        |  P_Put2008_eq39
+        |  P_Put2008_eq38 (T-independent)
+        |  P_Put2008_eq39 (T-dependent)
 
-    T: float, int, pd.series, str  ("Solve")
+    T: float, int, pd.Series, str  ("Solve")
         Temperature in Kelvin.
         Only needed for T-sensitive barometers.
         If T="Solve", returns a partial function.
@@ -334,7 +334,7 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
     -------
     The function requires inputs of cpx_comps and opx_comps, or input of a
     combined dataframe of cpx-opx compositions (this is used for the matching
-    algorithm.
+    algorithm).
 
     cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
@@ -345,16 +345,17 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
     Two_Px_Match: DataFrame
         Combined Cpx-Opx compositions. Used for "melt match" functionality.
 
-    EquationT: str
-        Choice of equation:
+    equationT: str
+        Choose from:
 
-        T_Put2008_Eq36  (P-dependent)
-        T_Put2008_Eq37 (P-dependent)
-        T_Brey1990 (P-dependent)
-        T_Wood1973 (P-independent)
-        T_Wells1977 (P-independent)
 
-     P: int, float, series, str ("Solve")
+        |  T_Put2008_Eq36  (P-dependent)
+        |  T_Put2008_Eq37 (P-dependent)
+        |  T_Brey1990 (P-dependent)
+        |  T_Wood1973 (P-independent)
+        |  T_Wells1977 (P-independent)
+
+     P: int, float, pandas.Series, str ("Solve")
         Pressure in kbar.
         Can enter float or int to use same P for all calculations
         If "Solve", returns partial if function is P-dependent
@@ -428,37 +429,42 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
 def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match=None,
                               equationP=None, equationT=None, iterations=30, T_K_guess=1300, eq_tests=False):
     '''
-    Solves simultaneous equations for temperature and pressure using clinopyroxene-orthopyroxene thermometers and barometers.
+    Solves simultaneous equations for temperature and pressure using clinopyroxene-orthopyroxene
+    thermometers and barometers.
 
+    The function requires inputs of cpx_comps and opx_comps, or input of a
+    combined dataframe of cpx-opx compositions (this is used for the matching
+    algorithm).
 
    Parameters
     -------
 
-    opx_comps: DataFrame (opt, either specify opx_comps AND cpx_comps or meltmatch)
+    opx_comps: DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    cpx_comps: DataFrame (not required for P_Put2008_eq29c)
+    cpx_comps: DataFrame
         Cpxuid compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    Or:
 
     meltmatch: DataFrame
-        Combined dataframe of Opx-Cpx compositions (headings SiO2_Cpx, SiO2_Opx etc.). S
-        Used for calculate Cpx_Opx_press_temp_matching function.
+        Combined dataframe of Opx-Cpx compositions (headings SiO2_Cpx, SiO2_Opx etc.).
+        Used for calculate cpx_opx_press_temp_matching function.
 
 
-    EquationP: str
-        Barometer
-        P_Put2008_eq38
-        P_Put2008_eq39
+    equationP: str
+        Choose from:
 
-    EquationT: str
-        Thermometer
-        T_Put2008_eq36
-        T_Put2008_eq37
-        T_Brey1990
-        T_Wood1973
-        T_Wells1977
+        |  P_Put2008_eq38 (T-independent)
+        |  P_Put2008_eq39 (T-dependent)
+
+    equationT: str
+        Choose from:
+
+        |  T_Put2008_Eq36  (P-dependent)
+        |  T_Put2008_Eq37 (P-dependent)
+        |  T_Brey1990 (P-dependent)
+        |  T_Wood1973 (P-independent)
+        |  T_Wells1977 (P-independent)
 
     Optional:
 
@@ -554,12 +560,15 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
 def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=None, equationP=None,
                                   Kd_Match=None, Kd_Err=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None):
     '''
-    Evaluates all possible Cpx-Opx pairs,
-    returns P (kbar) and T (K) for those in Kd Fe-Mg equilibrium.
+    Evaluates all possible Cpx-Opx pairs for user supplied dataframes of opx and cpx
+    comps (can be different lengths). returns P (kbar) and T (K) for those in Kd Fe-Mg equilibrium.
 
 
    Parameters
     -------
+
+    You can either enter an equation for P and T, or specify one equation (e.g., equationP),
+    and values (E.g., T=...)
 
     opx_comps: DataFrame
         Panda DataFrame of opx compositions with column headings SiO2_Opx etc.
@@ -568,16 +577,21 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     cpx_comps: DataFrame
         Panda DataFrame of cpx compositions with column headings SiO2_Cpx etc.
 
-    EquationP: str
-        |  P_Put2008_eq38
-        |  P_Put2008_eq39
+    equationP: str
+        Choose from:
 
-    EquationT: str
-        |  T_Put2008_eq36
-        |  T_Put2008_eq37
-        |  T_Brey1990
-        |  T_Wood1973
-        |  T_Wells1977
+        |  P_Put2008_eq38 (T-independent)
+        |  P_Put2008_eq39 (T-dependent)
+
+    equationT: str
+        Choose from:
+
+        |  T_Put2008_Eq36  (P-dependent)
+        |  T_Put2008_Eq37 (P-dependent)
+        |  T_Brey1990 (P-dependent)
+        |  T_Wood1973 (P-independent)
+        |  T_Wells1977 (P-independent)
+
 
 
     Or: User sets one of P or T
