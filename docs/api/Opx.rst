@@ -1,4 +1,4 @@
-Orthopyroxene_thermobarometry functions
+Opx and Opx-Liquid functions
 ======================
 
 .. automodule:: Thermobar.orthopyroxene_thermobarometry

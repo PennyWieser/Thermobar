@@ -1,4 +1,4 @@
-Liquid Thermobarometry Functions
+Liquid Functions
 ======================
 
 .. automodule:: Thermobar.liquid_thermometers

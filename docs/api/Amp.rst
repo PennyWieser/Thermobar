@@ -1,4 +1,4 @@
-Amphibole Thermobarometry Functions
+Amp and Amp-Liquid functions Functions
 ======================
 
 .. automodule:: Thermobar.amphibole
