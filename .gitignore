@@ -5,3 +5,5 @@ ipynb_checkpoints
 /.ipynb_checkpoints/
 /.ipynb_checkpoints/
 /.coverage
+/docs/_build/
+~$*
