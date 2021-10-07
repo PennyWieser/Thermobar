@@ -42,7 +42,9 @@ Ca_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
 Fm2Si2O6, En_Opx, EnFs):
     '''
 
-    Two pyroxene barometer of Putirka (2008) Eq39. As for Eq38, but also a function of temperature.
+    Two pyroxene barometer of Putirka (2008) Eq39. Similar to Eq38, but
+    has a temperature term.
+    :cite:`putirka2008thermometers`
 
     | SEE=+-2.8 kbar (Cpx Mg#>0.75)
     | SEE=+-3.2 kbar (all data)
@@ -71,6 +73,8 @@ def T_Put2008_eq36(P, *, EnFs, Fm2Si2O6, Ca_Cpx_cat_6ox,
                    CrCaTs, Mn_Opx_cat_6ox, Na_Opx_cat_6ox, En_Opx, Di_Opx):
     '''
     Two-pyroxene thermometer of Putirka (2008) eq 36. Best for Cpx with Mg#>0.75
+    :cite:`putirka2008thermometers`
+
     SEE=+-45C for Cpx Mg#>0.75
     SEE=+-56C for all data
     '''
@@ -82,6 +86,8 @@ def T_Brey1990(P, *, Fet_Cpx_cat_6ox, Ca_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat
                Fet_Opx_cat_6ox, Mg_Opx_cat_6ox, Ca_Opx_cat_6ox, Na_Opx_cat_6ox):
     '''
     Two-pyroxene thermometer of Brey and Kohler (1990).
+    :cite:`brey1990geothermobarometry`
+
     SEE=+-50C for Cpx Mg#>0.75
     SEE=+-70C for all data
     '''
@@ -95,6 +101,8 @@ def T_Put2008_eq37(P, *, EnFs, Di_Cpx, Fm2Si2O6, Mn_Opx_cat_6ox,
                    FmAl2SiO6, Mg_Cpx_cat_6ox, Fet_Cpx_cat_6ox):
     '''
     Two-pyroxene thermometer of Putirka (2008) eq 37. For Cpx with Mg#<0.75
+    :cite:`putirka2008thermometers`
+
     SEE=+-38C for Cpx Mg#>0.75
     SEE=+-60C for all data
     '''
@@ -110,6 +118,8 @@ Mn_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Na_Cpx_cat_6ox, Al_IV_cat_6ox,
 Al_VI_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox):
     '''
     Two-pyroxene thermometer of Wood and Banno (1973)
+    :cite:`wood1973garnet`
+
     '''
     # Opx parts
     Lindley_Fe3_Opx = Na_Opx_cat_6ox + Al_IV_Opx_cat_6ox - Al_VI_Opx_cat_6ox - \
@@ -161,6 +171,8 @@ Fet_Opx_cat_6ox, Na_Opx_cat_6ox, Al_IV_Opx_cat_6ox, Al_VI_Opx_cat_6ox,
  Al_VI_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox):
     '''
     Two-pyroxene thermometer of Wells 1977
+    :cite:`wells1977pyroxene`
+
     '''
     # Opx parts
     Lindley_Fe3_Opx = Na_Opx_cat_6ox + Al_IV_Opx_cat_6ox - Al_VI_Opx_cat_6ox - \
@@ -215,6 +227,9 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
 
     Parameters
     -------
+    The function requires inputs of cpx_comps and opx_comps, or input of a
+    combined dataframe of cpx-opx compositions (this is used for the matching
+    algorithm.
 
     cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
@@ -222,34 +237,33 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     opx_comps: DataFrame
        Opx compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    Or:
-
     Two_Px_Match: DataFrame
-        Combined Cpx-Opx compositions.
+        Combined Cpx-Opx compositions instead of separate dataframes.
         Used for calculate Cpx_Opx_press_temp_matching function.
 
     EquationP: str
-        Choice of equation:
+        options:
+
         |  P_Put2008_eq38
         |  P_Put2008_eq39
 
-    T: float, int, series, str  ("Solve")
-        Temperature in Kelvin
+    T: float, int, pd.series, str  ("Solve")
+        Temperature in Kelvin.
         Only needed for T-sensitive barometers.
-        If enter T="Solve", returns a partial function
-        Else, enter an integer, float, or panda series
+        If T="Solve", returns a partial function.
+        Else, enter an integer, float, or panda series.
 
     eq_tests: bool
-        If False, just returns temperature in K (default) as a panda series
+        If False, just returns temperature in K (default) as a panda series.
         If True, returns pressure in kbar, Kd Fe-Mg for opx-cpx,
         and the user-entered cpx and opx comps as a panda dataframe.
 
 
     Returns
     -------
-    If eq_tests=False
-        pandas.series: Pressure in kbar (if eq_tests=False)
-    If eq_tests=True
+    If eq_tests is False
+        pandas.series: Pressure in kbar
+    If eq_tests is True
         panda.dataframe: Pressure in kbar + Kd-Fe-Mg + cpx+opx comps
 
     '''
@@ -318,6 +332,9 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
 
    Parameters
     -------
+    The function requires inputs of cpx_comps and opx_comps, or input of a
+    combined dataframe of cpx-opx compositions (this is used for the matching
+    algorithm.
 
     cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
@@ -325,13 +342,12 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
     opx_comps: DataFrame
        Opx compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    Or:
-
     Two_Px_Match: DataFrame
         Combined Cpx-Opx compositions. Used for "melt match" functionality.
 
     EquationT: str
         Choice of equation:
+
         T_Put2008_Eq36  (P-dependent)
         T_Put2008_Eq37 (P-dependent)
         T_Brey1990 (P-dependent)
