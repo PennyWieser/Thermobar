@@ -1,6 +1,6 @@
 Core functions (e.g., cation fractions)
-======================
+=======================================
 
-.. automodule:: core
+.. automodule:: Thermobar.core
    :members:
 

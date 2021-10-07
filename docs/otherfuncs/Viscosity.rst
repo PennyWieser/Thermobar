@@ -1,6 +1,6 @@
 Viscosity calculator
-======================
+====================
 
-.. automodule:: viscosity
+.. automodule:: Thermobar.viscosity
    :members:
 
