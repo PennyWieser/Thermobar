@@ -9,3 +9,4 @@ Other functions
     otherfuncs/Core
     otherfuncs/Equilibrium
     otherfuncs/Noise
+    otherfuncs/Viscosity

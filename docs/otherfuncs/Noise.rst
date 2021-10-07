@@ -1,4 +1,4 @@
-Error Propgataion Functions
+Error Propagation Functions
 ======================
 
 .. automodule:: Thermobar.noise_averaging
