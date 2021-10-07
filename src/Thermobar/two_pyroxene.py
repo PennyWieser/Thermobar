@@ -225,11 +225,12 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     '''
     calculates pressure in kbar for Opx-Cpx pairs
 
-    Parameters
-    -------
     The function requires inputs of cpx_comps and opx_comps, or input of a
     combined dataframe of cpx-opx compositions (this is used for the matching
     algorithm).
+
+    Parameters
+    -----------
 
     cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
@@ -328,13 +329,14 @@ Cpx_Opx_T_funcs_by_name = {p.__name__: p for p in Cpx_Opx_T_funcs}
 def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
                            Two_Px_Match=None, equationT=None, P=None, eq_tests=False):
     '''
-    calculates Temperature in K for Opx-Cpx pairs
+    calculates Temperature in K for Opx-Cpx pairs.
 
-   Parameters
-    -------
     The function requires inputs of cpx_comps and opx_comps, or input of a
     combined dataframe of cpx-opx compositions (this is used for the matching
     algorithm).
+
+    Parameters
+    ------------
 
     cpx_comps: DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
@@ -436,8 +438,8 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     combined dataframe of cpx-opx compositions (this is used for the matching
     algorithm).
 
-   Parameters
-    -------
+    Parameters
+    -----------
 
     opx_comps: DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
@@ -564,8 +566,8 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     comps (can be different lengths). returns P (kbar) and T (K) for those in Kd Fe-Mg equilibrium.
 
 
-   Parameters
-    -------
+    Parameters
+    -----------
 
     You can either enter an equation for P and T, or specify one equation (e.g., equationP),
     and values (E.g., T=...)
@@ -619,7 +621,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
 
    Returns
     -------
-        dict
+        dict with keys 'Av_PTs_perCpx' and 'All_PTs'
 
         Av_PTs_perCpx: Average P and T for each cpx.
         E.g., if cpx1 matches Opx1, Opx4, Opx6, Opx10, averages outputs for all 4 of those opxs.
