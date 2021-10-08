@@ -555,8 +555,8 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
         two_pyx.insert(2, "Equation Choice (T)", str(equationT))
         two_pyx.insert(3, "Equation Choice (P)", str(equationP))
         two_pyx.insert(4, 'Delta Kd High T', DeltaKd_HighT)
-        two_pyx.insert(6, 'Delta Kd Low T', DeltaKd_LowT)
-        two_pyfax.replace([np.inf, -np.inf], np.nan, inplace=True)
+        two_pyx.insert(6, 'Delta Kd Low T', DeltaKd_SubSol)
+        two_pyx.replace([np.inf, -np.inf], np.nan, inplace=True)
     return two_pyx
    # return P_func
 
