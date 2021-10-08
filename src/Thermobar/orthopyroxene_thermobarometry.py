@@ -18,9 +18,10 @@ def P_Put2008_eq29a(T, *, Si_Liq_cat_frac, Mg_Liq_cat_frac, Fet_Opx_cat_6ox, FmA
                     Na_Liq_cat_frac, Al_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq, NaAlSi2O6):
     '''
     Orthopyroxene-Liquid barometer of Putirka, (2008) eq 29a. Global calibration of experiments.
+    :cite:`putirka2008thermometers`
 
-    |  SEE=+-2.6 kbar (all data)
-    |  SEE=+-2.1 kbar for hydrous data
+    SEE=+-2.6 kbar (all data)
+    SEE=+-2.1 kbar for hydrous data
 
     '''
     Na_Si_Al_Na=(NaAlSi2O6 / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac * Na_Liq_cat_frac)).astype(float)
@@ -36,8 +37,9 @@ Fet_Liq_cat_frac, Si_Opx_cat_6ox, Fet_Opx_cat_6ox,
 Na_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
     '''
     Orthopyroxene-Liquid barometer of Putirka, (2008) eq 29b. Global calibration of experiments.
+    :cite:`putirka2008thermometers`
 
-    |  Exact SEE not given, but ~2-3 kbar.
+    Exact SEE not given, but ~2-3 kbar.
 
     '''
     return (1.788 + 0.0375 * (T - 273.15) + 0.001295 * (T - 273.15) * ln_FmAl2SiO6_liq - 33.42 * Al_Liq_cat_frac
@@ -49,9 +51,11 @@ Na_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
 
 def P_Put_Global_Opx(T=None, *, MgO_Liq, Al2O3_Opx, Al2O3_Liq, Na2O_Liq, K2O_Liq):
     '''
-    New Opx-Liquid barometer released in Putirka spreadsheets. Addresses problem in low pressure Opxs that Al(VI)=0. Uses the Al2O3 contnet of the Opx instead.
+    New Opx-Liquid barometer released in Putirka spreadsheets.
+    Addresses problem in low pressure Opxs that Al(VI)=0. Uses the Al2O3 content of the Opx instead.
+    :cite:`putirka2008thermometers`
 
-    |  SEE=+-3.2 kbar
+    SEE=+-3.2 kbar
 
     '''
     return ((-8.51 + 0.856 * MgO_Liq - 1.14 * Al2O3_Opx + 45.474 *
@@ -60,7 +64,10 @@ def P_Put_Global_Opx(T=None, *, MgO_Liq, Al2O3_Opx, Al2O3_Liq, Na2O_Liq, K2O_Liq
 
 def P_Put_Felsic_Opx(T=None, *, Al2O3_Opx, Al2O3_Liq):
     '''
-    New Opx_Liq barometer released in Putirka spreadsheets. Addresses problem in low pressure Opxs that Al(VI)=0. Uses the Al2O3 content of the Opx instead.
+    New Opx_Liq barometer released in Putirka spreadsheets.
+    Addresses problem in low pressure Opxs that Al(VI)=0. Uses the Al2O3 content of the Opx instead.
+    Felsic regression.
+    :cite:`putirka2008thermometers`
 
     |  SEE=+-1.2 kbar
 
@@ -74,11 +81,13 @@ def P_Put_Felsic_Opx(T=None, *, Al2O3_Opx, Al2O3_Liq):
 def P_Put2008_eq29c(T, *, Al_Opx_cat_6ox,
                     Ca_Opx_cat_6ox, Cr_Opx_cat_6ox):
     '''
-    Orthopyroxene-only barometer of Putirka, (2008) eq 29c. Doesn't require liquid composition.  Global calibration of experiments.
-    Has systematic error for hydrous data.
+    Orthopyroxene-only barometer of Putirka, (2008) eq 29c. Doesn't require liquid composition.
+    Global calibration of experiments, has systematic error for hydrous data.
+    :cite:`putirka2008thermometers`
 
-    |  SEE=+-3 kbar (anhydrous)
-    |  SEE=+-4.1 kbar (hydrous)
+    SEE=+-3 kbar (anhydrous)
+
+    SEE=+-4.1 kbar (hydrous)
 
     '''
     logCr2O3 = np.log(Cr_Opx_cat_6ox.astype(float))
@@ -99,9 +108,11 @@ def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, Mg_Liq_cat_frac,
     """
     Putirka (2008) Equation 28a.
     Global calibration: T=750-1600°C, SiO2=33-77 wt%, P=atm-11 GPa. H2O=0-14.2 wt%.
+    :cite:`putirka2008thermometers`
 
-    |  SEE= ±26°C for calibration data
-    |  SEE=± 41°C for testing data
+    SEE= ±26°C for calibration data
+
+    SEE=± 41°C for testing data
     """
     return (273.15 + 10**4 / (4.07 - 0.329 * (0.1 * P) + 0.12 * H2O_Liq +
     0.567 * ln_Fm2Si2O6_liq.astype(float) - 3.06 * Mg_Liq_cat_frac -
@@ -111,7 +122,8 @@ def T_Put2008_eq28a(P, *, H2O_Liq, ln_Fm2Si2O6_liq, Mg_Liq_cat_frac,
 def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac, Mn_Liq_cat_frac,
                             Fet_Liq_cat_frac, Fet_Opx_cat_6ox, Al_Liq_cat_frac, Ti_Liq_cat_frac, Mg_Number_Liq_NoFe3):
     '''
-    Orthopyroxene-liquid thermometer- temperature at which a liquid is saturated in orhopyroxene (for a given P). Equation 28b of Putirka et al. (2008)
+    Equation 28b of Putirka et al. (2008). Orthopyroxene-liquid thermometer- temperature at which a liquid is saturated in orhopyroxene (for a given P).
+    :cite:`putirka2008thermometers`
     '''
     Cl_NM = Mg_Liq_cat_frac + Fet_Liq_cat_frac + \
         Ca_Liq_cat_frac + Mn_Liq_cat_frac
@@ -126,6 +138,7 @@ def T_Beatt1993_opx(P, *, Ca_Liq_cat_frac, Fet_Liq_cat_frac, Mg_Liq_cat_frac,
     '''
     Opx-Liquid thermometer of Beattie (1993). Only uses liquid composition.
     Putirka (2008) warn that overpredicts for hydrous compositions at <1200°C, and anhydrous compositions at <1100°C
+    :cite:`beattie1993olivine`
     '''
     Num_B1993 = 125.9 * 1000 / 8.3144 + \
         ((0.1 * P) * 10**9 - 10**5) * 6.5 * (10**(-6)) / 8.3144
@@ -153,13 +166,13 @@ def calculate_opx_only_press(*, opx_comps, equationP, T=None):
    Parameters
     -------
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
     equationP: str
         | P_Put2008_eq29c
 
-    T: float, int, series, str  ("Solve")
+    T: float, int, pandas.Series, str  ("Solve")
         Temperature in Kelvin
         Only needed for T-sensitive barometers.
         If enter T="Solve", returns a partial function
@@ -229,23 +242,25 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
     Orthopyroxene-Liquid barometer, user specifies equation, and calculates pressure in kbar.
     Also has option to calculate equilibrium tests.
 
-   Parameters
+    Parameters
     -------
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     Or:
 
-    meltmatch: DataFrame
+    meltmatch: pandas.DataFrame
         Combined Opx-Liquid compositions.
         Used for calculate_opx_liq_press_temp_matching.
 
     EquationP: str
-        Choice of equation:
+
+        choose from:
+
         |  P_Put2008_eq28a
         |  P_Put2008_eq28b
         |  P_Put2008_eq28c
@@ -253,7 +268,7 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
         |  P_Put_Felsic_Opx
 
 
-    T: float, int, series, str  ("Solve")
+    T: float, int, pandas.Series, str  ("Solve")
         Temperature in Kelvin
         Only needed for T-sensitive barometers.
         If enter T="Solve", returns a partial function
@@ -267,9 +282,9 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
     Returns
     -------
     If eq_tests=False
-        pandas.series: Pressure in kbar (if eq_tests=False)
+        pandas.Series: Pressure in kbar (if eq_tests=False)
     If eq_tests=True
-        panda.dataframe: Pressure in kbar + Kd-Fe-Mg + opx+liq comp
+        pandas.DataFrame: Pressure in kbar + Kd-Fe-Mg + opx+liq comp
 
     '''
 # This checks if your equation is one of the accepted equations
@@ -364,16 +379,16 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmat
     Orthopyroxene-Liquid thermometer, user specifies equation,
     and calculates temperature in Kelvin.  Also has option to calculate equilibrium tests.
 
-   Parameters
+    Parameters
     -------
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    meltmatch: DataFrame
+    meltmatch: pandas.DataFrame
         Combined Opx-Liquid compositions. Used for "melt match" functionality.
 
     EquationT: str
@@ -383,7 +398,7 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmat
         |  T_Put2008_eq28b_opx_sat
 
 
-    P: float, int, series, str  ("Solve")
+    P: float, int, pandas.Series, str  ("Solve")
         Pressure in kbar
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
@@ -397,9 +412,9 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmat
     Returns
     -------
     If eq_tests=False
-        pandas.series: Pressure in kbar (if eq_tests=False)
+        pandas.Series: Pressure in kbar (if eq_tests=False)
     If eq_tests=True
-        panda.dataframe: Pressure in kbar + Kd-Fe-Mg + opx+liq comps
+        pandas.DataFrame: Pressure in kbar + Kd-Fe-Mg + opx+liq comps
 
 
     '''
@@ -479,20 +494,14 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
     Solves simultaneous equations for temperature and pressure using
     orthopyroxene-liquid thermometers and barometers.
 
-   Parameters
+    Parameters
     -------
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
-
-    Or:
-
-    meltmatch: DataFrame
-        Combined dataframe of opx-Liquid compositions (headings SiO2_Liq, SiO2_Opx etc.).
-        Used for calculate_opx_liq_press_temp_matching.
 
     EquationP: str
         Barometer
@@ -528,7 +537,7 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
     If eq_tests=False
         pandas.DataFrame: Temperature in Kelvin, pressure in Kbar
     If eq_tests=True
-        panda.dataframe: Temperature in Kelvin, pressure in Kbar
+        pandas.DataFrame: Temperature in Kelvin, pressure in Kbar
         Eq Tests + opx+liq comps + components
 
     '''
@@ -622,13 +631,13 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     Evaluates all possible Opx-Liq pairs from  N Liquids, M opx compositions
     returns P (kbar) and T (K) for those in equilibrium.
 
-   Parameters
-    -------
+    Parameters
+    -----------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Panda DataFrame of liquid compositions with column headings SiO2_Liq etc.
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         Panda DataFrame of opx compositions with column headings SiO2_Opx etc.
 
     EquationP: str

@@ -13,6 +13,7 @@ def T_Put2008_eq23(P, *, An_Plag, Si_Liq_cat_frac,
                    Al_Liq_cat_frac, Ca_Liq_cat_frac, Ab_Plag, H2O_Liq):
     '''
     Plagioclase-Liquid thermometer of Putirka (2008) eq. 23
+    :cite:`putirka2008thermometers`
     SEE=+-43C
     '''
     return ((10**4 / (6.12 + 0.257 * np.log(An_Plag / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac**2 * Ca_Liq_cat_frac))
@@ -27,7 +28,9 @@ def T_Put2008_eq24a(P, *, An_Plag, Si_Liq_cat_frac, Al_Liq_cat_frac,
                     Ca_Liq_cat_frac, K_Liq_cat_frac, Ab_Plag, H2O_Liq):
     '''
     Plagioclase-Liquid thermometer of Putirka (2008) eq. 24a
-    Global regression, improves equation 23 SEE by  6C
+    :cite:`putirka2008thermometers`
+
+    Global regression, improves equation 23 SEE by 6C
     SEE=+-36C
     '''
     return ((10**4 / (6.4706 + 0.3128 * (np.log(An_Plag / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac**2 * Ca_Liq_cat_frac)))
@@ -42,6 +45,8 @@ def P_Put2008_eq25(T, *, Ab_Plag, Al_Liq_cat_frac, Ca_Liq_cat_frac,
                    Na_Liq_cat_frac, Si_Liq_cat_frac, An_Plag, K_Liq_cat_frac):
     '''
     Plagioclase-Liquid barometer of Putirka (2008) eq. 26.
+    :cite:`putirka2008thermometers`
+
     SEE=+-2.2 kbar *But in spreadsheet, Putirka warns plag is not a good barometer*
     '''
     return (-42.2 + (4.94 * (10**-2) * T) + (1.16 * (10**-2) * T) *
@@ -56,7 +61,10 @@ def T_Put2008_eq24b(P, *, Ab_Kspar, Al_Liq_cat_frac, Na_Liq_cat_frac,
                   K_Liq_cat_frac, Si_Liq_cat_frac, Ca_Liq_cat_frac):
     '''
     Alkali Felspar-Liquid thermometer of Putirka (2008) eq. 24b.
+    :cite:`putirka2008thermometers`
+
     SEE=+-23 C (Calibration data)
+
     SEE=+-25 C (All data)
 
     '''
@@ -76,51 +84,7 @@ plag_liq_T_funcs_by_name = {p.__name__: p for p in plag_liq_T_funcs}
 Kspar_Liq_T_funcs = {T_Put2008_eq24b}
 Kspar_Liq_T_funcs_by_name = {p.__name__: p for p in Kspar_Liq_T_funcs}
 
-def calculate_plag_liq_temp_all_eqs(*, plag_comps=None,
-    liq_comps=None, equationT=None, P=None, H2O_Liq=None):
 
-    '''
-    Plag-Liquid thermometery
-    returns temperature in Kelvin for equation 23 and 24a
-
-    Parameters
-    -------
-
-    liq_comps: DataFrame
-        liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
-
-    plag_comps (DataFrame)
-        Specify plag_comps=... Dataframe from import_excel (with column headings SiO2_Plag, MgO_Plag) etc
-
-
-    P: float, int, series
-        Pressure in kbar
-
-
-    H2O_Liq: optional.
-        If None, uses H2O_Liq column from input.
-        If int, float, series, uses this instead of H2O_Liq Column
-
-    Returns
-    -------
-    DataFrame
-        Temperatures in Kelvin
-
-    '''
-
-    Eq_23=calculate_fspar_liq_temp(plag_comps=plag_comps,
-    liq_comps=liq_comps, equationT="T_Put2008_eq23",
-    P=P, H2O_Liq=H2O_Liq)
-
-    Eq_24a=calculate_fspar_liq_temp(plag_comps=plag_comps,
-    liq_comps=liq_comps, equationT="T_Put2008_eq24a",
-    P=P, H2O_Liq=H2O_Liq)
-
-    Out=pd.DataFrame(data={'Put2008_eq23':  Eq_23,
-                           'Put2008_eq24a': Eq_24a})
-    Out2=pd.concat([Out, plag_comps, liq_comps], axis=1)
-
-    return Out2
 
 def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
     liq_comps=None, equationT=None, P=None, H2O_Liq=None, eq_tests=False):
@@ -131,33 +95,41 @@ def calculate_fspar_liq_temp(*, plag_comps=None, kspar_comps=None,
     Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    kspar_comps or plag_comps (DataFrame)
+    kspar_comps or plag_comps (pandas.DataFrame)
+
         Specify kspar_comps=... for Kspar-Liquid thermometry (with column headings SiO2_Kspar, MgO_Kspar) etc
+
         Specify plag_comps=... for Plag-Liquid thermometry (with column headings SiO2_Plag, MgO_Plag) etc
 
     EquationT: str
-        Equation choices:
+
+        choose from:
+
             |   T_Put2008_eq24b (Kspar-Liq, P-dependent, H2O-independent
             |   T_Put2008_eq23 (Plag-Liq, P-dependent, H2O-dependent)
             |   T_Put2008_eq24a (Plag-Liq, P-dependent, H2O-dependent)
 
-    P: float, int, series, str  ("Solve")
-        Pressure in kbar
+    P: float, int, pandas.Series, str  ("Solve")
+        Pressure in kbar to perform calculations at
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
         Else, enter an integer, float, or panda series
 
     H2O_Liq: optional.
         If None, uses H2O_Liq column from input.
-        If int, float, series, uses this instead of H2O_Liq Column
+        If int, float, pandas.Series, uses this instead of H2O_Liq Column
 
     Returns
     -------
-    Panda series
-        Temperatures in Kelvin
+
+        Temperature in Kelvin: pandas.Series
+            If eq_tests is False
+
+        Temperature in Kelvin + eq Tests + input compositions: pandas.DataFrame
+            If eq_tests is True
 
     '''
     liq_comps_c = liq_comps.copy()
@@ -254,30 +226,35 @@ def calculate_fspar_liq_press(*, plag_comps=None, kspar_comps=None, liq_comps=No
     Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    plag_comps (DataFrame)
-        Specify plag_comps=... (with column headings SiO2_Plag, MgO_Plag) etc
+    plag_comps: pandas.DataFrame
+        Plag compositions with column headings SiO2_Plag, MgO_Plag etc.
 
     EquationP: str
-        Equation choices:
-            |   P_Put2008_eq25 (Kspar-Liq, P-dependent, H2O-independent
 
-    T: float, int, series, str  ("Solve")
-        Temperature in Kelvin
+        Choose from
+
+            |   P_Put2008_eq25 (Plag-Liq, P-dependent, H2O-independent)
+
+    T: float, int, pandas.Series, str  ("Solve")
+        Temperature in Kelvin to perform calculations at.
         Only needed for T-sensitive barometers.
-        If enter T="Solve", returns a partial function
-        Else, enter an integer, float, or panda series
+        If enter T="Solve", returns a partial function,
+        else, enter an integer, float, or panda series.
 
     H2O_Liq: optional.
         If None, uses H2O_Liq column from input.
-        If int, float, series, uses this instead of H2O_Liq Column
+        If int, float, pandas.Series, uses this instead of H2O_Liq Column
 
     Returns
     -------
-    Panda series
-        Temperature in Kelvin
+    If eq_tests is False: pandas.Series
+        Pressure in kbar
+    If eq_tests is True: pandas.DataFrame
+        Pressure in kbar + eq Tests + input compositions
+
 
     '''
     if kspar_comps is not None:
@@ -345,45 +322,40 @@ def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_com
                                 H2O_Liq=None):
     '''
     Solves simultaneous equations for temperature and pressure using
-    plagioclase-liquid thermometers and barometers.
+    feldspar-liquid thermometers and barometers. Currently no Kspar barometers exist.
 
-   Parameters
-    -------
+    Parameters
+    -----------
 
-    plag_comps: DataFrame
-        Feldspar compositions with column headings SiO2_Fspar, MgO_Fspar etc.
+    plag_comps: pandas.DataFrame
+        Plag compositions with column headings SiO2_Plag, MgO_Plag etc.
 
-    liq_comps: DataFrame (not required for P_Put2008_eq29c)
+    liq_comps: pandas.DataFrame (not required for P_Put2008_eq29c)
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    Or:
-
-    meltmatch: DataFrame
-        Combined dataframe of fspar-Liquid compositions (headings SiO2_Liq, SiO2_Plag etc.).
-        means a plag-liq matching algorithm could be added (not implemented currently due
-        to lack of equilibrium test consensus).
-
     EquationP: str
-        Barometer
-        |  P_Put2008_eq25 (Plagioclase)
+
+        choose from;
+
+            |   P_Put2008_eq25 (Plag-Liq, P-dependent, H2O-independent)
 
     EquationT: str
-        Thermometer
-        |  T_Put2008_eq23 (Plagioclase)
-        |  T_Put2008_eq24a (Plagioclase)
 
+        choose from:
 
-     iterations: int. Default=30
+            |   T_Put2008_eq24b (Kspar-Liq, P-dependent, H2O-independent)
+            |   T_Put2008_eq23 (Plag-Liq, P-dependent, H2O-dependent)
+            |   T_Put2008_eq24a (Plag-Liq, P-dependent, H2O-dependent)
+
+    iterations: int (default=30)
          Number of iterations used to converge to solution.
 
-     T_K_guess: int or float  (optional). Default = 1300K
+    T_K_guess: int or float (Default = 1300K)
          Initial guess of temperature.
 
-    Returns:
-    -------
-    panda.dataframe: Pressure in kbar, Temperature in K + fspar+liq comps (if eq_tests=True)
-
-
+    Returns
+    ---------
+    pandas.DataFrame: Pressure in kbar, Temperature in K + fspar+liq comps (if eq_tests=True)
     '''
     # Gives users flexibility to reduce or increase iterations
     liq_comps_c=liq_comps.copy()
@@ -440,6 +412,9 @@ def H_Put2008_eq25b(T, *, P, An_Plag, Si_Liq_cat_frac,
                     Al_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac, Mg_Liq_cat_frac):
     '''
     Plagioclase-Hygrometer of  Putirka (2008) eq. 25b
+    :cite:`putirka2008thermometers`
+
+
     Global calibration improving estimate of Putirka (2005) eq H
     SEE=+-1.1 wt%
     '''
@@ -452,6 +427,7 @@ def H_Put2005_eqH(T, *, An_Plag, Si_Liq_cat_frac, Al_Liq_cat_frac, Na_Liq_cat_fr
     '''
     Plagioclase-Hygrometer of  Putirka (2005) eq. H
     Tends to overpredict water in global datasets
+    :cite:`putirka2005igneous`
     '''
 
     return (24.757 - 2.26 * 10**(-3) * (T) * (np.log(An_Plag / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac**2 * Ca_Liq_cat_frac)))
@@ -461,9 +437,12 @@ def H_Put2005_eqH(T, *, An_Plag, Si_Liq_cat_frac, Al_Liq_cat_frac, Na_Liq_cat_fr
 def H_Waters2015(T, *, liq_comps=None, plag_comps=None,
                  P, XAn=None, XAb=None):
     '''
-    Plagioclase-Hygrometer of  Waters and Lange (2015)
-    Update of Lange et al. (2009) model.
+    Plagioclase-Hygrometer of  Waters and Lange (2015),
+    update from Lange et al. (2009).
+    :cite:`waters2015updated`
+
     SEE=+-0.35 wt%
+
     '''
     # 1st bit calculates mole fractions in the same way as Waters and Lange.
     # Note, to match excel, all Fe is considered as FeOT.
@@ -654,44 +633,41 @@ plag_liq_H_funcs_by_name = {p.__name__: p for p in plag_liq_H_funcs}
 
 def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
                             equationH=None, P=None, T=None, XAn=None, XAb=None, XOr=0):
+    '''
+    calculates H2O content (wt%) from composition of equilibrium plagioclase
+    and liquid.
 
-    '''calculates H2O content (wt%) from composition of equilibrium plagioclase
-     and liquid.
+    Parameters
+    ------------
 
-   Parameters
-    -------
-    liq_comps: DataFrame
-        liquids compositions with column headings SiO2_Liq, MgO_Liq etc.
+    liq_comps: pandas.DataFrame
+        Liq compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    One of:
+    plag_comps: pandas.DataFrame
+        Plag compositions with column headings SiO2_Plag, MgO_Plag etc. Or users
+        can enter XAn, XAb, without the other oxides.
 
-    1) plag_comps: DataFrame (optional)
-        Plag compositions with column headings SiO2_Plag, MgO_Plag etc.
-
-
-    2) XAn, XAb, XOr, float, int, series
-        If plag_comps is None, enter XAn and XAb for plagioclases instead.
+    XAn+XAb: float, int, pandas.Series
+        If plag_comps is None, enter XAn= and XAb= for plagioclases instead.
         XOr is set to zero by default, but can be overwritten for equilibrium tests
 
     equationH: str
+        choose from:
 
         |  H_Waters2015 (T-dependent, P-dependent)
         |  H_Put2005_eqH (T-dependent, P-independent)
         |  H_Put2008_eq25b (T-dependent, P-dependent)
 
-    P: float, int, series
-        Pressure (kbar)
+    P: float, int, pandas.Series
+        Pressure in kbar to perform calculations at
 
-    T: float, int, series
-        Temperature (K)
+    T: float, int, pandas.Series
+        Temperature in Kelvin to perform calculations at
 
-    eq_tests: bool
-        If True, also calculatse equilibrum tests of Putirka (2008).
+    Returns
+    ---------
 
-    Returns:
-    Pandas DataFrame
-        DataFrame with calculated H2O, along with calculated plag and liq parameters
-
+    Calculated H2O, eq tests, and input plag and liq parameters: pandas.DataFrame
 
     '''
     if kspar_comps is not None:
@@ -783,39 +759,47 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
 def calculate_fspar_liq_temp_hygr(*, liq_comps, plag_comps, equationT, equationH, iterations=10,
                                 P=None):
 
-    '''Iterates temperature and water content for Plag-liquid pairs for a user-specified number of
+    '''
+    Iterates temperature and water content for Plag-liquid pairs for a user-specified number of
     iterations. Returns calculated T and H2O, as well as change in T and H with the # of iterations.
 
-   Parameters
+    Parameters
     -------
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquids compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-
-    plag_comps: DataFrame (optional)
+    plag_comps: pandas.DataFrame (optional)
         Plag compositions with column headings SiO2_Plag, MgO_Plag etc.
 
     equationH: str
+        choose from:
 
         |  H_Waters2015 (T-dependent, P-dependent)
         |  H_Put2005_eqH (T-dependent, P-independent)
         |  H_Put2008_eq25b (T-dependent, P-dependent)
 
     equationT: str
+        choose from:
+
         |   T_Put2008_eq23 (Plag-Liq, P-dependent, H2O-dependent)
         |   T_Put2008_eq24a (Plag-Liq, P-dependent, H2O-dependent)
 
-    P: float, int, series
-        Pressure (kbar)
+    P: float, int, pandas.Series
+        Pressure (kbar) to perform calculations at
 
 
 
-    Returns:
-    Dictionary:
-    'T_H_calc': Pandas Dataframe with calculated H2O, calculated T, plag-liq equilibrium parameters,
-    and change in T and H between second last and last iteration.
-    'T_H_Evolution' Pandas dataframes, where rows are number of iterations, and column headings show the T and H2O
-    calculated for each sample.
+    Returns
+    -------
+        Dictionary with keys 'T_H_calc' and 'T_H_Evolution': Dictionary
+
+        'T_H_calc': pandas.DataFrame
+            Calculated H2O, calculated T, plag-liq equilibrium parameters,
+            and change in T and H between second last and last iteration
+
+        'T_H_Evolution': pandas.DataFrame
+            Pandas dataframes, where rows are number of iterations, and column headings show the T and H2O
+            calculated for each sample.
 
 
     '''
@@ -888,7 +872,10 @@ def T_Put2008_eq27a(P, *, K_Barth, Si_Kspar_cat_frac,
                     Ca_Kspar_cat_frac, An_Kspar, An_Plag, Ab_Plag):
     '''
     Two feldspar thermometer: Equation 27a of Putirka (2008).
+    :cite:`putirka2008thermometers`
+
     SEE±23°C for calibration
+
     SEE±44°C for test data
     '''
 
@@ -903,6 +890,8 @@ def T_Put2008_eq27b(P, *, K_Barth, Si_Kspar_cat_frac,
     Putirka recomends using this thermometer over 27a, with preference
     being 27b>global>27a
     Global calibration (unlike 27a, which is calibrated on a smaller dataset)
+    :cite:`putirka2008thermometers`
+
     SEE±30°C for calibration
     '''
     return (273.15 + (-442 - 3.72 * P) / (-0.11 + 0.1 * np.log(K_Barth) -
@@ -914,6 +903,8 @@ Ab_Kspar, Or_Kspar, Na_Plag_cat_frac, An_Kspar, An_Plag, Ab_Plag):
     '''
     Two feldspar thermometer from supporting spreadsheet of Putirka (2008)
     Global calibration
+    :cite:`putirka2008thermometers`
+
     '''
     return (273.15 + 10**4 / (100.638 - 0.0975 * P - 4.9825 * An_Plag
     - 115.03 * Ab_Kspar - 95.745 * Or_Kspar
@@ -932,39 +923,37 @@ Plag_Kspar_T_funcs_by_name = {p.__name__: p for p in Plag_Kspar_T_funcs}
 def calculate_plag_kspar_temp(*, plag_comps=None, kspar_comps=None, Two_Fspar_Match=None,
 equationT=None, P=None, eq_tests=False):
     '''
-    Two feldspar thermometer (Kspar-Plag)
-    Returns temperature in Kelvin
+
+    Two feldspar thermometer (Kspar-Plag), returns temperature in Kelvin
 
     Parameters
-    -------
+    ----------
 
-    plag_comps: DataFrame
+    plag_comps: pandas.DataFrame
         Plag compositions with column headings SiO2_Plag, MgO_Plag etc.
 
-    kspar_comps: DataFrame
+    kspar_comps: pandas.DataFrame
         Kspar compositions with column headings SiO2_Kspar, MgO_Kspar etc.
 
-    or:
-    Two_Fspar_Match: Pandas dataframe from mineral matching algorithm
-
     EquationT: str
-        Equation choices:
+        choose from:
+
             |   T_Put2008_eq27a (P-dependent, H2O-independent)
             |   T_Put2008_eq27b (P-dependent, H2O-independent)
             |   T_Put_Global_2Fspar (P-dependent, H2O-independent)
 
-
-    P: float, int, series, str  ("Solve")
-        Pressure in kbar
+    P: float, int, pandas.Series, str
+        Pressure in kbar to perform calculations at.
         Only needed for P-sensitive thermometers.
-        If enter P="Solve", returns a partial function
-        Else, enter an integer, float, or panda series
-
+        If P="Solve", returns a partial function,
+        else, enter an integer, float, or panda series.
 
     Returns
     -------
-    Panda series
-        Temperatures in Kelvin
+    If eq_tests is False
+        pandas.Series: Temperature in Kelvin
+    If eq_tests is True
+        pandas.DataFrame: Temperature in Kelvin+eq Tests + input compositions
 
     '''
 # These are checks that our inputs are okay
@@ -1029,37 +1018,34 @@ equationT=None, P=None, eq_tests=False):
 
 def calculate_plag_kspar_temp_matching(*, kspar_comps, plag_comps, equationT=None,
                                  P=None):
-    '''Evaluates all possible Plag-Kspar pairs,
+    '''
+    Evaluates all possible Plag-Kspar pairs,
     returns T (K) and equilibrium tests
 
-   Parameters
-    -------
+    Parameters
+    ----------------
 
-    plag_comps: DataFrame
+    plag_comps: pandas.DataFrame
         Panda DataFrame of plag compositions with column headings SiO2_Plag, CaO_Plag etc.
 
-    kspar_comps: DataFrame
+    kspar_comps: pandas.DataFrame
         Panda DataFrame of kspar compositions with column headings SiO2_Kspar etc.
 
     EquationT: str
+        Choose from:
+
             |   T_Put2008_eq27a (P-dependent, H2O-independent)
             |   T_Put2008_eq27b (P-dependent, H2O-independent)
             |   T_Put_Global_2Fspar (P-dependent, H2O-independent)
 
+    P: float, int, pandas.Series
+        Pressure in kbar to perform calculations at.
 
-    Or: User sets one of P or T
-        pressure in kbar or temperature in Kelvin. Doesn't need to iterate,
-        e.g., if set pressure, calculates temperature for that pressure,
-        and returns temperature for equilibrium pairs.
-
-
-
-   Returns
+    Returns
     -------
-    DataFrame
-        dataframe of calculated equilibrium tests, temperature,
-        as well as user-entered oxides
-        and component calculations.
+    pandas.DataFrame
+        T in K for all posible plag-kspar matches, along with equilibrium
+        tests, components and input mineral compositions
     '''
 
 

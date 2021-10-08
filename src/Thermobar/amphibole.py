@@ -15,6 +15,7 @@ from Thermobar.core import *
 def P_Kraw2012(T=None, *, Mgno_Amp, deltaNNO):
     '''
     Amphibole-only barometer (PH2O) from Krawczynski et al. (2012)
+    :cite:`krawczynski2012amphibole`
 
     **Note - this is only the pressure for the first appearance of amphibole,
     so should only be applied to the highest Mg# amphiboles in each suite.
@@ -27,7 +28,9 @@ def P_Kraw2012(T=None, *, Mgno_Amp, deltaNNO):
 def P_Ridolfi2012_1a(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
                      MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
     '''
-    Amphibole-only barometer: Equation 1a of Ridolfi and Renzulli (2012). Calibrated between 1.3-22 kbars
+    Amphibole-only barometer: Equation 1a of Ridolfi and Renzulli (2012).
+    Calibrated between 1.3-22 kbars
+    :cite:`ridolfi2012calcic`
     '''
     return 0.01 * (np.exp(125.9332115 - 9.587571403 * SiO2_Amp_13_cat - 10.11615567 * TiO2_Amp_13_cat
     - 8.173455128 * Al2O3_Amp_13_cat- 9.226076274 * FeOt_Amp_13_cat - 8.793390507 * MgO_Amp_13_cat
@@ -37,7 +40,9 @@ def P_Ridolfi2012_1a(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_ca
 def P_Ridolfi2012_1b(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
                      MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
     '''
-    Amphibole-only barometer: Equation 1b of Ridolfi and Renzulli (2012). Calibrated between 1.3-5 kbars
+    Amphibole-only barometer: Equation 1b of Ridolfi and Renzulli (2012).
+    Calibrated between 1.3-5 kbars
+    :cite:`ridolfi2012calcic`
     '''
     return (0.01 * (np.exp(38.722545085 - 2.695663047 * SiO2_Amp_13_cat - 2.35647038717941 * TiO2_Amp_13_cat
             - 1.30063975020919 * Al2O3_Amp_13_cat - 2.7779767369382 * FeOt_Amp_13_cat
@@ -48,7 +53,9 @@ def P_Ridolfi2012_1b(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_ca
 def P_Ridolfi2012_1c(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat, MgO_Amp_13_cat,
                      CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
     '''
-    Amphibole-only barometer: Equation 1c of Ridolfi and Renzulli (2012). Calibrated between 1.3-5 kbars
+    Amphibole-only barometer: Equation 1c of Ridolfi and Renzulli (2012).
+    Calibrated between 1.3-5 kbars
+    :cite:`ridolfi2012calcic`
     '''
     return (0.01 * (24023.367332 - 1925.298250* SiO2_Amp_13_cat
     - 1720.63250944418 * TiO2_Amp_13_cat - 1478.53847391822 * Al2O3_Amp_13_cat
@@ -60,7 +67,9 @@ def P_Ridolfi2012_1c(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_ca
 def P_Ridolfi2012_1d(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat, MgO_Amp_13_cat, CaO_Amp_13_cat,
                      K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
     '''
-    Amphibole-only barometer: Equation 1d of Ridolfi and Renzulli (2012). . Calibrated between 4-15 kbars
+    Amphibole-only barometer: Equation 1d of Ridolfi and Renzulli (2012).
+    Calibrated between 4-15 kbars
+    :cite:`ridolfi2012calcic`
     '''
     return (0.01 * (26105.7092067 - 1991.93398583468 * SiO2_Amp_13_cat
     - 3034.9724955129 * TiO2_Amp_13_cat - 1472.2242262718 * Al2O3_Amp_13_cat - 2454.76485311127 * FeOt_Amp_13_cat
@@ -71,7 +80,9 @@ def P_Ridolfi2012_1d(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_ca
 def P_Ridolfi2012_1e(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
                      MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
     '''
-    Amphibole-only barometer: Equation 1e of Ridolfi and Renzulli (2012).  Calibrated between 930-2200 kbars
+    Amphibole-only barometer: Equation 1e of Ridolfi and Renzulli (2012).
+    Calibrated between 9.3-22 kbars
+    :cite:`ridolfi2012calcic`
     '''
     return (0.01 * np.exp(26.5426319326957 - 1.20851740386237 * SiO2_Amp_13_cat
     - 3.85930939071001 * TiO2_Amp_13_cat - 1.10536070667051 * Al2O3_Amp_13_cat
@@ -83,28 +94,32 @@ def P_Ridolfi2012_1e(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_ca
 def P_Ridolfi2010(T=None, *, Al_Amp_cat_23ox, cation_sum_Si_Ca):
     '''
     Amphibole-only (Al) barometer: Ridolfi et al. (2010)
+    :cite:`ridolfi2010stability`
     '''
     return (10 * (19.209 * np.exp(1.438 * Al_Amp_cat_23ox *
             13 / cation_sum_Si_Ca)) / 1000)
 
 
-def P_Hammerstrom1986_eq1(T=None, *, Al_Amp_cat_23ox):
+def P_Hammarstrom1986_eq1(T=None, *, Al_Amp_cat_23ox):
     '''
-    Amphibole-only (Al) barometer: Hammerstrom and Zen, 1986 eq.1
+    Amphibole-only (Al) barometer: Hammarstrom and Zen, 1986 eq.1
+    :cite:`hammarstrom1986aluminum`
     '''
     return (-3.92 + 5.03 * Al_Amp_cat_23ox)
 
 
-def P_Hammerstrom1986_eq2(T=None, *, Al_Amp_cat_23ox):
+def P_Hammarstrom1986_eq2(T=None, *, Al_Amp_cat_23ox):
     '''
-    Amphibole-only (Al) barometer: Hammerstrom and Zen, 1986 eq.2
+    Amphibole-only (Al) barometer: Hammarstrom and Zen, 1986 eq.2
+    :cite:`hammarstrom1986aluminum`
     '''
     return (1.27 * (Al_Amp_cat_23ox**2.01))
 
 
-def P_Hammerstrom1986_eq3(T=None, *, Al_Amp_cat_23ox):
+def P_Hammarstrom1986_eq3(T=None, *, Al_Amp_cat_23ox):
     '''
-    Amphibole-only (Al) barometer: Hammerstrom and Zen, 1986 eq.3
+    Amphibole-only (Al) barometer: Hammarstrom and Zen, 1986 eq.3
+    :cite:`hammarstrom1986aluminum`
     '''
     return (0.26 * np.exp(1.48 * Al_Amp_cat_23ox))
 
@@ -112,6 +127,7 @@ def P_Hammerstrom1986_eq3(T=None, *, Al_Amp_cat_23ox):
 def P_Hollister1987(T=None, *, Al_Amp_cat_23ox):
     '''
     Amphibole-only (Al) barometer: Hollister et al. 1987
+    :cite:`hammarstrom1986aluminum`
     '''
     return (-4.76 + 5.64 * Al_Amp_cat_23ox)
 
@@ -119,6 +135,7 @@ def P_Hollister1987(T=None, *, Al_Amp_cat_23ox):
 def P_Johnson1989(T=None, *, Al_Amp_cat_23ox):
     '''
     Amphibole-only (Al) barometer: Johnson and Rutherford, 1989
+    :cite:`hammarstrom1986aluminum`
     '''
     return (-3.46 + 4.23 * Al_Amp_cat_23ox)
 
@@ -126,6 +143,7 @@ def P_Johnson1989(T=None, *, Al_Amp_cat_23ox):
 def P_Anderson1995(T, *, Al_Amp_cat_23ox):
     '''
     Amphibole-only (Al) barometer: Anderson and Smith (1995)
+    :cite:`hammarstrom1986aluminum`
     '''
     return (4.76 * Al_Amp_cat_23ox - 3.01 - (((T - 273.15 - 675) / 85)
             * (0.53 * Al_Amp_cat_23ox + 0.005294 * (T - 273.15 - 675))))
@@ -134,13 +152,15 @@ def P_Anderson1995(T, *, Al_Amp_cat_23ox):
 def P_Blundy1990(T=None, *, Al_Amp_cat_23ox):
     '''
     Amphibole-only (Al) barometer: Blundy et al. 1990
+    :cite:`blundy1990calcic`
     '''
     return (5.03 * Al_Amp_cat_23ox - 3.53)
 
 
 def P_Schmidt1992(T=None, *, Al_Amp_cat_23ox):
-    '''s
+    '''
     Amphibole-only (Al) barometer: Schmidt 1992
+    :cite:`schmidt1992amphibole`
     '''
     return (-3.01 + 4.76 * Al_Amp_cat_23ox)
 
@@ -149,7 +169,7 @@ def P_Schmidt1992(T=None, *, Al_Amp_cat_23ox):
 ## Function: Amphibole-only barometry
 
 Amp_only_P_funcs = { P_Ridolfi2012_1a, P_Ridolfi2012_1b, P_Ridolfi2012_1c, P_Ridolfi2012_1d,
-P_Ridolfi2012_1e, P_Ridolfi2010, P_Hammerstrom1986_eq1, P_Hammerstrom1986_eq2, P_Hammerstrom1986_eq3, P_Hollister1987,
+P_Ridolfi2012_1e, P_Ridolfi2010, P_Hammarstrom1986_eq1, P_Hammarstrom1986_eq2, P_Hammarstrom1986_eq3, P_Hollister1987,
 P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995, P_Kraw2012} # put on outside
 
 Amp_only_P_funcs_by_name= {p.__name__: p for p in Amp_only_P_funcs}
@@ -159,10 +179,10 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
     Calculates melt compositions from Amphibole compositions using Zhang et al. (2017),
     Ridolfi et al. 2021 and Putirka (2016).
 
-   Parameters
-    -------
+    Parameters
+    -----------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
         Amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     T: optional, float, int
@@ -287,7 +307,10 @@ classification=False, Ridolfi_Filter=True):
     """
     Amphibole-only barometry, returns pressure in kbar.
 
-    amp_comps: DataFrame
+    Parameters
+    -----------
+
+    amp_comps: pandas.DataFrame
         Amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
 
@@ -302,16 +325,16 @@ classification=False, Ridolfi_Filter=True):
         select pressures from equations 1a-e.
 
         | P_Ridolfi2010  (T-independent)
-        | P_Hammerstrom1986_eq1  (T-independent)
-        | P_Hammerstrom1986_eq2 (T-independent)
-        | P_Hammerstrom1986_eq3 (T-independent)
+        | P_Hammarstrom1986_eq1  (T-independent)
+        | P_Hammarstrom1986_eq2 (T-independent)
+        | P_Hammarstrom1986_eq3 (T-independent)
         | P_Hollister1987 (T-independent)
         | P_Johnson1989 (T-independent)
         | P_Blundy1990 (T-independent)
         | P_Schmidt1992 (T-independent)
         | P_Anderson1995 (*T-dependent*)
 
-    T: float, int, series, str  ("Solve")
+    T: float, int, pandas.Series, str  ("Solve")
         Temperature in Kelvin
         Only needed for T-sensitive barometers.
         If enter T="Solve", returns a partial function
@@ -555,6 +578,7 @@ def T_Put2016_eq5(P=None, *, Si_Amp_cat_23ox,
                   Ti_Amp_cat_23ox, Fet_Amp_cat_23ox, Na_Amp_cat_23ox):
     '''
     Amphibole-only thermometer: Equation 5 of Putirka et al. (2016)
+    :cite:`putirka2016amphibole`
     '''
     return (273.15 + 1781 - 132.74 * Si_Amp_cat_23ox + 116.6 *
             Ti_Amp_cat_23ox - 69.41 * Fet_Amp_cat_23ox + 101.62 * Na_Amp_cat_23ox)
@@ -564,6 +588,7 @@ def T_Put2016_eq6(P, *, Si_Amp_cat_23ox,
                   Ti_Amp_cat_23ox, Fet_Amp_cat_23ox, Na_Amp_cat_23ox):
     '''
     Amphibole-only thermometer: Equation 6 of Putirka et al. (2016)
+    :cite:`putirka2016amphibole`
     '''
     return (273.15 + 1687 - 118.7 * Si_Amp_cat_23ox + 131.56 * Ti_Amp_cat_23ox -
             71.41 * Fet_Amp_cat_23ox + 86.13 * Na_Amp_cat_23ox + 22.44 * P / 10)
@@ -572,6 +597,7 @@ def T_Put2016_eq6(P, *, Si_Amp_cat_23ox,
 def T_Put2016_SiHbl(P=None, *, Si_Amp_cat_23ox):
     '''
     Amphibole-only thermometer: Si in Hbl, Putirka et al. (2016)
+    :cite:`putirka2016amphibole`
     '''
     return (273.15 + 2061 - 178.4 * Si_Amp_cat_23ox)
 
@@ -579,6 +605,8 @@ def T_Ridolfi2012(P, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
                   MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
     '''
     Amphibole-only thermometer of Ridolfi and Renzuli, 2012
+    :cite:`ridolfi2012calcic`
+
     SEE=22C
     '''
     return (273.15 + 8899.682 - 691.423 * SiO2_Amp_13_cat - 391.548 * TiO2_Amp_13_cat - 666.149 * Al2O3_Amp_13_cat
@@ -589,6 +617,7 @@ def T_Put2016_eq8(P, *, Si_Amp_cat_23ox, Ti_Amp_cat_23ox,
                   Mg_Amp_cat_23ox, Na_Amp_cat_23ox):
     '''
     Amphibole-only thermometer: Eq8,  Putirka et al. (2016)
+    :cite:`putirka2016amphibole`
     '''
     return (273.15+1201.4 - 97.93 * Si_Amp_cat_23ox + 201.82 * Ti_Amp_cat_23ox +
             72.85 * Mg_Amp_cat_23ox + 88.9 * Na_Amp_cat_23ox + 40.65 * P / 10)
@@ -599,6 +628,8 @@ K_Amp_cat_23ox, Al2O3_Liq_mol_frac_hyd, Na2O_Liq_mol_frac_hyd,
 H2O_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd):
     '''
     Amphibole-Liquid barometer: Equation 7a of Putirka et al. (2016)
+    :cite:`putirka2016amphibole`
+
     '''
     return (10 * (-3.093 - 4.274 * np.log(Al_Amp_cat_23ox / Al2O3_Liq_mol_frac_hyd)
     - 4.216 * np.log(Al2O3_Liq_mol_frac_hyd) + 63.3 * P2O5_Liq_mol_frac_hyd +
@@ -610,6 +641,8 @@ def P_Put2016_eq7b(T=None, *, Al2O3_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd, Al_
     SiO2_Liq_mol_frac_hyd, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd, CaO_Liq_mol_frac_hyd):
     '''
     Amphibole-Liquid barometer: Equation 7b of Putirka et al. (2016)
+    :cite:``
+
     '''
     return (-64.79 - 6.064 * np.log(Al_Amp_cat_23ox / Al2O3_Liq_mol_frac_hyd)
     + 61.75 * SiO2_Liq_mol_frac_hyd + 682 * P2O5_Liq_mol_frac_hyd
@@ -622,6 +655,8 @@ def P_Put2016_eq7c(T=None, *, Al_Amp_cat_23ox, K_Amp_cat_23ox,
                    P2O5_Liq_mol_frac, Al2O3_Liq_mol_frac, Na_Amp_cat_23ox, Na2O_Liq_mol_frac):
     '''
     Amphibole-Liquid barometer: Equation 7c of Putirka et al. (2016)
+    :cite:`putirka2016amphibole`
+
     '''
     return (-45.55 + 26.65 * Al_Amp_cat_23ox + 22.52 * K_Amp_cat_23ox
     + 439 * P2O5_Liq_mol_frac - 51.1 * np.log(Al2O3_Liq_mol_frac) -
@@ -635,6 +670,8 @@ def T_Put2016_eq4b(P=None, *, H2O_Liq_mol_frac_hyd, Fet_Amp_cat_23ox, FeOt_Liq_m
                    MnO_Liq_mol_frac_hyd, Al2O3_Liq_mol_frac_hyd, Ti_Amp_cat_23ox, TiO2_Liq_mol_frac_hyd):
     '''
     Amphibole-Liquid thermometer: Eq4b,  Putirka et al. (2016)
+    :cite:`putirka2016amphibole`
+
     '''
     return (273.15 + (8037.85 / (3.69 - 2.62 * H2O_Liq_mol_frac_hyd + 0.66 * Fet_Amp_cat_23ox
     - 0.416 * np.log(TiO2_Liq_mol_frac_hyd) + 0.37 * np.log(MgO_Liq_mol_frac_hyd)
@@ -647,6 +684,8 @@ def T_Put2016_eq4a_amp_sat(P=None, *, FeOt_Liq_mol_frac_hyd, TiO2_Liq_mol_frac_h
                            MnO_Liq_mol_frac_hyd, MgO_Liq_mol_frac_hyd, Na_Amp_cat_23ox, Na2O_Liq_mol_frac_hyd):
     '''
     Amphibole-Liquid thermometer Saturation surface of amphibole, Putirka et al. (2016)
+    :cite:`putirka2016amphibole`
+
     '''
     return (273.15 + (6383.4 / (-12.07 + 45.4 * Al2O3_Liq_mol_frac_hyd + 12.21 * FeOt_Liq_mol_frac_hyd -
     0.415 * np.log(TiO2_Liq_mol_frac_hyd) - 3.555 * np.log(Al2O3_Liq_mol_frac_hyd)
@@ -660,6 +699,9 @@ Fet_Amp_cat_23ox, Na_Amp_cat_23ox,  FeOt_Liq_mol_frac_hyd, Al_Amp_cat_23ox, Al2O
 K_Amp_cat_23ox, Ca_Amp_cat_23ox, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd):
     '''
     Amphibole-Liquid thermometer: Eq9,  Putirka et al. (2016)
+    :cite:`putirka2016amphibole`
+
+
     '''
     NaM4_1=2-Fet_Amp_cat_23ox-Ca_Amp_cat_23ox
     NaM4=np.empty(len(NaM4_1))
@@ -692,7 +734,12 @@ def calculate_amp_only_temp(amp_comps, equationT, P=None):
     '''
     Amphibole-only thermometry, calculates temperature in Kelvin.
 
+    Parameters
+    -----------
+
     equationT: str
+        choose from:
+
         |   T_Put2016_eq5 (P-independent)
         |   T_Put2016_eq6 (P-dependent)
         |   T_Put2016_SiHbl (P-independent)
@@ -700,15 +747,15 @@ def calculate_amp_only_temp(amp_comps, equationT, P=None):
         |   T_Put2016_eq8 (P-dependent)
 
 
-    P: float, int, series, str  ("Solve")
-        Pressure in kbar
+    P: float, int, pandas.Series, str
+        Pressure in kbar to perform calculations at,
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
         Else, enter an integer, float, or panda series
 
     Returns
     -------
-    pandas.series: Pressure in kbar (if eq_tests=False
+    pandas.Series: Pressure in kbar (if eq_tests=False)
 
     '''
     try:
@@ -771,7 +818,7 @@ T_K_guess=1300, Ridolfi_Filter=True):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
         Amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     EquationP: str
@@ -786,9 +833,9 @@ T_K_guess=1300, Ridolfi_Filter=True):
         select pressures from equations 1a-e.
 
         | P_Ridolfi2010  (T-independent)
-        | P_Hammerstrom1986_eq1  (T-independent)
-        | P_Hammerstrom1986_eq2 (T-independent)
-        | P_Hammerstrom1986_eq3 (T-independent)
+        | P_Hammarstrom1986_eq1  (T-independent)
+        | P_Hammarstrom1986_eq2 (T-independent)
+        | P_Hammarstrom1986_eq3 (T-independent)
         | P_Hollister1987 (T-independent)
         | P_Johnson1989 (T-independent)
         | P_Blundy1990 (T-independent)
@@ -802,7 +849,7 @@ T_K_guess=1300, Ridolfi_Filter=True):
         |   T_Ridolfi2012 (P-dependent)
         |   T_Put2016_eq8 (P-dependent)
 
-    H2O_Liq: float, int, series, optional
+    H2O_Liq: float, int, pandas.Series, optional
         Needed if you select P_Put2008_eq32b, which is H2O-dependent.
 
     Optional:
@@ -816,7 +863,7 @@ T_K_guess=1300, Ridolfi_Filter=True):
 
     Returns:
     -------
-    panda.dataframe: Pressure in Kbar, Temperature in K
+    pandas.DataFrame: Pressure in Kbar, Temperature in K
     '''
     T_func = calculate_amp_only_temp(amp_comps=amp_comps, equationT=equationT, P="Solve")
     if equationP !="P_Ridolfi2021" and equationP != "P_Mutch2016":
@@ -892,7 +939,7 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
         | P_Put2016_eq7b (T-independent, H2O-dependent (as hyd frac))
         | P_Put2016_eq7c (T-independent, H2O-dependent (as hyd frac))
 
-    P: float, int, series, str  ("Solve")
+    P: float, int, pandas.Series, str  ("Solve")
         Pressure in kbar
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
@@ -984,6 +1031,7 @@ P=None, H2O_Liq=None, eq_tests=False):
 
    Parameters
     -------
+
     amp_comps: pandas DataFrame
         amphibole compositions (SiO2_Amp, TiO2_Amp etc.)
 
@@ -995,7 +1043,7 @@ P=None, H2O_Liq=None, eq_tests=False):
         T_Put2016_eq4b (P-independent, H2O-dep)
         T_Put2016_eq9 (P-independent, H2O-dep through hydrous fractions)
 
-    P: float, int, series, str  ("Solve")
+    P: float, int, pandas.Series, str  ("Solve")
         Pressure in kbar
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
@@ -1083,7 +1131,7 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
         Amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     equationP: str
@@ -1097,7 +1145,7 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
         T_Put2016_eq9 (P-independent, H2O-dep through hydrous fractions)
 
 
-    H2O_Liq: float, int, series, optional
+    H2O_Liq: float, int, pandas.Series, optional
         Needed if you select P_Put2008_eq32b, which is H2O-dependent.
 
     Optional:
@@ -1116,7 +1164,7 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
 
     Returns:
     -------
-    panda.dataframe: Pressure in Kbar, Temperature in K, Kd-Fe-Mg if eq_tests=True
+    pandas.DataFrame: Pressure in Kbar, Temperature in K, Kd-Fe-Mg if eq_tests=True
     '''
     liq_comps_c=liq_comps.copy()
     if H2O_Liq is not None:

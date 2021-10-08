@@ -13,6 +13,8 @@ from Thermobar.core import *
 def T_Put2008_eq13(P=None, *, MgO_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids: Equation 13 of Putirka et al. (2008)
+    :cite:`putirka2008thermometers`
+
     SEE=±72 °C
     '''
     return (26.3 * MgO_Liq + 994.4 + 273.15)
@@ -22,6 +24,8 @@ def T_Put2008_eq14(P=None, *, Mg_Number_Liq_NoFe3, MgO_Liq,
                    FeOt_Liq, Na2O_Liq, K2O_Liq, H2O_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids: Equation 14 of Putirka et al. (2008)
+    :cite:`putirka2008thermometers`
+
     SEE=±58 °C
     '''
     return (754 + 190.6 * Mg_Number_Liq_NoFe3 + 25.52 * MgO_Liq + 9.585 *
@@ -31,7 +35,10 @@ def T_Put2008_eq14(P=None, *, Mg_Number_Liq_NoFe3, MgO_Liq,
 def T_Put2008_eq15(P, *, Mg_Number_Liq_NoFe3, MgO_Liq,
                    FeOt_Liq, Na2O_Liq, K2O_Liq, H2O_Liq):
     '''
-    Liquid-only thermometer for olivine-saturated liquids: Equation 15 of Putirka et al. (2008). Pressure-dependent form of Equation 14.
+    Liquid-only thermometer for olivine-saturated liquids: Equation 15 of Putirka et al. (2008).
+    Pressure-dependent form of Equation 14.
+    :cite:`putirka2008thermometers`
+
     SEE=±46 °C
     '''
     return (815.3 + 265.5 * Mg_Number_Liq_NoFe3 + 15.37 * MgO_Liq + 8.61 * FeOt_Liq +
@@ -43,6 +50,8 @@ def T_Put2008_eq16(P, *, SiO2_Liq_mol_frac,
     '''
     Liquid-only thermometer for ol-cpx-plag-saturated liquids:
     Equation 16 of Putirka et al. (2008). Adapted from Yang et al (1996).
+    :cite:`putirka2008thermometers`
+
     SEE=±19 °C
     '''
     return (- 583 + 3141 * SiO2_Liq_mol_frac + 15779 * Al2O3_Liq_mol_frac + 1338.6 *
@@ -53,6 +62,8 @@ def T_Helz1987_MgO(P=None, *, MgO_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids:
     Equation 1 (MgO thermometer) of Helz and Thornber (1987)
+    :cite:``
+
     SEE=±10 °C
     '''
     return (20.1 * MgO_Liq + 1014 + 273.15)
@@ -62,6 +73,8 @@ def T_Montierth1995_MgO(P=None, *, MgO_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids:
     update of Helz and Thornber (1987) by Montrieth et al. (1995).
+    :cite:``
+
     SEE=±10 °C
     '''
     return (23.0 * MgO_Liq + 1012 + 273.15)
@@ -71,6 +84,8 @@ def T_Helz1987_CaO(P=None, *, CaO_Liq):
     '''
     Liquid-only thermometer for glasses with Ol+Augite+Plag
     Equation 2 (CaO thermometer) of Helz and Thornber (1987)
+    :cite:``
+
     SEE=±10 °C
     '''
     return (16.6 * CaO_Liq + 968 + 273.15)
@@ -81,6 +96,7 @@ def T_Beatt93_BeattDMg(P, *, Den_Beat93):
     Liquid-only thermometer.
     Re-arrangement of Beattie (1993) by Putirka (2008) such that
     an olivine composition isn't required (DMg ol-melt is calculated rather than measured).
+    :cite:``
 
     '''
     return (((113.1 * 1000) / 8.3144 + (0.1 * P * 10**9 - 10**5)
@@ -92,6 +108,7 @@ def T_Beatt93_BeattDMg_HerzCorr(P, *, Den_Beat93):
     Liquid-only thermometer. Herzberg and O'Hara (2002) correction
     to the olivine-free re-arrangment (T_Beatt93_BeattDMg) of Beattie (1993) by Putirka.
     Eliminates systematic error at high pressures
+    :cite:``
 
     '''
     return (((113.1 * 1000 / 8.3144 + (0.0001 * (10**9) - 10**5) * 4.11 *
@@ -104,6 +121,8 @@ def T_Sug2000_eq1(P=None, *, MgO_Liq_mol_frac):
 
     '''
     Liquid-only thermometer. Equation 1 of Sugawara et al. (2000) for olivine-saturated liquids at 0.1 MPa
+    :cite:``
+
     '''
     return (1316 + 12.95 * MgO_Liq_mol_frac * 100)
 # Coefficients form their Table 2 for olivine-liquid
@@ -111,7 +130,9 @@ def T_Sug2000_eq1(P=None, *, MgO_Liq_mol_frac):
 
 def T_Sug2000_eq3_ol(P, *, MgO_Liq_mol_frac):
     '''
-    Liquid-only thermometer. Equation 3 of Sugawara et al. (2000) for olivine-saturated liquids. Unlike eq 1, this is pressure-dependent
+    Liquid-only thermometer. Equation 3 of Sugawara et al. (2000) for olivine-saturated liquids.
+    Unlike eq 1, this is pressure-dependent
+    :cite:``
     '''
     A = 1293
     B = 14.60
@@ -124,6 +145,7 @@ def T_Sug2000_eq3_ol(P, *, MgO_Liq_mol_frac):
 def T_Sug2000_eq3_opx(P, *, MgO_Liq_mol_frac):
     '''
     Liquid-only thermometer. Equation 3 of Sugawara et al. (2000) for opx-saturated liquids.
+    :cite:``
     '''
     A = 1324
     B = 12.22
@@ -136,6 +158,7 @@ def T_Sug2000_eq3_opx(P, *, MgO_Liq_mol_frac):
 def T_Sug2000_eq3_cpx(P, *, MgO_Liq_mol_frac):
     '''
     Liquid-only thermometer. Equation 3 of Sugawara et al. (2000) for cpx-saturated liquids.
+    :cite:``
     '''
     A = 1289
     B = 12.35
@@ -148,6 +171,7 @@ def T_Sug2000_eq3_cpx(P, *, MgO_Liq_mol_frac):
 def T_Sug2000_eq3_pig(P, *, MgO_Liq_mol_frac):
     '''
     Liquid-only thermometer. Equation 3 of Sugawara et al. (2000) for pig-saturated liquids.
+    :cite:``
     '''
     A = 1294
     B = 13.47
@@ -160,6 +184,7 @@ def T_Sug2000_eq6a_H7a(P, *, SiO2_Liq_mol_frac,
     Liquid-only thermometer. Equation 6a of Sugawara et al. (2000) for
     olivine-saturated liquids. Adds terms for CaO, SiO2 and FeO relative to equation 1 and 3.
     Included corrections for H2O given in their equation 7a.
+    :cite:``
     '''
     return ((1446 - 1.440 * SiO2_Liq_mol_frac * 100 - 0.5 * FeOt_Liq_mol_frac * 100 +
             12.32 * MgO_Liq_mol_frac * 100 - 3.899 * CaO_Liq_mol_frac * 100 + 0.0043 * (P * 1000))
@@ -170,6 +195,8 @@ def T_Sug2000_eq6a(P, *, SiO2_Liq_mol_frac,
     '''
     Liquid-only thermometer. Equation 6a of Sugawara et al. (2000) for
     olivine-saturated liquids. Adds terms for CaO, SiO2 and FeO relative to equation 1 and 3.
+    :cite:``
+
     '''
     return (1446 - 1.440 * SiO2_Liq_mol_frac * 100 - 0.5 * FeOt_Liq_mol_frac * 100 +
             12.32 * MgO_Liq_mol_frac * 100 - 3.899 * CaO_Liq_mol_frac * 100 + 0.0043 * (P * 1000))
@@ -180,6 +207,7 @@ def T_Sug2000_eq6b(P, *, SiO2_Liq_mol_frac,
     '''
     Liquid-only thermometer. Equation 6b of Sugawara et al. (2000) for cpx-saturated liquids.
     Adds terms for CaO, SiO2 and FeO relative to equation 3
+    :cite:``
     '''
     return (1202 + 1.511 * SiO2_Liq_mol_frac * 100 - 1.426 * FeOt_Liq_mol_frac * 100 +
             8.780 * MgO_Liq_mol_frac * 100 + 5.537 * CaO_Liq_mol_frac * 100 + 0.0081 * (P * 1000))
@@ -190,6 +218,7 @@ def T_Sug2000_eq6b_H7b(P, *, SiO2_Liq_mol_frac,
     Liquid-only thermometer. Equation 6b of Sugawara et al. (2000) for cpx-saturated liquids.
     Adds terms for CaO, SiO2 and FeO relative to equation 3.
     Included corrections for H2O given in their equation 7b.
+    :cite:``
     '''
     return ((1202 + 1.511 * SiO2_Liq_mol_frac * 100 - 1.426 * FeOt_Liq_mol_frac * 100 +
             8.780 * MgO_Liq_mol_frac * 100 + 5.537 * CaO_Liq_mol_frac * 100 + 0.0081 * (P * 1000))
@@ -199,6 +228,7 @@ def T_Put2008_eq19_BeattDMg(P, *, calcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_N
     '''
     Liquid-only thermometer. Combining terms from Beattie et al. (1993) by Putirka (2008).
     This function uses calculated DMg from Beattie, so you don't need a measured olivine composition.
+    :cite:`putirka2008thermometers`
     '''
     return ((13603) + (4.943 * 10**(-7)) * ((0.1 * P)*10**9 - 10**(-5))) / (6.26 + 2 *
             np.log(calcDMg_Beat93) + 2 * np.log(1.5 * Beat_CNML) + 2 * np.log(3 * Beat_CSiO2L) - Beat_NF)
@@ -210,6 +240,8 @@ def T_Put2008_eq21_BeattDMg(P, *, calcDMg_Beat93, Na2O_Liq, K2O_Liq, H2O_Liq):
     Liquid-only thermometer (adapted from ol-liq thermometer using calc DMg from Beattie) Putirka (2008),
     equation 21 (originally Putirka et al., 2007,  Eq 2). Recalibration of Beattie (1993) to account for the
     pressure sensitivity noted by Herzberg and O'Hara (2002), and eliminates the systematic error of Beattie (1993) for hydrous compositions.
+    :cite:`putirka2008thermometers`
+
     '''
     return (1 / ((np.log(calcDMg_Beat93) + 2.158 - 5.115 * 10**(-2) * (Na2O_Liq +
             K2O_Liq) + 6.213 * 10**(-2) * H2O_Liq) / (55.09 * 0.1 * P + 4430)) + 273.15)
@@ -220,6 +252,7 @@ def T_Put2008_eq22_BeattDMg(P, *, calcDMg_Beat93, Beat_CNML, Beat_CSiO2L, Beat_N
     Liquid-only thermometer (adapted from ol-liq thermometer using calc DMg from Beattie): Putirka (2008),
     equation 22 (originally Putirka et al., 2007,  Eq 4). Recalibration of Beattie (1993) to account for the pressure
     sensitivity noted by Herzberg and O'Hara (2002), and eliminates the systematic error of Beattie (1993) for hydrous compositions.
+    :cite:`putirka2008thermometers`
     '''
     return ((15294.6 + 1318.8 * 0.1 * P + 2.48348 * ((0.1 * P)**2)) / (8.048 + 2.8352 * np.log(calcDMg_Beat93) + 2.097 *
             np.log(1.5 * Beat_CNML) + 2.575 * np.log(3 * Beat_CSiO2L) - 1.41 * Beat_NF + 0.222 * H2O_Liq + 0.5 * (0.1 * P)) + 273.15)
@@ -231,6 +264,7 @@ def T_Molina2015_amp_sat(P=None, *, Mg_Liq_cat_frac,
                          Ca_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Amphibole-saturation thermometer from Molina et al. (2015)
+    :cite:``
     '''
 
     return (273.15 + 107 * np.log(Mg_Liq_cat_frac) - 108 *
@@ -239,7 +273,9 @@ def T_Molina2015_amp_sat(P=None, *, Mg_Liq_cat_frac,
 def T_Put2016_eq3_amp_sat(P=None, *, FeOt_Liq_mol_frac_hyd, CaO_Liq_mol_frac_hyd, SiO2_Liq_mol_frac_hyd,
                           TiO2_Liq_mol_frac_hyd, MgO_Liq_mol_frac_hyd, MnO_Liq_mol_frac_hyd, Al2O3_Liq_mol_frac_hyd):
     '''
-    Amphibole-Liquid thermometer- temperature at which a liquid is saturated in amphibole. Equation 3 of Putirka et al. (2016)
+    Equation 3 of Putirka et al. (2016)
+    Amphibole-Liquid thermometer- temperature at which a liquid is saturated in amphibole.
+    :cite:``
     '''
     return (273.15 + (24429.2) / (2.31 + 42.1 * FeOt_Liq_mol_frac_hyd
     + 32.2 * CaO_Liq_mol_frac_hyd + 2.21 * np.log(SiO2_Liq_mol_frac_hyd) -
@@ -345,7 +381,7 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     equationT: str
@@ -394,7 +430,7 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
         Equation from Beattie (1993)
            | T_Beatt1993_opx
 
-    P: float, int, series, str  ("Solve")
+    P: float, int, pandas.Series, str  ("Solve")
         Pressure in kbar
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
@@ -402,7 +438,7 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
 
     H2O_Liq: optional.
         If None, uses H2O_Liq column from input.
-        If int, float, series, uses this instead of H2O_Liq Column
+        If int, float, pandas.Series, uses this instead of H2O_Liq Column
 
 
     Returns

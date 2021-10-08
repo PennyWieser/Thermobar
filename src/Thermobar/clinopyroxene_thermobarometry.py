@@ -18,9 +18,11 @@ from Thermobar.core import *
 def P_Put1996_eqP1(T, *, lnK_Jd_liq, Na_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Clinopyroxene-liquid barometer of Putirka (1996) EqP1
+    :cite:`putirka1996thermobarometry`
 
-    | SEE=+-4.6 kbar (anhydrous)
-    | SEE=+-5.4 kbar (hydrous)
+    SEE=+-4.6 kbar (anhydrous)
+
+    SEE=+-5.4 kbar (hydrous)
 
     '''
     return - 54.3 + 299 * T / 10 ** 4 + 36.4 * T * lnK_Jd_liq / \
@@ -31,7 +33,9 @@ def P_Mas2013_eqPalk1(T, *, lnK_Jd_liq,
                       Na_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid barometer of Putirka (1996) EqP1 by Masotta et al. (2013) for alkaline melts
-    | SEE=+-1.71 kbar
+    :cite:`masotta2013clinopyroxene`
+
+    SEE=+-1.71 kbar
 
     '''
     return - 8.83763538032322 + 79.0497715060127 * T / 10 ** 4 + 11.6474409456619 * \
@@ -42,6 +46,7 @@ def P_Mas2013_eqPalk1(T, *, lnK_Jd_liq,
 def P_Put1996_eqP2(T, *, lnK_Jd_liq, Na_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Clinopyroxene-liquid barometer of Putirka (1996) EqP2
+    :cite:`putirka1996thermobarometry`
 
 
     '''
@@ -54,7 +59,9 @@ def P_Mas2013_eqPalk2(T, *, lnK_Jd_liq,
     '''
     Recalibration of the clinopyroxene-liquid barometer of Putirka (1996)
     EqP2 by Masotta et al. (2013) for alkaline melts
-    | SEE=+-1.70 kbar
+    :cite:`masotta2013clinopyroxene`
+
+    SEE=+-1.70 kbar
 
     '''
     return (-6.28332277837751 + 38.1796219610587 * T / 10 ** 4
@@ -67,9 +74,11 @@ def P_Put2003(T, *, lnK_Jd_liq, Ca_Liq_cat_frac,
               Si_Liq_cat_frac, Mg_Number_Liq_NoFe3):
     '''
     Clinopyroxene-liquid barometer of Putirka (2003) Eq1
+    :cite:`putirka2008thermometers`
 
-    | SEE=+-4.8 kbar (anhydrous)
-    | SEE=+-5.0 kbar (hydrous)
+    SEE=+-4.8 kbar (anhydrous)
+
+    SEE=+-5.0 kbar (hydrous)
 
     '''
     return (- 88.3 + 0.00282 * T * lnK_Jd_liq + 0.0219 * T
@@ -82,9 +91,10 @@ def P_Put2008_eq30(T, *, lnK_Jd_liq, Fet_Liq_cat_frac, Mg_Liq_cat_frac,
                    DiHd_2003, Mg_Number_Liq_NoFe3, Na_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
     '''
     Clinopyroxene-liquid barometer of Putirka (2008) Eq30
+    :cite:`putirka2008thermometers`
 
-    | SEE=+-3.6 kbar (all data)
-    | SEE=+-1.6 kbar (calibration data)
+    SEE=+-3.6 kbar (all data)
+    SEE=+-1.6 kbar (calibration data)
 
     '''
     return (-48.7 + 271.3 * (T / 10**4) + 31.96 * (T / 10**4) * lnK_Jd_liq - 8.2 * np.log(Fet_Liq_cat_frac.astype(float))
@@ -96,8 +106,9 @@ def P_Put2008_eq31(T, *, lnK_Jd_liq, Ca_Liq_cat_frac, Na_Liq_cat_frac, K_Liq_cat
                    Fet_Liq_cat_frac, DiHd_2003, EnFs, Al_Cpx_cat_6ox, H2O_Liq):
     '''
     Clinopyroxene-liquid barometer of Putirka (2008) Eq31
+    :cite:`putirka2008thermometers`
 
-    | SEE=+-2.9 kbar (all data)
+    SEE=+-2.9 kbar (all data)
     '''
     return (-40.73 + 358 * (T / 10**4) + 21.7 * (T / 10**4) * lnK_Jd_liq - 106 * Ca_Liq_cat_frac - 166 * (Na_Liq_cat_frac + K_Liq_cat_frac)**2
             - 50.2 * Si_Liq_cat_frac *
@@ -110,9 +121,10 @@ def P_Put2008_eq32c(T, *, Fet_Liq_cat_frac, CaTs, H2O_Liq, Ca_Liq_cat_frac,
                     Si_Liq_cat_frac, Al_Cpx_cat_6ox, Al_Liq_cat_frac):
     '''
     Clinopyroxene-liquid barometer of Putirka (2008) Eq32c based on partitioning of Al between cpx and liquid
+    :cite:`putirka2008thermometers`
 
-    | SEE=+-5 kbar (all data)
-    | SEE=+-1.5 kbar (calibration data)
+    SEE=+-5 kbar (all data)
+    SEE=+-1.5 kbar (calibration data)
     '''
     return (-57.9 + 0.0475 * (T) - 40.6 * Fet_Liq_cat_frac - 47.7 * CaTs + 0.67 * H2O_Liq -
             153 * Ca_Liq_cat_frac * Si_Liq_cat_frac + 6.89 * (Al_Cpx_cat_6ox / Al_Liq_cat_frac))
@@ -122,7 +134,9 @@ def P_Mas2013_eqalk32c(T, *, Fet_Liq_cat_frac, CaTs, H2O_Liq, Ca_Liq_cat_frac,
                        Si_Liq_cat_frac, Al_Cpx_cat_6ox, Al_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid barometer of Putirka (2008) Eq32c by Masotta et al. (2013) for alkaline melts
-    | SEE=+-1.67 kbar
+    :cite:`putirka2008thermometers`
+
+    SEE=+-1.67 kbar
     '''
     return (-16.3446543551989 + 0.0141435837038975 * (T)
     - 12.3909508275802 * Fet_Liq_cat_frac - 9.19220692402416 * CaTs
@@ -134,7 +148,9 @@ def P_Mas2013_Palk2012(T=None, *, lnK_Jd_liq, H2O_Liq,
                        Na_Liq_cat_frac, K_Liq_cat_frac, Kd_Fe_Mg_Fet):
     '''
     Clinopyroxene-liquid barometer of Masotta et al. (2013) for alkaline melts
-    | SEE=+-1.15 kbar
+    :cite:`masotta2013clinopyroxene`
+
+    SEE=+-1.15 kbar
     '''
     return (-3.88903951262765 + 0.277651046511846 * np.exp(lnK_Jd_liq)
     + 0.0740292491471828 * H2O_Liq + 5.00912129248619 * (Na_Liq_cat_frac)
@@ -152,9 +168,10 @@ def P_Wieser2021_H2O_indep(T=None, *, MgO_Liq, Ca_Liq_cat_frac, lnK_Jd_liq, Jd,
 def P_Neave2017(T, *, lnK_Jd_liq, DiHd_2003, Al_Liq_cat_frac,
                 Na_Liq_cat_frac, K_Liq_cat_frac):
     '''
-    Clinopyroxene-liquid barometer of Neave and Putirka (2017) Putirka (2008)  based on Jd in pyroxene
+    Clinopyroxene-liquid barometer of Neave and Putirka (2017)
+    :cite:`neave2017new`
 
-    | SEE=+-1.4 kbar
+    SEE=+-1.4 kbar
     '''
     return (-26.2712 + 39.16138 * T * lnK_Jd_liq / 10**4 - 4.21676 * np.log(DiHd_2003.astype(float))
             + 78.43463 * Al_Liq_cat_frac + 393.8126 * (Na_Liq_cat_frac + K_Liq_cat_frac)**2)
@@ -163,7 +180,9 @@ def P_Petrelli2021_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     '''
     Clinopyroxene-liquid  barometer of Petrelli et al. (2021) based on
     Machine Learning.
-    |  SEE==+-2.9 kbar
+    :cite:`petrelli2020machine`
+
+    SEE==+-2.9 kbar
     '''
     if meltmatch is None:
         cpx_test=cpx_comps.copy()
@@ -225,6 +244,7 @@ def T_Put1996_eqT1(P=None, *, lnK_Jd_DiHd_liq_1996,
                    Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac):
     '''
     Clinopyroxene-liquid thermometer of Putirka (1996) EqT1 (pressure-independent)
+    :cite:`putirka1996thermobarometry`
 
     '''
     return (10 ** 4 / (6.73 - 0.26 * lnK_Jd_DiHd_liq_1996 - 0.86 * np.log(Mg_Number_Liq_NoFe3.astype(float))
@@ -234,8 +254,11 @@ def T_Put1996_eqT1(P=None, *, lnK_Jd_DiHd_liq_1996,
 def T_Mas2013_eqTalk1(P=None, *, lnK_Jd_DiHd_liq_1996,
                       Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac):
     '''
-    Recalibration of the clinopyroxene-liquid thermometer of Putirka (1996) EqT1 by Masotta et al. (2013) for alkaline melts
-    |  SEE=+-31.6°C
+    Recalibration of the clinopyroxene-liquid thermometer of Putirka (1996) EqT1
+    by Masotta et al. (2013) for alkaline melts.
+    :cite:`masotta2013clinopyroxene`
+
+    SEE=+-31.6°C
     '''
     return (10 ** 4 / (6.7423126317975 - 0.023236627691972 * lnK_Jd_DiHd_liq_1996 -
             0.68839419999351 * np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.153193056441978 * np.log(Ca_Liq_cat_frac.astype(float))))
@@ -245,6 +268,7 @@ def T_Put1996_eqT2(P, *, lnK_Jd_DiHd_liq_1996,
                    Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac):
     '''
     Clinopyroxene-liquid thermometer of Putirka (1996) EqT2 (pressure-dependent)
+    :cite:`putirka1996thermobarometry`
 
     '''
     return (10 ** 4 / (6.59 - 0.16 * lnK_Jd_DiHd_liq_1996 - 0.65 * np.log(Mg_Number_Liq_NoFe3.astype(float))
@@ -254,8 +278,11 @@ def T_Put1996_eqT2(P, *, lnK_Jd_DiHd_liq_1996,
 def T_Mas2013_eqTalk2(P, *, lnK_Jd_DiHd_liq_1996,
                       Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac):
     '''
-    Recalibration of the clinopyroxene-liquid thermometer of Putirka (1996) EqT2 by Masotta et al. (2013) for alkaline melts
-    |  SEE=+-31.2°C
+    Recalibration of the clinopyroxene-liquid thermometer of Putirka (1996),
+    EqT2 by Masotta et al. (2013) for alkaline melts
+    :cite:`masotta2013clinopyroxene`
+
+    SEE=+-31.2°C
     '''
     return (10 ** 4 / (6.52396326315485 - 0.0396542787609402 * lnK_Jd_DiHd_liq_1996 - 0.680638985726502 *
             np.log(Mg_Number_Liq_NoFe3.astype(float)) - 0.145757123805013 * np.log(Ca_Liq_cat_frac.astype(float)) + 0.0790582631912926 * P))
@@ -265,6 +292,8 @@ def T_Put1999(P, *, Mg_Liq_cat_frac, Fet_Liq_cat_frac,
               Ca_Liq_cat_frac, Si_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Equation in Keith's Cpx-Liquid spreadsheet labelled "Putirka 1999".
+    :cite:`putirka1999clinopyroxene`
+
 
     '''
 
@@ -280,6 +309,7 @@ def T_Put2003(P, *, lnK_Jd_DiHd_liq_2003, Mg_Number_Liq_NoFe3,
               Na_Liq_cat_frac, Si_Liq_cat_frac, Jd):
     '''
     Clinopyroxene-liquid thermometer of Putirka (2003)
+    :cite:`putirka2003new`
 
     '''
     return (10 ** 4 / (4.6 - 0.437 * lnK_Jd_DiHd_liq_2003 - 0.654 * np.log(Mg_Number_Liq_NoFe3.astype(float))
@@ -291,8 +321,9 @@ def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_Liq_c
                    Ti_Liq_cat_frac, Na_Liq_cat_frac, K_Liq_cat_frac, EnFs, lnK_Jd_DiHd_liq_2003):
     '''
     Clinopyroxene-liquid  thermometer of Putirka (2008) Eq 33.
+    :cite:`putirka2008thermometers`
 
-    |  SEE=+-45°C (all data)
+    SEE=+-45°C (all data)
     '''
     return (10 ** 4 / (7.53 + 0.07 * H2O_Liq - 1.1 * Mg_Number_Liq_NoFe3
     - 14.9 * (Ca_Liq_cat_frac * Si_Liq_cat_frac) -
@@ -306,7 +337,9 @@ def T_Mas2013_eqalk33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_Li
     '''
     Recalibration of the clinopyroxene-liquid thermometer of Putirka (2008)
     Eq 33 by Masotta et al. (2013) for alkaline melts
-    |  SEE=+-24°C
+    :cite:`masotta2013clinopyroxene`
+
+    SEE=+-24°C
     '''
     return (10 ** 4 / (6.80728851520843 + 0.0500993963259582 * H2O_Liq
     - 1.91449550102791 * Mg_Number_Liq_NoFe3
@@ -324,7 +357,9 @@ Mg_Number_Liq_NoFe3, DiHd_2003, Na_Liq_cat_frac, K_Liq_cat_frac,
 Ti_Liq_cat_frac, lnK_Jd_liq, Ca_Liq_cat_frac, Si_Liq_cat_frac):
     '''
     Clinopyroxene-liquid thermometer of Masotta et al. (2013) for alkaline melts
-    | SEE=+-18.2C
+    :cite:`putirka2008thermometers`
+
+    SEE=+-18.2C
     '''
     return (10**4 / (2.90815635794002 - 0.400827676578132 * lnK_Jd_DiHd_liq_2003
         + 0.0375720784518263 * H2O_Liq - 1.6383282971929 *
@@ -337,9 +372,11 @@ Ti_Liq_cat_frac, lnK_Jd_liq, Ca_Liq_cat_frac, Si_Liq_cat_frac):
 def T_Brug2019(P=None, *, CaTs, DiHd_2003, Si_Liq_cat_frac, Ti_Liq_cat_frac,
 Fet_Liq_cat_frac, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac):
     '''
-    Clinopyroxene-liquid  thermometer of Brugmann and Till (2019) for evolved systems (Cpx Mg#>64, Al2O3 Cpx<7 wt%, SiO2_Liq>70 wt%)
+    Clinopyroxene-liquid  thermometer of Brugmann and Till (2019) for evolved systems,
+    (Cpx Mg#>64, Al2O3 Cpx<7 wt%, SiO2_Liq>70 wt%)
+    :cite:`brugman2019low`
 
-    |  SEE==+-20°C
+    SEE==+-20°C
     '''
     return (273.15 + 300 * (-1.8946098 - 0.6010197 * CaTs - 0.1856423 * DiHd_2003
 + 4.71248858 * Si_Liq_cat_frac + 77.5861878 * Ti_Liq_cat_frac +
@@ -352,7 +389,9 @@ def T_Petrelli2021_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     '''
     Clinopyroxene-liquid  thermometer of Petrelli et al. (2021) based on
     Machine Learning.
-    |  SEE==+-51°C
+    :cite:`petrelli2020machine`
+
+    SEE==+-51°C
     '''
     if meltmatch is None:
         cpx_test=cpx_comps.copy()
@@ -421,18 +460,18 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
     (and equilibrium tests as an option)
 
 
-   Parameters
+    Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     Or:
 
-    meltmatch: DataFrame
+    meltmatch: pandas.DataFrame
         Combined dataframe of cpx-Liquid compositions
         Used for calculate_cpx_liq_press_temp_matching function.
 
@@ -450,7 +489,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         |  P_Mas2013_eqalk32c (T-dep, H2O-dep, alk adaption of 32c)
 
 
-    T: float, int, series, str  ("Solve")
+    T: float, int, pandas.Series, str  ("Solve")
         Temperature in Kelvin
         Only needed for T-sensitive barometers.
         If enter T="Solve", returns a partial function
@@ -465,9 +504,9 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
     Returns
     -------
     If eq_tests=False
-        pandas.series: Pressure in kbar
+        pandas.Series: Pressure in kbar
     If eq_tests=True
-        panda.dataframe: Temperature in Kelvin +
+        pandas.DataFrame: Temperature in Kelvin +
         Eq Tests + cpx+liq comps + components
 
     '''
@@ -594,17 +633,17 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
     Clinopyroxene-Liquid thermometry, calculates temperature in Kelvin
     (and equilibrium tests as an option)
 
-   Parameters
+    Parameters
     -------
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     Or:
 
-    meltmatch: DataFrame
+    meltmatch: pandas.DataFrame
         Combined dataframe of cpx-Liquid compositions
         Used for calculate_cpx_liq_press_temp_matching function.
 
@@ -624,7 +663,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
         |  T_Mas2013_Palk2012 (P-indep, H2O_dep)
 
 
-    P: float, int, series, str  ("Solve")
+    P: float, int, pandas.Series, str  ("Solve")
         Pressure in kbar
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
@@ -641,9 +680,9 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
     Returns
     -------
     If eq_tests=False
-        pandas.series: Temperature in Kelvin
+        pandas.Series: Temperature in Kelvin
     If eq_tests=True
-        panda.dataframe: Temperature in Kelvin +
+        pandas.DataFrame: Temperature in Kelvin +
         Eq Tests + cpx+liq comps + components
 
     '''
@@ -760,18 +799,18 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
     using clinopyroxene-liquid thermometers and barometers.
 
 
-   Parameters
+    Parameters
     -------
 
-     cpx_comps: DataFrame (opt, either specify cpx_comps AND liq_comps or meltmatch)
+     cpx_comps: pandas.DataFrame (opt, either specify cpx_comps AND liq_comps or meltmatch)
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     Or
 
-    meltmatch: DataFrame
+    meltmatch: pandas.DataFrame
         Combined dataframe of cpx-Liquid compositions
         Used for calculate_cpx_liq_press_temp_matching function.
 
@@ -813,12 +852,12 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
     T_K_guess: int or float. Default is 1300K
          Initial guess of temperature.
 
-    Fe3Fet_Liq: float, int, series,
+    Fe3Fet_Liq: float, int, pandas.Series,
         Fe3Fet ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
         If users don't specify, uses Fe3Fet_Liq from liq_comps.
         If specified, overwrites the Fe3Fet_Liq column in the liquid input.
 
-    H2O_Liq: float, int, series, optional
+    H2O_Liq: float, int, pandas.Series, optional
         If users don't specify, uses H2O_Liq from liq_comps,
         if specified overwrites this.
 
@@ -833,13 +872,13 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
     If eq_tests=False
         pandas.DataFrame: Temperature in Kelvin, pressure in Kbar
     If eq_tests=True
-        panda.dataframe: Temperature in Kelvin, pressure in Kbar
+        pandas.DataFrame: Temperature in Kelvin, pressure in Kbar
         Eq Tests + cpx+liq comps + components
 
 
     Returns:
     -------
-    panda.dataframe: Pressure in Kbar, Temperature in K + Kd-Fe-Mg + cpx+liq comps (if eq_tests=True)
+    pandas.DataFrame: Pressure in Kbar, Temperature in K + Kd-Fe-Mg + cpx+liq comps (if eq_tests=True)
 
     '''
 
@@ -966,10 +1005,10 @@ H2O_Liq=None, Return_All_Matches=False):
     Parameters
     -----------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Panda DataFrame of liquid compositions with column headings SiO2_Liq etc.
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         Panda DataFrame of cpx compositions with column headings SiO2_Cpx etc.
 
     equationT: str
@@ -1036,12 +1075,12 @@ H2O_Liq=None, Return_All_Matches=False):
         Allows users to specify the permitted error on CaTs (default=0.03 from Neave et al. 2019)
         Compares measured and calculated values from Putirka (1999).
 
-    Fe3Fet_Liq: float, int, series, optional
+    Fe3Fet_Liq: float, int, pandas.Series, optional
         Fe3Fet ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
         If users don't specify, uses Fe3Fet_Liq from liq_comps.
         If specified, overwrites the Fe3Fet_Liq column in the liquid input.
 
-    H2O_Liq: float, int, series, optional
+    H2O_Liq: float, int, pandas.Series, optional
         If users don't specify, uses H2O_Liq from liq_comps, if specified overwrites this.
 
     Cpx Quality: bool, optional
@@ -1339,8 +1378,10 @@ Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, 
     '''
     Clinopyroxene-only barometer of Wang et al. (2021) equation 1
     Uses NCT
+    currently on Zenodo - 10.5281/zenodo.4727870
+
     SEE=1.52
-    - currently on Zenodo - 10.5281/zenodo.4727870
+
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
     +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
@@ -1353,8 +1394,8 @@ Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
 FeII_Wang21, FeIII_Wang21, Ca_Cpx_cat_6ox, Al_Cpx_cat_6ox):
     '''
     Clinopyroxene-only barometer of Wang et al. (2021) equation 3
-    - currently on Zenodo - 10.5281/zenodo.4727870.
     Doesnt use NCT
+    currently on Zenodo - 10.5281/zenodo.4727870.
     '''
 
 
@@ -1369,8 +1410,9 @@ def P_Put2008_eq32a(T, *, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox,
                     Al_VI_cat_6ox, DiHd_2003, EnFs):
     '''
     Clinopyroxene-only barometer of Putirka (2008) Eq32a
+    :cite:`putirka2008thermometers`
 
-    | SEE=+-3.1 kbar (anhydrous)
+    SEE=+-3.1 kbar (anhydrous)
 
     '''
     return (3205 - 5.62 * Mg_Cpx_cat_6ox + 83.2 * Na_Cpx_cat_6ox + 68.2 * DiHd_2003
@@ -1383,8 +1425,9 @@ Al_Cpx_cat_6ox, K_Cpx_cat_6ox, Al_IV_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
                     Al_VI_cat_6ox, Fet_Cpx_cat_6ox, DiHd_1996, Mg_Cpx_cat_6ox, Jd):
     '''
     Clinopyroxene-only barometer of Putirka (2008) Eq32b. Unlike 32a, requires H2O_Liq to be specified.
+    :cite:`putirka2008thermometers`
 
-    | SEE=+-2.6 kbar (anhydrous)
+    SEE=+-2.6 kbar (anhydrous)
 
     '''
 
@@ -1413,7 +1456,9 @@ def P_Petrelli2021_Cpx_only(T=None, *, cpx_comps):
     '''
     Clinopyroxene-only  barometer of Petrelli et al. (2021) based on
     Machine Learning.
-    |  SEE==+-3.1 kbar
+    :cite:`petrelli2020machine`
+
+    SEE==+-3.1 kbar
     '''
     Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
                                 'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
@@ -1450,8 +1495,9 @@ def P_Petrelli2021_Cpx_only(T=None, *, cpx_comps):
 def P_Petrelli2021_Cpx_only_withH2O(T=None, *, cpx_comps):
     '''
     Clinopyroxene-only  barometer following the Machine learning approach of
-    Petrelli et al. (2021),
-    but including the H2O content of the liquid while training the model.
+    Petrelli et al. (2021), but including the H2O content of the liquid while training the model.
+
+    :cite:`petrelli2020machine` and cite Thermobar.
     '''
     Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
                                 'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
@@ -1565,8 +1611,9 @@ def T_Wang2021_eq2(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_
 Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
 FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
     '''
-    Clinopyroxene-only thermometer of Wang et al. (2021) e
-    equation 2 - currently on Zenodo - 10.5281/zenodo.4727870
+    Clinopyroxene-only thermometer of Wang et al. (2021) Eq 2
+    currently on Zenodo - 10.5281/zenodo.4727870
+
     SEE=35.2 C
     '''
     NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
@@ -1599,10 +1646,12 @@ FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox):
 def T_Put2008_eq32d(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
                     Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En):
     '''
-    Clinopyroxene-only thermometer of Putirka (2008) Eq32d. Does overestimate temperature for hydrous data
+    Clinopyroxene-only thermometer of Putirka (2008) Eq32d.
+    Overestimates temperature for hydrous data
+    :cite:`putirka2008thermometers`
 
-    | SEE=±58°C (anhydrous)
-    | SEE=±87°C (anhydrous)
+    SEE=±58°C (anhydrous)
+    SEE=±87°C (anhydrous)
     '''
 
     return (((93100 + 544 * P) / (61.1 + 36.6 * Ti_Cpx_cat_6ox + 10.9 * Fet_Cpx_cat_6ox
@@ -1618,7 +1667,10 @@ def T_Put2008_eq32d(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
 def T_Put2008_eq32d_subsol(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
                            Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En):
     '''
-    Adapted version of clinopyroxene-only thermoter of Putirka (2008) Eq32d, provides better fit to subsolidus T estimates
+    Adapted version of clinopyroxene-only thermoter of Putirka (2008) Eq32d,
+    provides better fit to subsolidus T estimates
+    :cite:`putirka2008thermometers`
+
     '''
     return (((93100 + 755 * P) / (61.1 + 36.6 * Ti_Cpx_cat_6ox + 10.9 * Fet_Cpx_cat_6ox
     - 0.95 * (Al_Cpx_cat_6ox + Cr_Cpx_cat_6ox - Na_Cpx_cat_6ox - K_Cpx_cat_6ox)
@@ -1629,7 +1681,9 @@ def T_Petrelli2021_Cpx_only(P=None, *, cpx_comps):
     '''
     Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
     Machine Learning.
-    |  SEE==+-51°C
+    :cite:`petrelli2020machine`
+
+    SEE==+-51°C
     '''
     Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
                                 'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
@@ -1663,8 +1717,10 @@ def T_Petrelli2021_Cpx_only(P=None, *, cpx_comps):
 def T_Petrelli2021_Cpx_only_withH2O(P=None, *, cpx_comps):
     '''
     Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
-    Machine Learning.
-    |  SEE==+-51°C
+    Machine Learning, but adding water.
+    :cite:`petrelli2020machine` and this study.
+
+    SEE==+-51°C
     '''
     cpx_test=cpx_comps.copy()
     Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
@@ -1711,10 +1767,10 @@ return_input=False):
     Clinopyroxene only barometry. Enter a panda dataframe with Cpx compositions,
     returns a pressure in kbar.
 
-   Parameters
+    Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     equationP: str
@@ -1726,7 +1782,7 @@ return_input=False):
         | P_Wang2021_eq3 (T_independent, H2O-independent)
 
 
-    T: float, int, series, str  ("Solve")
+    T: float, int, pandas.Series, str  ("Solve")
         Temperature in Kelvin
         Only needed for T-sensitive barometers.
         If enter T="Solve", returns a partial function
@@ -1893,10 +1949,10 @@ H2O_Liq=None, return_input=False):
     Clinopyroxene only thermometer. Enter a panda dataframe with Cpx compositions,
     returns a temperature in Kelvin.
 
-   Parameters
+    Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     equationT: str
@@ -1909,7 +1965,7 @@ H2O_Liq=None, return_input=False):
 
 
 
-    P: float, int, series, str  ("Solve")
+    P: float, int, pandas.Series, str  ("Solve")
         Pressure in kbar
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
@@ -2010,10 +2066,10 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
     clinopyroxene-lonly thermometers and barometers.
 
 
-   Parameters
+    Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     equationP: str
@@ -2024,7 +2080,7 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
         | T_Put2008_eq32d (P-dependent)
         | T_Put2008_eq32d_subsol (P-dependent)
 
-    H2O_Liq: float, int, series, optional
+    H2O_Liq: float, int, pandas.Series, optional
         Needed if you select P_Put2008_eq32b, which is H2O-dependent.
 
     Optional:
@@ -2042,7 +2098,7 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
 
     Returns:
     -------
-    panda.dataframe: Pressure in kbar, Temperature in K
+    pandas.DataFrame: Pressure in kbar, Temperature in K
     '''
 
 

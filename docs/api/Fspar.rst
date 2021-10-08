@@ -1,4 +1,4 @@
-Feldspar Thermobarometry Functions
+Feldspar Functions
 ======================
 
 .. automodule:: Thermobar.feldspar

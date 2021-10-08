@@ -232,13 +232,13 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     Parameters
     -----------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
        Opx compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    Two_Px_Match: DataFrame
+    Two_Px_Match: pandas.DataFrame
         Combined Cpx-Opx compositions instead of separate dataframes.
         Used for calculate Cpx_Opx_press_temp_matching function.
 
@@ -249,7 +249,7 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
         |  P_Put2008_eq39 (T-dependent)
 
     T: float, int, pd.Series, str  ("Solve")
-        Temperature in Kelvin.
+        Temperature in Kelvin to perform calculations at.
         Only needed for T-sensitive barometers.
         If T="Solve", returns a partial function.
         Else, enter an integer, float, or panda series.
@@ -263,9 +263,9 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     Returns
     -------
     If eq_tests is False
-        pandas.series: Pressure in kbar
+        pandas.Series: Pressure in kbar
     If eq_tests is True
-        panda.dataframe: Pressure in kbar + Kd-Fe-Mg + cpx+opx comps
+        pandas.DataFrame: Pressure in kbar + Kd-Fe-Mg + cpx+opx comps
 
     '''
     try:
@@ -329,7 +329,7 @@ Cpx_Opx_T_funcs_by_name = {p.__name__: p for p in Cpx_Opx_T_funcs}
 def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
                            Two_Px_Match=None, equationT=None, P=None, eq_tests=False):
     '''
-    calculates Temperature in K for Opx-Cpx pairs.
+    calculates temperature in Kelvin for Opx-Cpx pairs.
 
     The function requires inputs of cpx_comps and opx_comps, or input of a
     combined dataframe of cpx-opx compositions (this is used for the
@@ -338,18 +338,17 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
     Parameters
     ------------
 
-    cpx_comps: DataFrame
-        Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
+    cpx_comps: pandas.DataFrame
+        Cpx compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
        Opx compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    Two_Px_Match: DataFrame
+    Two_Px_Match: pandas.DataFrame
         Combined Cpx-Opx compositions. Used for "melt match" functionality.
 
     equationT: str
         Choose from:
-
 
         |  T_Put2008_Eq36  (P-dependent)
         |  T_Put2008_Eq37 (P-dependent)
@@ -357,14 +356,22 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
         |  T_Wood1973 (P-independent)
         |  T_Wells1977 (P-independent)
 
-     P: int, float, pandas.Series, str ("Solve")
-        Pressure in kbar.
+    P: int, float, pandas.Series, str ("Solve")
+        Pressure in kbar to perform calculations at.
         Can enter float or int to use same P for all calculations
         If "Solve", returns partial if function is P-dependent
 
     eq_tests: bool
         If False, just returns pressure in kbar (default) as a panda series
         If True, returns pressure in kbar, Kd Fe-Mg for opx-cpx, and the user-entered cpx and opx comps as a panda dataframe.
+
+
+    Returns
+    -------
+    If eq_tests is False
+        pandas.Series: Temperature in K
+    If eq_tests is True
+        pandas.DataFrame: Temperature in K + Kd-Fe-Mg + cpx + opx comps
 
     '''
 
@@ -441,13 +448,13 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     Parameters
     -----------
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
-    cpx_comps: DataFrame
-        Cpxuid compositions with column headings SiO2_Cpx, MgO_Cpx etc.
+    cpx_comps: pandas.DataFrame
+        Cpx compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    meltmatch: DataFrame
+    meltmatch: pandas.DataFrame
         Combined dataframe of Opx-Cpx compositions (headings SiO2_Cpx, SiO2_Opx etc.).
         Used for calculate cpx_opx_press_temp_matching function.
 
@@ -468,12 +475,11 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
 
     Optional:
 
-    iterations: int (optional). Default is 20.
+    iterations: int, Default = 20
          Number of iterations used to converge to solution
 
-    T_K_guess: int or float. Default is 1300K
-         Initial guess of temperature.
-
+    T_K_guess: int or float. Default = 1300K
+         Initial guess of temperature to start iterations at
 
     eq_tests: bool
         If False, just returns pressure (default) as a panda series
@@ -484,11 +490,10 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
 
     Returns
     -------
-    If eq_tests=False
-        pandas.DataFrame: Temperature in Kelvin, pressure in Kbar
-    If eq_tests=True
-        panda.dataframe: Temperature in Kelvin, pressure in Kbar
-        Eq Tests + opx+cpx comps + components
+    If eq_tests is False
+        pandas.DataFrame: Temperature in Kelvin, pressure in kbar
+    If eq_tests is True
+        pandas.DataFrame: Temperature in Kelvin, pressure in kbar, eq Tests + opx+cpx comps + components
 
     '''
     # Gives users flexibility to reduce or increase iterations
@@ -561,20 +566,15 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
                                   Kd_Match=None, Kd_Err=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None):
     '''
     Evaluates all possible Cpx-Opx pairs for user supplied dataframes of opx and cpx
-    comps (can be different lengths). returns P (kbar) and T (K) for those in Kd Fe-Mg equilibrium.
-
+    comps (can be different lengths). Returns P (kbar) and T (K) for those in Kd Fe-Mg equilibrium.
 
     Parameters
     -----------
 
-    You can either enter an equation for P and T, or specify one equation (e.g., equationP),
-    and values (E.g., T=...)
-
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         Panda DataFrame of opx compositions with column headings SiO2_Opx etc.
 
-
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         Panda DataFrame of cpx compositions with column headings SiO2_Cpx etc.
 
     equationP: str
@@ -592,40 +592,38 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         |  T_Wood1973 (P-independent)
         |  T_Wells1977 (P-independent)
 
+    P, T: float, int, pandas.Series. Instead of specifying equationP or equationT
 
+        P is pressure in kbar to perform calculations at if equationP not specified
 
-    Or: User sets one of P or T
-        pressure in kbar or temperature in Kelvin. Doesn't need to iterate, e.g.,
-        if set pressure, calculates temperature for that pressure, and
-        returns temperature for equilibrium pairs.
-
+        T is temperature in Kelvin to perform calculations at if equationT not specified
 
     Kd_Match: str
         |  If None, returns all cpx-opx pairs.
         |  If "HighTemp", returns all cpxs-opxs within Kd cpx-opx=1.09+-0.14 suggested by Putirka (2008)
         |  If "Subsolidus" returns all cpxs-opxs within Kd cpx-opx=0.7+-0.2 suggested by Putirka (2008)
-        |  If int or float, also need to specify Kd_Err. returns all matches within Kd_Match +- Kd_Err
+        |  If int or float, also need to specify Kd_Err. Returns all matches within Kd_Match +- Kd_Err
 
+    Kd_Err: float or int (defaults given in Kd_Match)
+        Optional input to change defaults. Returns all cpx-opx pairs within Kd_Match+-Kd_Err
 
-    Kd_Err: float or int (optional)
-        returns all cpx-opx pairs within Kd_Match+-Kd_Err
-
-    Cpx Quality: bool (optional)
+    Cpx_Quality: bool
+        Default False, no filter
         If True, filters out clinopyroxenes with cation sums outside of 4.02-3.99 (after Neave et al. 2017)
 
-    Opx Quality: bool (optional)
+    Opx_Quality: bool
+        Default False, no filter
         If True, filters out orthopyroxenes with cation sums outside of 4.02-3.99
 
+    Returns
+    ----------
+        Dict with keys: 'Av_PTs_per_Cpx', 'All_PTs'.
 
-   Returns
-    -------
-        dict with keys 'Av_PTs_perCpx' and 'All_PTs'
+        'Av_PTs_perCpx': Average P and T for each cpx, e.g., if cpx1 matches Opx1,
+        Opx4, Opx6, Opx10, returns mean and 1 sigma for each cpx.
 
-        Av_PTs_perCpx: Average P and T for each cpx.
-        E.g., if cpx1 matches Opx1, Opx4, Opx6, Opx10, averages outputs for all 4 of those opxs.
-        Returns mean and 1 sigma of these averaged parameters for each Cpx.
-
-        All_PTs: Returns output parameters for all matches (e.g, cpx1-opx1, cpx1-opx4) without any averaging.
+        'All_PTs': Returns output parameters for all matches, e.g, cpx1-opx1,
+        cpx1-opx4 without any averaging.
 
     '''
     if (Kd_Err is None and isinstance(Kd_Match, int)) or (Kd_Err is None and isinstance(Kd_Match, float)):
