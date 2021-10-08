@@ -12,7 +12,7 @@ Welcome to Thermobar's documentation!
 
    otherfuncs
    api
-
+   youtube
    references
 
 
