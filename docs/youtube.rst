@@ -21,14 +21,11 @@ Introduction to Thermobar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A short video introducing Thermobar including how to import and save data, simple calculations
 
-**Useful files:**
+**Useful files (right click and choose 'Save Link As...') to download files:**
 
-    * 'Five_min_intro.ipynb <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.ipynb>`_
-    * `Andesite_MI_SatPs.xlsx <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.xlsx>`_
+    * `Five_min_intro.ipynb <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.ipynb>`_
 
-**Useful files:**
-
-    * `Andesite_MI_SatPs.xlsx <https://github.com/kaylai/VESIcal/raw/27a5b5cd5bb2044268183d3e4371c87afa257d7a/You%20Tube%20Examples/Andesite_MI_SatPs.xlsx>`_
+    * `Five_min_intro.xlsx <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.xlsx>`_
 
 
 .. raw:: html
