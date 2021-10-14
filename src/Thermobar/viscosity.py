@@ -18,7 +18,7 @@ def normalize_anhydrous_to_100_incF_mol_prop(liq_comps, F2O_content=0):
     Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     F2O_content: int, pd.series
@@ -68,7 +68,7 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_conte
     Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     F2O_content: int, pd.series

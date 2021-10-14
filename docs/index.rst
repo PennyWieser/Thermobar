@@ -10,11 +10,19 @@ Welcome to Thermobar's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
    installation
+   available_functions_pdf
    youtube
    api
    otherfuncs
    references
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Examples:
+
+   Examples/Five_min_intro
 
 
 Indices and tables

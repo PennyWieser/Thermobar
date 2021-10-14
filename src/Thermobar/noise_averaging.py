@@ -55,7 +55,7 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
     grouping by values in "ID_heading".
     Parameters
     -------
-    dataframe: Dataframe
+    dataframe: pandas.DataFrame
         Panda datframe of inputs you want to average.
         Must contain column headings "calc_heading" and "ID_heading".
     calc_heading: str
@@ -445,10 +445,10 @@ def calculate_bootstrap_mixes(
    Parameters
     -------
 
-    endmember1: DataFrame
+    endmember1: pandas.DataFrame
         Panda DataFrame of liquid compositions for end-member 1, with column headings SiO2_Liq etc.
 
-    endmember2: DataFrame
+    endmember2: pandas.DataFrame
         Panda DataFrame of liquid compositions for end-member 2, with column headings SiO2_Liq etc.
 
     num_samples: float or int

@@ -1,4 +1,4 @@
-Available mineral-melt equilibrium
+Code and documentation for mineral-melt calculations
 ==================================
 
 

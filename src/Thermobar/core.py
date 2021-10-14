@@ -347,11 +347,11 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None):
    Parameters
     -------
 
-    df: DataFrame
+    df: pandas.DataFrame
         Data frame of oxide compositions. Can have suffixes like "_Amp"
         in which case you need to specify suffix="_Amp"
 
-    returns: Dataframe
+    returns: pandas.DataFrame
     wt% of elements
     """
     df_c=df.copy()
@@ -395,7 +395,7 @@ def calculate_anhydrous_mol_proportions_liquid(liq_comps):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Panda DataFrame of liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
     Returns
@@ -423,7 +423,7 @@ def calculate_anhydrous_mol_fractions_liquid(liq_comps):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
                 Panda DataFrame of liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
     Returns
@@ -447,7 +447,7 @@ def calculate_anhydrous_cat_proportions_liquid(liq_comps):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
                 Panda DataFrame of liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
 
@@ -480,7 +480,7 @@ def calculate_anhydrous_cat_fractions_liquid(liq_comps):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
 
@@ -539,10 +539,10 @@ def calculate_liq_mgno(liq_comps, Fe3Fet_Liq=None):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
-    Fe3FeT: opt, float, series, int
+    Fe3FeT: opt, float, pandas.Series, int
         Overwrites Fe3Fet_Liq column if specified
 
     Returns
@@ -568,7 +568,7 @@ def calculate_hydrous_mol_proportions_liquid(liq_comps):
     -------
 
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
     Returns
@@ -595,7 +595,7 @@ def calculate_hydrous_mol_fractions_liquid(liq_comps):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
 
@@ -621,7 +621,7 @@ def calculate_hydrous_cat_proportions_liquid(liq_comps):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
 
@@ -665,7 +665,7 @@ def calculate_hydrous_cat_fractions_liquid(liq_comps, oxide_headers=False):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
     oxide_headers=False
@@ -721,7 +721,7 @@ def calculate_anhydrous_mol_proportions_liquid_Ni(liq_comps):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
     Returns
@@ -749,7 +749,7 @@ def calculate_anhydrous_mol_fractions_liquid_Ni(liq_comps):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
 
     Returns
@@ -773,7 +773,7 @@ def calculate_mol_proportions_olivine_ni(ol_comps):
    Parameters
     -------
 
-    ol_comps: DataFrame
+    ol_comps: pandas.DataFrame
         olivine compositions with column headings SiO2_Ol, MgO_Ol etc.
 
     Returns
@@ -800,7 +800,7 @@ def calculate_mol_fractions_olivine_ni(ol_comps):
    Parameters
     -------
 
-    ol_comps: DataFrame
+    ol_comps: pandas.DataFrame
         olivine compositions with column headings SiO2_Ol, MgO_Ol etc.
 
     Returns
@@ -826,7 +826,7 @@ def calculate_mol_proportions_olivine(ol_comps):
    Parameters
     -------
 
-    ol_comps: DataFrame
+    ol_comps: pandas.DataFrame
             Panda DataFrame of olivine compositions with column headings SiO2_Ol, MgO_Ol etc.
 
     Returns
@@ -853,7 +853,7 @@ def calculate_mol_fractions_olivine(ol_comps):
    Parameters
     -------
 
-    ol_comps: DataFrame
+    ol_comps: pandas.DataFrame
             olivine compositions with column headings SiO2_Ol, MgO_Ol etc.
 
     Returns
@@ -877,7 +877,7 @@ def calculate_cat_proportions_olivine(ol_comps):
    Parameters
     -------
 
-    ol_comps: DataFrame
+    ol_comps: pandas.DataFrame
             olivine compositions with column headings SiO2_Ol, MgO_Ol etc.
 
     Returns
@@ -923,7 +923,7 @@ def calculate_cat_fractions_olivine(ol_comps):
    Parameters
     -------
 
-    ol_comps: DataFrame
+    ol_comps: pandas.DataFrame
         olivine compositions with column headings SiO2_Ol, MgO_Ol etc.
 
     Returns
@@ -952,7 +952,7 @@ def calculate_mol_proportions_orthopyroxene(opx_comps):
    Parameters
     -------
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
     Returns
@@ -980,7 +980,7 @@ def calculate_oxygens_orthopyroxene(opx_comps):
    Parameters
     -------
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         Panda DataFrame of orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
     Returns
@@ -1008,7 +1008,7 @@ def calculate_6oxygens_orthopyroxene(opx_comps):
    Parameters
     -------
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         Orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
 
     Returns
@@ -1064,7 +1064,7 @@ def calculate_orthopyroxene_components(opx_comps):
    Parameters
     -------
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
         Panda DataFrame of orthopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
 
@@ -1116,13 +1116,13 @@ def calculate_orthopyroxene_liquid_components(
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
     AND
-     opx_comps: DataFrame
+     opx_comps: pandas.DataFrame
         orthopyroxene compositions with column headings SiO2_Opx, MgO_Opx etc.
     OR
-    meltmatch: DataFrame
+    meltmatch: pandas.DataFrame
        merged orthopyroxene and liquid compositions used for melt matching
 
     Returns
@@ -1201,7 +1201,7 @@ def calculate_mol_proportions_clinopyroxene(cpx_comps):
    Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     Returns
@@ -1229,7 +1229,7 @@ def calculate_oxygens_clinopyroxene(cpx_comps):
    Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
 
@@ -1259,7 +1259,7 @@ def calculate_6oxygens_clinopyroxene(cpx_comps):
    Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
 
@@ -1316,7 +1316,7 @@ def calculate_clinopyroxene_components(cpx_comps):
    Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     Returns
@@ -1419,16 +1419,16 @@ def calculate_clinopyroxene_liquid_components(
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
     AND
-     cpx_comps: DataFrame
+     cpx_comps: pandas.DataFrame
         clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
     OR
-    meltmatch: DataFrame
+    meltmatch: pandas.DataFrame
         Panda DataFrame of merged clinopyroxene and liquid compositions used for melt matching
 
-    Fe3Fet_Liq: opt, int, float, series
+    Fe3Fet_Liq: opt, int, float, pandas.Series
         overwrites Fe3FeT ratio inliquid input
     Returns
     -------
@@ -1538,7 +1538,7 @@ def calculate_mol_proportions_plagioclase(*, plag_comps=None):
    Parameters
     -------
 
-    plag_comps: DataFrame
+    plag_comps: pandas.DataFrame
             Panda DataFrame of plagioclase compositions with column headings SiO2_Plag, MgO_Plag etc.
 
     Returns
@@ -1569,7 +1569,7 @@ def calculate_mol_fractions_plagioclase(*, plag_comps=None):
    Parameters
     -------
 
-    plag_comps: DataFrame
+    plag_comps: pandas.DataFrame
             plagioclase compositions with column headings SiO2_Plag, MgO_Plag etc.
 
     Returns
@@ -1598,7 +1598,7 @@ def calculate_cat_proportions_plagioclase(*, plag_comps=None, oxide_headers=Fals
    Parameters
     -------
 
-    plag_comps: DataFrame
+    plag_comps: pandas.DataFrame
             plagioclase compositions with column headings SiO2_Plag, MgO_Plag etc.
 
     oxide_headers: bool
@@ -1652,7 +1652,7 @@ def calculate_cat_fractions_plagioclase(plag_comps):
    Parameters
     -------
 
-    plag_comps: DataFrame
+    plag_comps: pandas.DataFrame
         plagioclase compositions with column headings SiO2_Plag, MgO_Plag etc.
 
     Returns
@@ -1691,7 +1691,7 @@ def calculate_mol_proportions_kspar(*, kspar_comps=None):
    Parameters
     -------
 
-    kspar_comps: DataFrame
+    kspar_comps: pandas.DataFrame
             Panda DataFrame of AlkaliFspar compositions with column headings SiO2_Kspar, MgO_Kspar etc.
 
     Returns
@@ -1722,7 +1722,7 @@ def calculate_mol_fractions_kspar(kspar_comps):
    Parameters
     -------
 
-    kspar_comps: DataFrame
+    kspar_comps: pandas.DataFrame
             AlkaliFspar compositions with column headings SiO2_Kspar, MgO_Kspar etc.
 
     Returns
@@ -1752,7 +1752,7 @@ def calculate_cat_proportions_kspar(*, kspar_comps=None, oxide_headers=False):
    Parameters
     -------
 
-    kspar_comps: DataFrame
+    kspar_comps: pandas.DataFrame
             kspar compositions with column headings SiO2_Kspar, MgO_Kspar etc.
 
     oxide_headers: bool
@@ -1807,7 +1807,7 @@ def calculate_cat_fractions_kspar(*, kspar_comps=None):
    Parameters
     -------
 
-    kspar_comps: DataFrame
+    kspar_comps: pandas.DataFrame
         AlkaliFspar compositions with column headings SiO2_Kspar, MgO_Kspar etc.
 
     Returns
@@ -1846,7 +1846,7 @@ def calculate_mol_proportions_amphibole(amp_comps):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
             Panda DataFrame of amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     Returns
@@ -1874,7 +1874,7 @@ def calculate_mol_fractions_amphibole(amp_comps):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
             amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     Returns
@@ -1891,7 +1891,7 @@ def calculate_cat_proportions_amphibole(*, amp_comps=None, oxide_headers=False):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
             amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
 
@@ -1941,7 +1941,7 @@ def calculate_oxygens_amphibole(amp_comps):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
         amphiboles compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     Returns
@@ -1969,7 +1969,7 @@ def calculate_23oxygens_amphibole(amp_comps):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
         amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     Returns
@@ -2032,7 +2032,7 @@ def calculate_mol_proportions_amphibole_ridolfi(amp_comps):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
             Panda DataFrame of amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     Returns
@@ -2061,7 +2061,7 @@ def calculate_cat_proportions_amphibole_ridolfi(*, amp_comps=None):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
             amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     Returns
@@ -2094,7 +2094,7 @@ def calculate_13cations_amphibole_ridolfi(amp_comps):
    Parameters
     -------
 
-    amp_comps: DataFrame
+    amp_comps: pandas.DataFrame
             amphibole compositions with column headings SiO2_Amp, MgO_Amp etc.
 
     Returns
@@ -3297,23 +3297,23 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
    Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    meltmatch: DataFrame
+    meltmatch: pandas.DataFrame
         Combined Cpx-Liquid compositions. Used for "melt match" functionality.
 
 
-    P_kbar: int, float, series
+    P_kbar: int, float, pandas.Series
         Pressure in kbar at which to evaluate equilibrium tests
 
-    T: int, float, series
+    T: int, float, pandas.Series
         Temprature in K at which to evaluate equilibrium tests
 
-    Fe3Fet_Liq: int, float, series (optional)
+    Fe3Fet_Liq: int, float, pandas.Series (optional)
         Fe3FeT ratio used to assess Kd Fe-Mg equilibrium between cpx and melt.
         If None, uses Fe3Fet_Liq from liq_comps.
         If specified, overwrites the Fe3Fet_Liq column in the liquid input.
@@ -3486,10 +3486,10 @@ def calculate_cpx_opx_eq_tests(cpx_comps, opx_comps):
     Parameters
     -------
 
-    cpx_comps: DataFrame
+    cpx_comps: pandas.DataFrame
             Cpx compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
-    opx_comps: DataFrame
+    opx_comps: pandas.DataFrame
             Cpx compositions with column headings SiO2_Opx, MgO_Opx etc.
     Returns
     -------
@@ -3558,22 +3558,22 @@ P, T):
     Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
             Cpx compositions with column headings SiO2_Liq, MgO_Liq etc.
 
     One of:
 
-    1) plag_comps: DataFrame (optional)
+    1) plag_comps: pandas.DataFrame (optional)
         Plag compositions with column headings SiO2_Plag, MgO_Plag etc.
 
 
-    2) XAn, XAb, XOr, float, int, series
+    2) XAn, XAb, XOr, float, int, pandas.Series
         If plag_comps is None, enter XAn and XAb for plagioclases instead.
         XOr is set to zero by default, but can be overwritten for equilibrium tests
-    P: int, float, Series
+    P: int, float, pandas.Series
         Pressure in kbar
 
-    T: int, float, Series
+    T: int, float, pandas.Series
         Temperature in Kelvin
 
     Returns
@@ -3763,20 +3763,20 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model=None, fo2, ren
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    T_K:  int, flt, Series
+    T_K:  int, flt, pandas.Series
         Temperature in Kelvin (buffer positions are very T-sensitive)
 
-    P_kbar: int, flt, Series
+    P_kbar: int, flt, pandas.Series
         Pressure in Kbar (Buffer positions are slightly sensitive to pressure)
 
-    fo2:  str ("QFM", "NNO") or int, flt, series
+    fo2:  str ("QFM", "NNO") or int, flt, pandas.Series
         Either a value of fo2 (enter 10*logfo2), or buffer position.
         So far, includes QFM or NNO
 
-    fo2_offset: int, flt, series
+    fo2_offset: int, flt, pandas.Series
         log units offset from buffer, e.g., could specify fo2=QFM, fo2_offset=1
         to perform calculations at QFM+1
 

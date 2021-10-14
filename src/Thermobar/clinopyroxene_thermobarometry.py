@@ -58,8 +58,8 @@ def P_Mas2013_eqPalk2(T, *, lnK_Jd_liq,
                       Na_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid barometer of Putirka (1996)
-    EqP2 by Masotta et al. (2013) for alkaline melts
-    :cite:`masotta2013clinopyroxene`
+    EqP2 by Masotta et al. (2013) for alkaline melts.
+    Cite :cite:`masotta2013clinopyroxene`
 
     SEE=+-1.70 kbar
 
@@ -73,8 +73,8 @@ def P_Mas2013_eqPalk2(T, *, lnK_Jd_liq,
 def P_Put2003(T, *, lnK_Jd_liq, Ca_Liq_cat_frac,
               Si_Liq_cat_frac, Mg_Number_Liq_NoFe3):
     '''
-    Clinopyroxene-liquid barometer of Putirka (2003) Eq1
-    :cite:`putirka2008thermometers`
+    Clinopyroxene-liquid barometer of Putirka (2003) Eq1.
+    Cite :cite:`putirka2003new`
 
     SEE=+-4.8 kbar (anhydrous)
 
@@ -90,8 +90,8 @@ def P_Put2003(T, *, lnK_Jd_liq, Ca_Liq_cat_frac,
 def P_Put2008_eq30(T, *, lnK_Jd_liq, Fet_Liq_cat_frac, Mg_Liq_cat_frac,
                    DiHd_2003, Mg_Number_Liq_NoFe3, Na_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
     '''
-    Clinopyroxene-liquid barometer of Putirka (2008) Eq30
-    :cite:`putirka2008thermometers`
+    Clinopyroxene-liquid barometer of Putirka (2008) Eq30.
+    Cite :cite:`putirka2008thermometers`
 
     SEE=+-3.6 kbar (all data)
     SEE=+-1.6 kbar (calibration data)
@@ -134,7 +134,7 @@ def P_Mas2013_eqalk32c(T, *, Fet_Liq_cat_frac, CaTs, H2O_Liq, Ca_Liq_cat_frac,
                        Si_Liq_cat_frac, Al_Cpx_cat_6ox, Al_Liq_cat_frac):
     '''
     Recalibration of the clinopyroxene-liquid barometer of Putirka (2008) Eq32c by Masotta et al. (2013) for alkaline melts
-    :cite:`putirka2008thermometers`
+    :cite:`masotta2013clinopyroxene`
 
     SEE=+-1.67 kbar
     '''
@@ -357,7 +357,7 @@ Mg_Number_Liq_NoFe3, DiHd_2003, Na_Liq_cat_frac, K_Liq_cat_frac,
 Ti_Liq_cat_frac, lnK_Jd_liq, Ca_Liq_cat_frac, Si_Liq_cat_frac):
     '''
     Clinopyroxene-liquid thermometer of Masotta et al. (2013) for alkaline melts
-    :cite:`putirka2008thermometers`
+    :cite:`masotta2013clinopyroxene`
 
     SEE=+-18.2C
     '''
@@ -459,7 +459,6 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
     Clinopyroxene-Liquid barometer, calculates pressure in kbar
     (and equilibrium tests as an option)
 
-
     Parameters
     -------
 
@@ -469,14 +468,9 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
     liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    Or:
-
-    meltmatch: pandas.DataFrame
-        Combined dataframe of cpx-Liquid compositions
-        Used for calculate_cpx_liq_press_temp_matching function.
-
     EquationP: str
-        Cpx-Liquid
+        choose from:
+
         |  P_Put1996_eqP1 (T-dep, H2O-indep)
         |  P_Mas2013_eqPalk1 (T-dep, H2O-indep, alk adaption of P1)
         |  P_Put1996_eqP2 (T-dep, H2O-indep)
@@ -488,9 +482,8 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         |  P_Put2008_eq32c (T-dep, H2O-dep)
         |  P_Mas2013_eqalk32c (T-dep, H2O-dep, alk adaption of 32c)
 
-
-    T: float, int, pandas.Series, str  ("Solve")
-        Temperature in Kelvin
+    T: float, int, pandas.Series, str
+        Temperature in Kelvin to perform calculations at.
         Only needed for T-sensitive barometers.
         If enter T="Solve", returns a partial function
         Else, enter an integer, float, or panda series
@@ -498,16 +491,15 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
     eq_tests: bool
         If False, just returns pressure (default) as a panda series
         If True, returns pressure, Values of Eq tests,
-        as well as user-entered cpx and liq comps and components.
-
+        as well as user-entered cpx and liq comps and components
 
     Returns
-    -------
-    If eq_tests=False
-        pandas.Series: Pressure in kbar
-    If eq_tests=True
-        pandas.DataFrame: Temperature in Kelvin +
-        Eq Tests + cpx+liq comps + components
+    -----------
+    Pressure in kbar: pandas.Series
+        If eq_tests is False
+
+    Pressure in kbar + eq Tests + input compositions: pandas.DataFrame
+        If eq_tests is True
 
     '''
     # This checks if your equation is one of the accepted equations
@@ -991,11 +983,59 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         return eq_tests
 
 ## Clinopyroxene melt-matching algorithm
+def arrange_all_cpx_liq_pairs(liq_comps, cpx_comps, H2O_Liq=None, Fe3Fet_Liq=None):
+    # This allows users to overwrite H2O and Fe3Fet
+    liq_comps_c = liq_comps.copy().reset_index(drop=True)
+    cpx_comps_c = cpx_comps.copy().reset_index(drop=True)
+
+
+    if Fe3Fet_Liq is not None:
+        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
+    if "Fe3Fet_Liq" not in liq_comps:
+        liq_comps_c['Fe3Fet_Liq'] = 0
+    if "Sample_ID_Liq" not in liq_comps:
+        liq_comps_c['Sample_ID_Liq'] = liq_comps_c.index
+    if H2O_Liq is not None:
+        liq_comps_c['H2O_Liq'] = H2O_Liq
+
+
+    # calculating Cpx and liq components.
+    myCPXs1_concat = calculate_clinopyroxene_components(cpx_comps=cpx_comps_c)
+    myLiquids1_concat = calculate_anhydrous_cat_fractions_liquid(
+        liq_comps=liq_comps_c)
+
+    # Adding an ID label to help with melt-cpx rematching later
+    myCPXs1_concat['ID_CPX'] = myCPXs1_concat.index
+    if "Sample_ID_Cpx" not in cpx_comps:
+        myCPXs1_concat['Sample_ID_Cpx'] = myCPXs1_concat.index
+    else:
+        myCPXs1_concat['Sample_ID_Cpx']=cpx_comps_c['Sample_ID_Cpx']
+
+    myCPXs1_concat['ID_CPX']=myCPXs1_concat.index
+    myLiquids1_concat['ID_Liq'] = myLiquids1_concat.index
+
+
+    # This duplicates CPXs, repeats cpx1-cpx1*N, cpx2-cpx2*N etc.
+    DupCPXs = pd.DataFrame(np.repeat(myCPXs1_concat.values,
+    np.shape(myLiquids1_concat)[0], axis=0))
+    DupCPXs.columns = myCPXs1_concat.columns
+
+    # This duplicates liquids like liq1-liq2-liq3 for cpx1, liq1-liq2-liq3 for
+    # cpx2 etc.
+    DupLiqs = pd.concat([myLiquids1_concat] *
+                        np.shape(myCPXs1_concat)[0]).reset_index(drop=True)
+
+    # Combines these merged liquids and cpx dataframes
+    Combo_liq_cpxs = pd.concat([DupLiqs, DupCPXs], axis=1)
+    Combo_liq_cpxs2 = calculate_clinopyroxene_liquid_components(meltmatch=Combo_liq_cpxs)
+
+    return Combo_liq_cpxs2
+
 
 def calculate_cpx_liq_press_temp_matching(*, liq_comps, cpx_comps, equationT=None,
 equationP=None, P=None, T=None, PMax=30,
 Fe3Fet_Liq=None, Kd_Match="Putirka", Kd_Err=0.03, DiHd_Err=0.06, EnFs_Err=0.05, CaTs_Err=0.03, Cpx_Quality=False,
-H2O_Liq=None, Return_All_Matches=False):
+H2O_Liq=None, return_all_pairs=False):
 
     '''
     Evaluates all possible Opx-Liq pairs from  N Liquids, M Cpx compositions
@@ -1173,38 +1213,33 @@ H2O_Liq=None, Return_All_Matches=False):
     # calculate clinopyroxene-liquid components for this merged dataframe
     Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(meltmatch=Combo_liq_cpxs)
 
-    # This returns the stiched dataframe of cpx-liq, no P or T yet.
-    if Return_All_Matches is True:
-        return Combo_liq_cpxs
 
 
-    else:
+    if Cpx_Quality is True:
+        Combo_liq_cpxs_2 = Combo_liq_cpxs.loc[(Combo_liq_cpxs['Cation_Sum_Cpx'] < 4.02) & (
+            Combo_liq_cpxs['Cation_Sum_Cpx'] > 3.99) & (Combo_liq_cpxs['Jd'] > 0.01)]
 
-        if Cpx_Quality is True:
-            Combo_liq_cpxs_2 = Combo_liq_cpxs.loc[(Combo_liq_cpxs['Cation_Sum_Cpx'] < 4.02) & (
-                Combo_liq_cpxs['Cation_Sum_Cpx'] > 3.99) & (Combo_liq_cpxs['Jd'] > 0.01)]
+    if Cpx_Quality is False:
+        Combo_liq_cpxs_2 = Combo_liq_cpxs.copy()
+    # This section of code is for when users specify a presssure or
+    # temperature, its much faster to not have to iterate, so we don't need
+    # the preliminary Kd filter
 
-        if Cpx_Quality is False:
-            Combo_liq_cpxs_2 = Combo_liq_cpxs.copy()
-        # This section of code is for when users specify a presssure or
-        # temperature, its much faster to not have to iterate, so we don't need
-        # the preliminary Kd filter
+    if P is not None:
+        Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
+        T_K_calc = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
+        equationT=equationT, P=P)
+        P_guess = P
+        T_K_guess = T_K_calc
+    if T is not None:
+        Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
+        P_kbar_calc = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs_FeMgMatch,
+        equationP=equationP, T=T)
+        P_guess = P_kbar_calc
+        T_K_guess = T
 
-        if P is not None:
-            Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
-            T_K_calc = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
-            equationT=equationT, P=P)
-            P_guess = P
-            T_K_guess = T_K_calc
-        if T is not None:
-            Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
-            P_kbar_calc = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs_FeMgMatch,
-            equationP=equationP, T=T)
-            P_guess = P_kbar_calc
-            T_K_guess = T
-
-
-
+    # This is the default, e.g., the function filters for equilibrium test.
+    if return_all_pairs is False:
 
         if equationP is not None and equationT is not None:
 
@@ -1278,6 +1313,17 @@ H2O_Liq=None, Return_All_Matches=False):
             P_guess = PT_out['P_kbar_calc']
             T_K_guess = PT_out['T_K_calc']
 
+        # This performs calculations if user specifies equation for P, but a real temp:
+        if equationP is not None and equationT is None:
+            P_guess = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs_FeMgMatch,
+            equationP=equationP, T=T)
+            T_K_guess = T
+        # Same if user doesnt specify an equation for P, but a real P
+        if equationT is not None and equationP is None:
+            T_guess = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
+            equationT=equationT, P=P)
+            P_guess = P
+
         # Now, we use calculated pressures and temperatures, regardless of
         # whether we iterated or not, to calculate the other CPX components
         Combo_liq_cpxs_eq_comp = calculate_cpx_liq_eq_tests(
@@ -1305,71 +1351,99 @@ H2O_Liq=None, Return_All_Matches=False):
         & (Combo_liq_cpxs_eq_comp['Delta_EnFs_Mollo13'] < EnFs_Err)
         & (Combo_liq_cpxs_eq_comp['Delta_CaTs_Put1999'] < CaTs_Err)])
 
+    if return_all_pairs is True:
+        print('No equilibrium filters applied')
 
-        # This just tidies up some columns to put stuff nearer the start
-        cols_to_move = ['Sample_ID_Liq', 'Sample_ID_Cpx']
-        combo_liq_cpx_fur_filt = combo_liq_cpx_fur_filt[cols_to_move + [
-            col for col in combo_liq_cpx_fur_filt.columns if col not in cols_to_move]]
+        if equationP is not None and equationT is not None:
 
-        combo_liq_cpx_fur_filt.drop(["Sample_ID_Liq"], axis=1, inplace=True)
-        if T is not None:
-            combo_liq_cpx_fur_filt.rename(columns={'T_K_calc': 'T_K_input'}, inplace=True)
-        if P is not None:
-            combo_liq_cpx_fur_filt.rename(columns={'P_kbar_calc': 'P_kbar_input'}, inplace=True)
 
-        print('Finished calculating Ps and Ts, now just averaging the results. Almost there!')
+            PT_out = calculate_cpx_liq_press_temp(meltmatch=Combo_liq_cpxs_2,
+            equationP=equationP, equationT=equationT)
+            P_guess = PT_out['P_kbar_calc']
+            T_K_guess = PT_out['T_K_calc']
 
-        # Final step, calcuate a 3rd output which is the average and standard
-        # deviation for each CPx (e.g., CPx1-Melt1, CPx1-melt3 etc. )
-        CpxNumbers = combo_liq_cpx_fur_filt['ID_CPX'].unique()
-        if len(CpxNumbers) > 0:
-            df1_Mean_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).mean()
-            df1_Std_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).std()
-            count=combo_liq_cpx_fur_filt.groupby('ID_CPX',as_index=False).count().iloc[:, 1]
-            df1_Mean_nopref['# of Liqs Averaged']=count
-            Sample_ID_Cpx_Mean=df1_Mean_nopref['Sample_ID_Cpx']
-            Sample_ID_Cpx_Std=df1_Std_nopref['Sample_ID_Cpx']
-            df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
-            df1_Std=df1_Std_nopref.add_prefix('Std_')
-            df1_Mean=df1_Mean.drop(['Mean_Eq Tests Neave2017?', 'Mean_Sample_ID_Cpx'], axis=1)
-            df1_Std=df1_Std.drop(['Std_Eq Tests Neave2017?','Std_Sample_ID_Cpx'], axis=1)
-            df1_Mean.rename(columns={"Mean_ID_CPX": "ID_CPX"}, inplace=True)
-            df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
-            df1_Std.rename(columns={"Std_ID_CPX": "ID_CPX"}, inplace=True)
+        # This performs calculations if user specifies equation for P, but a real temp:
+        if equationP is not None and equationT is None:
+            P_guess = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs_2,
+            equationP=equationP, T=T)
+            T_K_guess = T
+        # Same if user doesnt specify an equation for P, but a real P
+        if equationT is not None and equationP is None:
+            T_guess = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_2,
+            equationT=equationT, P=P)
+            P_guess = P
+
+        combo_liq_cpx_fur_filt = calculate_cpx_liq_eq_tests(
+            meltmatch=Combo_liq_cpxs_2, P=P_guess, T=T_K_guess)
 
 
 
-            df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_CPX'])
-            df1_M['Sample_ID_Cpx']=Sample_ID_Cpx_Mean
-
-            if equationT is not None and equationP is not None:
-                cols_to_move = ['Sample_ID_Cpx', '# of Liqs Averaged',
-                            'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
-                            'Std_P_kbar_calc']
-
-            if equationT is not None and equationP is None:
-                cols_to_move = ['Sample_ID_Cpx',
-                            'Mean_P_kbar_input',
-                            'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
-
-            if equationT is None and equationP is not None:
-                cols_to_move = ['Sample_ID_Cpx',
-                            'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
-                            'Std_P_kbar_calc']
-
-            df1_M = df1_M[cols_to_move +
-                      [col for col in df1_M.columns if col not in cols_to_move]]
 
 
-        else:
-            raise Exception(
-                'No Matches - to set less strict filters, change perhaps change sigma to a value greater'
-                ' than one, or specify eq_crit for only a subset of the values in Neave and Putirka')
+    # This just tidies up some columns to put stuff nearer the start
+    cols_to_move = ['Sample_ID_Liq', 'Sample_ID_Cpx']
+    combo_liq_cpx_fur_filt = combo_liq_cpx_fur_filt[cols_to_move + [
+        col for col in combo_liq_cpx_fur_filt.columns if col not in cols_to_move]]
+
+    combo_liq_cpx_fur_filt.drop(["Sample_ID_Liq"], axis=1, inplace=True)
+    if T is not None:
+        combo_liq_cpx_fur_filt.rename(columns={'T_K_calc': 'T_K_input'}, inplace=True)
+    if P is not None:
+        combo_liq_cpx_fur_filt.rename(columns={'P_kbar_calc': 'P_kbar_input'}, inplace=True)
+
+    print('Finished calculating Ps and Ts, now just averaging the results. Almost there!')
+
+    # Final step, calcuate a 3rd output which is the average and standard
+    # deviation for each CPx (e.g., CPx1-Melt1, CPx1-melt3 etc. )
+    CpxNumbers = combo_liq_cpx_fur_filt['ID_CPX'].unique()
+    if len(CpxNumbers) > 0:
+        df1_Mean_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).mean()
+        df1_Std_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).std()
+        count=combo_liq_cpx_fur_filt.groupby('ID_CPX',as_index=False).count().iloc[:, 1]
+        df1_Mean_nopref['# of Liqs Averaged']=count
+        Sample_ID_Cpx_Mean=df1_Mean_nopref['Sample_ID_Cpx']
+        Sample_ID_Cpx_Std=df1_Std_nopref['Sample_ID_Cpx']
+        df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+        df1_Std=df1_Std_nopref.add_prefix('Std_')
+        df1_Mean=df1_Mean.drop(['Mean_Eq Tests Neave2017?', 'Mean_Sample_ID_Cpx'], axis=1)
+        df1_Std=df1_Std.drop(['Std_Eq Tests Neave2017?','Std_Sample_ID_Cpx'], axis=1)
+        df1_Mean.rename(columns={"Mean_ID_CPX": "ID_CPX"}, inplace=True)
+        df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
+        df1_Std.rename(columns={"Std_ID_CPX": "ID_CPX"}, inplace=True)
 
 
 
-        print('Done!')
-        return {'Av_PTs': df1_M, 'All_PTs': combo_liq_cpx_fur_filt}
+        df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_CPX'])
+        df1_M['Sample_ID_Cpx']=Sample_ID_Cpx_Mean
+
+        if equationT is not None and equationP is not None:
+            cols_to_move = ['Sample_ID_Cpx', '# of Liqs Averaged',
+                        'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+                        'Std_P_kbar_calc']
+
+        if equationT is not None and equationP is None:
+            cols_to_move = ['Sample_ID_Cpx',
+                        'Mean_P_kbar_input',
+                        'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
+
+        if equationT is None and equationP is not None:
+            cols_to_move = ['Sample_ID_Cpx',
+                        'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
+                        'Std_P_kbar_calc']
+
+        df1_M = df1_M[cols_to_move +
+                    [col for col in df1_M.columns if col not in cols_to_move]]
+
+
+    else:
+        raise Exception(
+            'No Matches - to set less strict filters, change perhaps change sigma to a value greater'
+            ' than one, or specify eq_crit for only a subset of the values in Neave and Putirka')
+
+
+
+    print('Done!')
+    return {'Av_PTs': df1_M, 'All_PTs': combo_liq_cpx_fur_filt}
 
 ## Clinopyroxene-only pressure equations
 
@@ -1885,11 +1959,13 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
         w.simplefilter('ignore')
         cpx_comps_copy=cpx_comps.copy()
         cpx_comps_c=calculate_clinopyroxene_components(cpx_comps=cpx_comps_copy)
+        cpx_comps_copy['H2O_Liq']=H2O_Liq
+        cpx_comps_c['H2O_Liq']=H2O_Liq
         cpx_comps_c['P_Wang21_eq1']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy, equationP="P_Wang2021_eq1")
         cpx_comps_c['P_Wang21_eq3']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy, equationP="P_Wang2021_eq3")
 
-        cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq2")
-        cpx_comps_c['T_Wang21_eq4']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq4")
+        cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq2", H2O_Liq=H2O_Liq)
+        cpx_comps_c['T_Wang21_eq4']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq4", H2O_Liq=H2O_Liq)
 
         cpx_comps_c['T_Petrelli21']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
         equationT="T_Petrelli2021_Cpx_only").T_K_calc

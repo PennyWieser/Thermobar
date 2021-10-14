@@ -74,7 +74,7 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Ol, MgO_Ol etc.
 
 
@@ -349,7 +349,7 @@ def calculate_opx_rhodes_diagram_lines(
         KdMax: float. Optional.
             Also returns line for a user-specified Maximum Kd.
 
-        liq_comps: DataFrame. Optional
+        liq_comps: pandas.DataFrame. Optional
             Uses average cation fraction of XSi in the liquid to
             calculate Kd Fe-Mg using the expression = 0.4805 - 0.3733 XSi (Putirka, 2008)
 

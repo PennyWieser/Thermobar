@@ -35,8 +35,7 @@ A short video introducing Thermobar including how to import and save data, simpl
 
 Liquid-only Thermometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-An example of how to perform liquid only thermometry.
-Covers different ways to select the pressure and water content at which to perform calculations, as well as saving calculated temperatures to excel.
+An example of how to perform liquid only thermometry. We cover the different ways to select the pressure and water content at which to perform calculations, as well as saving calculated temperatures to excel.
 
 **Useful files (right click and choose 'Save Link As...') to download files:**
 
@@ -55,10 +54,10 @@ Covers different ways to select the pressure and water content at which to perfo
 Olivine-Liquid Thermometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This video shows how to calculate Olivine-Liquid temperatures, as well as:
-    * Various ways to assess whether Ol-Liq pairs are in equilibrium
-    * Calculating equilibrium Ol Fo contents using just a liquid composition
-    * Plotting olivine and liquid compositions on a rhodes diagram
-    * Converting buffer values to Fe3FeT proportions
+    * various ways to assess whether Ol-Liq pairs are in equilibrium
+    * calculating equilibrium Ol Fo contents using just a liquid composition for a variety of Kd models
+    * plotting olivine and liquid compositions on a Rhodes diagram
+    * converting buffer values to Fe3FeT proportions
 
 
 **Useful files (right click and choose 'Save Link As...') to download files:**
@@ -76,7 +75,7 @@ This video shows how to calculate Olivine-Liquid temperatures, as well as:
 Clinopyroxene-Liquid Melt Matching 1 (simpler)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This video recreates the Cpx-Liq melt matching results from :cite:`gleeson2020upper`.
-It shows how to calculate all possible matches between inputted Cpx and Liq compositions. It also shows how to change the equilibrium filters for assessing equilibrium matches (Kd, EnFs, DiHd, CaTs), how to plot calculated pressures and temperatures etc.
+It shows how to calculate all possible matches between inputted Cpx and Liq compositions, and how to change the equilibrium filters for assessing equilibrium matches (Kd, EnFs, DiHd, CaTs), how to plot calculated pressures and temperatures etc.
 
 
 **Useful files (right click and choose 'Save Link As...') to download files:**
@@ -114,8 +113,7 @@ Synthetic liquid compositions are produced by adding noise and bootstrapping, an
 
 Amphibole-only and Amphibole-Liquid  (advanced)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Demonstrates amphibole-only and amphibole-Liquid thermobarometry, hygrometry and chemometry,
- including equilibrium tests
+Demonstrates amphibole-only and amphibole-Liquid thermobarometry, hygrometry and chemometry, including equilibrium tests.
 
 
 **Useful files (right click and choose 'Save Link As...') to download files:**
@@ -153,7 +151,7 @@ Demonstrates plagioclase-liquid and kspar-liquid thermometry, and plagioclase-li
 
 Two Feldspar thermometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Demonstrates plagioclase-liquid and kspar-liquid thermometry, and plagioclase-liquid hygrometry. We discuss equilibrium tests, and iteration between Temp and H2O for hygrometers.
+Demonstrates two feldspar thermometry, along with discussion of how to apply various equilibrium filters.
 
 
 **Useful files (right click and choose 'Save Link As...') to download files:**

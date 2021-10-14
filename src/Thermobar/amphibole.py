@@ -214,7 +214,7 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
     + 7.55122550171372*amp_sites_R['Ti_C'] + 5.46318534905121*amp_sites_R['Fe3_C'] -4.73884449358073*amp_sites_R['Mg_C']
         -7.20328571556139*amp_sites_R['Fe2_C']-17.5610110666215*amp_sites_R['Mn_C'] + 13.762022684517*amp_sites_R['Ca_B']
         + 13.7560270877436*amp_sites_R['Na_A']  + 27.5944871599305*amp_sites_R['K_A'])
-    amp_sites.insert(0, "deltaNNO_calc_Ridolfi21", deltaNNO_calc)
+    amp_sites.insert(0, "deltaNNO_Ridolfi21", deltaNNO_calc)
 
     # Calculating H2O form Ridofli 2021
 
@@ -222,7 +222,7 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
     + 0.85944576818503*amp_sites_R['Ti_C'] + 1.18881568772057*amp_sites_R['Fe3_C'] -0.675980097369545*amp_sites_R['Mg_C']
         -0.390086849565756*amp_sites_R['Fe2_C']-6.40208103925722*amp_sites_R['Mn_C'] + 2.54899046000297*amp_sites_R['Ca_B']
         + 1.37094801209146*amp_sites_R['Na_A']  + 1.25720999388625*amp_sites_R['K_A']))
-    amp_sites.insert(0, "H2O_calc_Ridolfi21", H2O_calc)
+    amp_sites.insert(0, "H2O_Ridolfi21", H2O_calc)
 
 
     if T is None:
@@ -292,7 +292,7 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
 
         # Putirka 2016 equation 10
         SiO2_Put2016=751.95-0.4*(T-273.15)-278000/(T-273.15)-9.184*amp_23ox['Al_Amp_cat_23ox']
-        amp_sites.insert(0, 'SiO2_Put2016', SiO2_Put2016)
+        amp_sites.insert(0, 'SiO2_Eq10_Put2016', SiO2_Put2016)
 
 
 

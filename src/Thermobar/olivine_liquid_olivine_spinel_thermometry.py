@@ -49,10 +49,10 @@ P=None, T=None, equationT=None, Fe3Fet_Liq=None):
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    ol_comps: DataFrame
+    ol_comps: pandas.DataFrame
         Olivine compositions with column headings SiO2_Ol, MgO_Ol etc.
 
     equationH: str
@@ -62,15 +62,15 @@ P=None, T=None, equationT=None, Fe3Fet_Liq=None):
         if true, calculates Kd for olivine-liquid pairs.
         Other inputs for these tests:
 
-        P: int, flt, Series (needed for Toplis Kd calculation).
+        P: int, flt, pandas.Series (needed for Toplis Kd calculation).
         If nothing inputted, P set to 1 kbar
 
-        T: int, flt, Series (needed for Toplis KD calculation).
+        T: int, flt, pandas.Series (needed for Toplis KD calculation).
         Can also specify equationT="" to calculate temperature
         using an olivine-liquid thermometer, using the calculated H2O content
         from the hygrometer
 
-        Fe3Fet_Liq: int, flt, Series. As Kd calculated using only Fe2 in the Liq.
+        Fe3Fet_Liq: int, flt, pandas.Series. As Kd calculated using only Fe2 in the Liq.
 
 
     Returns
@@ -248,10 +248,10 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
    Parameters
     -------
 
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
 
-    ol_comps: DataFrame
+    ol_comps: pandas.DataFrame
         Olivine compositions with column headings SiO2_Ol, MgO_Ol etc.
 
     equationT: str
@@ -263,7 +263,7 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
         T_Pu2017 (P-independent, H2O_independent)
         T_Pu2021 (P-dependent, H2O_independent)
 
-    P: float, int, series, str  ("Solve")
+    P: float, int, pandas.Series, str  ("Solve")
         Pressure in kbar
         Only needed for P-sensitive thermometers.
         If enter P="Solve", returns a partial function
@@ -271,7 +271,7 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
 
     H2O_Liq: optional.
         If None, uses H2O_Liq column from input.
-        If int, float, series, uses this instead of H2O_Liq Column
+        If int, float, pandas.Series, uses this instead of H2O_Liq Column
 
 
     Returns
@@ -457,10 +457,10 @@ def calculate_ol_sp_temp(ol_comps, sp_comps, equationT):
 
    Parameters
     -------
-    ol_comps: DataFrame
+    ol_comps: pandas.DataFrame
         liquid compositions with column headings SiO2_Ol, MgO_Ol etc
 
-    sp_comps: DataFrame
+    sp_comps: pandas.DataFrame
         spinel compositions with column headings SiO2_Sp, MgO_Sp etc
 
     equationT: str

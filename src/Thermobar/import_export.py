@@ -690,7 +690,7 @@ def convert_to_vesical(liq_comps, T1):
 
    Parameters
     -------
-    liq_comps: DataFrame
+    liq_comps: pandas.DataFrame
         DataFrame of liquid compositions.
 
     T1: Panda series, int, float
