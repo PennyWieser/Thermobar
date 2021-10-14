@@ -1,6 +1,6 @@
 Import Functions
-=================
+======================
 
-.. automodule:: Thermobar.import_export
+.. automodule:: import_export
    :members:
 
