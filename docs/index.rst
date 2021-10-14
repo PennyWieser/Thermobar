@@ -14,9 +14,7 @@ Welcome to Thermobar's documentation!
    installation
    available_functions_pdf
    youtube
-   api
-   otherfuncs
-   references
+
 
 .. toctree::
    :maxdepth: 2
@@ -46,6 +44,14 @@ Welcome to Thermobar's documentation!
    Examples/Error_propagation/Liquid_Thermometry_Error_prop
    Examples/Error_propagation/Cpx_Liq_Thermobarometry_Error_prop
 
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Code Documentation:
+
+   api
+   otherfuncs
+   references
 
 
 
