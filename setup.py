@@ -36,6 +36,7 @@ setup(
             'scikit-learn',
             'scipy',
             'statsmodels',
+            'openpyxl',
             ],
     classifiers=[
         "Programming Language :: Python :: 3",

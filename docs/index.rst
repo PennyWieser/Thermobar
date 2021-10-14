@@ -23,6 +23,12 @@ Welcome to Thermobar's documentation!
    :caption: Examples:
 
    Examples/Five_min_intro
+   Examples/Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry
+   Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_thermometry
+   Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_hygrometry
+   Examples/Amphibole/Amphibole_Examples
+   Examples/Two_Pyroxene_Thermobarometry/Two_Pyroxene_Example
+   Examples/Two_Pyroxene_Thermobarometry/Two_Pyroxene_Matching
 
 
 Indices and tables
