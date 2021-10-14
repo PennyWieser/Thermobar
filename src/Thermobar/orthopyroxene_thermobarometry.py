@@ -687,7 +687,6 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         If users don't specify, uses Fe3Fet_Liq from liq_comps.
         If specified, overwrites the Fe3Fet_Liq column in the liquid input.
 
-
     Returns: dict
 
         Av_PTs: Average P and T for each opx.
@@ -730,8 +729,11 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         liq_comps=liq_comps_c)
 
     # Adding an ID label to help with melt-opx rematching later
+    myOPXs1_concat['Sample_ID_Opx'] = opx_comps['Sample_ID_Opx']
+    myLiquids1_concat['Sample_ID_Liq'] = liq_comps_c['Sample_ID_Liq']
     myOPXs1_concat['ID_OPX'] = myOPXs1_concat.index
     myLiquids1_concat['ID_Liq'] = myLiquids1_concat.index
+
 
     # This duplicates OPXs, repeats opx1-opx1*N, opx2-opx2*N etc.
     DupOPXs = pd.DataFrame(
@@ -842,17 +844,17 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
             df1_M['Sample_ID_Opx']=Sample_ID_Opx_Mean
 
             if equationT is not None and equationP is not None:
-                cols_to_move = ['Sample_ID_Opx',
+                cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq',
                             'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
                             'Std_P_kbar_calc']
 
             if equationT is not None and equationP is None:
-                cols_to_move = ['Sample_ID_Opx',
+                cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq',
                             'Mean_P_kbar_input',
                             'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
 
             if equationT is None and equationP is not None:
-                cols_to_move = ['Sample_ID_Opx',
+                cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq',
                             'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
                             'Std_P_kbar_calc']
 
@@ -872,6 +874,12 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         # equilibrium parameters, averaged matches, and all matches (not averaged)
 
         print('Finished!')
+
+
+        cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq']
+
+        Combo_liq_opx_fur_filt = Combo_liq_opx_fur_filt[cols_to_move +
+                            [col for col in Combo_liq_opx_fur_filt.columns if col not in cols_to_move]]
 
         return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_opx_fur_filt}
         # return Combo_liq_opx_fur_filt
