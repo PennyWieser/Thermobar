@@ -1,5 +1,6 @@
 #################
 Available mineral and mineral-melt equations
+
 #################
 .. contents::
 
