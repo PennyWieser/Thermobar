@@ -3,6 +3,12 @@ YouTube Tutorials
 #################
 .. contents::
 
+# Trying to get https://github.com/kaylai/VESIcal/raw/27a5b5cd5bb2044268183d3e4371c87afa257d7a/You%20Tube%20Examples/Andesite_MI_SatPs.xlsx>
+# Permalink:
+#     https://github.com/kaylai/VESIcal/blob/3ea18b0ce30b30fb55786346c37ef8f428ee5034/You%20Tube%20Examples/Andesite_MI_SatPs.xlsx
+# Actual URL:
+#     https://github.com/kaylai/VESIcal/blob/master/You%20Tube%20Examples/Andesite_MI_SatPs.xlsx
+
 Subscribe to `ThermoBar on youtube <https://www.youtube.com/channel/UC7ddceuNnikCdQa_fRHmdXw>`_ to get notified when we create new tutorial videos. Or watch tutorials below.
 
 We recommend readers go through the associated notebooks for each of their tutorials in their own time to read the detailed descriptions. These videos are only an introductory guide! Files available from: https://github.com/PennyWieser/Thermobar. Click the green "Code" button in the top right, then "download zip", unzip, and open the "Examples" folder. Or you can download the files directly from this website.
@@ -23,7 +29,7 @@ A short video introducing Thermobar including how to import and save data, simpl
 
 **Useful files (right click and choose 'Save Link As...') to download files:**
 
-    * `Five_min_intro.ipynb <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.ipynb>`_
+    * `Five_min_intro.ipynb <https://raw.githubusercontent.com/PennyWieser/Thermobar/main/docs/Examples/Five_min_intro.ipynb>`_
 
     * `Five_min_intro.xlsx <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.xlsx>`_
 
