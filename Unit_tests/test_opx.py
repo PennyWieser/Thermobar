@@ -139,7 +139,8 @@ with w.catch_warnings():
 
 
 
-    Liq2=pd.DataFrame(data={"SiO2_Liq": 51.1,
+    Liq2=pd.DataFrame(data={"Sample_ID_Liq":"test",
+                                "SiO2_Liq": 51.1,
                                 "TiO2_Liq": 0.93,
                                 "Al2O3_Liq": 17.5,
                                 "FeOt_Liq": 8.91,
@@ -153,7 +154,8 @@ with w.catch_warnings():
                                 "H2O_Liq": 3.8,
                                 "Fe3Fet_Liq":0}, index=[0])
 
-    Opx2=pd.DataFrame(data={"SiO2_Opx": 55.00,
+    Opx2=pd.DataFrame(data={"Sample_ID_Opx":"test",
+                            "SiO2_Opx": 55.00,
                                 "TiO2_Opx": 0.34,
                                 "Al2O3_Opx": 1.50,
                                 "FeOt_Opx": 11.30,

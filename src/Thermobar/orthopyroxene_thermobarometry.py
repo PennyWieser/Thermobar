@@ -844,17 +844,17 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
             df1_M['Sample_ID_Opx']=Sample_ID_Opx_Mean
 
             if equationT is not None and equationP is not None:
-                cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq',
+                cols_to_move = ['Sample_ID_Opx',
                             'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
                             'Std_P_kbar_calc']
 
             if equationT is not None and equationP is None:
-                cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq',
+                cols_to_move = ['Sample_ID_Opx',
                             'Mean_P_kbar_input',
                             'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
 
             if equationT is None and equationP is not None:
-                cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq',
+                cols_to_move = ['Sample_ID_Opx',
                             'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
                             'Std_P_kbar_calc']
 
