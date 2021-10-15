@@ -1,6 +1,6 @@
-============
-Introduction
-============
+==============================
+Introduction and Citation
+==============================
 
 Welcome to Thermobar - An Open-Source python3 tool for performing mineral and mineral-melt thermobarometry, hygrometry and chemometry.
 
