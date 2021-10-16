@@ -625,7 +625,7 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
 
 def calculate_opx_liq_press_temp_matching(*, liq_comps, opx_comps, equationT=None,
 equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
- Kd_Match=None, Kd_Err=None, Opx_Quality=False, Return_All_Matches=False):
+ Kd_Match=None, Kd_Err=None, Opx_Quality=False, return_all_pairs=False):
 
     '''
     Evaluates all possible Opx-Liq pairs from  N Liquids, M opx compositions
@@ -666,10 +666,6 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
 
     Optional:
 
-    PMax: int or float (default=30 kbar)
-        Used to apply a preliminary KdFe-Mg filter based on the T equation specified by the user.
-        Users can set a lower pressure to save computation time
-        (E.g., can set at P=10 kbar if reasonably sure shallow pressures)
 
     Kd_Match: int of float, optional
         Allows users to ovewrite the default where Kd is calculated from the
@@ -757,7 +753,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     print("Considering " + LenCombo +
           " Liq-Opx pairs, be patient if this is >>1 million!")
 
-    if Return_All_Matches is True:
+    if return_all_pairs is True:
         return Combo_liq_opxs
     else:
 

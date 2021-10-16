@@ -2849,7 +2849,7 @@ def amp_components_ferric_ferrous(sites_df, norm_cations):
     amp_components_ferric_ferrous calculates the Fe3+ and Fe2+ apfu values of
     amphibole and adjusts the generic stoichiometry such that charge balance is
     maintained. This is based off the "f parameters" listed in Holland and Blundy
-    (1994).
+    (1994). Following Mutch et al. (2016) spreadsheet.
 
     Parameters
     ----------
@@ -2882,8 +2882,8 @@ def amp_components_ferric_ferrous(sites_df, norm_cations):
     # B group
     f6 = 8 / (sites_df['Si_T'] + sites_df['Al_T'] + sites_df['Al_C'])
     f7 = 15 / (sites_df.sum(axis='columns') - sites_df['K_A'])
-    f8 = 12.9 / (sites_df.sum(axis='columns') - (sites_df['Na_A'] + sites_df['K_A'] +
-    sites_df['K_A']) - sites_df['Ca_B'] - (sites_df['Mn_C'] + sites_df['Mn_B']))
+    f8 = 12.9 / (sites_df.sum(axis='columns') - (sites_df['Na_A'] + sites_df['Na_B'] +
+    sites_df['K_A']) - (sites_df['Mn_B'] + sites_df['Mn_C']) - sites_df['Ca_B'])
     f9 = 36 / (46 - (sites_df['Al_T'] + sites_df['Al_C']
                      ) - sites_df['Si_T'] - sites_df['Ti_C'])
     f10 = 46 / ((sites_df['Fe_C'] + sites_df['Fe_B']) + 46)
@@ -2898,13 +2898,13 @@ def amp_components_ferric_ferrous(sites_df, norm_cations):
         norm_cations_hb['Fe2O3_Amp_cat_23ox']
     norm_cations_hb.drop(columns=['Fet_Amp_cat_23ox', 'oxy_renorm_factor',
                          'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All'], inplace=True)
-    newnames = []
-    for name in norm_cations_hb.columns.tolist():
-        newnames.append(norm_cations.split('_')[0])
+    # newnames = []
+    # for name in norm_cations_hb.columns.tolist():
+    #     newnames.append(norm_cations.split('_')[0])
 
-    norm_cations_hb.columns = newnames
+    #norm_cations_hb.columns = newnames
 
-    return norm_cations_hb
+    return norm_cations_hb, f_ave
 
 
 def get_amp_sites_ferric_ferrous(amp_apfu_df):

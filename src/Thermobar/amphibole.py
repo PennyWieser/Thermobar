@@ -571,6 +571,46 @@ def calculate_amp_only_press_all_eqs(amp_comps, plot=False, H2O_Liq=None, Ridolf
 
     return out
 
+def calculate_amp_liq_all_equations(amp_comps, liq_comps, H2O_Liq=None):
+
+    # Eq5 and 7s
+    CalcPT_Teq4b_P7a=calculate_amp_liq_press_temp(amp_comps=amp_comps,
+liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq4b", equationT="P_Put2006_eq7a")
+
+    CalcPT_Teq4b_P7b=calculate_amp_liq_press_temp(amp_comps=amp_comps,
+liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq4b", equationT="P_Put2006_eq7b")
+
+    CalcPT_Teq4b_P7c=calculate_amp_liq_press_temp(amp_comps=amp_comps,
+liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq4b", equationT="P_Put2006_eq7c")
+
+    # Equation 6 and 7s
+    CalcPT_Teq9_P7a=calculate_amp_liq_press_temp(amp_comps=amp_comps,
+liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq9", equationT="P_Put2006_eq7a")
+
+    CalcPT_Teq9_P7b=calculate_amp_liq_press_temp(amp_comps=amp_comps,
+liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq9", equationT="P_Put2006_eq7b")
+
+    CalcPT_Teq9_P7c=calculate_amp_liq_press_temp(amp_comps=amp_comps,
+liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq9", equationT="P_Put2006_eq7c")
+
+
+    out=pd.DataFrame(data={
+                            'P_kbar_Teq4b_P7a': CalcPT_Teq4b_P7a.P_kbar_calc,
+                            'T_K_Teq4b_P7a': CalcPT_Teq4b_P7a.T_K_calc,
+                            'P_kbar_Teq4b_P7b': CalcPT_Teq4b_P7b.P_kbar_calc,
+                            'T_K_Teq4b_P7b': CalcPT_Teq4b_P7b.T_K_calc,
+                            'P_kbar_Teq4b_P7c': CalcPT_Teq4b_P7c.P_kbar_calc,
+                            'T_K_Teq4b_P7c': CalcPT_Teq4b_P7c.T_K_calc,
+                            'P_kbar_Teq9_P7a': CalcPT_Teq9_P7a.P_kbar_calc,
+                            'T_K_Teq9_P7a': CalcPT_Teq9_P7a.T_K_calc,
+                            'P_kbar_Teq9_P7b': CalcPT_Teq9_P7b.P_kbar_calc,
+                            'T_K_Teq9_P7b': CalcPT_Teq9_P7b.T_K_calc,
+                            'P_kbar_Teq9_P7c': CalcPT_Teq9_P7c.P_kbar_calc,
+                            'T_K_Teq9_P7c': CalcPT_Teq9_P7c.T_K_calc}
+     )
+    return out
+
+
 ## Amphibole-only thermometers
 
 
@@ -809,7 +849,7 @@ def calculate_amp_only_temp(amp_comps, equationT, P=None):
 ## Function: PT Iterate Amphibole - only
 
 def calculate_amp_only_press_temp(amp_comps, equationT, equationP, iterations=30,
-T_K_guess=1300, Ridolfi_Filter=True):
+T_K_guess=1300, Ridolfi_Filter=True, return_amps=True):
     '''
     Solves simultaneous equations for temperature and pressure using
     amphibole only thermometers and barometers.
@@ -911,7 +951,12 @@ T_K_guess=1300, Ridolfi_Filter=True):
 
     else:
         PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
-    return PT_out
+
+    if return_amps is True:
+        PT_out2=pd.concat([PT_out, amp_comps], axis=1)
+        return PT_out2
+    else:
+        return PT_out
 
 ## Function: Amphibole-Liquid barometer
 Amp_Liq_P_funcs = {P_Put2016_eq7a, P_Put2016_eq7b, P_Put2016_eq7c}
@@ -979,7 +1024,7 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
 
     if meltmatch is not None:
         Combo_liq_amps = meltmatch
-    if liq_comps is not None and amp_comps is not None:
+    if meltmatch is None:
         liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
@@ -1024,7 +1069,7 @@ Amp_Liq_T_funcs = {T_Put2016_eq4b,  T_Put2016_eq4a_amp_sat, T_Put2016_eq9}
 
 Amp_Liq_T_funcs_by_name = {p.__name__: p for p in Amp_Liq_T_funcs}
 
-def calculate_amp_liq_temp(*, amp_comps=None, liq_comps=None, equationT=None,
+def calculate_amp_liq_temp(*, amp_comps=None, liq_comps=None, meltmatch=None, equationT=None,
 P=None, H2O_Liq=None, eq_tests=False):
     '''
     Amphibole-liquid thermometers. Returns temperature in Kelvin.
@@ -1077,16 +1122,19 @@ P=None, H2O_Liq=None, eq_tests=False):
             if len(P) != len(liq_comps):
                 raise ValueError('The panda series entered for Pressure isnt the same length as the dataframe of liquid compositions')
 
-
-    if liq_comps is not None:
+    if meltmatch is not None:
+        Combo_liq_amps=meltmatch
+    if meltmatch is None:
         liq_comps_c = liq_comps.copy()
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
 
-    amp_comps_23 = calculate_23oxygens_amphibole(amp_comps=amp_comps)
-    liq_comps_hy = calculate_hydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
-    liq_comps_an = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
-    Combo_liq_amps = pd.concat([amp_comps_23, liq_comps_hy, liq_comps_an], axis=1)
+        amp_comps_23 = calculate_23oxygens_amphibole(amp_comps=amp_comps)
+        liq_comps_hy = calculate_hydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+        liq_comps_an = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+        Combo_liq_amps = pd.concat([amp_comps_23, liq_comps_hy, liq_comps_an], axis=1)
+
+
     kwargs = {name: Combo_liq_amps[name] for name, p in sig.parameters.items()
     if p.kind == inspect.Parameter.KEYWORD_ONLY}
 
@@ -1121,7 +1169,7 @@ P=None, H2O_Liq=None, eq_tests=False):
 ## Function for amphibole-liquid PT iter (although technically not needed)
 
 
-def calculate_amp_liq_press_temp(liq_comps, amp_comps, equationT, equationP, iterations=30,
+def calculate_amp_liq_press_temp(*, liq_comps=None, amp_comps=None, meltmatch=None, equationT, equationP, iterations=30,
 T_K_guess=1300, H2O_Liq=None, eq_tests=False):
     '''
     Solves simultaneous equations for temperature and pressure using
@@ -1166,15 +1214,24 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
     -------
     pandas.DataFrame: Pressure in Kbar, Temperature in K, Kd-Fe-Mg if eq_tests=True
     '''
-    liq_comps_c=liq_comps.copy()
-    if H2O_Liq is not None:
-        liq_comps_c['H2O_Liq']=H2O_Liq
 
-    T_func = calculate_amp_liq_temp(liq_comps=liq_comps_c,
-    amp_comps=amp_comps, equationT=equationT, P="Solve")
+    if meltmatch is None:
 
-    P_func = calculate_amp_liq_press(liq_comps=liq_comps_c,
-    amp_comps=amp_comps, equationP=equationP, T="Solve")
+        liq_comps_c=liq_comps.copy()
+
+        if H2O_Liq is not None:
+            liq_comps_c['H2O_Liq']=H2O_Liq
+
+        T_func = calculate_amp_liq_temp(liq_comps=liq_comps_c,
+        amp_comps=amp_comps, equationT=equationT, P="Solve")
+
+        P_func = calculate_amp_liq_press(liq_comps=liq_comps_c,
+        amp_comps=amp_comps, equationP=equationP, T="Solve")
+
+    if meltmatch is not None:
+        T_func = calculate_amp_liq_temp(meltmatch=meltmatch, equationT=equationT, P="Solve")
+
+        P_func = calculate_amp_liq_press(meltmatch=meltmatch, equationP=equationP, T="Solve")
 
     if isinstance(T_func, pd.Series) and isinstance(P_func, pd.Series):
         P_guess = P_func
@@ -1217,3 +1274,220 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
         PT_out["Eq Putirka 2016?"]=b
 
     return PT_out
+
+## Assessing all possible matches
+
+
+def calculate_amp_liq_press_temp_matching(*, liq_comps, amp_comps, equationT=None,
+equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
+ Kd_Match=0.28, Kd_Err=0.11, return_all_pairs=False):
+
+    '''
+    Evaluates all possible Amp-Liq pairs from  N Liquids, M amp compositions
+    returns P (kbar) and T (K) for those in equilibrium.
+
+    Parameters
+    -----------
+
+    liq_comps: pandas.DataFrame
+        Panda DataFrame of liquid compositions with column headings SiO2_Liq etc.
+
+    amp_comps: pandas.DataFrame
+        Panda DataFrame of amp compositions with column headings SiO2_Amp etc.
+
+
+    equationP: str
+        | P_Put2016_eq7a (T-independent, H2O-dependent)
+        | P_Put2016_eq7b (T-independent, H2O-dependent (as hyd frac))
+        | P_Put2016_eq7c (T-independent, H2O-dependent (as hyd frac))
+
+    equationT: str
+        T_Put2016_eq4a_amp_sat (P-independent, H2O-dep through hydrous fractions)
+        T_Put2016_eq4b (P-independent, H2O-dep)
+        T_Put2016_eq9 (P-independent, H2O-dep through hydrous fractions)
+
+    Or:
+
+    P: int, float
+        Can also specify a pressure to run calculations at, rather than iterating
+        using an equation for pressure. E.g., specify an equationT, but no equationP
+
+    T: int, float
+        Can also specify a temperature to run calculations at, rather than iterating
+        using an equation for temperature.  E.g., specify an equationP, but no equationT
+
+    Optional:
+
+    Kd_Match: int of float, optional
+        Allows users to ovewrite the default where Kd is assessed using the 0.28+-0.11 value of Putirka (2016)
+
+    Kd_Err: int or float, optional
+        Allows users to override the defualt 1 sigma on Kd matches of +-0.11
+
+
+
+   Fe3Fet_Liq: int or float, optional
+        Fe3FeT ratio used to assess Kd Fe-Mg equilibrium between amp and melt.
+        If users don't specify, uses Fe3Fet_Liq from liq_comps.
+        If specified, overwrites the Fe3Fet_Liq column in the liquid input.
+
+    Returns: dict
+
+        Av_PTs: Average P and T for each amp.
+        E.g., if amp1 matches Liq1, Liq4, Liq6, Liq10, averages outputs for all 4 of those liquids.
+        Returns mean and 1 sigma of these averaged parameters for each Amp.
+
+        All_PTs: Returns output parameters for all matches (e.g, amp1-Liq1, amp1-Liq4) without any averaging.
+
+    '''
+    # This checks that inputs are consistent, and not contradictory
+    if equationP is not None and P is not None:
+        raise ValueError('You have entered an equation for P and specified a pressure. '
+        ' The code doesnt know what you want it to do. Either enter an equation, or choose a pressure. ')
+
+    if equationT is not None and T is not None:
+        raise ValueError('You have entered an equation for T and specified a temperature. '
+        'The code doesnt know what you want it to do. Either enter an equation, or choose a temperature.  ')
+
+    # This over-writes inputted Fe3Fet_Liq and H2O_Liq inputs.
+    liq_comps_c = liq_comps.copy()
+    amp_comps_c=amp_comps.copy()
+    if H2O_Liq is not None and not isinstance(H2O_Liq, str):
+        liq_comps_c['H2O_Liq'] = H2O_Liq
+    if "Fe3Fet_Liq" not in liq_comps:
+        liq_comps_c['Fe3Fet_Liq'] = 0
+
+    # Adding sample names if there aren't any
+    if "Sample_ID_Liq" not in liq_comps:
+        liq_comps_c['Sample_ID_Liq'] = liq_comps_c.index
+    if "Sample_ID_Amp" not in amp_comps:
+        amp_comps_c['Sample_ID_Amp'] = amp_comps.index
+
+    amp_comps_c['ID_AMP'] = amp_comps_c.index
+    liq_comps_c['ID_Liq'] = liq_comps_c.index
+
+
+    amp_comps_23_sim = calculate_23oxygens_amphibole(amp_comps=amp_comps_c)
+    amp_mols=calculate_mol_proportions_amphibole(amp_comps=amp_comps_c)
+    amp_comps_23=pd.concat([amp_comps_23_sim, amp_mols, amp_comps_c], axis=1)
+    liq_comps_hy = calculate_hydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+    liq_comps_an = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+    Combo_liqs_hyd_anhyd = pd.concat([liq_comps_hy, liq_comps_an], axis=1)
+
+
+    # This duplicates AMPs, repeats amp1-amp1*N, amp2-amp2*N etc.
+    DupAMPs = pd.DataFrame(
+        np.repeat(amp_comps_23.values, np.shape(Combo_liqs_hyd_anhyd)[0], axis=0))
+    DupAMPs.columns = amp_comps_23.columns
+
+    # This duplicates liquids like liq1-liq2-liq3 for amp1, liq1-liq2-liq3 for
+    # amp2 etc.
+    DupLiqs = pd.concat([Combo_liqs_hyd_anhyd] *
+                        np.shape(amp_comps_23)[0]).reset_index(drop=True)
+    # Combines these merged liquids and amp dataframes
+    Combo_liq_amps = pd.concat([DupLiqs, DupAMPs], axis=1)
+
+    # calculate Kd for this merged dataframe
+    Combo_liq_amps['Kd']=((Combo_liq_amps['FeOt_Amp_mol_prop']/Combo_liq_amps['MgO_Amp_mol_prop'])/
+    (Combo_liq_amps['FeOt_Liq_mol_frac_hyd']/Combo_liq_amps['MgO_Liq_mol_frac_hyd']))
+
+
+    if return_all_pairs is True:
+        Combo_liq_amp_fur_filt=Combo_liq_amps.copy()
+
+    if return_all_pairs is False:
+        Filt=np.abs(Combo_liq_amps['Kd']-Kd_Match)<=Kd_Err
+        Combo_liq_amp_fur_filt=Combo_liq_amps.loc[Filt]
+
+
+
+#         # If users want to melt match specifying an equation for both T and P
+    if equationP is not None and equationT is not None:
+
+        PT_out = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
+         equationP=equationP, equationT=equationT)
+        P_guess = PT_out['P_kbar_calc'].astype('float64')
+        T_K_guess = PT_out['T_K_calc'].astype('float64')
+        Combo_liq_amp_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
+        Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+        Combo_liq_amp_fur_filt.insert(2, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
+    return Combo_liq_amp_fur_filt
+#
+#         # Users may already know their pressure, rather than choosing an equation.
+#         if equationT is not None and equationP is None:
+#             P_guess = P
+#             T_K_guess = calculate_amp_liq_temp(meltmatch=Combo_liq_amp_fur_filt, equationT=equationT, P=P_guess)
+#             Combo_liq_amp_fur_filt.insert(0, "P_kbar_input", P_guess)
+#             Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+#
+#     # Users may already know their temperature, rather than using an equation
+#         if equationP is not None and equationT is None:
+#             T_K_guess = T
+#             P_guess = calculate_amp_liq_press(meltmatch=Combo_liq_amp_fur_filt, equationP=equationP, T=T_K_guess)
+#             Combo_liq_amp_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
+#             Combo_liq_amp_fur_filt.insert(1, "T_K_input", T_K_guess)
+#
+#
+#
+#         print('Finished calculating Ps and Ts, now just averaging the results. Almost there!')
+#
+#
+#
+#         # # This bit averages all the matches for a given Amp (e.g, Amp1-Liq1,
+#         ampNumbers = Combo_liq_amp_fur_filt['ID_AMP'].unique()
+#         if len(ampNumbers) > 0:
+#             df1_Mean_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).mean()
+#             df1_Std_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).std()
+#             count=Combo_liq_amp_fur_filt.groupby('ID_AMP').count()
+#             Sample_ID_Amp_Mean=df1_Mean_nopref['Sample_ID_Amp']
+#             Sample_ID_Amp_Std=df1_Std_nopref['Sample_ID_Amp']
+#             df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+#             df1_Std=df1_Std_nopref.add_prefix('Std_')
+#             df1_Mean=df1_Mean.drop(['Mean_Sample_ID_Amp'], axis=1)
+#             df1_Std=df1_Std.drop(['Std_Sample_ID_Amp'], axis=1)
+#             df1_Mean.rename(columns={"Mean_ID_AMP": "ID_AMP"}, inplace=True)
+#             df1_Std.rename(columns={"Std_ID_AMP": "ID_AMP"}, inplace=True)
+#
+#             df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_AMP'])
+#             df1_M['Sample_ID_Amp']=Sample_ID_Amp_Mean
+#
+#             if equationT is not None and equationP is not None:
+#                 cols_to_move = ['Sample_ID_Amp',
+#                             'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+#                             'Std_P_kbar_calc']
+#
+#             if equationT is not None and equationP is None:
+#                 cols_to_move = ['Sample_ID_Amp',
+#                             'Mean_P_kbar_input',
+#                             'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
+#
+#             if equationT is None and equationP is not None:
+#                 cols_to_move = ['Sample_ID_Amp',
+#                             'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
+#                             'Std_P_kbar_calc']
+#
+#
+#
+#             df1_M = df1_M[cols_to_move +
+#                             [col for col in df1_M.columns if col not in cols_to_move]]
+#
+#
+#         else:
+#             raise Exception(
+#                 'No Matches - you may need to set less strict filters, e.g.,'
+#                 'you could edit Kd_Match is None and Kd_Err to get more matches')
+#
+#
+#         # Returns all amps-liquids that went through 1st Kd filter with
+#         # equilibrium parameters, averaged matches, and all matches (not averaged)
+#
+#         print('Finished!')
+#
+#
+#         cols_to_move = ['Sample_ID_Amp', 'Sample_ID_Liq']
+#
+#         Combo_liq_amp_fur_filt = Combo_liq_amp_fur_filt[cols_to_move +
+#                             [col for col in Combo_liq_amp_fur_filt.columns if col not in cols_to_move]]
+#
+#         return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_amp_fur_filt}
+#         # return Combo_liq_amp_fur_filt

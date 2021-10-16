@@ -428,9 +428,12 @@ filter_q=None, append=False):
     mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
 
     if positive is True:
-        mynoisedDataframe[mynoisedDataframe < 0] = 0
+        num = mynoisedDataframe._get_numeric_data()
+        num[num < 0] = 0
         print('All negative numbers replaced with zeros. '\
         'If you wish to keep these, set positive=False')
+
+    mynoisedDataframe=mynoisedDataframe.fillna(0)
     if append is True:
         mynoisedDataframe2 = pd.concat([Sample_c, mynoisedDataframe], axis=0)
         return mynoisedDataframe2
