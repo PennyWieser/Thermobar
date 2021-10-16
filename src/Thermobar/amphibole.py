@@ -1429,8 +1429,11 @@ def calculate_amp_plag_temp(amp_comps, plag_comps=None, XAn=None, XAb=None, equa
         XAb=plag_components['Ab_Plag']
         XAn=plag_components['An_Plag']
     if plag_comps is None:
-        XAb=XAb
-        XAn=XAn
+        if isinstance(XAn, int) or isinstance(XAn, float):
+            XAn=pd.Series(data=XAn)
+        if isinstance(XAb, int) or isinstance(XAb, float):
+            XAb=pd.Series(data=XAb)
+
 
 
     amp_apfu_df=calculate_23oxygens_amphibole(amp_comps=amp_comps_c)
@@ -1491,8 +1494,6 @@ def calculate_amp_plag_temp(amp_comps, plag_comps=None, XAn=None, XAb=None, equa
         (0.0721-0.0083144*np.log(Ked_trB)))
 
     if equationT=="T_HB1994_A":
-        print(f)
-        print(YAb)
         return Ta
     if equationT=="T_HB1994_B":
         return Tb
