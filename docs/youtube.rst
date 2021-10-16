@@ -32,6 +32,7 @@ A short video introducing Thermobar including how to import and save data, simpl
     * `Five_min_intro.ipynb <https://raw.githubusercontent.com/PennyWieser/Thermobar/main/docs/Examples/Five_min_intro.ipynb>`_
 
     * `Five_min_intro.xlsx <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.xlsx>`_
+    * See :download:`this example script <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.xlsx>`
 
 
 .. raw:: html
