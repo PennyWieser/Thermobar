@@ -1412,82 +1412,91 @@ equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
         Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
         Combo_liq_amp_fur_filt.insert(2, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
     return Combo_liq_amp_fur_filt
-#
-#         # Users may already know their pressure, rather than choosing an equation.
-#         if equationT is not None and equationP is None:
-#             P_guess = P
-#             T_K_guess = calculate_amp_liq_temp(meltmatch=Combo_liq_amp_fur_filt, equationT=equationT, P=P_guess)
-#             Combo_liq_amp_fur_filt.insert(0, "P_kbar_input", P_guess)
-#             Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
-#
-#     # Users may already know their temperature, rather than using an equation
-#         if equationP is not None and equationT is None:
-#             T_K_guess = T
-#             P_guess = calculate_amp_liq_press(meltmatch=Combo_liq_amp_fur_filt, equationP=equationP, T=T_K_guess)
-#             Combo_liq_amp_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
-#             Combo_liq_amp_fur_filt.insert(1, "T_K_input", T_K_guess)
-#
-#
-#
-#         print('Finished calculating Ps and Ts, now just averaging the results. Almost there!')
-#
-#
-#
-#         # # This bit averages all the matches for a given Amp (e.g, Amp1-Liq1,
-#         ampNumbers = Combo_liq_amp_fur_filt['ID_AMP'].unique()
-#         if len(ampNumbers) > 0:
-#             df1_Mean_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).mean()
-#             df1_Std_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).std()
-#             count=Combo_liq_amp_fur_filt.groupby('ID_AMP').count()
-#             Sample_ID_Amp_Mean=df1_Mean_nopref['Sample_ID_Amp']
-#             Sample_ID_Amp_Std=df1_Std_nopref['Sample_ID_Amp']
-#             df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
-#             df1_Std=df1_Std_nopref.add_prefix('Std_')
-#             df1_Mean=df1_Mean.drop(['Mean_Sample_ID_Amp'], axis=1)
-#             df1_Std=df1_Std.drop(['Std_Sample_ID_Amp'], axis=1)
-#             df1_Mean.rename(columns={"Mean_ID_AMP": "ID_AMP"}, inplace=True)
-#             df1_Std.rename(columns={"Std_ID_AMP": "ID_AMP"}, inplace=True)
-#
-#             df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_AMP'])
-#             df1_M['Sample_ID_Amp']=Sample_ID_Amp_Mean
-#
-#             if equationT is not None and equationP is not None:
-#                 cols_to_move = ['Sample_ID_Amp',
-#                             'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
-#                             'Std_P_kbar_calc']
-#
-#             if equationT is not None and equationP is None:
-#                 cols_to_move = ['Sample_ID_Amp',
-#                             'Mean_P_kbar_input',
-#                             'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
-#
-#             if equationT is None and equationP is not None:
-#                 cols_to_move = ['Sample_ID_Amp',
-#                             'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
-#                             'Std_P_kbar_calc']
-#
-#
-#
-#             df1_M = df1_M[cols_to_move +
-#                             [col for col in df1_M.columns if col not in cols_to_move]]
-#
-#
-#         else:
-#             raise Exception(
-#                 'No Matches - you may need to set less strict filters, e.g.,'
-#                 'you could edit Kd_Match is None and Kd_Err to get more matches')
-#
-#
-#         # Returns all amps-liquids that went through 1st Kd filter with
-#         # equilibrium parameters, averaged matches, and all matches (not averaged)
-#
-#         print('Finished!')
-#
-#
-#         cols_to_move = ['Sample_ID_Amp', 'Sample_ID_Liq']
-#
-#         Combo_liq_amp_fur_filt = Combo_liq_amp_fur_filt[cols_to_move +
-#                             [col for col in Combo_liq_amp_fur_filt.columns if col not in cols_to_move]]
-#
-#         return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_amp_fur_filt}
-#         # return Combo_liq_amp_fur_filt
+
+## Amphibole-Plag temperatures, Holland and Blundy 1994
+
+
+def calculate_amp_plag_temp(amp_comps, plag_comps=None, XAn=None, XAb=None, equationT=None, P=None):
+    if equationT != "T_HB1994_A" and equationT != "T_HB1994_B":
+        raise Exception('At the moment, the only options are T_HB1994_A and _B')
+    if P is None:
+        raise Exception('Please select a P in kbar')
+    amp_comps_c=amp_comps.copy()
+
+    if plag_comps is not None:
+        plag_comps_c=plag_comps.copy()
+        plag_components=calculate_cat_fractions_plagioclase(plag_comps=plag_comps_c)
+        XAb=plag_components['Ab_Plag']
+        XAn=plag_components['An_Plag']
+    if plag_comps is None:
+        XAb=XAb
+        XAn=XAn
+
+
+    amp_apfu_df=calculate_23oxygens_amphibole(amp_comps=amp_comps_c)
+    f1=16/(amp_apfu_df['cation_sum_All'])
+    f2=8/(amp_apfu_df['Si_Amp_cat_23ox'])
+    f3=15/(amp_apfu_df['cation_sum_All']-amp_apfu_df['Na_Amp_cat_23ox']-amp_apfu_df['K_Amp_cat_23ox'])
+    f4=2/amp_apfu_df['Ca_Amp_cat_23ox']
+    f5=1
+    f6=8/(amp_apfu_df['Si_Amp_cat_23ox']+amp_apfu_df['Al_Amp_cat_23ox'])
+    f7=15/(amp_apfu_df['cation_sum_All']-amp_apfu_df['K_Amp_cat_23ox'])
+    f8=12.9/(amp_apfu_df['cation_sum_All']-amp_apfu_df['Ca_Amp_cat_23ox']-amp_apfu_df['Na_Amp_cat_23ox']
+            -amp_apfu_df['K_Amp_cat_23ox'])
+    f9=36/(46-amp_apfu_df['Si_Amp_cat_23ox']-amp_apfu_df['Al_Amp_cat_23ox']-amp_apfu_df['Ti_Amp_cat_23ox'])
+    f10=46/(amp_apfu_df['Fet_Amp_cat_23ox']+46)
+    fa=pd.DataFrame(data={'f1': f1, 'f2': f2, 'f3':f3, 'f4': f4, 'f5': f5})
+    fb=pd.DataFrame(data={'f6': f6, 'f7': f7, 'f8':f8, 'f9': f9, 'f10': f10})
+    fa_min=fa.min(axis="columns")
+    fb_max=fb.max(axis="columns")
+    f=(fa_min+fb_max)/2
+    fmin_greater1=fa_min>1
+    fmax_greater1=fb_max>1
+    f.loc[fmin_greater1]=1
+    f.loc[fmax_greater1]=1
+
+    amp_apfu_df_recalc=amp_apfu_df.drop(columns=['Fet_Amp_cat_23ox', 'oxy_renorm_factor',
+                            'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All', 'Mgno_Amp'])
+    amp_apfu_df_recalc=amp_apfu_df_recalc.multiply(f, axis='rows')
+    amp_apfu_df_recalc['Fe3_Amp_cat_23ox']=46*(1-f)
+    amp_apfu_df_recalc['Fe2_Amp_cat_23ox']=(amp_apfu_df.multiply(f, axis='rows').get('Fet_Amp_cat_23ox')
+    - amp_apfu_df_recalc['Fe3_Amp_cat_23ox'])
+
+    cm=((amp_apfu_df_recalc['Si_Amp_cat_23ox']+amp_apfu_df_recalc['Al_Amp_cat_23ox']
+    +amp_apfu_df_recalc['Ti_Amp_cat_23ox']+amp_apfu_df_recalc['Fe3_Amp_cat_23ox']
+    + amp_apfu_df_recalc['Fe2_Amp_cat_23ox']+amp_apfu_df_recalc['Mg_Amp_cat_23ox']
+    +amp_apfu_df_recalc['Mn_Amp_cat_23ox'])-13)
+
+    XSi_T1=(amp_apfu_df_recalc['Si_Amp_cat_23ox']-4)/4
+    XAl_T1=(8-amp_apfu_df_recalc['Si_Amp_cat_23ox'])/4
+    XAl_M2=(amp_apfu_df_recalc['Si_Amp_cat_23ox']+amp_apfu_df_recalc['Al_Amp_cat_23ox']-8)/2
+    XK_A=amp_apfu_df_recalc['K_Amp_cat_23ox']
+    Xsq_A=(3-amp_apfu_df_recalc['Ca_Amp_cat_23ox']-amp_apfu_df_recalc['Na_Amp_cat_23ox']-amp_apfu_df_recalc['K_Amp_cat_23ox']
+    -cm)
+    XNa_A=amp_apfu_df_recalc['Ca_Amp_cat_23ox']+amp_apfu_df_recalc['Na_Amp_cat_23ox']+cm-2
+    XNa_M4=(2-amp_apfu_df_recalc['Ca_Amp_cat_23ox']-cm)/2
+    XCa_M4=amp_apfu_df_recalc['Ca_Amp_cat_23ox']/2
+    Ked_trA=(27/256)*(Xsq_A*XSi_T1*XAb)/(XNa_A*XAl_T1)
+    Ked_trB=(27/64)*(XNa_M4*XSi_T1*XAn)/(XCa_M4*XAl_T1*XAb)
+    YAb=12*(1-XAb)**2-3
+    HighXAb=XAb>0.5
+    YAb[HighXAb]=0
+
+    Ta=((-76.95+P*0.79+YAb+39.4*XNa_A+22.4*XK_A+(41.5-2.89*P)*XAl_M2)/
+        (-0.065-0.0083144*np.log(Ked_trA)))
+
+    YAb_B=12*(2*XAb-1)+3
+    YAb_B[HighXAb]=3
+    Tb=((78.44 +YAb_B - 33.6*XNa_M4 - (66.8 -2.92*P)*XAl_M2 +78.5*XAl_T1 +9.4*XNa_A )/
+        (0.0721-0.0083144*np.log(Ked_trB)))
+
+    if equationT=="T_HB1994_A":
+        print(f)
+        print(YAb)
+        return Ta
+    if equationT=="T_HB1994_B":
+        return Tb
+
+
+
+
