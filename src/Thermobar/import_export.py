@@ -434,28 +434,28 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
     myAmphs1 = myAmphs1.apply(pd.to_numeric, errors='coerce').fillna(0)
     myAmphs1[myAmphs1 < 0] = 0
     # Adding sample Names
-    if "Sample_ID_Cpx" in my_input:
-        myCPXs1['Sample_ID_Cpx'] = my_input['Sample_ID_Cpx']
+    if "Sample_ID_Cpx" in my_input_c:
+        myCPXs1['Sample_ID_Cpx'] = my_input_c['Sample_ID_Cpx']
     else:
         myCPXs1['Sample_ID_Cpx'] = my_input.index
 
-    if "Sample_ID_Opx" in my_input:
-        myOPXs1['Sample_ID_Opx'] = my_input['Sample_ID_Opx']
+    if "Sample_ID_Opx" in my_input_c:
+        myOPXs1['Sample_ID_Opx'] = my_input_c['Sample_ID_Opx']
     else:
         myOPXs1['Sample_ID_Opx'] = my_input.index
 
-    if "Sample_ID_Liq" in my_input:
-        myLiquids1['Sample_ID_Liq'] = my_input['Sample_ID_Liq']
+    if "Sample_ID_Liq" in my_input_c:
+        myLiquids1['Sample_ID_Liq'] = my_input_c['Sample_ID_Liq']
     else:
         myLiquids1['Sample_ID_Liq'] = my_input.index
 
-    if "Sample_ID_Plag" in my_input:
-        myPlags1['Sample_ID_Plag'] = my_input['Sample_ID_Plag']
+    if "Sample_ID_Plag" in my_input_c:
+        myPlags1['Sample_ID_Plag'] = my_input_c['Sample_ID_Plag']
     else:
         myPlags1['Sample_ID_Plag'] = my_input.index
 
-    if "Sample_ID_Amp" in my_input:
-        myAmphs1['Sample_ID_Amp'] = my_input['Sample_ID_Amp']
+    if "Sample_ID_Amp" in my_input_c:
+        myAmphs1['Sample_ID_Amp'] = my_input_c['Sample_ID_Amp']
     else:
         myAmphs1['Sample_ID_Amp'] = my_input.index
 
