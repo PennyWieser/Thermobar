@@ -28,7 +28,7 @@ A short video introducing Thermobar including how to import and save data, simpl
 
     %* `Five_min_intro.xlsx <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.xlsx>`_
 
-    * See :download:`this example script <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.ipynb>`
+    * See :download:`this example script <Examples/Five_min_intro.ipynb>`
 
 
 .. raw:: html

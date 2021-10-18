@@ -342,7 +342,7 @@ df_ideal_all2 = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
 
 def convert_oxide_percent_to_element_weight_percent(df, suffix=None):
     """
-    Converts oxide wt% to elemental wt%
+    Converts oxide wt% to elemental wt% including oxygen by default
 
    Parameters
     -------
@@ -350,6 +350,9 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None):
     df: pandas.DataFrame
         Data frame of oxide compositions. Can have suffixes like "_Amp"
         in which case you need to specify suffix="_Amp"
+
+    remove_oxygen: str
+        default False, so element wt% doesnt sum to 100.
 
     returns: pandas.DataFrame
     wt% of elements
@@ -383,6 +386,10 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None):
 
 
                                 })
+    sum_element=wt_perc2.sum(axis=1)
+    Oxy=100-sum_element
+    wt_perc2['O_wt_make_to_100']=Oxy
+
     return wt_perc2
 
 
