@@ -111,7 +111,7 @@ Demonstrates amphibole-only and amphibole-Liquid thermobarometry, hygrometry and
 **Useful files:
 
     * Download :download:`Python Notebook (Amphibole_Examples.ipynb) <Examples/Amphibole/Amphibole_Examples.ipynb>`
-    * Download :download:`Excel Workbook (Amphibole_Liquids.xlsx <Examples/Amphibole/Amphibole_Liquids.xlsx>`
+    * Download :download:`Excel Workbook (Amphibole_Liquids.xlsx) <Examples/Amphibole/Amphibole_Liquids.xlsx>`
 
 
 
