@@ -38,8 +38,8 @@ An example of how to perform liquid only thermometry. We cover the different way
 
 **Useful files:
 
-    * Download :download:`Python Notebook (Liquid_only_Thermometry.ipynb) <Examples/Liquid_only_Thermometry.ipynb>`
-    * Download :download:`Excel Workbook (Liquid_only_Thermometry.xlsx) <Examples/Liquid_only_Thermometry.xlsx>`
+    * Download :download:`Python Notebook (Liquid_only_Thermometry.ipynb) <Examples/Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry.ipynb>`
+    * Download :download:`Excel Workbook (Liquid_only_Thermometry.xlsx) <Examples/Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry.xlsx>`
 
 
 
@@ -129,7 +129,7 @@ Demonstrates plagioclase-liquid and kspar-liquid thermometry, and plagioclase-li
 
 **Useful files:
 
-    * Download :download:`Python Notebook (Feldspar_Liquid.ipynb) <Examples/Feldspar_Thermobarometry/Feldspar_Liquid.ipynb`
+    * Download :download:`Python Notebook (Feldspar_Liquid.ipynb) <Examples/Feldspar_Thermobarometry/Feldspar_Liquid.ipynb>`
     * Download :download:`Excel Workbook (Feldspar_Liquid.xlsx) <Examples/Feldspar_Thermobarometry/Feldspar_Liquid.xlsx>`
 
 
@@ -147,7 +147,7 @@ Demonstrates two feldspar thermometry, along with discussion of how to apply var
 
 **Useful files:
 
-    * Download :download:`Python Notebook (Two_Feldspar_Example.ipynb) <Examples/Feldspar_Thermobarometry/Two_Feldspar_Example.ipynb`
+    * Download :download:`Python Notebook (Two_Feldspar_Example.ipynb) <Examples/Feldspar_Thermobarometry/Two_Feldspar_Example.ipynb>`
     * Download :download:`Excel Workbook (Two_Feldspar_input.xlsx) <Examples/Feldspar_Thermobarometry/Two_Feldspar_input.xlsx>`
 
 
