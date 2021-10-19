@@ -21,14 +21,10 @@ Introduction to Thermobar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A short video introducing Thermobar including how to import and save data, simple calculations
 
-**Useful files (right click and choose 'Save Link As...') to download files:**
+**Useful files:
 
-    * `Five_min_intro.ipynb <https://raw.githubusercontent.com/PennyWieser/Thermobar/main/docs/Examples/Five_min_intro.ipynb>`_
-    * `Five_min_intro.xlsx <https://raw.githubusercontent.com/PennyWieser/Thermobar/main/docs/Examples/Five_min_intro.xlsx>`_
-
-    %* `Five_min_intro.xlsx <https://github.com/PennyWieser/Thermobar/blob/main/Examples/Five_min_intro.xlsx>`_
-
-    * See :download:`this example script <Examples/Five_min_intro.ipynb>`
+    * Download :download:`Python Notebook (Five_min_intro.ipynb) <Examples/Five_min_intro.ipynb>`
+    * Download :download:`Python Notebook (Five_min_intro.xlsx) <Examples/Five_min_intro.xlsx>`
 
 
 .. raw:: html
