@@ -74,6 +74,11 @@ Treatment of FeO vs. Fe2O3
 For liquids, Thermobar allows users to specify how they partition Fe between ferrous and ferric iron, because equilibrium tests involving the partitioning of Fe$^{2+}$ and Mg between minerals and melt are sensitive to the proportion of Fe$^{3+}$.  To avoid ambiguity, such as in cases where XRF data is reported as Fe$_{2}O_{3}$, but the speciation is unknown compared to situations when the proportions of FeO and Fe$_2$O$_{3}$ are known, total FeO contents should be used in input spreadsheets and labelled "FeOt\textunderscore  Liq" (e.g., from EPMA, XRF data). To partition melt Fe between redox states, the input spreadsheet should contain a column labelled \python{Fe3Fet_Liq} specifying the decimal proportion of Fe$^{3+}$ in the liquid.  None of the models considered here are sensitive to user-entered Fe redox proportions in phases other than liquid. This Fe3Fet ratio can also be overwritten in the functions themselves.
 
 
+Exporting Data to Excel
+================================
+See the example notebook Exporting_to_Excel.ipynb, under the big examples heading.
+
+
 FAQs
 =================
 Q: Columns are filled with zeros that you expect to be filled with numbers. A: Check for special characters, e.g., zeros rather than capital 0s, spaces at the start or end of the word, incorrect phase identifiers (e.g., typos like oxps)

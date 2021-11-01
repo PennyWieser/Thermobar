@@ -22,6 +22,7 @@ Welcome to Thermobar's documentation!
    :caption: Examples:
 
    Examples/Five_min_intro
+   Examples/Exporting_to_Excel
    %
    Examples/Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_thermometry
