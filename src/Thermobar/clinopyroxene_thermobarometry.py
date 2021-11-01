@@ -182,7 +182,7 @@ def P_Petrelli2021_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     Machine Learning.
     :cite:`petrelli2020machine`
 
-    SEE==+-2.9 kbar
+    SEE==+-2.6 kbar
     '''
     if meltmatch is None:
         cpx_test=cpx_comps.copy()
@@ -391,7 +391,7 @@ def T_Petrelli2021_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     Machine Learning.
     :cite:`petrelli2020machine`
 
-    SEE==+-51°C
+    SEE==+-40°C
     '''
     if meltmatch is None:
         cpx_test=cpx_comps.copy()
@@ -1957,7 +1957,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
     import warnings
     with w.catch_warnings():
         w.simplefilter('ignore')
-        cpx_comps_copy=cpx_comps.copy()
+        cpx_comps_copy=cpx_comps.reset_index(drop=True).copy()
         cpx_comps_c=calculate_clinopyroxene_components(cpx_comps=cpx_comps_copy)
         cpx_comps_copy['H2O_Liq']=H2O_Liq
         cpx_comps_c['H2O_Liq']=H2O_Liq
@@ -1977,6 +1977,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
 
         cpx_comps_c['P_Petrelli21']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
         equationP="P_Petrelli2021_Cpx_only").P_kbar_calc
+
         cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
         cpx_comps_c['P_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,

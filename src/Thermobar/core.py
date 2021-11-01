@@ -18,10 +18,7 @@ df_ideal_liq = pd.DataFrame(columns=['SiO2_Liq', 'TiO2_Liq', 'Al2O3_Liq',
 'Cr2O3_Liq', 'P2O5_Liq', 'H2O_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq',
  'CO2_Liq'])
 
-df_ideal_liq = pd.DataFrame(columns=['SiO2_Liq', 'TiO2_Liq', 'Al2O3_Liq',
-'FeOt_Liq', 'MnO_Liq', 'MgO_Liq', 'CaO_Liq', 'Na2O_Liq', 'K2O_Liq',
-'Cr2O3_Liq', 'P2O5_Liq', 'H2O_Liq', 'Fe3Fet_Liq', 'NiO_Liq', 'CoO_Liq',
- 'CO2_Liq'])
+
 
 df_ideal_oxide = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
 'FeOt', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O',
@@ -340,7 +337,7 @@ df_ideal_all2 = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
 
 
 
-def convert_oxide_percent_to_element_weight_percent(df, suffix=None):
+def convert_oxide_percent_to_element_weight_percent(df, suffix=None, without_oxygen=False):
     """
     Converts oxide wt% to elemental wt% including oxygen by default
 
@@ -390,7 +387,17 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None):
     Oxy=100-sum_element
     wt_perc2['O_wt_make_to_100']=Oxy
 
-    return wt_perc2
+
+    if without_oxygen is True:
+        wt_perc3=wt_perc2.div(sum_element/100,  axis=0)
+        wt_perc3=wt_perc3.add_suffix('_noO2')
+
+        return wt_perc3
+
+    else:
+        return wt_perc2
+
+
 
 
 
@@ -1371,10 +1378,11 @@ def calculate_clinopyroxene_components(cpx_comps):
 
     AlVI_minus_Na=cpx_calc['Al_VI_cat_6ox']-cpx_calc['Na_Cpx_cat_6ox']
     cpx_calc['Jd']=cpx_calc['Na_Cpx_cat_6ox']
+    cpx_calc['Jd_from 0=Na, 1=Al']=0
     cpx_calc['CaTs'] = cpx_calc['Al_VI_cat_6ox'] -cpx_calc['Na_Cpx_cat_6ox']
 
     # If value of AlVI<Na cat frac
-
+    cpx_calc.loc[(AlVI_minus_Na<0), 'Jd_from 0=Na, 1=Al']=1
     cpx_calc.loc[(AlVI_minus_Na<0), 'Jd']=cpx_calc['Al_VI_cat_6ox']
     cpx_calc.loc[(AlVI_minus_Na<0), 'CaTs']=0
 
