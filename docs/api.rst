@@ -1,4 +1,4 @@
-Code and documentation for mineral-melt calculations
+CFunctions for mineral-melt calculations
 ==================================
 
 

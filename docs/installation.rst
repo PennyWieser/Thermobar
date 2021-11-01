@@ -49,4 +49,4 @@ For maximum reproducability, you should state which version of Thermobar you are
 
 .. code-block:: python
 
-    pt.__version__.
+    pt.__version__

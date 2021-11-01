@@ -12,6 +12,7 @@ Welcome to Thermobar's documentation!
 
    introduction
    installation
+   importing_data
    available_functions_pdf
    youtube
 

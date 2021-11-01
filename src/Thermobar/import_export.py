@@ -296,8 +296,8 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
    Parameters
     -------
 
-    filename: pExcel file
-        Excel file of oxides in wt% with columns labelled SiO2_Liq, SiO2_Ol, SiO2_Cpx etc.
+    filename: .xlsx, .csv, .xls file
+        Excel-type file of oxides in wt% with columns labelled SiO2_Liq, SiO2_Ol, SiO2_Cpx etc.
 
     filename: str
         specifies the file name (e.g., Python_OlLiq_Thermometers_Test.xlsx)

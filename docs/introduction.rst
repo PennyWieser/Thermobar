@@ -17,5 +17,15 @@ Please also reference the original paper for the equation you have choosen as we
 For example, you might say in your paper "We calculated plagioclase-liquid temperatures and water contents by iterating equation 23 of Putirka (2008) with the hygrometer of Waters and Lange (2015) using the iterative algorith implemented in the Python3 tool Thermobar (v.0.07, Wieser et al. 2021).
 
 
+==============================
+Units
+==============================
+
+Thermobar performs all calculations in Kelvin for temperature, kbar for Pressure.
+If you want results in celcius, you simply have to subtract 273.15 from results.
+
+
+
+
 
 
