@@ -297,7 +297,7 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
     -------
 
     filename: .xlsx, .csv, .xls file
-        Excel-type file of oxides in wt% with columns labelled SiO2_Liq, SiO2_Ol, SiO2_Cpx etc.
+        Compositional data as an Excel spreadsheet (.xlsx, .xls) or a comma separated values (.csv) file with columns labelled SiO2_Liq, SiO2_Ol, SiO2_Cpx etc, and each row corresponding to an analysis.
 
     filename: str
         specifies the file name (e.g., Python_OlLiq_Thermometers_Test.xlsx)

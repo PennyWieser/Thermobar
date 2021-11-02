@@ -14,12 +14,14 @@ Welcome to Thermobar's documentation!
    installation
    importing_data
    available_functions_pdf
-   youtube
+   FAQs
 
 
 .. toctree::
    :maxdepth: 2
    :caption: Examples:
+
+   youtube
 
    Examples/Five_min_intro
    Examples/Exporting_to_Excel

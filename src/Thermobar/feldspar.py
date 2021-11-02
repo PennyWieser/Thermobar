@@ -423,6 +423,18 @@ def H_Put2008_eq25b(T, *, P, An_Plag, Si_Liq_cat_frac,
     LnKAn=np.log((An_Plag)/((Si_Liq_cat_frac**2)*(Al_Liq_cat_frac**2) * Ca_Liq_cat_frac))
     return (25.95-0.0032*(T-273.15)*LnKAn-18.9*K_Liq_cat_frac+14.5*Mg_Liq_cat_frac-40.3*Ca_Liq_cat_frac+5.7*An_Plag**2+0.108*(P))
 
+def H_Masotta2019(T, *, An_Plag, Ab_Plag, Si_Liq_cat_frac, Al_Liq_cat_frac, Na_Liq_cat_frac,
+                  Ca_Liq_cat_frac,  K_Liq_cat_frac):
+    '''
+    Plagioclase-Hygrometer of  Masotta et al. (2019), for trachytic systems.
+    :cite:`masotta2019new`
+    '''
+
+    return (46.2207233262084
+    -0.329007908696103* (np.log(An_Plag / (Si_Liq_cat_frac**2 * Al_Liq_cat_frac**2 * Ca_Liq_cat_frac)))
+    -0.0348279402544078*(T-273.15) -12.306919163926*Ab_Plag
+    -1.30868665306982* (Na_Liq_cat_frac/(Na_Liq_cat_frac+K_Liq_cat_frac)))
+
 
 def H_Put2005_eqH(T, *, An_Plag, Si_Liq_cat_frac, Al_Liq_cat_frac, Na_Liq_cat_frac,
                   Ca_Liq_cat_frac, Pred_Ab_EqF, Pred_An_EqE, K_Liq_cat_frac, Mg_Liq_cat_frac):
@@ -628,7 +640,7 @@ def H_Waters2015(T, *, liq_comps=None, plag_comps=None,
 
 ## Function for Plag-Liq hygrometry
 
-plag_liq_H_funcs = {H_Put2008_eq25b, H_Put2005_eqH, H_Waters2015}
+plag_liq_H_funcs = {H_Put2008_eq25b, H_Put2005_eqH, H_Waters2015, H_Masotta2019}
 plag_liq_H_funcs_by_name = {p.__name__: p for p in plag_liq_H_funcs}
 
 
@@ -657,8 +669,10 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
         choose from:
 
         |  H_Waters2015 (T-dependent, P-dependent)
+        |  H_Masotta2019 (T-dependent, P-independent, for Trachytes)
         |  H_Put2005_eqH (T-dependent, P-independent)
         |  H_Put2008_eq25b (T-dependent, P-dependent)
+
 
     P: float, int, pandas.Series
         Pressure in kbar to perform calculations at
@@ -729,10 +743,10 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
         return eq_tests
 
 
-    if equationH == "H_Put2008_eq25b" or equationH == "H_Put2005_eqH":
+    if equationH == "H_Put2008_eq25b" or equationH == "H_Put2005_eqH" or equationH == "H_Masotta2019":
         if P is None:
             raise TypeError('even if the equation doesnt require a P to be entered'
-            ' because you have selected eq tests, you need to enter a P')
+            ' because we want to return you eq tests, you need to enter a P')
         if plag_comps is not None:
             combo_plag_liq = calculate_plag_liq_eq_tests(
                 liq_comps=liq_comps, plag_comps=plag_comps, T=T, P=P)

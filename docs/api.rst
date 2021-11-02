@@ -1,4 +1,4 @@
-CFunctions for mineral-melt calculations
+Functions for mineral-melt calculations
 ==================================
 
 

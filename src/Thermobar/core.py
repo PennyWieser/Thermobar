@@ -2128,7 +2128,22 @@ def calculate_13cations_amphibole_ridolfi(amp_comps):
     cat_13.columns = [str(col).replace('_cat_prop', '_13_cat')
                       for col in cat_13.columns]
     cat_13['cation_sum_Si_Mg'] = sum_SiMg
-    cat_13_out = pd.concat([cats, cat_13], axis=1)
+    cation_13_noox=cat_13.rename(columns={
+                            'SiO2_Amp_13_cat': 'Si_Amp_13_cat',
+                            'TiO2_Amp_13_cat': 'Ti_Amp_13_cat',
+                            'Al2O3_Amp_13_cat': 'Al_Amp_13_cat',
+                            'FeOt_Amp_13_cat': 'Fet_Amp_13_cat',
+                            'MnO_Amp_13_cat': 'Mn_Amp_13_cat',
+                            'MgO_Amp_13_cat': 'Mg_Amp_13_cat',
+                            'CaO_Amp_13_cat': 'Ca_Amp_13_cat',
+                            'Na2O_Amp_13_cat': 'Na_Amp_13_cat',
+                            'K2O_Amp_13_cat': 'K_Amp_13_cat',
+                            'Cr2O3_Amp_13_cat': 'Cr_Amp_13_cat',
+                            'P2O5_Amp_13_cat': 'P_Amp_13_cat_frac'})
+
+
+
+    cat_13_out = pd.concat([cats, cation_13_noox], axis=1)
     return cat_13_out
 
 def calculate_sites_ridolfi(amp_comps):
@@ -2137,7 +2152,7 @@ def calculate_sites_ridolfi(amp_comps):
     norm_cations=calculate_13cations_amphibole_ridolfi(amp_comps_c)
 
     # Ridolfi T sites
-    norm_cations['Si_T']=norm_cations['SiO2_Amp_13_cat']
+    norm_cations['Si_T']=norm_cations['Si_Amp_13_cat']
     norm_cations['Al_IV_T']=0
     norm_cations['Ti_T']=0
     # Ridolfi C Sites
@@ -2149,57 +2164,57 @@ def calculate_sites_ridolfi(amp_comps):
     norm_cations['Fe2_C']=0
     norm_cations['Mn_C']=0
     # Ridolfi B sites
-    norm_cations['Ca_B']=norm_cations['CaO_Amp_13_cat']
+    norm_cations['Ca_B']=norm_cations['Ca_Amp_13_cat']
     norm_cations['Na_B']=0
     # Ridolfi A sites
     norm_cations['Na_A']=0
-    norm_cations['K_A']=norm_cations['K2O_Amp_13_cat']
+    norm_cations['K_A']=norm_cations['K_Amp_13_cat']
 
     # if sum greater than 8, equal to difference
     norm_cations['Al_IV_T']=8-norm_cations['Si_T']
     # But if SiTi grater than 8
-    Si_Al_less8=(norm_cations['SiO2_Amp_13_cat']+norm_cations['Al2O3_Amp_13_cat'])<8
-    norm_cations.loc[(Si_Al_less8), 'Al_IV_T']=norm_cations['Al2O3_Amp_13_cat']
+    Si_Al_less8=(norm_cations['Si_Amp_13_cat']+norm_cations['Al_Amp_13_cat'])<8
+    norm_cations.loc[(Si_Al_less8), 'Al_IV_T']=norm_cations['Al_Amp_13_cat']
 
     # Ti, If Si + Al (IV)<8, 8-Si-AlIV
     Si_Al_sites_less8=(norm_cations['Si_T']+norm_cations['Al_IV_T'])<8
     norm_cations.loc[(Si_Al_sites_less8), 'Ti_T']=8-norm_cations['Si_T']-norm_cations['Al_IV_T']
 
     #  AL VI, any AL left
-    norm_cations['Al_VI_C']=norm_cations['Al2O3_Amp_13_cat']-norm_cations['Al_IV_T']
+    norm_cations['Al_VI_C']=norm_cations['Al_Amp_13_cat']-norm_cations['Al_IV_T']
 
     # Ti C Sites, any Ti left
-    norm_cations['Ti_C']=norm_cations['TiO2_Amp_13_cat']-norm_cations['Ti_T']
+    norm_cations['Ti_C']=norm_cations['Ti_Amp_13_cat']-norm_cations['Ti_T']
 
     # CR site, All Cr
-    norm_cations['Cr_C']=norm_cations['Cr2O3_Amp_13_cat']
+    norm_cations['Cr_C']=norm_cations['Cr_Amp_13_cat']
 
     # Calculate charge for Fe
-    norm_cations['Charge']=(norm_cations['SiO2_Amp_13_cat']*4+norm_cations['TiO2_Amp_13_cat']*4+norm_cations['Al2O3_Amp_13_cat']*3+
-    norm_cations['Cr2O3_Amp_13_cat']*3+norm_cations['FeOt_Amp_13_cat']*2+norm_cations['MnO_Amp_13_cat']*2+norm_cations['MgO_Amp_13_cat']*2
-    +norm_cations['CaO_Amp_13_cat']*2+norm_cations['Na2O_Amp_13_cat']+norm_cations['K2O_Amp_13_cat'])
+    norm_cations['Charge']=(norm_cations['Si_Amp_13_cat']*4+norm_cations['Ti_Amp_13_cat']*4+norm_cations['Al_Amp_13_cat']*3+
+    norm_cations['Cr_Amp_13_cat']*3+norm_cations['Fet_Amp_13_cat']*2+norm_cations['Mn_Amp_13_cat']*2+norm_cations['Mg_Amp_13_cat']*2
+    +norm_cations['Ca_Amp_13_cat']*2+norm_cations['Na_Amp_13_cat']+norm_cations['K_Amp_13_cat'])
 
     # If DG2 (charge)>46, set Fe3 to zero, else set to 46-charge
     norm_cations['Fe3_C']=46-norm_cations['Charge']
     High_Charge=norm_cations['Charge']>46
     norm_cations.loc[(High_Charge), 'Fe3_C']=0
 
-    norm_cations['Fe2_C']=norm_cations['FeOt_Amp_13_cat']-norm_cations['Fe3_C']
+    norm_cations['Fe2_C']=norm_cations['Fet_Amp_13_cat']-norm_cations['Fe3_C']
 
     #  Allocate all Mg
-    norm_cations['Mg_C']=norm_cations['MgO_Amp_13_cat']
+    norm_cations['Mg_C']=norm_cations['Mg_Amp_13_cat']
 
     # Allocate all Mn
-    norm_cations['Mn_C']=norm_cations['MnO_Amp_13_cat']
+    norm_cations['Mn_C']=norm_cations['Mn_Amp_13_cat']
 
     # Na B site,
 
-    norm_cations['Na_B']=2-norm_cations['CaO_Amp_13_cat']
-    Ca_greaterthanNa=norm_cations['Na2O_Amp_13_cat']<(2-norm_cations['CaO_Amp_13_cat'])
-    norm_cations.loc[(Ca_greaterthanNa), 'Na_B']=norm_cations['Na2O_Amp_13_cat']
+    norm_cations['Na_B']=2-norm_cations['Ca_Amp_13_cat']
+    Ca_greaterthanNa=norm_cations['Na_Amp_13_cat']<(2-norm_cations['Ca_Amp_13_cat'])
+    norm_cations.loc[(Ca_greaterthanNa), 'Na_B']=norm_cations['Na_Amp_13_cat']
 
     # All Na left after B
-    norm_cations['Na_A']=norm_cations['Na2O_Amp_13_cat']-norm_cations['Na_B']
+    norm_cations['Na_A']=norm_cations['Na_Amp_13_cat']-norm_cations['Na_B']
     if "Sample_ID_Amp" in amp_comps.columns:
         myAmps1_label = amp_comps_c.drop(['Sample_ID_Amp'], axis='columns')
     else:
@@ -2212,15 +2227,15 @@ def calculate_sites_ridolfi(amp_comps):
     norm_cations['H2O_calc']=(2-norm_cations['F_Amp_13_cat']-norm_cations['Cl_Amp_13_cat'])*norm_cations['cation_sum_Si_Mg']*17/13/2
     norm_cations.loc[(Low_sum), 'H2O_calc']=0
 
-    norm_cations['Charge']=(norm_cations['SiO2_Amp_13_cat']*4+norm_cations['TiO2_Amp_13_cat']*4+norm_cations['Al2O3_Amp_13_cat']*3+
-    norm_cations['Cr2O3_Amp_13_cat']*3+norm_cations['FeOt_Amp_13_cat']*2+norm_cations['MnO_Amp_13_cat']*2+norm_cations['MgO_Amp_13_cat']*2
-    +norm_cations['CaO_Amp_13_cat']*2+norm_cations['Na2O_Amp_13_cat']+norm_cations['K2O_Amp_13_cat'])
+    norm_cations['Charge']=(norm_cations['Si_Amp_13_cat']*4+norm_cations['Ti_Amp_13_cat']*4+norm_cations['Al_Amp_13_cat']*3+
+    norm_cations['Cr_Amp_13_cat']*3+norm_cations['Fet_Amp_13_cat']*2+norm_cations['Mn_Amp_13_cat']*2+norm_cations['Mg_Amp_13_cat']*2
+    +norm_cations['Ca_Amp_13_cat']*2+norm_cations['Na_Amp_13_cat']+norm_cations['K_Amp_13_cat'])
 
     norm_cations['Fe3_calc']=46-norm_cations['Charge']
     High_Charge=norm_cations['Charge']>46
     norm_cations.loc[(High_Charge), 'Fe3_calc']=0
 
-    norm_cations['Fe2_calc']=norm_cations['FeOt_Amp_13_cat']-norm_cations['Fe3_calc']
+    norm_cations['Fe2_calc']=norm_cations['Fet_Amp_13_cat']-norm_cations['Fe3_calc']
 
 
     norm_cations['Fe2O3_calc']=norm_cations['Fe3_calc']*norm_cations['cation_sum_Si_Mg']*159.691/13/2
@@ -2267,8 +2282,8 @@ def calculate_sites_ridolfi(amp_comps):
     norm_cations.loc[(Negative_Fe2), 'Fail Msg']="unbalanced charge (Fe2<0)"
 
     # Check that Mg# calculated using just Fe2 is >54, else low Mg
-    norm_cations['Mgno_Fe2']=norm_cations['MgO_Amp_13_cat']/(norm_cations['MgO_Amp_13_cat']+norm_cations['Fe2_calc'])
-    norm_cations['Mgno_FeT']=norm_cations['MgO_Amp_13_cat']/(norm_cations['MgO_Amp_13_cat']+norm_cations['FeOt_Amp_13_cat'])
+    norm_cations['Mgno_Fe2']=norm_cations['Mg_Amp_13_cat']/(norm_cations['Mg_Amp_13_cat']+norm_cations['Fe2_calc'])
+    norm_cations['Mgno_FeT']=norm_cations['Mg_Amp_13_cat']/(norm_cations['Mg_Amp_13_cat']+norm_cations['Fet_Amp_13_cat'])
 
     Low_Mgno=100*norm_cations['Mgno_Fe2']<54
     norm_cations.loc[(Low_Mgno), 'Input_Check']=False
@@ -2279,20 +2294,20 @@ def calculate_sites_ridolfi(amp_comps):
 
 
     # If Column CU<1.5,"low Ca"
-    Ca_low=norm_cations['CaO_Amp_13_cat']<1.5
+    Ca_low=norm_cations['Ca_Amp_13_cat']<1.5
     norm_cations.loc[(Ca_low), 'Input_Check']=False
     norm_cations.loc[(Ca_low), 'Fail Msg']="Low Ca (<1.5)"
 
     # If Column CU>2.05, "high Ca"
-    Ca_high=norm_cations['CaO_Amp_13_cat']>2.05
+    Ca_high=norm_cations['Ca_Amp_13_cat']>2.05
     norm_cations.loc[(Ca_high), 'Input_Check']=False
     norm_cations.loc[(Ca_high), 'Fail Msg']="High Ca (>2.05)"
 
     # Check that CW<1.99, else "Low B cations"
-    norm_cations['Na_calc']=2-norm_cations['CaO_Amp_13_cat']
-    Ca_greaterthanNa=norm_cations['Na2O_Amp_13_cat']<(2-norm_cations['CaO_Amp_13_cat'])
-    norm_cations.loc[(Ca_greaterthanNa), 'Na_calc']=norm_cations['Na2O_Amp_13_cat']
-    norm_cations['B_Sum']=norm_cations['Na_calc']+norm_cations['CaO_Amp_13_cat']
+    norm_cations['Na_calc']=2-norm_cations['Ca_Amp_13_cat']
+    Ca_greaterthanNa=norm_cations['Na_Amp_13_cat']<(2-norm_cations['Ca_Amp_13_cat'])
+    norm_cations.loc[(Ca_greaterthanNa), 'Na_calc']=norm_cations['Na_Amp_13_cat']
+    norm_cations['B_Sum']=norm_cations['Na_calc']+norm_cations['Ca_Amp_13_cat']
 
 
     Low_B_Cations=norm_cations['B_Sum']<1.99
@@ -4049,3 +4064,14 @@ def classify_phases(filename=None, sheet_name=None, df=None, return_end_members=
 
     return Oxides_out
 
+
+
+def check_consecative(df):
+    idx = df.index
+    diffs = np.diff(idx)
+    diff_one_check = (diffs == 1).all()
+    index0=df.index[0]==0
+    if index0 == True and diff_one_check == True:
+        return True
+    else:
+        return False

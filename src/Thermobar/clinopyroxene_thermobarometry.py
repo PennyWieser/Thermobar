@@ -176,7 +176,7 @@ def P_Neave2017(T, *, lnK_Jd_liq, DiHd_2003, Al_Liq_cat_frac,
     return (-26.2712 + 39.16138 * T * lnK_Jd_liq / 10**4 - 4.21676 * np.log(DiHd_2003.astype(float))
             + 78.43463 * Al_Liq_cat_frac + 393.8126 * (Na_Liq_cat_frac + K_Liq_cat_frac)**2)
 
-def P_Petrelli2021_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
+def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
     Clinopyroxene-liquid  barometer of Petrelli et al. (2021) based on
     Machine Learning.
@@ -385,7 +385,7 @@ Fet_Liq_cat_frac, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac):
 
 
 
-def T_Petrelli2021_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
+def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
     Clinopyroxene-liquid  thermometer of Petrelli et al. (2021) based on
     Machine Learning.
@@ -447,7 +447,7 @@ def T_Petrelli2021_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 ## Function for calculatin clinopyroxene-liquid pressure
 Cpx_Liq_P_funcs = {P_Put1996_eqP1, P_Mas2013_eqPalk1, P_Put1996_eqP2, P_Mas2013_eqPalk2,
 P_Put2003, P_Put2008_eq30, P_Put2008_eq31, P_Put2008_eq32c, P_Mas2013_eqalk32c,
-P_Mas2013_Palk2012, P_Wieser2021_H2O_indep, P_Neave2017, P_Petrelli2021_Cpx_Liq} # put on outside
+P_Mas2013_Palk2012, P_Wieser2021_H2O_indep, P_Neave2017, P_Petrelli2020_Cpx_Liq} # put on outside
 
 Cpx_Liq_P_funcs_by_name = {p.__name__: p for p in Cpx_Liq_P_funcs}
 
@@ -562,8 +562,8 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
 
 
 
-    if equationP == "P_Petrelli2021_Cpx_Liq":
-        df_stats=P_Petrelli2021_Cpx_Liq(meltmatch=Combo_liq_cpxs)
+    if equationP == "P_Petrelli2020_Cpx_Liq":
+        df_stats=P_Petrelli2020_Cpx_Liq(meltmatch=Combo_liq_cpxs)
         P_kbar=df_stats['P_kbar_calc']
 
     else:
@@ -587,7 +587,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
             P_kbar_is_bad = (P_kbar == 0) | (P_kbar == 273.15) | (P_kbar ==  -np.inf) | (P_kbar ==  np.inf)
             P_kbar[P_kbar_is_bad] = np.nan
 
-            if equationP == "P_Petrelli2021_Cpx_Liq":
+            if equationP == "P_Petrelli2020_Cpx_Liq":
                 return df_stats
             else:
                 return P_kbar
@@ -614,7 +614,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
 ## Function for calculation Cpx-Liquid temperatures
 Cpx_Liq_T_funcs = {T_Put1996_eqT1, T_Mas2013_eqTalk1, T_Put1996_eqT2, T_Mas2013_eqTalk2,
 T_Put1999, T_Put2003, T_Put2008_eq33, T_Mas2013_eqalk33,
-T_Mas2013_Talk2012, T_Brug2019, T_Petrelli2021_Cpx_Liq} # put on outside
+T_Mas2013_Talk2012, T_Brug2019, T_Petrelli2020_Cpx_Liq} # put on outside
 
 Cpx_Liq_T_funcs_by_name = {p.__name__: p for p in Cpx_Liq_T_funcs}
 
@@ -734,8 +734,8 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
             w.warn("which is outside the recomended calibration range of Brugman and Till (2019)")
 
     # Easiest to treat Machine Learning ones differently
-    if equationT == "T_Petrelli2021_Cpx_Liq":
-        df_stats=T_Petrelli2021_Cpx_Liq(meltmatch=Combo_liq_cpxs)
+    if equationT == "T_Petrelli2020_Cpx_Liq":
+        df_stats=T_Petrelli2020_Cpx_Liq(meltmatch=Combo_liq_cpxs)
         T_K=df_stats['T_K_calc']
     else:
         kwargs = {name: Combo_liq_cpxs[name] for name, p in sig.parameters.items()
@@ -760,7 +760,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
             T_K_is_bad = (T_K == 0) | (T_K == 273.15) | (T_K ==  -np.inf) | (T_K ==  np.inf)
             T_K[T_K_is_bad] = np.nan
 
-            if equationT == "T_Petrelli2021_Cpx_Liq":
+            if equationT == "T_Petrelli2020_Cpx_Liq":
                 return df_stats
             else:
                 return T_K
@@ -939,10 +939,10 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
 
-    #if equationT != "T_Petrelli2021_Cpx_Liq":
+    #if equationT != "T_Petrelli2020_Cpx_Liq":
     T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
     T_K_guess[T_K_guess_is_bad] = np.nan
-    #if equationP != "P_Petrelli2021_Cpx_Liq":
+    #if equationP != "P_Petrelli2020_Cpx_Liq":
     P_guess[T_K_guess_is_bad] = np.nan
 
 
@@ -950,12 +950,13 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
     if eq_tests is False:
         PT_out = pd.DataFrame(
             data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+
         if "Petrelli" in equationP:
             PT_out.insert(2, "Median_Trees_P", Median_P)
             PT_out.insert(3, "Std_Trees_P", Std_P)
             PT_out.insert(4, "IQR_Trees_P", Std_P)
 
-        if "Petrelli" in equationP:
+        if "Petrelli" in equationT:
             PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
             PT_out.insert(len(PT_out.columns), "Std_Trees_T", Std_T)
             PT_out.insert(len(PT_out.columns), "IQR_Trees_T", Std_T)
@@ -1526,7 +1527,7 @@ Al_Cpx_cat_6ox, K_Cpx_cat_6ox, Al_IV_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
     - 27.7 * Al_Cpx_cat_6ox**2 + 97.3 * Fe_M2**2
     + 30.7 * Mg_M2**2 - 27.6 * DiHd_1996**2)
 
-def P_Petrelli2021_Cpx_only(T=None, *, cpx_comps):
+def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
     '''
     Clinopyroxene-only  barometer of Petrelli et al. (2021) based on
     Machine Learning.
@@ -1566,7 +1567,7 @@ def P_Petrelli2021_Cpx_only(T=None, *, cpx_comps):
     return df_stats
 
 
-def P_Petrelli2021_Cpx_only_withH2O(T=None, *, cpx_comps):
+def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
     '''
     Clinopyroxene-only  barometer following the Machine learning approach of
     Petrelli et al. (2021), but including the H2O content of the liquid while training the model.
@@ -1606,7 +1607,7 @@ def P_Petrelli2021_Cpx_only_withH2O(T=None, *, cpx_comps):
     return df_stats
 
 
-def P_Petrelli2021_Cpx_only_noCr(T=None, *, cpx_comps):
+def P_Petrelli2020_Cpx_only_noCr(T=None, *, cpx_comps):
     '''
     Clinopyroxene-only  barometer following the Machine learning approach of
     Petrelli et al. (2021),
@@ -1641,7 +1642,7 @@ def P_Petrelli2021_Cpx_only_noCr(T=None, *, cpx_comps):
 
     return df_stats
 
-def P_Petrelli2021_Cpx_only_components(T=None, *, cpx_comps):
+def P_Petrelli2020_Cpx_only_components(T=None, *, cpx_comps):
     '''
     Clinopyroxene-only  barometer following the Machine learning approach of
     Petrelli et al. (2021),
@@ -1751,7 +1752,7 @@ def T_Put2008_eq32d_subsol(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox
     + 3.5 * (np.log(a_cpx_En.astype(float)))**2)))
 
 
-def T_Petrelli2021_Cpx_only(P=None, *, cpx_comps):
+def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
     '''
     Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
     Machine Learning.
@@ -1788,7 +1789,7 @@ def T_Petrelli2021_Cpx_only(P=None, *, cpx_comps):
     return df_stats
 
 
-def T_Petrelli2021_Cpx_only_withH2O(P=None, *, cpx_comps):
+def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
     '''
     Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
     Machine Learning, but adding water.
@@ -1831,7 +1832,7 @@ def T_Petrelli2021_Cpx_only_withH2O(P=None, *, cpx_comps):
 
 ## Function for calculationg Cpx-only pressure
 Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
-P_Wang2021_eq3, P_Petrelli2021_Cpx_only, P_Petrelli2021_Cpx_only_withH2O, P_Petrelli2021_Cpx_only_noCr}
+P_Wang2021_eq3, P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Petrelli2020_Cpx_only_noCr}
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
@@ -1850,8 +1851,8 @@ return_input=False):
     equationP: str
         | P_Put2008_eq32a (T-dependent)
         | P_Put2008_eq32b (T-dependent, H2O dependent)
-        | P_Petrelli2021_Cpx_only (T_independent, H2O-independent)
-        | P_Petrelli2021_Cpx_only_withH2O (T_independent, H2O-dependent)
+        | P_Petrelli2020_Cpx_only (T_independent, H2O-independent)
+        | P_Petrelli2020_Cpx_only_withH2O (T_independent, H2O-dependent)
         | P_Wang2021_eq1 (T_independent, H2O-independent)
         | P_Wang2021_eq3 (T_independent, H2O-independent)
 
@@ -1873,16 +1874,24 @@ return_input=False):
     '''
 
     cpx_comps_c=cpx_comps.copy()
+
+    if 'Petrelli' in equationP:
+
+        if  check_consecative(cpx_comps_c)==False:
+            cpx_comps_c=cpx_comps_c.reset_index(drop=True)
+            print('Weve reset the index of your Cpx compositions for Petrelli ML calculations, as non-consecative indexes or missing indices cause problems for iteration' )
+
+
     cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps_c)
 
     if H2O_Liq is None:
-        if equationP == "P_Put2008_eq32b" or  equationP == "P_Petrelli2021_Cpx_only_withH2O":
+        if equationP == "P_Put2008_eq32b" or  equationP == "P_Petrelli2020_Cpx_only_withH2O":
             w.warn('This Cpx-only barometer is sensitive to H2O content of the liquid. '
         ' By default, this function uses H2O=0 wt%, else you can enter a value of H2O_Liq in the function')
             cpx_components['H2O_Liq']=0
             cpx_comps_c['H2O_Liq']=0
     if H2O_Liq is not None:
-        if equationP == "P_Put2008_eq32b" or  equationP == "P_Petrelli2021_Cpx_only_withH2O":
+        if equationP == "P_Put2008_eq32b" or  equationP == "P_Petrelli2020_Cpx_only_withH2O":
             cpx_components['H2O_Liq']=H2O_Liq
             cpx_comps_c['H2O_Liq']=H2O_Liq
 
@@ -1911,13 +1920,13 @@ return_input=False):
 
 
     # if
-    #     df_stats=P_Petrelli2021_Cpx_only_withH2O(cpx_comps=cpx_comps_c)
+    #     df_stats=P_Petrelli2020_Cpx_only_withH2O(cpx_comps=cpx_comps_c)
     #     P_kbar=df_stats['P_kbar_calc']
     #
     # if equationP == "
-    #     df_stats=P_Petrelli2021_Cpx_only_noCr(cpx_comps=cpx_comps_c)
+    #     df_stats=P_Petrelli2020_Cpx_only_noCr(cpx_comps=cpx_comps_c)
     #     P_kbar=df_stats['P_kbar_calc']
-    if equationP == "P_Petrelli2021_Cpx_only" or equationP == "P_Petrelli2021_Cpx_only_withH2O" or equationP == "P_Petrelli2021_Cpx_only_noCr":
+    if 'Petrelli' in equationP:
         df_stats=func(cpx_comps=cpx_comps_c)
 
     else:
@@ -1937,14 +1946,14 @@ return_input=False):
 
 
     if return_input is False:
-        if equationP == "P_Petrelli2021_Cpx_only" or equationP == "P_Petrelli2021_Cpx_only_withH2O" or equationP == "P_Petrelli2021_Cpx_only_noCr":
+        if equationP == "P_Petrelli2020_Cpx_only" or equationP == "P_Petrelli2020_Cpx_only_withH2O" or equationP == "P_Petrelli2020_Cpx_only_noCr":
             P_kbar=df_stats['P_kbar_calc']
             return df_stats
         else:
             return P_kbar
 
     if return_input is True:
-        if equationP == "P_Petrelli2021_Cpx_only" or equationP == "P_Petrelli2021_Cpx_only_withH2O" or equationP == "P_Petrelli2021_Cpx_only_noCr":
+        if equationP == "P_Petrelli2020_Cpx_only" or equationP == "P_Petrelli2020_Cpx_only_withH2O" or equationP == "P_Petrelli2020_Cpx_only_noCr":
             out=pd.concat([df_stats, cpx_comps],axis=0)
             return out
         else:
@@ -1968,7 +1977,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
         cpx_comps_c['T_Wang21_eq4']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq4", H2O_Liq=H2O_Liq)
 
         cpx_comps_c['T_Petrelli21']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
-        equationT="T_Petrelli2021_Cpx_only").T_K_calc
+        equationT="T_Petrelli2020_Cpx_only").T_K_calc
 
         cpx_comps_c['T_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").T_K_calc
@@ -1976,7 +1985,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).T_K_calc
 
         cpx_comps_c['P_Petrelli21']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
-        equationP="P_Petrelli2021_Cpx_only").P_kbar_calc
+        equationP="P_Petrelli2020_Cpx_only").P_kbar_calc
 
         cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
@@ -2016,7 +2025,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
     return cpx_comps_c
 ## Function for calculating Cpx-only temperature
 Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol, T_Wang2021_eq4,
-T_Wang2021_eq2, T_Petrelli2021_Cpx_only, T_Petrelli2021_Cpx_only_withH2O}
+T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O}
 Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
@@ -2035,8 +2044,8 @@ H2O_Liq=None, return_input=False):
     equationT: str
         | T_Put2008_eq32d (P-dependent)
         | T_Put2008_eq32d_subsol (P-dependent)
-        | T_Petrelli2021_Cpx_only (P-independent, H2O-independent)
-        | T_Petrelli2021_Cpx_only_withH2O (P-independent, H2O-dependent)
+        | T_Petrelli2020_Cpx_only (P-independent, H2O-independent)
+        | T_Petrelli2020_Cpx_only_withH2O (P-independent, H2O-dependent)
         | T_Wang2021_eq2 (P-independent, H2O-dependent)
         | T_Wang2021_eq4 (P-independent, H2O-dependent)
 
@@ -2058,16 +2067,24 @@ H2O_Liq=None, return_input=False):
 
     '''
     cpx_comps_c=cpx_comps.copy()
+
+    if 'Petrelli' in equationT:
+
+        if  check_consecative(cpx_comps_c)==False:
+            cpx_comps_c=cpx_comps_c.reset_index(drop=True)
+
+            print('Weve reset the index of your Cpx compositions for Petrelli ML calculations, as non-consecative indexes or missing indices cause problems for iteration' )
+
     cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps_c)
 
     if H2O_Liq is None:
-        if equationT == "T_Petrelli2021_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4":
+        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4":
             w.warn('This Cpx-only thermometer is sensitive to H2O content of the liquid. '
         ' By default, this function uses H2O=0 wt%, else you can enter a value of H2O_Liq in the function')
             cpx_components['H2O_Liq']=0
             cpx_comps_c['H2O_Liq']=0
     if H2O_Liq is not None:
-        if equationT == "T_Petrelli2021_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4":
+        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4":
             cpx_components['H2O_Liq']=H2O_Liq
             cpx_comps_c['H2O_Liq']=H2O_Liq
 
@@ -2091,14 +2108,14 @@ H2O_Liq=None, return_input=False):
             'length as the dataframe of Cpx compositions')
 
 
-    if equationT == "T_Petrelli2021_Cpx_only":
+    if equationT == "T_Petrelli2020_Cpx_only":
 
-        df_stats=T_Petrelli2021_Cpx_only(cpx_comps=cpx_comps_c)
+        df_stats=T_Petrelli2020_Cpx_only(cpx_comps=cpx_comps_c)
         T_K=df_stats['T_K_calc']
 
 
-    elif equationT == "T_Petrelli2021_Cpx_only_withH2O":
-        df_stats=T_Petrelli2021_Cpx_only_withH2O(cpx_comps=cpx_comps_c)
+    elif equationT == "T_Petrelli2020_Cpx_only_withH2O":
+        df_stats=T_Petrelli2020_Cpx_only_withH2O(cpx_comps=cpx_comps_c)
         T_K=df_stats['T_K_calc']
 
 
@@ -2120,12 +2137,12 @@ H2O_Liq=None, return_input=False):
             T_K.replace([np.inf, -np.inf], np.nan, inplace=True)
 
     if return_input is False:
-        if equationT == "T_Petrelli2021_Cpx_only" or  equationT == "T_Petrelli2021_Cpx_only_withH2O":
+        if equationT == "T_Petrelli2020_Cpx_only" or  equationT == "T_Petrelli2020_Cpx_only_withH2O":
             return df_stats
         else:
             return T_K
     if return_input is True:
-        if equationT == "T_Petrelli2021_Cpx_only" or equationT == "T_Petrelli2021_Cpx_only_withH2O":
+        if equationT == "T_Petrelli2020_Cpx_only" or equationT == "T_Petrelli2020_Cpx_only_withH2O":
             out=pd.concat([df_stats, cpx_comps],axis=1)
             return out
         else:
@@ -2180,6 +2197,12 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
 
 
     cpx_comps_c=cpx_comps.copy()
+    if 'Petrelli' in equationT or "Petrelli" in equationP:
+
+        if  check_consecative(cpx_comps_c)==False:
+            cpx_comps_c=cpx_comps_c.reset_index(drop=True)
+
+            print('Weve reset the index of your Cpx compositions for Petrelli ML calculations, as non-consecative indexes or missing indices cause problems for iteration' )
 
     if H2O_Liq is None:
         T_func = calculate_cpx_only_temp(cpx_comps=cpx_comps_c, equationT=equationT, P="Solve")
@@ -2192,6 +2215,12 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
     else:
         P_func = calculate_cpx_only_press(
             cpx_comps=cpx_comps_c, equationP=equationP, H2O_Liq=H2O_Liq, T="Solve")
+
+    if equationP == "P_Petrelli2020_Cpx_only" or equationP == "P_Petrelli2020_Cpx_only_withH2O" or equationP == "P_Petrelli2020_Cpx_only_noCr":
+        P_func=P_func.P_kbar_calc
+
+    if equationT == "T_Petrelli2020_Cpx_only" or equationT ==  "T_Petrelli2020_Cpx_only_withH2O":
+         T_func=T_func.T_K_calc
 
 
     if isinstance(P_func, pd.Series) and isinstance(T_func, partial):

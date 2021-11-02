@@ -25,70 +25,70 @@ def P_Kraw2012(T=None, *, Mgno_Amp, deltaNNO):
 
     return 0.01*((Mgno_Amp/52.7 -0.014*deltaNNO)**15.12)
 
-def P_Ridolfi2012_1a(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
-                     MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1a(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat,
+                     Mg_Amp_13_cat, Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1a of Ridolfi and Renzulli (2012).
     Calibrated between 1.3-22 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return 0.01 * (np.exp(125.9332115 - 9.587571403 * SiO2_Amp_13_cat - 10.11615567 * TiO2_Amp_13_cat
-    - 8.173455128 * Al2O3_Amp_13_cat- 9.226076274 * FeOt_Amp_13_cat - 8.793390507 * MgO_Amp_13_cat
-    - 1.6658613 * CaO_Amp_13_cat + 2.48347198 * Na2O_Amp_13_cat + 2.519184959 * K2O_Amp_13_cat))
+    return 0.01 * (np.exp(125.9332115 - 9.587571403 * Si_Amp_13_cat - 10.11615567 * Ti_Amp_13_cat
+    - 8.173455128 * Al_Amp_13_cat- 9.226076274 * Fet_Amp_13_cat - 8.793390507 * Mg_Amp_13_cat
+    - 1.6658613 * Ca_Amp_13_cat + 2.48347198 * Na_Amp_13_cat + 2.519184959 * K_Amp_13_cat))
 
 
-def P_Ridolfi2012_1b(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
-                     MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1b(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat,
+                     Mg_Amp_13_cat, Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1b of Ridolfi and Renzulli (2012).
     Calibrated between 1.3-5 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return (0.01 * (np.exp(38.722545085 - 2.695663047 * SiO2_Amp_13_cat - 2.35647038717941 * TiO2_Amp_13_cat
-            - 1.30063975020919 * Al2O3_Amp_13_cat - 2.7779767369382 * FeOt_Amp_13_cat
-            - 2.48384821395444 * MgO_Amp_13_cat- 0.661386638563983 * CaO_Amp_13_cat
-            - 0.270530207793162 * Na2O_Amp_13_cat + 0.111696322092308 * K2O_Amp_13_cat)))
+    return (0.01 * (np.exp(38.722545085 - 2.695663047 * Si_Amp_13_cat - 2.35647038717941 * Ti_Amp_13_cat
+            - 1.30063975020919 * Al_Amp_13_cat - 2.7779767369382 * Fet_Amp_13_cat
+            - 2.48384821395444 * Mg_Amp_13_cat- 0.661386638563983 * Ca_Amp_13_cat
+            - 0.270530207793162 * Na_Amp_13_cat + 0.111696322092308 * K_Amp_13_cat)))
 
 
-def P_Ridolfi2012_1c(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat, MgO_Amp_13_cat,
-                     CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1c(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat, Mg_Amp_13_cat,
+                     Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1c of Ridolfi and Renzulli (2012).
     Calibrated between 1.3-5 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return (0.01 * (24023.367332 - 1925.298250* SiO2_Amp_13_cat
-    - 1720.63250944418 * TiO2_Amp_13_cat - 1478.53847391822 * Al2O3_Amp_13_cat
-    - 1843.19249824537 * FeOt_Amp_13_cat - 1746.94437497404 * MgO_Amp_13_cat
-    - 158.279055907371 * CaO_Amp_13_cat - 40.4443246813322 * Na2O_Amp_13_cat
-    + 253.51576430265 * K2O_Amp_13_cat))
+    return (0.01 * (24023.367332 - 1925.298250* Si_Amp_13_cat
+    - 1720.63250944418 * Ti_Amp_13_cat - 1478.53847391822 * Al_Amp_13_cat
+    - 1843.19249824537 * Fet_Amp_13_cat - 1746.94437497404 * Mg_Amp_13_cat
+    - 158.279055907371 * Ca_Amp_13_cat - 40.4443246813322 * Na_Amp_13_cat
+    + 253.51576430265 * K_Amp_13_cat))
 
 
-def P_Ridolfi2012_1d(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat, MgO_Amp_13_cat, CaO_Amp_13_cat,
-                     K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1d(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat, Mg_Amp_13_cat, Ca_Amp_13_cat,
+                     K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1d of Ridolfi and Renzulli (2012).
     Calibrated between 4-15 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return (0.01 * (26105.7092067 - 1991.93398583468 * SiO2_Amp_13_cat
-    - 3034.9724955129 * TiO2_Amp_13_cat - 1472.2242262718 * Al2O3_Amp_13_cat - 2454.76485311127 * FeOt_Amp_13_cat
-    - 2125.79095875747 * MgO_Amp_13_cat - 830.644984403603 * CaO_Amp_13_cat
-    + 2708.82902160291 * Na2O_Amp_13_cat + 2204.10480275638 * K2O_Amp_13_cat))
+    return (0.01 * (26105.7092067 - 1991.93398583468 * Si_Amp_13_cat
+    - 3034.9724955129 * Ti_Amp_13_cat - 1472.2242262718 * Al_Amp_13_cat - 2454.76485311127 * Fet_Amp_13_cat
+    - 2125.79095875747 * Mg_Amp_13_cat - 830.644984403603 * Ca_Amp_13_cat
+    + 2708.82902160291 * Na_Amp_13_cat + 2204.10480275638 * K_Amp_13_cat))
 
 
-def P_Ridolfi2012_1e(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
-                     MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1e(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat,
+                     Mg_Amp_13_cat, Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1e of Ridolfi and Renzulli (2012).
     Calibrated between 9.3-22 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return (0.01 * np.exp(26.5426319326957 - 1.20851740386237 * SiO2_Amp_13_cat
-    - 3.85930939071001 * TiO2_Amp_13_cat - 1.10536070667051 * Al2O3_Amp_13_cat
-    - 2.90677947035468 * FeOt_Amp_13_cat - 2.64825741548332 *MgO_Amp_13_cat
-    + 0.513357584438019 * CaO_Amp_13_cat
-    + 2.9751971464851 * Na2O_Amp_13_cat + 1.81467032749331 * K2O_Amp_13_cat))
+    return (0.01 * np.exp(26.5426319326957 - 1.20851740386237 * Si_Amp_13_cat
+    - 3.85930939071001 * Ti_Amp_13_cat - 1.10536070667051 * Al_Amp_13_cat
+    - 2.90677947035468 * Fet_Amp_13_cat - 2.64825741548332 *Mg_Amp_13_cat
+    + 0.513357584438019 * Ca_Amp_13_cat
+    + 2.9751971464851 * Na_Amp_13_cat + 1.81467032749331 * K_Amp_13_cat))
 
 
 def P_Ridolfi2010(T=None, *, Al_Amp_cat_23ox, cation_sum_Si_Ca):
@@ -641,17 +641,17 @@ def T_Put2016_SiHbl(P=None, *, Si_Amp_cat_23ox):
     '''
     return (273.15 + 2061 - 178.4 * Si_Amp_cat_23ox)
 
-def T_Ridolfi2012(P, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
-                  MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def T_Ridolfi2012(P, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat,
+                  Mg_Amp_13_cat, Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only thermometer of Ridolfi and Renzuli, 2012
     :cite:`ridolfi2012calcic`
 
     SEE=22C
     '''
-    return (273.15 + 8899.682 - 691.423 * SiO2_Amp_13_cat - 391.548 * TiO2_Amp_13_cat - 666.149 * Al2O3_Amp_13_cat
-    - 636.484 * FeOt_Amp_13_cat -584.021 * MgO_Amp_13_cat - 23.215 * CaO_Amp_13_cat
-    + 79.971 * Na2O_Amp_13_cat - 104.134 * K2O_Amp_13_cat + 78.993 * np.log(P * 100))
+    return (273.15 + 8899.682 - 691.423 * Si_Amp_13_cat - 391.548 * Ti_Amp_13_cat - 666.149 * Al_Amp_13_cat
+    - 636.484 * Fet_Amp_13_cat -584.021 * Mg_Amp_13_cat - 23.215 * Ca_Amp_13_cat
+    + 79.971 * Na_Amp_13_cat - 104.134 * K_Amp_13_cat + 78.993 * np.log(P * 100))
 
 def T_Put2016_eq8(P, *, Si_Amp_cat_23ox, Ti_Amp_cat_23ox,
                   Mg_Amp_cat_23ox, Na_Amp_cat_23ox):
