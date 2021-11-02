@@ -731,21 +731,22 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     if equationP is not None and equationT is not None:
         PT_out = calculate_cpx_opx_press_temp(
             Two_Px_Match=Combo_opxs_cpxs_2, equationP=equationP, equationT=equationT)
-        Combo_opxs_cpxs_2.insert(0, "P_kbar_calc", PT_out['P_kbar_calc'])
-        Combo_opxs_cpxs_2.insert(1, "T_K_calc", PT_out['T_K_calc'])
+        Combo_opxs_cpxs_2.insert(0, "T_K_calc", PT_out['T_K_calc'])
+        Combo_opxs_cpxs_2.insert(1, "P_kbar_calc", PT_out['P_kbar_calc'])
+
         Combo_opxs_cpxs_2.insert(2, "Equation Choice (T)", str(equationT))
         Combo_opxs_cpxs_2.insert(3, "Equation Choice (P)", str(equationP))
     if P is not None:
         T_K_calc = calculate_cpx_opx_temp(
             Two_Px_Match=Combo_opxs_cpxs_2, equationT=equationT, P=P)
-        Combo_opxs_cpxs_2.insert(0, "P_kbar_input", P)
-        Combo_opxs_cpxs_2.insert(1, "T_K_calc", T_K_calc)
+        Combo_opxs_cpxs_2.insert(0, "T_K_calc", T_K_calc)
+        Combo_opxs_cpxs_2.insert(1, "P_kbar_input", P)
         Combo_opxs_cpxs_2.insert(2, "Equation Choice (T)", str(equationT))
     if T is not None:
         P_kbar_calc = calculate_cpx_opx_press(
             Two_Px_Match=Combo_opxs_cpxs_2, equationP=equationP, T=T)
-        Combo_opxs_cpxs_2.insert(0, "P_kbar_calc", P_kbar_calc)
-        Combo_opxs_cpxs_2.insert(1, "T_K_input", T)
+        Combo_opxs_cpxs_2.insert(0, "T_K_input", T)
+        Combo_opxs_cpxs_2.insert(1, "P_kbar_calc", P_kbar_calc)
         Combo_opxs_cpxs_2.insert(3, "Equation Choice (P)", str(equationP))
 
     cols_to_move = ['Kd_Fe_Mg_Cpx_Opx']
