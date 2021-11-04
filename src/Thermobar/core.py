@@ -2447,6 +2447,8 @@ def get_amp_sites_leake(amp_apfu_df):
     norm_cations['Ca_B']=norm_cations['Ca_Amp_cat_23ox']
     norm_cations['Na_A']=0
     norm_cations['K_A']=norm_cations['K_Amp_cat_23ox']
+    norm_cations['Ca_A']=0 # This is very ambigous, Leake have Ca A in some of their plots, but no way to put it in A based on workflow of site allocation.
+
 
 
     # 5a) Leake T Sites. Place all Si here, if Si<8, fill rest of T with Al.
@@ -2540,7 +2542,7 @@ def get_amp_sites_leake(amp_apfu_df):
     norm_cations['Fe_B']= Fe_remaining
     norm_cations['Mn_B']= Mn_remaining
 
-
+    # If B sites sum to less than 2, fill sites with Ca to bring total to 2
 
     # If B sites sum to less than 2, fill sites with Na to bring total to 2
 

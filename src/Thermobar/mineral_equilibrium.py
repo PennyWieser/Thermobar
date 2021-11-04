@@ -464,7 +464,7 @@ def calculate_cpx_rhodes_diagram_lines(
 
 ## Amphibole classification diagram
 
-def add_Leake_Amp_Fields_Fig3a(plot_axes, fontsize=8, color=[0.3, 0.3, 0.3],
+def add_Leake_Amp_Fields_Fig3bot(plot_axes, fontsize=8, color=[0.3, 0.3, 0.3],
 linewidth=0.5, lower_text=0.3, upper_text=0.7, text_labels=True):
     """
     Code adapted from TAS plot
@@ -607,6 +607,56 @@ linewidth=0.5, lower_text=0.3, upper_text=0.7, text_labels=True):
                     horizontalalignment='center', verticalalignment='top',
                     rotation=name.rotation, zorder=0)
 
+def calculate_Leake_Diagram_Class(amp_comps):
+    cat_23ox=calculate_23oxygens_amphibole(amp_comps)
+    Leake_Sites=get_amp_sites_from_input(amp_comps)
+    Leake_Sites['Classification']="Not a calcic or sodic-calcic amphibole"
+    Leake_Sites['Diagram']="Not a calcic or sodic-calcic amphibole"
+
+
+    # Calcic amphiboles - Fig 3 top - Ca >1.5, Na + K A >0.5, Ti_C<0.5 LHS
+    High_Ca_B=Leake_Sites['Ca_B']>=1.5
+    High_NaK_A=(Leake_Sites['Na_A']+Leake_Sites['K_A'])>=0.5
+    low_TiC=(Leake_Sites['Ti_C'])<0.5
+    low_CaA=(Leake_Sites['Ca_A'])<0.5
+    Fig3bot_LHS=( (High_Ca_B) & (High_NaK_A) & (low_TiC))
+    Fig3bot_RHS=( (High_Ca_B) & (High_NaK_A) & (~low_TiC))
+
+    Leake_Sites.loc[(Fig3bot_LHS|Fig3bot_RHS), 'Classification']=="High Na-K calcic amphiboles"
+    Leake_Sites.loc[Fig3bot_LHS, 'Diagram']="Fig. 3 - top - LHS"
+    Leake_Sites.loc[Fig3bot_RHS, 'Diagram']="Fig. 3 - top - RHS"
+
+    # Fig 3 - bottom -
+
+
+    Fig3b_LHS=( (High_Ca_B) & (~High_NaK_A)  & (low_CaA) )
+    Fig3b_RHS=( (High_Ca_B) & (~High_NaK_A) & (~low_CaA))
+    Leake_Sites.loc[(Fig3b_LHS|Fig3b_RHS), 'Classification']=="Low Na-K calcic amphiboles"
+    Leake_Sites.loc[Fig3b_LHS, 'Diagram']="Fig. 3 - bottom - LHS"
+    Leake_Sites.loc[Fig3b_RHS, 'Diagram']="Fig. 3 - bottom - Cannilloite"
+
+    # Figure 4 - Sodic-Calcic amphiboles
+    High_Ca_NaB=(cat_23ox['Ca_Amp_cat_23ox']+ Leake_Sites['Na_B'])>=1
+    Int_NaB=Leake_Sites['Na_B'].between(0.5, 1.5)
+    Fig4_top=( (High_NaK_A) & (High_Ca_NaB) & (Int_NaB) )
+    Fig4_bottom=( (~High_NaK_A) & (High_Ca_NaB) & (Int_NaB) )
+    Leake_Sites.loc[(Fig4_top), 'Classification']="High Na-K sodic-calcic amphiboles"
+    Leake_Sites.loc[(Fig4_bottom), 'Classification']="Low Na-K sodic-calcic amphiboles"
+
+    Leake_Sites.loc[Fig4_top, 'Diagram']="Fig. 4 - top"
+    Leake_Sites.loc[Fig4_bottom, 'Diagram']="Fig. 4 - bottom"
+
+    cols_to_move = ['Diagram', 'Classification']
+    Leake_Sites = Leake_Sites[cols_to_move + [
+        col for col in Leake_Sites.columns if col not in cols_to_move]]
+
+    return Leake_Sites
+
+    # Figure 5 - sodic amphiboles
+
+
+
+
 def plot_amp_class_Leake(amp_comps, fontsize=8, color=[0.3, 0.3, 0.3],
 linewidth=0.5, lower_text=0.3, upper_text=0.7, text_labels=True, site_check=True,
 plots="Ca_Amphiboles", marker='.k'):
@@ -615,21 +665,29 @@ plots="Ca_Amphiboles", marker='.k'):
     cat_23ox=calculate_23oxygens_amphibole(amp_comps)
     Leake_Sites=get_amp_sites_from_input(amp_comps)
     low_Ca_B=Leake_Sites['Ca_B']<1.5
-    low_NaK_B=(Leake_Sites['Na_A']+Leake_Sites['K_A'])<0.5
+    High_Ca_A=Leake_Sites['Ca_A']>=0.5
+    high_NaK_A=(Leake_Sites['Na_A']+Leake_Sites['K_A'])>0.5
+
 
     if site_check==False:
 
-        if (any(Leake_Sites['Ca_B']<1.5)):
+        if (any(Leake_Sites['Ca_A']>=0.5)):
 
             #print(str(sum(low_Ca_B))+ " amphiboles have Ca_B<1.5")
-            w.warn(str(sum(low_Ca_B))+ " of your amphiboles have Ca_B<1.5, so shouldnt be plotted on this diagram based on Leake. site_check=True filters these out")
-        if (any((Leake_Sites['Na_A']+Leake_Sites['K_A'])<0.5)):
-            #print(str(sum(low_NaK_B=))+ " amphiboles have Na_A+K_A<1.5, so arent shown on this plot")
-            w.warn(str(sum(low_NaK_B))+ " of your amphiboles have Na_A+K_A>0.5"
-            " so shouldn\'t be plotted on this diagram based on Leake. site_check=True filters these out", stacklevel=2)
+            w.warn(str(sum(high_Ca_A))+ " of your amphiboles have Ca_A>=0.5, so shouldnt be plotted on this diagram based on Leake. site_check=True filters these out, but youve choosen site_check is False")
+
+        if (any(Leake_Sites['Ca_B']<1.5)):
+            #print(str(sum(low_Ca_B))+ " amphiboles have Ca_B<1.5")
+            w.warn(str(sum(low_Ca_B))+ " of your amphiboles have Ca_B<1.5, so shouldnt be plotted on this diagram based on Leake. site_check=True filters these out, but youve choosen site_check is False")
+        if (any((Leake_Sites['Na_A']+Leake_Sites['K_A'])>0.5)):
+            #print(str(sum(low_NaK_A=))+ " amphiboles have Na_A+K_A<1.5, so arent shown on this plot")
+            w.warn(str(sum(low_NaK_A))+ " of your amphiboles have Na_A+K_A>0.5"
+            " so shouldn\'t be plotted on this diagram based on Leake. site_check=True filters these out, but youve choosen site_check is False", stacklevel=2)
+
         fig, (ax1) = plt.subplots(1, 1, figsize = (7,5))
+
         ax1.plot(cat_23ox['Si_Amp_cat_23ox'], cat_23ox['Mgno_Amp'], 'ok')
-        add_Leake_Amp_Fields_Fig3a(ax1, fontsize=fontsize, color=color,
+        add_Leake_Amp_Fields_Fig3bot(ax1, fontsize=fontsize, color=color,
         linewidth=linewidth, lower_text=lower_text, upper_text=upper_text,
         text_labels=text_labels)
         ax1.invert_xaxis()
@@ -648,7 +706,7 @@ plots="Ca_Amphiboles", marker='.k'):
     # if site_check==False:
     #     fig, (ax1) = plt.subplots(figsize = (8,5))
     #     ax1.plot(cat_23ox['Si_Amp_cat_23ox'], cat_23ox['Mgno_Amp'], 'ok')
-    #     add_Leake_Amp_Fields_Fig3a(ax1, fontsize=fontsize, color=color,
+    #     add_Leake_Amp_Fields_Fig3bot(ax1, fontsize=fontsize, color=color,
     #     linewidth=linewidth, lower_text=lower_text, upper_text=upper_text,
     #     text_labels=text_labels)
     #     ax1.invert_xaxis()
@@ -658,14 +716,16 @@ plots="Ca_Amphiboles", marker='.k'):
     if site_check==True:
         if plots == "Ca_Amphiboles":
             print(str(sum(low_Ca_B))+ " amphiboles have Ca_B<1.5, so arent shown on this plot")
-            print(str(sum(low_NaK_B))+ " amphiboles have Na_A+K_A<1.5, so arent shown on this plot")
+            print(str(sum(High_Ca_A))+ " amphiboles have Ca_A>=0.5, so arent shown on this plot")
+            print(str(sum(high_NaK_A))+ " amphiboles have Na_A+K_A>0.5, so arent shown on this plot")
             fig, (ax1) = plt.subplots(1, 1, figsize = (7,5))
-            low_NaK_A=(Leake_Sites['Na_A']+Leake_Sites['K_A'])<0.5
-            high_NaK_A=(Leake_Sites['Na_A']+Leake_Sites['K_A'])>=0.5
-            ax1.plot(cat_23ox['Si_Amp_cat_23ox'].loc[(~low_NaK_A)&(~low_Ca_B)],
-            cat_23ox['Mgno_Amp'].loc[(~low_NaK_A)&(~low_Ca_B)], marker)
 
-            add_Leake_Amp_Fields_Fig3a(ax1, fontsize=fontsize, color=color,
+            ax1.plot(cat_23ox['Si_Amp_cat_23ox'].loc[(~high_NaK_A)&(~low_Ca_B)& (~High_Ca_A)],
+            cat_23ox['Mgno_Amp'].loc[(~high_NaK_A)&(~low_Ca_B)& (~High_Ca_A)], marker)
+
+
+
+            add_Leake_Amp_Fields_Fig3bot(ax1, fontsize=fontsize, color=color,
         linewidth=linewidth, lower_text=lower_text, upper_text=upper_text,
         text_labels=text_labels)
             ax1.invert_xaxis()
