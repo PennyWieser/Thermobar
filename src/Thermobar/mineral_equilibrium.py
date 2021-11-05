@@ -745,7 +745,7 @@ def plot_fsp_classification(
     minor_grid=False,
     labels=False,
     major_grid_kwargs={"ls": ":", "lw": 0.5, "c": "k"},
-    minor_grid_kwargs={"ls": "-", "lw": 0.1, "c": "lightgrey"},
+    minor_grid_kwargs={"ls": "-", "lw": 0.25, "c": "lightgrey"},
     fontsize_component_labels=10,
     fontsize_axes_labels=14,
     Anorthite_label='An',
