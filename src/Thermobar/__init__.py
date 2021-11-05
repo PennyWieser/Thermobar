@@ -8,7 +8,8 @@ from functools import partial
 import inspect
 import warnings as w
 import numbers
-
+import ternary
+from scipy import interpolate
 
 
 # This has the core calculations, e.g., molar fractions, cation fractions etc.

@@ -5,8 +5,8 @@ import inspect
 import warnings as w
 import numbers
 import pandas as pd
-
-
+import ternary
+from scipy import interpolate
 from Thermobar.core import *
 
 ## Equilibrium things for Olivine
@@ -736,5 +736,193 @@ plots="Ca_Amphiboles", marker='.k'):
 
 
 
+## Feldspar Ternary Diagram
+
+# The function to create the classification diagram
+def plot_fsp_classification(
+    figsize=(6,6),
+    major_grid=False,
+    minor_grid=False,
+    labels=False,
+    major_grid_kwargs={"ls": ":", "lw": 0.5, "c": "k"},
+    minor_grid_kwargs={"ls": "-", "lw": 0.1, "c": "lightgrey"},
+    fontsize_component_labels=10,
+    fontsize_axes_labels=14,
+    Anorthite_label='An',
+    Anorthoclase_label='AnC',
+    Albite_label='Ab',
+    Oligoclase_label='Ol',
+    Andesine_label='Ad',
+    Labradorite_label='La',
+    Bytownite_label='By',
+    Sanidine_label='San',
+
+):
+    """
+    Plotting a feldspar ternary classification diagram according to Deer, Howie, and Zussman 1992 3rd edition.
+    This function relies heavily on the python package python-ternary by Marc Harper et al. (2015).
+    :cite:`harper2015`
+
+    Inputs:
+    figsize: tuple
+    for figure size same as matplotlib
+
+    major_grid: boolean,
+    whether or not to show major grid lines shows lines every .2. Default = False
+
+    minor_grid: boolean,
+    whether or not to show minor grid lines...shows lines every .05. Default = False
+
+    labels: boolean,
+    whether or not to show abbreviated field labels for feldspar classification
+
+    major_grid_kwargs: dict,
+    inherited matplotlib kwargs for styling major grid
+
+    minor_grid_kwargs: dict,
+    inherited matplotlib kwargs for styling minor grid
+
+    Returns:
+
+    fig: matplotlib figure
+
+    tax: ternary axis subplot from ternary package. To use matplotlib ax level styling
+    and functions:
+            # Example
+            ax = tax.get_axes()
+            ax.set_title('my title')
+
+
+    """
+    # plagioclase classification
+    # anorthite      1.0 - 0.9
+    # bytownite      0.9 - 0.7
+    # labradorite    0.7 - 0.5
+    # andesine       0.5 - 0.3
+    # oligoclase     0.3 - 0.1
+    # albite         0.1 - 0.0
+
+    # figure and axis component
+    figure, tax = ternary.figure()
+    figure.set_size_inches(figsize)
+
+    # Draw Boundary and Gridlines
+    tax.boundary(linewidth=1.5,zorder = 0)  # outside triangle boundary width
+    if major_grid is True:
+        tax.gridlines(multiple=0.2, **major_grid_kwargs, zorder=0)
+    if minor_grid is True:
+        tax.gridlines(multiple=0.05, linewidth=0.5, **minor_grid_kwargs, zorder=0)
+    # Set Axis labels and Title
+    fontsize = 20
+    tax.right_corner_label("An", fontsize=fontsize_axes_labels)
+    tax.top_corner_label("Or", fontsize=fontsize_axes_labels)
+    tax.left_corner_label("Ab", fontsize=fontsize_axes_labels)
+
+    # making the plag curve
+    An = np.array([1.0, 0.9, 0.7, 0.5, 0.3, 0.20, 0.15])
+    Or = np.array([0.05, 0.05, 0.05, 0.05, 0.05, 0.1, 0.15])
+    f_plag = interpolate.interp1d(An, Or, kind="linear")
+    An_new = np.linspace(0.15, 1, 1000)
+    Or_new = f_plag(An_new)
+    Ab_new = 1 - An_new
+    plag_curve = np.hstack([An_new[:, None], Or_new[:, None], Ab_new[:, None]])
+
+    # making plag - kspar line
+
+    Or_kp = np.array([0, 0.15])
+    An_kp = np.array([0, 0.15])
+    Ab_kp = np.array([1, 0.85])
+
+    f_kp = interpolate.interp1d(An_kp, Ab_kp)
+    An_kp_new = np.linspace(0, 0.15, 1000)
+    Or_kp_new = An_kp_new
+    Ab_kp_new = An_kp_new
+    plag_kspar_line = np.hstack(
+        [An_kp_new[:, None], Or_kp_new[:, None], Ab_kp_new[:, None]]
+    )
+
+    # making the kspar curve
+    Or_k = np.array([1.0, 0.37, 0.15])
+    An_k = np.array([0.05, 0.05, 0.15])
+    f_kspar = interpolate.interp1d(Or_k, An_k)
+    Or_k_new = np.linspace(0.15, 1, 1000)
+    An_k_new = f_kspar(Or_k_new)
+    Ab_k_new = 1 - Or_k_new
+    kspar_curve = np.hstack([An_k_new[:, None], Or_k_new[:, None], Ab_k_new[:, None]])
+
+    # anorthite - bytownite divider
+    tax.line([0.9, 0, 0], plag_curve[plag_curve[:, 0] >= 0.9][0], color="k")
+
+    # bytownite - labradorite divider
+    tax.line([0.7, 0, 0], plag_curve[plag_curve[:, 0] >= 0.7][0], color="k")
+
+    # labradorite - andesine divider
+    tax.line([0.5, 0, 0], plag_curve[plag_curve[:, 0] >= 0.5][0], color="k")
+
+    # andesine - oligoclase divider
+    tax.line([0.3, 0, 0], plag_curve[plag_curve[:, 0] >= 0.3][0], color="k")
+
+    # oligoclase - albite divider
+    tax.line([0.1, 0, 0], plag_kspar_line[plag_kspar_line[:, 0] >= 0.1][0], color="k")
+
+    # sanidine - anorthoclase divider
+    tax.line([0, 0.37, 0.63], kspar_curve[kspar_curve[:, 1] >= 0.37][0], color="k")
+
+    # anorthoclase - albite divider
+    tax.line([0, 0.1, 0.9], plag_kspar_line[plag_kspar_line[:, 0] >= 0.1][0], color="k")
+
+    # making the plag - kspar divider
+    tax.plot(plag_kspar_line[plag_kspar_line[:, 1] > 0.1], color="k")
+
+    # plotting the curves
+    tax.plot(plag_curve[:-60], color="k")
+    tax.plot(kspar_curve[:-60], color="k")
+
+    # Set ticks
+    tax.ticks(
+        axis="lbr", linewidth=0.5, multiple=0.20, offset=0.02, tick_formats="%.1f"
+    )
+
+    # # Remove default Matplotlib Axes
+    tax.clear_matplotlib_ticks()
+    tax.get_axes().axis("off")
+    tax._redraw_labels()
+
+    if labels is True:
+        # annotations
+        ax = tax.get_axes()
+        ax.text(0.3, 0.5, Sanidine_label, fontsize=fontsize_component_labels, rotation=60)
+        ax.text(0.15, 0.2, Anorthoclase_label, fontsize=fontsize_component_labels)
+        ax.text(0.05, 0.03, Albite_label, fontsize=fontsize_component_labels)
+        ax.text(0.2, 0.03, Oligoclase_label, fontsize=fontsize_component_labels)
+        ax.text(0.38, 0.01, Andesine_label, fontsize=fontsize_component_labels)
+        ax.text(0.58, 0.01, Labradorite_label, fontsize=fontsize_component_labels)
+        ax.text(0.78, 0.01, Bytownite_label, fontsize=fontsize_component_labels)
+        ax.text(0.94, 0.01, Anorthite_label, fontsize=fontsize_component_labels)
+
+
+
+    return figure, tax
+
+
+# function to get arrays in proper format for plotting on ternary
+def tern_points(right, top, left):
+    """Tern_points takes 3 equal size 1D arrays or pandas series and organizes them into points to be plotted on a ternary
+         with the following arrangement:(lower right,top,lower left).
+             Inputs:
+             x = 1D array like (lower right vertex)
+             y = 1D array like (top vertex)
+             z = 1D array like (lower left vertex)
+    """
+    if isinstance(right, pd.Series):
+        right = right.to_numpy()
+    if isinstance(top, pd.Series):
+        top = top.to_numpy()
+    if isinstance(left, pd.Series):
+        left = left.to_numpy()
+
+    points = np.hstack([right[:, None], top[:, None], left[:, None]])
+
+    return points
 
     #return fig
