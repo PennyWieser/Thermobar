@@ -31,10 +31,12 @@ Welcome to Thermobar's documentation!
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_hygrometry
    %
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liq_Thermobarometry
+   Examples/Cpx_Cpx_Liq_Thermobarometry/Pyroxene_Ternary_Cpx_Example
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liquid_melt_matching/Cpx_MeltMatch1_Gleeson2020
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_MeltMatch2_ScruggsPutirka2018
    %
    Examples/Opx_and_Opx_Liq_Thermobarometry/Opx_Liq_Thermobarometry
+   Examples/Opx_and_Opx_Liq_Thermobarometry/Pyroxene_Ternary_Opx_Example
    Examples/Opx_and_Opx_Liq_Thermobarometry/Opx_Liq_Matching
    %
    Examples/Amphibole/Amphibole_Examples
