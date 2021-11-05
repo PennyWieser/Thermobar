@@ -744,6 +744,7 @@ def plot_fsp_classification(
     major_grid=False,
     minor_grid=False,
     labels=False,
+    ticks=True,
     major_grid_kwargs={"ls": ":", "lw": 0.5, "c": "k"},
     minor_grid_kwargs={"ls": "-", "lw": 0.25, "c": "lightgrey"},
     fontsize_component_labels=10,
@@ -776,11 +777,26 @@ def plot_fsp_classification(
     labels: boolean,
     whether or not to show abbreviated field labels for feldspar classification
 
+    ticks: boolean.
+        If True, adds ticks onto side of axes
+
     major_grid_kwargs: dict,
     inherited matplotlib kwargs for styling major grid
 
     minor_grid_kwargs: dict,
     inherited matplotlib kwargs for styling minor grid
+
+    ...labels: str
+    Can overwrite defauls for what the different regions are named. Defaults below.
+    Anorthite_label='An',
+    Anorthoclase_label='AnC',
+    Albite_label='Ab',
+    Oligoclase_label='Ol',
+    Andesine_label='Ad',
+    Labradorite_label='La',
+    Bytownite_label='By',
+    Sanidine_label='San',
+
 
     Returns:
 
@@ -813,7 +829,6 @@ def plot_fsp_classification(
     if minor_grid is True:
         tax.gridlines(multiple=0.05, linewidth=0.5, **minor_grid_kwargs, zorder=0)
     # Set Axis labels and Title
-    fontsize = 20
     tax.right_corner_label("An", fontsize=fontsize_axes_labels)
     tax.top_corner_label("Or", fontsize=fontsize_axes_labels)
     tax.left_corner_label("Ab", fontsize=fontsize_axes_labels)
@@ -879,9 +894,10 @@ def plot_fsp_classification(
     tax.plot(kspar_curve[:-60], color="k")
 
     # Set ticks
-    tax.ticks(
-        axis="lbr", linewidth=0.5, multiple=0.20, offset=0.02, tick_formats="%.1f"
-    )
+    if ticks is True:
+        tax.ticks(
+            axis="lbr", linewidth=0.5, multiple=0.20, offset=0.02, tick_formats="%.1f"
+        )
 
     # # Remove default Matplotlib Axes
     tax.clear_matplotlib_ticks()
@@ -900,6 +916,137 @@ def plot_fsp_classification(
         ax.text(0.78, 0.01, Bytownite_label, fontsize=fontsize_component_labels)
         ax.text(0.94, 0.01, Anorthite_label, fontsize=fontsize_component_labels)
 
+
+
+    return figure, tax
+
+
+
+
+def plot_px_classification(
+    figsize=(7,5),
+    cut_in_half=True,
+    major_grid=False,
+    minor_grid=False,
+    labels=False,
+    major_grid_kwargs={"ls": ":", "lw": 0.5, "c": "k"},
+    minor_grid_kwargs={"ls": "-", "lw": 0.25, "c": "lightgrey"},
+    fontsize_component_labels=10,
+    fontsize_axes_labels=14,
+    Enstatite_label='Enstatite',
+    Ferrosilite_label='Ferrosilite',
+    Pigeonite_label='Pigeonite',
+    Augite_label='Augite',
+    Diopside_label='Diopside',
+    Hedenbergite_label='Hedenbergite'
+
+):
+    """
+    Plotting a pyroxene ternary classification diagram according to Deer, Howie, and Zussman 1992 3rd edition.
+    This function relies heavily on the python package python-ternary by Marc Harper et al. (2015).
+    :cite:`harper2015`
+
+    Inputs:
+    figsize: tuple
+        for figure size same as matplotlib. Default is 7-5, assuming you'll cut the top off.
+
+    cut_in_half: boolean
+        If True, cuts the top off to give the pyroxene quadrilateral.
+
+
+    major_grid: boolean
+        whether or not to show major grid lines shows lines every .2. Default = False
+
+    minor_grid: boolean,
+        whether or not to show minor grid lines...shows lines every .05. Default = False
+
+    labels: boolean,
+        whether or not to show abbreviated field labels for pyroxene classification
+
+    major_grid_kwargs: dict,
+        inherited matplotlib kwargs for styling major grid
+
+    minor_grid_kwargs: dict,
+        inherited matplotlib kwargs for styling minor grid
+
+    ...labels: str
+    Can overwrite defauls for what the different regions are named. Defaults below.
+    Enstatite_label='Enstatite'
+    Ferrosilite_label='Ferrosilite'
+    Pigeonite_label='Pigeonite'
+    Augite_label='Augite'
+    Diopside_label='Diopside'
+    Hedenbergite_label='Hedenbergite'
+
+
+    Returns:
+
+    fig: matplotlib figure
+
+    tax: ternary axis subplot from ternary package. To use matplotlib ax level styling
+    and functions:
+            # Example
+            ax = tax.get_axes()
+            ax.set_title('my title')
+
+
+    """
+
+    # figure and axis component
+    figure, tax = ternary.figure()
+    figure.set_size_inches(figsize)
+
+
+
+    # Draw Boundary and Gridlines
+    tax.boundary(linewidth=1.5,zorder = 0)  # outside triangle boundary width
+    if major_grid is True:
+        tax.gridlines(multiple=0.2, **major_grid_kwargs, zorder=0)
+    if minor_grid is True:
+        tax.gridlines(multiple=0.05, linewidth=0.5, **minor_grid_kwargs, zorder=0)
+    # Set Axis labels and Title
+
+    if cut_in_half is True:
+        axes=tax.get_axes()
+        axes.set_ylim([-0.01, 0.434])
+
+
+    tax.right_corner_label("", fontsize=fontsize_axes_labels)
+
+
+
+    if cut_in_half is True:
+        tax.top_corner_label("↑ Wo", fontsize=fontsize_axes_labels)
+    else:
+        tax.top_corner_label("Wo", fontsize=fontsize_axes_labels)
+    tax.left_corner_label("En", fontsize=fontsize_axes_labels)
+    tax.right_corner_label("Fs", fontsize=fontsize_axes_labels)
+
+    # Adding Fields
+    tax.line([0, 0.5, 0.5], [0.5, 0.5, 0], color="k")
+    tax.line([0, 0.45, 0.55], [0.55, 0.45, 0], color="k")
+    tax.line([0.25, 0.5, 0.25], [0.275, 0.45, 0.275], color="k")
+    tax.line([0, 0.05, 0.95], [0.95, 0.05, 0], color="k")
+    tax.line([0, 0.2, 0.8], [0.8, 0.2, 0], color="k")
+    tax.line([0, 0.2, 0.8], [0.8, 0.2, 0], color="k")
+    tax.line([0.5, 0, 0.5], [0.475, 0.05, 0.475], color="k")
+
+
+
+    # # Remove default Matplotlib Axes
+    tax.clear_matplotlib_ticks()
+    tax.get_axes().axis("off")
+    tax._redraw_labels()
+
+    if labels is True:
+        # annotations
+        ax = tax.get_axes()
+        ax.text(0.2, 0.01, Enstatite_label, fontsize=fontsize_component_labels)
+        ax.text(0.7, 0.01, Ferrosilite_label, fontsize=fontsize_component_labels)
+        ax.text(0.4, 0.1, Pigeonite_label, fontsize=fontsize_component_labels)
+        ax.text(0.42, 0.25, Augite_label, fontsize=fontsize_component_labels)
+        ax.text(0.28, 0.40, Diopside_label, fontsize=fontsize_component_labels)
+        ax.text(0.52, 0.4, Hedenbergite_label, fontsize=fontsize_component_labels)
 
 
     return figure, tax

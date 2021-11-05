@@ -32,7 +32,7 @@ setup(
     install_requires=[
             'pandas',
             'numpy',
-            'ternary',
+            'python-ternary',
             'matplotlib',
             'scikit-learn',
             'scipy',

@@ -1068,6 +1068,16 @@ def calculate_6oxygens_orthopyroxene(opx_comps):
                             'Cr2O3_Opx_cat_6ox': 'Cr_Opx_cat_6ox',
                             'P2O5_Opx_cat_6ox': 'P_Opx_cat_6ox_frac',
                             })
+
+    cation_6_2['En_Simple_MgFeCa_Opx']=(cation_6_2['Mg_Opx_cat_6ox']/(cation_6_2['Mg_Opx_cat_6ox']
+    +cation_6_2['Fet_Opx_cat_6ox']+cation_6_2['Ca_Opx_cat_6ox']))
+
+    cation_6_2['Fs_Simple_MgFeCa_Opx']=(cation_6_2['Fet_Opx_cat_6ox']/(cation_6_2['Mg_Opx_cat_6ox']
+    +cation_6_2['Fet_Opx_cat_6ox']+cation_6_2['Ca_Opx_cat_6ox']))
+
+    cation_6_2['Wo_Simple_MgFeCa_Opx']=(cation_6_2['Ca_Opx_cat_6ox']/(cation_6_2['Mg_Opx_cat_6ox']
+    +cation_6_2['Fet_Opx_cat_6ox']+cation_6_2['Ca_Opx_cat_6ox']))
+
     return cation_6_2
 
 
@@ -1319,6 +1329,15 @@ def calculate_6oxygens_clinopyroxene(cpx_comps):
                         'Cr2O3_Cpx_cat_6ox': 'Cr_Cpx_cat_6ox',
                         'P2O5_Cpx_cat_6ox': 'P_Cpx_cat_6ox_frac',
                         })
+
+    cation_6_2['En_Simple_MgFeCa_Cpx']=(cation_6_2['Mg_Cpx_cat_6ox']/(cation_6_2['Mg_Cpx_cat_6ox']
+    +cation_6_2['Fet_Cpx_cat_6ox']+cation_6_2['Ca_Cpx_cat_6ox']))
+
+    cation_6_2['Fs_Simple_MgFeCa_Cpx']=(cation_6_2['Fet_Cpx_cat_6ox']/(cation_6_2['Mg_Cpx_cat_6ox']
+    +cation_6_2['Fet_Cpx_cat_6ox']+cation_6_2['Ca_Cpx_cat_6ox']))
+
+    cation_6_2['Wo_Simple_MgFeCa_Cpx']=(cation_6_2['Ca_Cpx_cat_6ox']/(cation_6_2['Mg_Cpx_cat_6ox']
+    +cation_6_2['Fet_Cpx_cat_6ox']+cation_6_2['Ca_Cpx_cat_6ox']))
     return cation_6_2
 
 # calculating Clinopyroxene components following Putirka spreadsheet
