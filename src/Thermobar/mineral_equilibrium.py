@@ -739,7 +739,7 @@ plots="Ca_Amphiboles", marker='.k'):
 ## Feldspar Ternary Diagram
 
 # The function to create the classification diagram
-def plot_fsp_classification(
+def plot_fspar_classification(
     figsize=(6,6),
     major_grid=False,
     minor_grid=False,
@@ -866,32 +866,32 @@ def plot_fsp_classification(
     kspar_curve = np.hstack([An_k_new[:, None], Or_k_new[:, None], Ab_k_new[:, None]])
 
     # anorthite - bytownite divider
-    tax.line([0.9, 0, 0], plag_curve[plag_curve[:, 0] >= 0.9][0], color="k")
+    tax.line([0.9, 0, 0], plag_curve[plag_curve[:, 0] >= 0.9][0], color="k",  zorder=0)
 
     # bytownite - labradorite divider
-    tax.line([0.7, 0, 0], plag_curve[plag_curve[:, 0] >= 0.7][0], color="k")
+    tax.line([0.7, 0, 0], plag_curve[plag_curve[:, 0] >= 0.7][0], color="k", zorder=0)
 
     # labradorite - andesine divider
-    tax.line([0.5, 0, 0], plag_curve[plag_curve[:, 0] >= 0.5][0], color="k")
+    tax.line([0.5, 0, 0], plag_curve[plag_curve[:, 0] >= 0.5][0], color="k", zorder=0)
 
     # andesine - oligoclase divider
-    tax.line([0.3, 0, 0], plag_curve[plag_curve[:, 0] >= 0.3][0], color="k")
+    tax.line([0.3, 0, 0], plag_curve[plag_curve[:, 0] >= 0.3][0], color="k", zorder=0)
 
     # oligoclase - albite divider
-    tax.line([0.1, 0, 0], plag_kspar_line[plag_kspar_line[:, 0] >= 0.1][0], color="k")
+    tax.line([0.1, 0, 0], plag_kspar_line[plag_kspar_line[:, 0] >= 0.1][0], color="k", zorder=0)
 
     # sanidine - anorthoclase divider
-    tax.line([0, 0.37, 0.63], kspar_curve[kspar_curve[:, 1] >= 0.37][0], color="k")
+    tax.line([0, 0.37, 0.63], kspar_curve[kspar_curve[:, 1] >= 0.37][0], color="k", zorder=0)
 
     # anorthoclase - albite divider
-    tax.line([0, 0.1, 0.9], plag_kspar_line[plag_kspar_line[:, 0] >= 0.1][0], color="k")
+    tax.line([0, 0.1, 0.9], plag_kspar_line[plag_kspar_line[:, 0] >= 0.1][0], color="k", zorder=0)
 
     # making the plag - kspar divider
-    tax.plot(plag_kspar_line[plag_kspar_line[:, 1] > 0.1], color="k")
+    tax.plot(plag_kspar_line[plag_kspar_line[:, 1] > 0.1], color="k", zorder=0)
 
     # plotting the curves
-    tax.plot(plag_curve[:-60], color="k")
-    tax.plot(kspar_curve[:-60], color="k")
+    tax.plot(plag_curve[:-60], color="k", zorder=0)
+    tax.plot(kspar_curve[:-60], color="k", zorder=0)
 
     # Set ticks
     if ticks is True:
@@ -907,14 +907,14 @@ def plot_fsp_classification(
     if labels is True:
         # annotations
         ax = tax.get_axes()
-        ax.text(0.3, 0.5, Sanidine_label, fontsize=fontsize_component_labels, rotation=60)
-        ax.text(0.15, 0.2, Anorthoclase_label, fontsize=fontsize_component_labels)
-        ax.text(0.05, 0.03, Albite_label, fontsize=fontsize_component_labels)
-        ax.text(0.2, 0.03, Oligoclase_label, fontsize=fontsize_component_labels)
-        ax.text(0.38, 0.01, Andesine_label, fontsize=fontsize_component_labels)
-        ax.text(0.58, 0.01, Labradorite_label, fontsize=fontsize_component_labels)
-        ax.text(0.78, 0.01, Bytownite_label, fontsize=fontsize_component_labels)
-        ax.text(0.94, 0.01, Anorthite_label, fontsize=fontsize_component_labels)
+        ax.text(0.3, 0.5, Sanidine_label, fontsize=fontsize_component_labels, rotation=60, zorder=0)
+        ax.text(0.15, 0.2, Anorthoclase_label, fontsize=fontsize_component_labels, zorder=0)
+        ax.text(0.05, 0.03, Albite_label, fontsize=fontsize_component_labels, zorder=0)
+        ax.text(0.2, 0.03, Oligoclase_label, fontsize=fontsize_component_labels, zorder=0)
+        ax.text(0.38, 0.01, Andesine_label, fontsize=fontsize_component_labels, zorder=0)
+        ax.text(0.58, 0.01, Labradorite_label, fontsize=fontsize_component_labels, zorder=0)
+        ax.text(0.78, 0.01, Bytownite_label, fontsize=fontsize_component_labels, zorder=0)
+        ax.text(0.94, 0.01, Anorthite_label, fontsize=fontsize_component_labels, zorder=0)
 
 
 
@@ -1023,13 +1023,13 @@ def plot_px_classification(
     tax.right_corner_label("Fs", fontsize=fontsize_axes_labels)
 
     # Adding Fields
-    tax.line([0, 0.5, 0.5], [0.5, 0.5, 0], color="k")
-    tax.line([0, 0.45, 0.55], [0.55, 0.45, 0], color="k")
-    tax.line([0.25, 0.5, 0.25], [0.275, 0.45, 0.275], color="k")
-    tax.line([0, 0.05, 0.95], [0.95, 0.05, 0], color="k")
-    tax.line([0, 0.2, 0.8], [0.8, 0.2, 0], color="k")
-    tax.line([0, 0.2, 0.8], [0.8, 0.2, 0], color="k")
-    tax.line([0.5, 0, 0.5], [0.475, 0.05, 0.475], color="k")
+    tax.line([0, 0.5, 0.5], [0.5, 0.5, 0], color="k", zorder=0)
+    tax.line([0, 0.45, 0.55], [0.55, 0.45, 0], color="k", zorder=0)
+    tax.line([0.25, 0.5, 0.25], [0.275, 0.45, 0.275], color="k", zorder=0)
+    tax.line([0, 0.05, 0.95], [0.95, 0.05, 0], color="k", zorder=0)
+    tax.line([0, 0.2, 0.8], [0.8, 0.2, 0], color="k", zorder=0)
+    tax.line([0, 0.2, 0.8], [0.8, 0.2, 0], color="k", zorder=0)
+    tax.line([0.5, 0, 0.5], [0.475, 0.05, 0.475], color="k", zorder=0)
 
 
 
@@ -1056,6 +1056,8 @@ def plot_px_classification(
 def tern_points(right, top, left):
     """Tern_points takes 3 equal size 1D arrays or pandas series and organizes them into points to be plotted on a ternary
          with the following arrangement:(lower right,top,lower left).
+         This is a generic function to allow flexibiliy, see also tern_points_px to calculate the components
+         for pyroxene, and tern_points_fspar to calculate components and coordinates for feldspar
              Inputs:
              x = 1D array like (lower right vertex)
              y = 1D array like (top vertex)
@@ -1071,5 +1073,59 @@ def tern_points(right, top, left):
     points = np.hstack([right[:, None], top[:, None], left[:, None]])
 
     return points
+
+
+def tern_points_px(px_comps=None):
+    """Tern_points takes pyroxene compositions, and calculates Fs, En and Wo,
+    and returns co-ordinates to plot on a ternary diagram as a np.array
+    """
+    # This just replaces columns, so if you load Opx, it treats as Cpx,
+    # There are more elegant ways to handle this probably!
+    px_comps_c=px_comps.copy()
+    px_comps_c.columns = px_comps_c.columns.str.replace("_Opx", "_Cpx")
+    cpx_comps=calculate_clinopyroxene_components(cpx_comps=px_comps_c)
+    right=cpx_comps["Fs_Simple_MgFeCa_Cpx"]
+    top=cpx_comps["Wo_Simple_MgFeCa_Cpx"]
+    left=cpx_comps["En_Simple_MgFeCa_Cpx"]
+
+
+    if isinstance(right, pd.Series):
+        right = right.to_numpy()
+    if isinstance(top, pd.Series):
+        top = top.to_numpy()
+    if isinstance(left, pd.Series):
+        left = left.to_numpy()
+
+    points = np.hstack([right[:, None], top[:, None], left[:, None]])
+
+    return points
+
+
+def tern_points_fspar(fspar_comps=None):
+    """Tern_points takes feldspar compositions, and calculates An, Ab, Or,
+    and returns co-ordinates to plot on a ternary diagram as a np.array
+    You can input plag or kspar compositions as fspar_comps
+    """
+    # This just replaces columns, so if you load Opx, it treats as Cpx,
+    # There are more elegant ways to handle this probably!
+    fspar_comps_c=fspar_comps.copy()
+    fspar_comps_c.columns = fspar_comps_c.columns.str.replace("_Kspar", "_Plag")
+    fspar_comps=calculate_cat_fractions_plagioclase(plag_comps=fspar_comps_c)
+    right=fspar_comps["An_Plag"]
+    top=fspar_comps["Or_Plag"]
+    left=fspar_comps["Ab_Plag"]
+
+
+    if isinstance(right, pd.Series):
+        right = right.to_numpy()
+    if isinstance(top, pd.Series):
+        top = top.to_numpy()
+    if isinstance(left, pd.Series):
+        left = left.to_numpy()
+
+    points = np.hstack([right[:, None], top[:, None], left[:, None]])
+
+    return points
+
 
     #return fig

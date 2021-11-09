@@ -459,6 +459,23 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
     else:
         myAmphs1['Sample_ID_Amp'] = my_input.index
 
+    if "Sample_ID_Ol" in my_input_c:
+        myOls1['Sample_ID_Ol'] = my_input_c['Sample_ID_Ol']
+    else:
+        myOls1['Sample_ID_Ol'] = my_input.index
+
+
+    if "Sample_ID_Kspar" in my_input_c:
+        myKspars1['Sample_ID_Kspar'] = my_input_c['Sample_ID_Kspar']
+    else:
+        myKspars1['Sample_ID_Kspar'] = my_input.index
+
+    if "Sample_ID_Sp" in my_input_c:
+        mySps1['Sample_ID_Sp'] = my_input_c['Sample_ID_Sp']
+    else:
+        mySps1['Sample_ID_Sp'] = my_input.index
+
+
     # if "P_kbar" in my_input:
     #     myAmphs1['P_kbar'] = my_input['P_kbar']
     #     myPlags1['P_kbar'] = my_input['P_kbar']
