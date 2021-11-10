@@ -51,6 +51,8 @@ Welcome to Thermobar's documentation!
    %
    Examples/Error_propagation/Liquid_Thermometry_Error_prop
    Examples/Error_propagation/Cpx_Liq_Thermobarometry_Error_prop
+   Examples/Error_propagation/Cpx_only_contour_plot
+
 
 
 .. toctree::
