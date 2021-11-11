@@ -228,16 +228,16 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
     if T is None:
         w.warn('You must enter a value for T in Kelvin to get results from equation3 and 5 from Zhang, and SiO2 from Putrka (2016)')
 
-    amp_sites['SiO2_Eq1_Zhang17']=(-736.7170+288.733*np.log(amp_sites['Si_T_ideal'])+56.536*amp_sites['Al_VI_C_ideal']
+    amp_sites['SiO2_Eq1_Zhang17']=(-736.7170+288.733*np.log(amp_sites['Si_T_ideal'].astype(float))+56.536*amp_sites['Al_VI_C_ideal']
     +27.169*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal'])
 + 62.665*amp_sites['Fe3_C_ideal']+34.814*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal'])
 +83.989*(amp_sites['Ti_T_ideal']+amp_sites['Ti_C_ideal'])+44.225*amp_sites['Ca_B_ideal']+14.049*amp_sites['Na_A_ideal'])
 
-    amp_sites['SiO2_Eq2_Zhang17']=(-399.9891 + 212.9463*np.log(amp_sites['Si_T_ideal']) + 11.7464*amp_sites['Al_VI_C_ideal'] +
+    amp_sites['SiO2_Eq2_Zhang17']=(-399.9891 + 212.9463*np.log(amp_sites['Si_T_ideal'].astype(float)) + 11.7464*amp_sites['Al_VI_C_ideal'] +
     23.5653*amp_sites['Fe3_C_ideal'] + 6.8467*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal']) +
     24.7743*(amp_sites['Ti_T_ideal']+amp_sites['Ti_C_ideal']) + 24.4399 * amp_sites['Ca_B_ideal'])
 
-    amp_sites['SiO2_Eq4_Zhang17']=(-222.614 + 167.517*np.log(amp_sites['Si_T_ideal']) -7.156*(amp_sites['Mg_C_ideal']
+    amp_sites['SiO2_Eq4_Zhang17']=(-222.614 + 167.517*np.log(amp_sites['Si_T_ideal'].astype(float)) -7.156*(amp_sites['Mg_C_ideal']
     +amp_sites['Mg_B_ideal']))
 
     amp_sites['TiO2_Eq6_Zhang17']=(np.exp(22.4650  -2.5975*amp_sites['Si_T_ideal']
@@ -281,7 +281,7 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
 
 
     if T is not None:
-        SiO2_Eq3=(-228 + 0.01065*(T-273.15) + 165*np.log(amp_sites['Si_T_ideal'])
+        SiO2_Eq3=(-228 + 0.01065*(T-273.15) + 165*np.log(amp_sites['Si_T_ideal'].astype(float))
         -7.219*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal']))
         amp_sites.insert(4, "SiO2_Eq3_Zhang17", SiO2_Eq3)
 
@@ -671,10 +671,10 @@ H2O_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd):
     :cite:`putirka2016amphibole`
 
     '''
-    return (10 * (-3.093 - 4.274 * np.log(Al_Amp_cat_23ox / Al2O3_Liq_mol_frac_hyd)
-    - 4.216 * np.log(Al2O3_Liq_mol_frac_hyd) + 63.3 * P2O5_Liq_mol_frac_hyd +
+    return (10 * (-3.093 - 4.274 * np.log(Al_Amp_cat_23ox.astype(float) / Al2O3_Liq_mol_frac_hyd.astype(float))
+    - 4.216 * np.log(Al2O3_Liq_mol_frac_hyd.astype(float)) + 63.3 * P2O5_Liq_mol_frac_hyd +
     1.264 * H2O_Liq_mol_frac_hyd + 2.457 * Al_Amp_cat_23ox + 1.86 * K_Amp_cat_23ox
-    + 0.4 * np.log(Na_Amp_cat_23ox / Na2O_Liq_mol_frac_hyd)))
+    + 0.4 * np.log(Na_Amp_cat_23ox.astype(float) / Na2O_Liq_mol_frac_hyd.astype(float))))
 
 
 def P_Put2016_eq7b(T=None, *, Al2O3_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd, Al_Amp_cat_23ox,
@@ -684,11 +684,11 @@ def P_Put2016_eq7b(T=None, *, Al2O3_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd, Al_
     :cite:``
 
     '''
-    return (-64.79 - 6.064 * np.log(Al_Amp_cat_23ox / Al2O3_Liq_mol_frac_hyd)
+    return (-64.79 - 6.064 * np.log(Al_Amp_cat_23ox.astype(float) / Al2O3_Liq_mol_frac_hyd.astype(float))
     + 61.75 * SiO2_Liq_mol_frac_hyd + 682 * P2O5_Liq_mol_frac_hyd
     - 101.9 *CaO_Liq_mol_frac_hyd + 7.85 * Al_Amp_cat_23ox
-    - 46.46 * np.log(SiO2_Liq_mol_frac_hyd)
-    - 4.81 * np.log(Na2O_Liq_mol_frac_hyd + K2O_Liq_mol_frac_hyd))
+    - 46.46 * np.log(SiO2_Liq_mol_frac_hyd.astype(float))
+    - 4.81 * np.log(Na2O_Liq_mol_frac_hyd.astype(float) + K2O_Liq_mol_frac_hyd.astype(float)))
 
 
 def P_Put2016_eq7c(T=None, *, Al_Amp_cat_23ox, K_Amp_cat_23ox,
@@ -699,9 +699,9 @@ def P_Put2016_eq7c(T=None, *, Al_Amp_cat_23ox, K_Amp_cat_23ox,
 
     '''
     return (-45.55 + 26.65 * Al_Amp_cat_23ox + 22.52 * K_Amp_cat_23ox
-    + 439 * P2O5_Liq_mol_frac - 51.1 * np.log(Al2O3_Liq_mol_frac) -
-    46.3 * np.log(Al_Amp_cat_23ox / (Al2O3_Liq_mol_frac))
-    + 5.231 * np.log(Na_Amp_cat_23ox / (Na2O_Liq_mol_frac)))
+    + 439 * P2O5_Liq_mol_frac - 51.1 * np.log(Al2O3_Liq_mol_frac.astype(float)) -
+    46.3 * np.log(Al_Amp_cat_23ox.astype(float) / (Al2O3_Liq_mol_frac.astype(float)))
+    + 5.231 * np.log(Na_Amp_cat_23ox.astype(float) / (Na2O_Liq_mol_frac.astype(float))))
 
 ## Equations: Amphibole-Liquid thermometers
 
@@ -714,10 +714,10 @@ def T_Put2016_eq4b(P=None, *, H2O_Liq_mol_frac_hyd, Fet_Amp_cat_23ox, FeOt_Liq_m
 
     '''
     return (273.15 + (8037.85 / (3.69 - 2.62 * H2O_Liq_mol_frac_hyd + 0.66 * Fet_Amp_cat_23ox
-    - 0.416 * np.log(TiO2_Liq_mol_frac_hyd) + 0.37 * np.log(MgO_Liq_mol_frac_hyd)
-    -1.05 * np.log((FeOt_Liq_mol_frac_hyd + MgO_Liq_mol_frac_hyd
-    + MnO_Liq_mol_frac_hyd) * Al2O3_Liq_mol_frac_hyd)
-    - 0.462 * np.log(Ti_Amp_cat_23ox / TiO2_Liq_mol_frac_hyd))))
+    - 0.416 * np.log(TiO2_Liq_mol_frac_hyd.astype(float)) + 0.37 * np.log(MgO_Liq_mol_frac_hyd.astype(float))
+    -1.05 * np.log((FeOt_Liq_mol_frac_hyd.astype(float) + MgO_Liq_mol_frac_hyd.astype(float)
+    + MnO_Liq_mol_frac_hyd.astype(float)) * Al2O3_Liq_mol_frac_hyd)
+    - 0.462 * np.log(Ti_Amp_cat_23ox.astype(float) / TiO2_Liq_mol_frac_hyd.astype(float)))))
 
 
 def T_Put2016_eq4a_amp_sat(P=None, *, FeOt_Liq_mol_frac_hyd, TiO2_Liq_mol_frac_hyd, Al2O3_Liq_mol_frac_hyd,
@@ -728,10 +728,10 @@ def T_Put2016_eq4a_amp_sat(P=None, *, FeOt_Liq_mol_frac_hyd, TiO2_Liq_mol_frac_h
 
     '''
     return (273.15 + (6383.4 / (-12.07 + 45.4 * Al2O3_Liq_mol_frac_hyd + 12.21 * FeOt_Liq_mol_frac_hyd -
-    0.415 * np.log(TiO2_Liq_mol_frac_hyd) - 3.555 * np.log(Al2O3_Liq_mol_frac_hyd)
-     - 0.832 * np.log(Na2O_Liq_mol_frac_hyd) -0.481 * np.log((FeOt_Liq_mol_frac_hyd
-     + MgO_Liq_mol_frac_hyd + MnO_Liq_mol_frac_hyd) * Al2O3_Liq_mol_frac_hyd)
-     - 0.679 * np.log(Na_Amp_cat_23ox / Na2O_Liq_mol_frac_hyd))))
+    0.415 * np.log(TiO2_Liq_mol_frac_hyd.astype(float)) - 3.555 * np.log(Al2O3_Liq_mol_frac_hyd.astype(float))
+     - 0.832 * np.log(Na2O_Liq_mol_frac_hyd.astype(float)) -0.481 * np.log((FeOt_Liq_mol_frac_hyd.astype(float)
+     + MgO_Liq_mol_frac_hyd.astype(float) + MnO_Liq_mol_frac_hyd.astype(float)) * Al2O3_Liq_mol_frac_hyd.astype(float))
+     - 0.679 * np.log(Na_Amp_cat_23ox.astype(float) / Na2O_Liq_mol_frac_hyd.astype(float)))))
 
 
 def T_Put2016_eq9(P=None, *, Si_Amp_cat_23ox, Ti_Amp_cat_23ox, Mg_Amp_cat_23ox,
@@ -752,11 +752,11 @@ K_Amp_cat_23ox, Ca_Amp_cat_23ox, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd):
             NaM4[i]=NaM4_1[i]
 
     HelzA=Na_Amp_cat_23ox-NaM4
-    ln_KD_Na_K=np.log((K_Amp_cat_23ox/HelzA)*(Na2O_Liq_mol_frac_hyd/K2O_Liq_mol_frac_hyd))
+    ln_KD_Na_K=np.log((K_Amp_cat_23ox.astype(float)/HelzA)*(Na2O_Liq_mol_frac_hyd.astype(float)/K2O_Liq_mol_frac_hyd.astype(float)))
 
     return (273.15+(10073.5/(9.75+0.934*Si_Amp_cat_23ox-1.454*Ti_Amp_cat_23ox
-    -0.882*Mg_Amp_cat_23ox-1.123*Na_Amp_cat_23ox-0.322*np.log(FeOt_Liq_mol_frac_hyd)
-    -0.7593*np.log(Al_Amp_cat_23ox/Al2O3_Liq_mol_frac_hyd)-0.15*ln_KD_Na_K)))
+    -0.882*Mg_Amp_cat_23ox-1.123*Na_Amp_cat_23ox-0.322*np.log(FeOt_Liq_mol_frac_hyd.astype(float))
+    -0.7593*np.log(Al_Amp_cat_23ox.astype(float)/Al2O3_Liq_mol_frac_hyd.astype(float))-0.15*ln_KD_Na_K)))
 
 
 
@@ -1486,12 +1486,12 @@ def calculate_amp_plag_temp(amp_comps, plag_comps=None, XAn=None, XAb=None, equa
     YAb[HighXAb]=0
 
     Ta=((-76.95+P*0.79+YAb+39.4*XNa_A+22.4*XK_A+(41.5-2.89*P)*XAl_M2)/
-        (-0.065-0.0083144*np.log(Ked_trA)))
+        (-0.065-0.0083144*np.log(Ked_trA.astype(float))))
 
     YAb_B=12*(2*XAb-1)+3
     YAb_B[HighXAb]=3
     Tb=((78.44 +YAb_B - 33.6*XNa_M4 - (66.8 -2.92*P)*XAl_M2 +78.5*XAl_T1 +9.4*XNa_A )/
-        (0.0721-0.0083144*np.log(Ked_trB)))
+        (0.0721-0.0083144*np.log(Ked_trB.astype(float))))
 
     if equationT=="T_HB1994_A":
         return Ta

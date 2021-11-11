@@ -753,43 +753,45 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     print("Considering " + LenCombo +
           " Liq-Opx pairs, be patient if this is >>1 million!")
 
+    if return_all_pairs is False:
+
+
+            # Filters using the method of Neave et al. 2017
+            if Opx_Quality is True:
+                Combo_liq_opxs_2 = Combo_liq_opxs.loc[(Combo_liq_opxs['Cation_Sum_Opx'] < 4.02) & (
+                    Combo_liq_opxs['Cation_Sum_Opx'] > 3.99)]
+            if Opx_Quality is False:
+                Combo_liq_opxs_2 = Combo_liq_opxs
+
+            # Filtering out matches which don't fit default, or user-specified Kd_Match
+            # and Kd_Err values.
+            if Kd_Match is None and Kd_Err is None:
+                Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < 0.06].reset_index(drop=True)
+                Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
+
+            if Kd_Match is not None and Kd_Err is None:
+                Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
+                Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < 0.06].reset_index(drop=True)
+                Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
+            if Kd_Match is not None and Kd_Err is not None:
+                Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
+                Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < Kd_Err].reset_index(drop=True)
+                Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
+            if Kd_Match is None and Kd_Err is not None:
+                Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < Kd_Err].reset_index(drop=True)
+                Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
+
+            if len(Combo_liq_opx_fur_filt) == 0:
+                raise Exception('No matches found to the choosen Kd criteria.')
+
+
+
+            # Replace automatically calculated one with various user-options.
+            Combo_liq_opx_fur_filt.drop(['Delta_Kd_Fe_Mg_Fe2'], axis=1, inplace=True)
+            Combo_liq_opx_fur_filt.insert(0, "Delta_Kd_Fe_Mg_Fe2", Kd)
+
     if return_all_pairs is True:
-        return Combo_liq_opxs
-    else:
-
-        # Filters using the method of Neave et al. 2017
-        if Opx_Quality is True:
-            Combo_liq_opxs_2 = Combo_liq_opxs.loc[(Combo_liq_opxs['Cation_Sum_Opx'] < 4.02) & (
-                Combo_liq_opxs['Cation_Sum_Opx'] > 3.99)]
-        if Opx_Quality is False:
-            Combo_liq_opxs_2 = Combo_liq_opxs
-
-        # Filtering out matches which don't fit default, or user-specified Kd_Match
-        # and Kd_Err values.
-        if Kd_Match is None and Kd_Err is None:
-            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < 0.06].reset_index(drop=True)
-            Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
-
-        if Kd_Match is not None and Kd_Err is None:
-            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
-            Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < 0.06].reset_index(drop=True)
-            Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
-        if Kd_Match is not None and Kd_Err is not None:
-            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
-            Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < Kd_Err].reset_index(drop=True)
-            Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
-        if Kd_Match is None and Kd_Err is not None:
-            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < Kd_Err].reset_index(drop=True)
-            Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
-
-        if len(Combo_liq_opx_fur_filt) == 0:
-            raise Exception('No matches found to the choosen Kd criteria.')
-
-
-
-        # Replace automatically calculated one with various user-options.
-        Combo_liq_opx_fur_filt.drop(['Delta_Kd_Fe_Mg_Fe2'], axis=1, inplace=True)
-        Combo_liq_opx_fur_filt.insert(0, "Delta_Kd_Fe_Mg_Fe2", Kd)
+        Combo_liq_opx_fur_filt=Combo_liq_opxs
 
         # Now we have reduced down the number of calculations, we solve for P and T iteratively
 
