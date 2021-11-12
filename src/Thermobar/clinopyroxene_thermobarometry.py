@@ -194,16 +194,7 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
 
 
-    Cpx_Liq_ML_in=pd.DataFrame(data={'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
-                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
-                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
-                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
-                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
-                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
-                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
-                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
-                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
-                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
+    Cpx_Liq_ML_in=pd.DataFrame(data={
                                 'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
                                 'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
                                 'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
@@ -215,7 +206,17 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
                                 'K2O_Liq': cpx_liq_combo['K2O_Liq'],
                                 'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
                                 'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
-                                'H2O_Liq': cpx_liq_combo['H2O_Liq']
+                                'H2O_Liq': cpx_liq_combo['H2O_Liq'],
+                                'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
+                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
+                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
     })
 
 
@@ -403,16 +404,7 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
 
 
-    Cpx_Liq_ML_in=pd.DataFrame(data={'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
-                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
-                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
-                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
-                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
-                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
-                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
-                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
-                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
-                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
+    Cpx_Liq_ML_in=pd.DataFrame(data={
                                 'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
                                 'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
                                 'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
@@ -424,7 +416,18 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
                                 'K2O_Liq': cpx_liq_combo['K2O_Liq'],
                                 'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
                                 'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
-                                'H2O_Liq': cpx_liq_combo['H2O_Liq']
+                                'H2O_Liq': cpx_liq_combo['H2O_Liq'],
+                                'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
+                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
+                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
+
     })
 
 

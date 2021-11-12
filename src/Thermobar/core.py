@@ -3794,6 +3794,8 @@ def calculate_fspar_activity_components(*, Ab_Plag, Or_Plag, An_Plag, Ab_Kspar, 
 def calculate_plag_components(*, Ca_Liq_cat_frac, H2O_Liq, Na_Liq_cat_frac, Al_Liq_cat_frac,
     Si_Liq_cat_frac, K_Liq_cat_frac, T, P, An_Plag, Ab_Plag, Mg_Number_Liq_NoFe3, Mg_Liq_cat_frac):
 
+
+
     An_Pred=np.exp(-3.485+22.93*Ca_Liq_cat_frac+0.0805*H2O_Liq+1.0925*Ca_Liq_cat_frac/(Ca_Liq_cat_frac+Na_Liq_cat_frac)
     +13.11*Al_Liq_cat_frac/(Al_Liq_cat_frac+Si_Liq_cat_frac)+5.59258*Si_Liq_cat_frac**3-
     38.786*P/(T)-125.04*Ca_Liq_cat_frac*Al_Liq_cat_frac+8.958*Si_Liq_cat_frac*K_Liq_cat_frac-2589.27/(T))
