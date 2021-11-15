@@ -1455,16 +1455,19 @@ def P_Wang2021_eq1(T=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_
 Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
     '''
     Clinopyroxene-only barometer of Wang et al. (2021) equation 1
-    Uses NCT
-    currently on Zenodo - 10.5281/zenodo.4727870
+    :cite:`wang2021new`
 
-    SEE=1.52
+    SEE=1.66 kbar
 
     '''
-    NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
-    +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
+    NCT=(1.4844*Al_VI_cat_6ox/(1.4844*Al_VI_cat_6ox+7.7408*Ti_Cpx_cat_6ox
+    +1.1675*Cr_Cpx_cat_6ox+1.0604*Fet_Cpx_cat_6ox+0.0387*Mn_Cpx_cat_6ox-0.0628*Mg_Cpx_cat_6ox))
 
-    return (-7.6551*NCT*np.log(Al_VI_cat_6ox.astype(float))-10.2203*Si_Cpx_cat_6ox+4.8343*Fet_Cpx_cat_6ox+0.7397*Mg_Cpx_cat_6ox-13.1746*Ca_Cpx_cat_6ox+122.1294*Na_Cpx_cat_6ox+23.35)
+
+
+    return (-7.9509*NCT*np.log(Al_VI_cat_6ox.astype(float))+0.6492*Si_Cpx_cat_6ox-5.9522*Fet_Cpx_cat_6ox-11.1942*Mg_Cpx_cat_6ox-24.2802*Ca_Cpx_cat_6ox+108.663*Na_Cpx_cat_6ox+25.0019)
+
+
 
 
 def P_Wang2021_eq3(T=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
@@ -1690,17 +1693,17 @@ Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
 FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
     '''
     Clinopyroxene-only thermometer of Wang et al. (2021) Eq 2
-    currently on Zenodo - 10.5281/zenodo.4727870
+    :cite:`wang2021new`
 
-    SEE=35.2 C
+    SEE=36.6 C
     '''
-    NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
-    +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
+    NCT=(1.4844*Al_VI_cat_6ox/(1.4844*Al_VI_cat_6ox+7.7408*Ti_Cpx_cat_6ox
+    +1.1675*Cr_Cpx_cat_6ox+1.0604*Fet_Cpx_cat_6ox+0.0387*Mn_Cpx_cat_6ox-0.0628*Mg_Cpx_cat_6ox))
 
 
-    return (273.15+226.3499*NCT-444.507*Ti_Cpx_cat_6ox-550.66*Al_Cpx_cat_6ox
-    -4290.88*Mn_Cpx_cat_6ox-580.33*Mg_Cpx_cat_6ox-760.789*Ca_Cpx_cat_6ox
-    -3612.82*K_Cpx_cat_6ox-732.13*FeII_Wang21-23.6413*H2O_Liq+2513.694)
+    return (273.15+312.4395*NCT+230.5194*Ti_Cpx_cat_6ox-568.698*Al_Cpx_cat_6ox
+    -3212*Mn_Cpx_cat_6ox-476.386*Mg_Cpx_cat_6ox-710.883*Ca_Cpx_cat_6ox
+    -651.019*FeII_Wang21-23.384*H2O_Liq+2321.929)
 
 
 def T_Wang2021_eq4(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
@@ -1736,6 +1739,21 @@ def T_Put2008_eq32d(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
     - 0.95 * (Al_Cpx_cat_6ox + Cr_Cpx_cat_6ox - Na_Cpx_cat_6ox - K_Cpx_cat_6ox)
      + 0.395 * (np.log(a_cpx_En.astype(float)))**2)))
 
+
+def T_Put2008_eq32dH(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
+                    Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En, H2O_Liq):
+    '''
+    Adaptation of the clinopyroxene-only thermometer of Putirka (2008) Eq32d
+    by Wang et al. (2021) to account for the effect of H2O
+    :cite:`wang2021new` and :cite:`putirka2008thermometers`
+
+    '''
+
+    return (273.15+
+    (93100 + 544 * P) / (72.70276 + 74.24179 * Ti_Cpx_cat_6ox + 21.95727 * Fet_Cpx_cat_6ox
+    - 0.31648 * (Al_Cpx_cat_6ox + Cr_Cpx_cat_6ox - Na_Cpx_cat_6ox - K_Cpx_cat_6ox)
+     + 0.420385 * (np.log(a_cpx_En.astype(float)) )**2 +1.864215*H2O_Liq)
+     )
 
 # This is the version in the Putirka 2-pyroxene spreadsheet. The 544 coefficient is changed to 755, and the coefficient for the enstatie activity is
 # changed from 0.395 to 3.5. This is a better fit to subsolidus T
@@ -2028,12 +2046,12 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
     return cpx_comps_c
 ## Function for calculating Cpx-only temperature
 Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol, T_Wang2021_eq4,
-T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O}
+T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O, T_Put2008_eq32dH}
 Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
 def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None,
-H2O_Liq=None, return_input=False):
+H2O_Liq=None, eq_tests=False):
     '''
     Clinopyroxene only thermometer. Enter a panda dataframe with Cpx compositions,
     returns a temperature in Kelvin.
@@ -2060,8 +2078,8 @@ H2O_Liq=None, return_input=False):
         If enter P="Solve", returns a partial function
         Else, enter an integer, float, or panda series
 
-    return_input: bool
-        if True, also returns cpx_comps
+    eq_tests: bool
+        if True, also returns cpx_components. No actual equilibrium tests.
 
     Returns
     -------
@@ -2081,13 +2099,13 @@ H2O_Liq=None, return_input=False):
     cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps_c)
 
     if H2O_Liq is None:
-        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4":
+        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4" or equationT=="T_Put2008_eq32dH":
             w.warn('This Cpx-only thermometer is sensitive to H2O content of the liquid. '
         ' By default, this function uses H2O=0 wt%, else you can enter a value of H2O_Liq in the function')
             cpx_components['H2O_Liq']=0
             cpx_comps_c['H2O_Liq']=0
     if H2O_Liq is not None:
-        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4":
+        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4" or equationT=="T_Put2008_eq32dH":
             cpx_components['H2O_Liq']=H2O_Liq
             cpx_comps_c['H2O_Liq']=H2O_Liq
 
@@ -2139,18 +2157,18 @@ H2O_Liq=None, return_input=False):
         if not isinstance(T_K, partial):
             T_K.replace([np.inf, -np.inf], np.nan, inplace=True)
 
-    if return_input is False:
+    if eq_tests is False:
         if equationT == "T_Petrelli2020_Cpx_only" or  equationT == "T_Petrelli2020_Cpx_only_withH2O":
             return df_stats
         else:
             return T_K
-    if return_input is True:
+    if eq_tests is True:
         if equationT == "T_Petrelli2020_Cpx_only" or equationT == "T_Petrelli2020_Cpx_only_withH2O":
-            out=pd.concat([df_stats, cpx_comps],axis=1)
+            out=pd.concat([df_stats, cpx_components],axis=1)
             return out
         else:
-            cpx_comps_c.insert(0, 'T_K_calc', T_K)
-            return cpx_comps_c
+            cpx_components.insert(0, 'T_K_calc', T_K)
+            return cpx_components
 
 
 ## Iterating PT- Cpx only

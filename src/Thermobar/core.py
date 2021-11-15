@@ -315,7 +315,7 @@ oxide_mass_amp_df_Ridolfi.set_index('Sample_ID_Amp', inplace=True)
 # For oxide to wt% function
 oxide_mass_all = {'SiO2': 60.084, 'MgO': 40.304, 'FeOt': 71.846, 'CaO': 56.079, 'Al2O3': 101.961,
                           'Na2O': 61.979, 'K2O': 94.195, 'MnO': 70.937, 'TiO2': 79.898,
-                          'Cr2O3': 151.9902, 'P2O5':141.944, 'F': 18.998, 'Cl': 35.453}
+                          'Cr2O3': 151.9902, 'P2O5':141.944, 'F': 18.998, 'Cl': 35.453, 'H2O': 18.01528}
 oxide_mass_all = pd.DataFrame.from_dict(
     oxide_mass_all, orient='index').T
 oxide_mass_all['Sample_ID'] = 'MolWt'
@@ -323,7 +323,7 @@ oxide_mass_all.set_index('Sample_ID', inplace=True)
 
 elemental_mass_mult_all = {'SiO2': 28.0855, 'MgO': 24.305, 'FeOt': 55.845, 'CaO': 40.078, 'Al2O3': 26.981539*2,
                           'Na2O': 22.989769*2, 'K2O': 39.0983*2, 'MnO': 54.938044, 'TiO2': 47.867,
-                          'Cr2O3': 51.9961*2, 'P2O5': 2*30.973762, 'F': 18.998, 'Cl': 35.453}
+                          'Cr2O3': 51.9961*2, 'P2O5': 2*30.973762, 'F': 18.998, 'Cl': 35.453, 'H2O':1.00794*2}
 elemental_mass_mult_all = pd.DataFrame.from_dict(
     elemental_mass_mult_all, orient='index').T
 elemental_mass_mult_all['Sample_ID'] = 'ElWt'
@@ -333,11 +333,12 @@ elemental_mass_mult_all.set_index('Sample_ID', inplace=True)
 
 df_ideal_all2 = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
 'FeOt', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O',
-'Cr2O3', 'P2O5', 'F', 'Cl'])
+'Cr2O3', 'P2O5', 'F', 'Cl', 'H2O'])
 
 
 
-def convert_oxide_percent_to_element_weight_percent(df, suffix=None, without_oxygen=False):
+def convert_oxide_percent_to_element_weight_percent(df, suffix=None,
+ without_oxygen=False, anhydrous=True):
     """
     Converts oxide wt% to elemental wt% including oxygen by default
 
@@ -358,14 +359,22 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None, without_oxy
     if suffix is not None:
         df_c.columns = df_c.columns.str.rstrip(suffix)
 
+    if anhydrous==True:
+        df_c['H2O']=0
+
+
     df_oxides=df_c.reindex(df_ideal_all2.columns, axis=1).fillna(0)
+
     liq_wt_combo = pd.concat([oxide_mass_all, df_oxides],)
+
+
     mol_prop_anhyd = liq_wt_combo.div(
         liq_wt_combo.loc['MolWt', :], axis='columns').drop(['MolWt'])
 
     el_combo=pd.concat([elemental_mass_mult_all, mol_prop_anhyd ],)
     wt_perc = el_combo.multiply(
         el_combo.loc['ElWt', :], axis='columns').drop(['ElWt'])
+
 
     wt_perc2=pd.DataFrame(data={'Si_wt': wt_perc['SiO2'],
                                 'Mg_wt': wt_perc['MgO'],
@@ -379,6 +388,7 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None, without_oxy
                                 'Cr_wt':wt_perc['Cr2O3'],
                                 'P_wt':wt_perc['P2O5'],
                                 'F_wt':wt_perc['F'],
+                                'H_wt': wt_perc['H2O'],
                                 'Cl_wt':wt_perc['Cl']
 
 
@@ -386,6 +396,7 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None, without_oxy
     sum_element=wt_perc2.sum(axis=1)
     Oxy=100-sum_element
     wt_perc2['O_wt_make_to_100']=Oxy
+
 
 
     if without_oxygen is True:
@@ -3808,6 +3819,27 @@ def calculate_plag_components(*, Ca_Liq_cat_frac, H2O_Liq, Na_Liq_cat_frac, Al_L
     Components=pd.DataFrame(data={'An_Pred': An_Pred, 'Ab_Pred': Ab_Pred, 'Or_Pred': Or_Pred})
 
     return Components
+
+def calculate_eq_plag_components(liq_comps, H2O_Liq, T,P):
+
+    cfs=calculate_anhydrous_cat_fractions_liquid(liq_comps)
+
+
+
+    cfs['An_Pred']=np.exp(-3.485+22.93*cfs['Ca_Liq_cat_frac']+0.0805*H2O_Liq
+    +1.0925*cfs['Ca_Liq_cat_frac']/(cfs['Ca_Liq_cat_frac']+cfs['Na_Liq_cat_frac'])
+    +13.11*cfs['Al_Liq_cat_frac']/(cfs['Al_Liq_cat_frac']+cfs['Si_Liq_cat_frac'])+5.59258*cfs['Si_Liq_cat_frac']**3-
+    38.786*P/(T)-125.04*cfs['Ca_Liq_cat_frac']*cfs['Al_Liq_cat_frac']+8.958*cfs['Si_Liq_cat_frac']*cfs['K_Liq_cat_frac']-2589.27/(T))
+    cfs['Ab_Pred']=np.exp(-2.748-0.1553*H2O_Liq+1.017*cfs['Mg_Number_Liq_NoFe3']-1.997*cfs['Si_Liq_cat_frac']**3+54.556*P/T-67.878*cfs['K_Liq_cat_frac']*cfs['Al_Liq_cat_frac']
+    -99.03*cfs['Ca_Liq_cat_frac']*cfs['Al_Liq_cat_frac']+4175.307/T)
+    cfs['Or_Pred']=np.exp(19.42-12.5*cfs['Mg_Liq_cat_frac']-161.4*cfs['Na_Liq_cat_frac']-16.65*cfs['Ca_Liq_cat_frac']/(cfs['Ca_Liq_cat_frac']+cfs['Na_Liq_cat_frac'])
+    -528.1*cfs['K_Liq_cat_frac']*cfs['Al_Liq_cat_frac']-19.38*cfs['Si_Liq_cat_frac']**3
+    +168.2*cfs['Si_Liq_cat_frac']*cfs['Na_Liq_cat_frac']
+    -1951.2*cfs['Ca_Liq_cat_frac']*cfs['K_Liq_cat_frac']-10190/T)
+
+    return cfs
+
+
 ## Tool to get Fe3Fet from logfo2 or buffer value.
 def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model=None, fo2, renorm=False, fo2_offset=0):
     '''

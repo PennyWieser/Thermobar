@@ -100,14 +100,14 @@ class test_cpx_liq_temp(unittest.TestCase):
 
     def test_Petrelli2020(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_temp(cpx_comps=CpxT,
-       liq_comps=LiqT, equationT="T_Petrelli2020_Cpx_Liq", P=5).T_K_calc[0], 1324.07,
+       liq_comps=LiqT, equationT="T_Petrelli2020_Cpx_Liq").T_K_calc[0], 1323.464545,
        decimalPlace,
        "Calc T from  Petrelli 2021 not equal to test value")
 
 
     def test_Petrelli2020_withH2O(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_temp(cpx_comps=CpxT,
-       liq_comps=LiqT, equationT="T_Petrelli2020_Cpx_Liq", P=5, H2O_Liq=10).T_K_calc[0], 1314.766364,
+       liq_comps=LiqT, equationT="T_Petrelli2020_Cpx_Liq", P=5, H2O_Liq=10).T_K_calc[0], 1313.382727,
        decimalPlace,
        "Calc T from  Petrelli 2021 not equal to test value")
 
@@ -121,20 +121,21 @@ class test_cpx_liq_press(unittest.TestCase):
 
     def test_Petrelli2020(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
-       liq_comps=LiqT, equationP="P_Petrelli2020_Cpx_Liq").P_kbar_calc[0], 5.049834,
+       liq_comps=LiqT, equationP="P_Petrelli2020_Cpx_Liq").P_kbar_calc[0],
+       5.493051,
        decimalPlace,
        "Calc P from  Petrelli 2021 not equal to test value")
 
 
     def test_Petrelli2020_withH2O(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
-       liq_comps=LiqT, equationP="P_Petrelli2020_Cpx_Liq", H2O_Liq=10).Median_Trees[0], 4.049,
+       liq_comps=LiqT, equationP="P_Petrelli2020_Cpx_Liq", H2O_Liq=10).Median_Trees[0], 4.043,
        decimalPlace,
        "Calc Median P from  Petrelli 2021 not equal to test value")
 
     def test_Petrelli2020_withH2O_Median(self):
        self.assertAlmostEqual(pt.calculate_cpx_liq_press(cpx_comps=CpxT,
-       liq_comps=LiqT, equationP="P_Petrelli2020_Cpx_Liq", H2O_Liq=10).P_kbar_calc[0], 5.463629,
+       liq_comps=LiqT, equationP="P_Petrelli2020_Cpx_Liq", H2O_Liq=10).P_kbar_calc[0], 5.802869,
        decimalPlace,
        "Calc P from  Petrelli 2021 not equal to test value")
 
