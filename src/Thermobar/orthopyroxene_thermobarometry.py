@@ -746,7 +746,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     # calculate clinopyroxene-liquid components for this merged dataframe
     Combo_liq_opxs = calculate_orthopyroxene_liquid_components(
         meltmatch=Combo_liq_opxs)
-    Combo_liq_opxs.drop(['Kd Eq (Put2008+-0.06)'], axis=1, inplace=True)
+   # Combo_liq_opxs.drop(['Kd Eq (Put2008+-0.06)'], axis=1, inplace=True)
 
     #Combo_liq_opxs = Combo_liq_opxs.convert_objects(convert_numeric=True)
     LenCombo = str(np.shape(Combo_liq_opxs)[0])
@@ -756,39 +756,41 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     if return_all_pairs is False:
 
 
-            # Filters using the method of Neave et al. 2017
-            if Opx_Quality is True:
-                Combo_liq_opxs_2 = Combo_liq_opxs.loc[(Combo_liq_opxs['Cation_Sum_Opx'] < 4.02) & (
-                    Combo_liq_opxs['Cation_Sum_Opx'] > 3.99)]
-            if Opx_Quality is False:
-                Combo_liq_opxs_2 = Combo_liq_opxs
+        # Filters using the method of Neave et al. 2017
+        if Opx_Quality is True:
+            Combo_liq_opxs_2 = Combo_liq_opxs.loc[(Combo_liq_opxs['Cation_Sum_Opx'] < 4.02) & (
+                Combo_liq_opxs['Cation_Sum_Opx'] > 3.99)]
+        if Opx_Quality is False:
+            Combo_liq_opxs_2 = Combo_liq_opxs
 
-            # Filtering out matches which don't fit default, or user-specified Kd_Match
-            # and Kd_Err values.
-            if Kd_Match is None and Kd_Err is None:
-                Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < 0.06].reset_index(drop=True)
-                Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
-
-            if Kd_Match is not None and Kd_Err is None:
-                Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
-                Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < 0.06].reset_index(drop=True)
-                Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
-            if Kd_Match is not None and Kd_Err is not None:
-                Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
-                Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < Kd_Err].reset_index(drop=True)
-                Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
-            if Kd_Match is None and Kd_Err is not None:
-                Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < Kd_Err].reset_index(drop=True)
-                Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
-
-            if len(Combo_liq_opx_fur_filt) == 0:
-                raise Exception('No matches found to the choosen Kd criteria.')
+        # Filtering out matches which don't fit default, or user-specified Kd_Match
+        # and Kd_Err values.
+        if Kd_Match is None and Kd_Err is None:
+            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < 0.06].reset_index(drop=True)
+            Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
 
 
+        if Kd_Match is not None and Kd_Err is None:
+            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
+            Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < 0.06].reset_index(drop=True)
+            Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
+        if Kd_Match is not None and Kd_Err is not None:
+            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[abs(Kd_Match -
+            Combo_liq_opxs['Kd_Fe_Mg_Fe2']) < Kd_Err].reset_index(drop=True)
+            Kd = Kd_Match - Combo_liq_opx_fur_filt['Kd_Fe_Mg_Fe2']
+        if Kd_Match is None and Kd_Err is not None:
+            Combo_liq_opx_fur_filt = Combo_liq_opxs_2.loc[Combo_liq_opxs['Delta_Kd_Fe_Mg_Fe2'] < Kd_Err].reset_index(drop=True)
+            Kd = Combo_liq_opx_fur_filt['Delta_Kd_Fe_Mg_Fe2']
 
-            # Replace automatically calculated one with various user-options.
-            Combo_liq_opx_fur_filt.drop(['Delta_Kd_Fe_Mg_Fe2'], axis=1, inplace=True)
-            Combo_liq_opx_fur_filt.insert(0, "Delta_Kd_Fe_Mg_Fe2", Kd)
+        if len(Combo_liq_opx_fur_filt) == 0:
+            raise Exception('No matches found to the choosen Kd criteria.')
+
+
+
+        # Replace automatically calculated one with various user-options.
+        Combo_liq_opx_fur_filt.drop(['Delta_Kd_Fe_Mg_Fe2'], axis=1, inplace=True)
+        Combo_liq_opx_fur_filt.insert(0, "Delta_Kd_Fe_Mg_Fe2", Kd)
+
 
     if return_all_pairs is True:
         Combo_liq_opx_fur_filt=Combo_liq_opxs
@@ -796,88 +798,90 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         # Now we have reduced down the number of calculations, we solve for P and T iteratively
 
         # If users want to melt match specifying an equation for both T and P
-        if equationP is not None and equationT is not None:
-            PT_out = calculate_opx_liq_press_temp(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
-            P_guess = PT_out['P_kbar_calc'].astype('float64')
-            T_K_guess = PT_out['T_K_calc'].astype('float64')
-            Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
-            Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+    if equationP is not None and equationT is not None:
 
-        # Users may already know their pressure, rather than choosing an equation.
+        PT_out = calculate_opx_liq_press_temp(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
+        print(PT_out)
+        P_guess = PT_out['P_kbar_calc'].astype('float64')
+        T_K_guess = PT_out['T_K_calc'].astype('float64')
+        Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
+        Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+
+    # Users may already know their pressure, rather than choosing an equation.
+    if equationT is not None and equationP is None:
+        P_guess = P
+        T_K_guess = calculate_opx_liq_temp(meltmatch=Combo_liq_opx_fur_filt, equationT=equationT, P=P_guess)
+        Combo_liq_opx_fur_filt.insert(0, "P_kbar_input", P_guess)
+        Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+
+# Users may already know their temperature, rather than using an equation
+    if equationP is not None and equationT is None:
+        T_K_guess = T
+        P_guess = calculate_opx_liq_press(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, T=T_K_guess)
+        Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
+        Combo_liq_opx_fur_filt.insert(1, "T_K_input", T_K_guess)
+
+
+
+    print('Finished calculating Ps and Ts, now just averaging the results. Almost there!')
+
+
+
+    # # This bit averages all the matches for a given Opx (e.g, Opx1-Liq1,
+    opxNumbers = Combo_liq_opx_fur_filt['ID_OPX'].unique()
+    if len(opxNumbers) > 0:
+        df1_Mean_nopref=Combo_liq_opx_fur_filt.groupby(['ID_OPX', 'Sample_ID_Opx'], as_index=False).mean()
+        df1_Std_nopref=Combo_liq_opx_fur_filt.groupby(['ID_OPX', 'Sample_ID_Opx'], as_index=False).std()
+        count=Combo_liq_opx_fur_filt.groupby('ID_OPX').count()
+        Sample_ID_Opx_Mean=df1_Mean_nopref['Sample_ID_Opx']
+        Sample_ID_Opx_Std=df1_Std_nopref['Sample_ID_Opx']
+        df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+        df1_Std=df1_Std_nopref.add_prefix('Std_')
+        df1_Mean=df1_Mean.drop(['Mean_Sample_ID_Opx'], axis=1)
+        df1_Std=df1_Std.drop(['Std_Sample_ID_Opx'], axis=1)
+        df1_Mean.rename(columns={"Mean_ID_OPX": "ID_OPX"}, inplace=True)
+        df1_Std.rename(columns={"Std_ID_OPX": "ID_OPX"}, inplace=True)
+
+        df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_OPX'])
+        df1_M['Sample_ID_Opx']=Sample_ID_Opx_Mean
+
+        if equationT is not None and equationP is not None:
+            cols_to_move = ['Sample_ID_Opx',
+                        'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+                        'Std_P_kbar_calc']
+
         if equationT is not None and equationP is None:
-            P_guess = P
-            T_K_guess = calculate_opx_liq_temp(meltmatch=Combo_liq_opx_fur_filt, equationT=equationT, P=P_guess)
-            Combo_liq_opx_fur_filt.insert(0, "P_kbar_input", P_guess)
-            Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+            cols_to_move = ['Sample_ID_Opx',
+                        'Mean_P_kbar_input',
+                        'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
 
-    # Users may already know their temperature, rather than using an equation
-        if equationP is not None and equationT is None:
-            T_K_guess = T
-            P_guess = calculate_opx_liq_press(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, T=T_K_guess)
-            Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
-            Combo_liq_opx_fur_filt.insert(1, "T_K_input", T_K_guess)
+        if equationT is None and equationP is not None:
+            cols_to_move = ['Sample_ID_Opx',
+                        'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
+                        'Std_P_kbar_calc']
 
 
 
-        print('Finished calculating Ps and Ts, now just averaging the results. Almost there!')
+        df1_M = df1_M[cols_to_move +
+                        [col for col in df1_M.columns if col not in cols_to_move]]
 
 
-
-        # # This bit averages all the matches for a given Opx (e.g, Opx1-Liq1,
-        opxNumbers = Combo_liq_opx_fur_filt['ID_OPX'].unique()
-        if len(opxNumbers) > 0:
-            df1_Mean_nopref=Combo_liq_opx_fur_filt.groupby(['ID_OPX', 'Sample_ID_Opx'], as_index=False).mean()
-            df1_Std_nopref=Combo_liq_opx_fur_filt.groupby(['ID_OPX', 'Sample_ID_Opx'], as_index=False).std()
-            count=Combo_liq_opx_fur_filt.groupby('ID_OPX').count()
-            Sample_ID_Opx_Mean=df1_Mean_nopref['Sample_ID_Opx']
-            Sample_ID_Opx_Std=df1_Std_nopref['Sample_ID_Opx']
-            df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
-            df1_Std=df1_Std_nopref.add_prefix('Std_')
-            df1_Mean=df1_Mean.drop(['Mean_Sample_ID_Opx'], axis=1)
-            df1_Std=df1_Std.drop(['Std_Sample_ID_Opx'], axis=1)
-            df1_Mean.rename(columns={"Mean_ID_OPX": "ID_OPX"}, inplace=True)
-            df1_Std.rename(columns={"Std_ID_OPX": "ID_OPX"}, inplace=True)
-
-            df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_OPX'])
-            df1_M['Sample_ID_Opx']=Sample_ID_Opx_Mean
-
-            if equationT is not None and equationP is not None:
-                cols_to_move = ['Sample_ID_Opx',
-                            'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
-                            'Std_P_kbar_calc']
-
-            if equationT is not None and equationP is None:
-                cols_to_move = ['Sample_ID_Opx',
-                            'Mean_P_kbar_input',
-                            'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
-
-            if equationT is None and equationP is not None:
-                cols_to_move = ['Sample_ID_Opx',
-                            'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
-                            'Std_P_kbar_calc']
+    else:
+        raise Exception(
+            'No Matches - you may need to set less strict filters, e.g.,'
+            'you could edit Kd_Match is None and Kd_Err to get more matches')
 
 
+    # Returns all opxs-liquids that went through 1st Kd filter with
+    # equilibrium parameters, averaged matches, and all matches (not averaged)
 
-            df1_M = df1_M[cols_to_move +
-                            [col for col in df1_M.columns if col not in cols_to_move]]
-
-
-        else:
-            raise Exception(
-                'No Matches - you may need to set less strict filters, e.g.,'
-                'you could edit Kd_Match is None and Kd_Err to get more matches')
+    print('Finished!')
 
 
-        # Returns all opxs-liquids that went through 1st Kd filter with
-        # equilibrium parameters, averaged matches, and all matches (not averaged)
+    cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq']
 
-        print('Finished!')
+    Combo_liq_opx_fur_filt = Combo_liq_opx_fur_filt[cols_to_move +
+                        [col for col in Combo_liq_opx_fur_filt.columns if col not in cols_to_move]]
 
-
-        cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq']
-
-        Combo_liq_opx_fur_filt = Combo_liq_opx_fur_filt[cols_to_move +
-                            [col for col in Combo_liq_opx_fur_filt.columns if col not in cols_to_move]]
-
-        return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_opx_fur_filt}
+    return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_opx_fur_filt}
         # return Combo_liq_opx_fur_filt
