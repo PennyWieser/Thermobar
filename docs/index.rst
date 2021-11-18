@@ -15,6 +15,7 @@ Welcome to Thermobar's documentation!
    importing_data
    available_functions_pdf
    FAQs
+   Changelog
 
 
 .. toctree::
