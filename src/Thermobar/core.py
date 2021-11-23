@@ -3611,7 +3611,7 @@ def calculate_cpx_opx_eq_tests(cpx_comps, opx_comps):
     return two_pyx
 
 
-def calculate_plag_liq_eq_tests(*, plag_comps=None, liq_comps=None, XAb=None, XAn=None, XOr=0,
+def calculate_plag_liq_eq_tests(*, plag_comps=None, liq_comps=None, meltmatch=None, XAb=None, XAn=None, XOr=0,
 P, T):
 
     '''
@@ -3632,6 +3632,10 @@ P, T):
     2) XAn, XAb, XOr, float, int, pandas.Series
         If plag_comps is None, enter XAn and XAb for plagioclases instead.
         XOr is set to zero by default, but can be overwritten for equilibrium tests
+
+    3) meltmatch (pandas dataframe), dont need Liq compositions.
+    Used for plag-liq melt matching code.
+
     P: int, float, pandas.Series
         Pressure in kbar
 
@@ -3646,47 +3650,52 @@ P, T):
         suggests is the best equilibrium test. Also calculate Delta_An, which
         is the absolute value of measured An - predicted An from Putirka (2008).
     '''
-
-    cat_liqs = calculate_anhydrous_cat_fractions_liquid(liq_comps)
+    if liq_comps is not None:
+        cat_liqs = calculate_anhydrous_cat_fractions_liquid(liq_comps)
     if plag_comps is not None and liq_comps is not None:
         cat_plags = calculate_cat_fractions_plagioclase(plag_comps=plag_comps)
         combo_plag_liq = pd.concat([cat_plags, cat_liqs], axis=1)
+    elif meltmatch is not None:
+        combo_plag_liq=meltmatch
+        print('here')
     else:
         combo_plag_liq = cat_liqs
         combo_plag_liq['An_Plag']=XAn
         combo_plag_liq['Ab_Plag']=XAb
         combo_plag_liq['Or_Plag']=XOr
 
-
+    # if type(P)==int:
+    #     P=float(P)
+    # if type(T)==int:
+    #     T=float(T)
     combo_plag_liq['P'] = P
     combo_plag_liq['T'] = T
-    Pred_An_EqE = (np.exp(-3.485 + 22.93 * combo_plag_liq['Ca_Liq_cat_frac'] + 0.0805 * combo_plag_liq['H2O_Liq']
-                          + 1.0925 * combo_plag_liq['Ca_Liq_cat_frac'] / (combo_plag_liq['Ca_Liq_cat_frac'] + combo_plag_liq['Na_Liq_cat_frac']) +
-                          13.11 * combo_plag_liq['Al_Liq_cat_frac'] / (
-                              combo_plag_liq['Al_Liq_cat_frac'] + combo_plag_liq['Si_Liq_cat_frac'])
-                          + 5.59258 *
-                          combo_plag_liq['Si_Liq_cat_frac']**3 -
-                          38.786 * P / (T)
-                          - 125.04 *
-                          combo_plag_liq['Ca_Liq_cat_frac'] *
-                          combo_plag_liq['Al_Liq_cat_frac']
-                          + 8.958 * combo_plag_liq['Si_Liq_cat_frac'] * combo_plag_liq['K_Liq_cat_frac'] - 2589.27 / (T)))
+    Pred_An_EqE = (np.exp(-3.485 + 22.93 * combo_plag_liq['Ca_Liq_cat_frac'].astype(float)
+     + 0.0805 * combo_plag_liq['H2O_Liq'].astype(float)
+    + 1.0925 * combo_plag_liq['Ca_Liq_cat_frac'].astype(float)
+     / (combo_plag_liq['Ca_Liq_cat_frac'].astype(float) + combo_plag_liq['Na_Liq_cat_frac'].astype(float))
+     +13.11 * combo_plag_liq['Al_Liq_cat_frac'].astype(float) / (
+    combo_plag_liq['Al_Liq_cat_frac'].astype(float) + combo_plag_liq['Si_Liq_cat_frac'].astype(float))
+    + 5.59258 *combo_plag_liq['Si_Liq_cat_frac'].astype(float)**3 -
+    38.786 * combo_plag_liq['P'].astype(float)  / (combo_plag_liq['T'].astype(float))- 125.04 *combo_plag_liq['Ca_Liq_cat_frac'].astype(float)
+    *combo_plag_liq['Al_Liq_cat_frac'].astype(float)
+    + 8.958 * combo_plag_liq['Si_Liq_cat_frac'].astype(float) * combo_plag_liq['K_Liq_cat_frac'].astype(float)
+     - 2589.27 / (combo_plag_liq['T'].astype(float))))
 
-    Pred_Ab_EqF = (np.exp(-2.748 - 0.1553 * combo_plag_liq['H2O_Liq'] + 1.017 * combo_plag_liq['Mg_Number_Liq_NoFe3'] - 1.997 * combo_plag_liq['Si_Liq_cat_frac']**3 + 54.556 * P / T
-                          - 67.878 *
-                          combo_plag_liq['K_Liq_cat_frac'] *
-                          combo_plag_liq['Al_Liq_cat_frac']
-                          - 99.03 * combo_plag_liq['Ca_Liq_cat_frac'] * combo_plag_liq['Al_Liq_cat_frac'] + 4175.307 / T))
+    Pred_Ab_EqF = (np.exp(-2.748 - 0.1553 * combo_plag_liq['H2O_Liq'].astype(float) + 1.017 * combo_plag_liq['Mg_Number_Liq_NoFe3'].astype(float) - 1.997 * combo_plag_liq['Si_Liq_cat_frac'].astype(float)**3
+     + 54.556 * combo_plag_liq['P'].astype(float)  / combo_plag_liq['T'].astype(float)- 67.878 *combo_plag_liq['K_Liq_cat_frac'].astype(float) *
+     combo_plag_liq['Al_Liq_cat_frac'].astype(float)
+    - 99.03 * combo_plag_liq['Ca_Liq_cat_frac'].astype(float) * combo_plag_liq['Al_Liq_cat_frac'].astype(float) + 4175.307 / combo_plag_liq['T'].astype(float)))
 
-    Pred_Or_EqG = (np.exp(19.42 - 12.5 * combo_plag_liq['Mg_Liq_cat_frac'] - 161.4 * combo_plag_liq['Na_Liq_cat_frac']
-                          - 16.65 * combo_plag_liq['Ca_Liq_cat_frac'] / (
-                              combo_plag_liq['Ca_Liq_cat_frac'] + combo_plag_liq['Na_Liq_cat_frac'])
-                          - 528.1 * combo_plag_liq['K_Liq_cat_frac'] * combo_plag_liq['Al_Liq_cat_frac'] -
-                          19.38 * combo_plag_liq['Si_Liq_cat_frac']**3
-                          + 168.2 *
-                          combo_plag_liq['Si_Liq_cat_frac'] *
-                          combo_plag_liq['Na_Liq_cat_frac']
-                          - 1951.2 * combo_plag_liq['Ca_Liq_cat_frac'] * combo_plag_liq['K_Liq_cat_frac'] - 10190 / T))
+    Pred_Or_EqG = (np.exp(19.42 - 12.5 * combo_plag_liq['Mg_Liq_cat_frac'].astype(float)
+     - 161.4 * combo_plag_liq['Na_Liq_cat_frac'].astype(float)
+     - 16.65 * combo_plag_liq['Ca_Liq_cat_frac'].astype(float) / (
+    combo_plag_liq['Ca_Liq_cat_frac'].astype(float) + combo_plag_liq['Na_Liq_cat_frac'].astype(float))
+     - 528.1 * combo_plag_liq['K_Liq_cat_frac'] * combo_plag_liq['Al_Liq_cat_frac'] -
+    19.38 * combo_plag_liq['Si_Liq_cat_frac']**3
+     + 168.2 *combo_plag_liq['Si_Liq_cat_frac'] *
+     combo_plag_liq['Na_Liq_cat_frac']
+     - 1951.2 * combo_plag_liq['Ca_Liq_cat_frac'] * combo_plag_liq['K_Liq_cat_frac'] - 10190 / combo_plag_liq['T'].astype(float)))
 
     Obs_Kd_Ab_An=(combo_plag_liq['Ab_Plag']*combo_plag_liq['Al_Liq_cat_frac']*combo_plag_liq['Ca_Liq_cat_frac']/
     (combo_plag_liq['An_Plag']*combo_plag_liq['Na_Liq_cat_frac']*combo_plag_liq['Si_Liq_cat_frac']))

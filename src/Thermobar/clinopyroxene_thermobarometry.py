@@ -1470,20 +1470,6 @@ Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, 
 
 
 
-def P_Wang2021_eq3(T=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
-FeII_Wang21, FeIII_Wang21, Ca_Cpx_cat_6ox, Al_Cpx_cat_6ox):
-    '''
-    Clinopyroxene-only barometer of Wang et al. (2021) equation 3
-    Doesnt use NCT
-    currently on Zenodo - 10.5281/zenodo.4727870.
-    '''
-
-
-    return (-1105.84-18.6052*Ti_Cpx_cat_6ox+252.1033*Al_Cpx_cat_6ox+311.0123*Cr_Cpx_cat_6ox+550.2534*Fet_Cpx_cat_6ox+
-451.6495*Mn_Cpx_cat_6ox+554.0535*Mg_Cpx_cat_6ox+540.2934*Ca_Cpx_cat_6ox
-+902.6805*Na_Cpx_cat_6ox-535.305*FeIII_Wang21-70.1424*Al_VI_cat_6ox*np.log(Al_VI_cat_6ox.astype(float))
--1.74473*np.log(Al_VI_cat_6ox.astype(float)))
 
 
 
@@ -1706,21 +1692,6 @@ FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
     -651.019*FeII_Wang21-23.384*H2O_Liq+2321.929)
 
 
-def T_Wang2021_eq4(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
-FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox):
-    '''
-    Clinopyroxene-only thermometer of Wang et al. (2021)
-    equation 4 - currently on Zenodo - 10.5281/zenodo.4727870
-    SEE=
-    '''
-    NCT=(2.2087*Al_VI_cat_6ox/(2.2087*Al_VI_cat_6ox+9.3594*Ti_Cpx_cat_6ox
-    +1.5117*Cr_Cpx_cat_6ox+1.4768*Fet_Cpx_cat_6ox-5.7686*Mn_Cpx_cat_6ox-0.0864*Mg_Cpx_cat_6ox))
-
-
-    return (273.15+1270.004-1362.6*Al_Cpx_cat_6ox+2087.355*Cr_Cpx_cat_6ox
-    +850.6013*Fet_Cpx_cat_6ox-2881.1*Mn_Cpx_cat_6ox-5511.84*K_Cpx_cat_6ox
-    +2821.792*Al_VI_cat_6ox-972.506*FeII_Wang21-26.7148*H2O_Liq)
 
 
 
@@ -1740,12 +1711,13 @@ def T_Put2008_eq32d(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
      + 0.395 * (np.log(a_cpx_En.astype(float)))**2)))
 
 
-def T_Put2008_eq32dH(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
+def T_Put2008_eq32dH_Wang2021adap(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
                     Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En, H2O_Liq):
     '''
     Adaptation of the clinopyroxene-only thermometer of Putirka (2008) Eq32d
     by Wang et al. (2021) to account for the effect of H2O
     :cite:`wang2021new` and :cite:`putirka2008thermometers`
+
 
     '''
 
@@ -1853,7 +1825,7 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
 
 ## Function for calculationg Cpx-only pressure
 Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
-P_Wang2021_eq3, P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Petrelli2020_Cpx_only_noCr}
+ P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Petrelli2020_Cpx_only_noCr}
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
@@ -1875,7 +1847,7 @@ return_input=False):
         | P_Petrelli2020_Cpx_only (T_independent, H2O-independent)
         | P_Petrelli2020_Cpx_only_withH2O (T_independent, H2O-dependent)
         | P_Wang2021_eq1 (T_independent, H2O-independent)
-        | P_Wang2021_eq3 (T_independent, H2O-independent)
+
 
 
     T: float, int, pandas.Series, str  ("Solve")
@@ -1992,10 +1964,8 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
         cpx_comps_copy['H2O_Liq']=H2O_Liq
         cpx_comps_c['H2O_Liq']=H2O_Liq
         cpx_comps_c['P_Wang21_eq1']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy, equationP="P_Wang2021_eq1")
-        cpx_comps_c['P_Wang21_eq3']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy, equationP="P_Wang2021_eq3")
 
         cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq2", H2O_Liq=H2O_Liq)
-        cpx_comps_c['T_Wang21_eq4']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq4", H2O_Liq=H2O_Liq)
 
         cpx_comps_c['T_Petrelli21']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
         equationT="T_Petrelli2020_Cpx_only").T_K_calc
@@ -2013,7 +1983,6 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
         cpx_comps_c['P_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).P_kbar_calc
         X_Wangeq1_Sorted=np.sort(cpx_comps_c['P_Wang21_eq1'])
-        X_Wangeq3_Sorted=np.sort(cpx_comps_c['P_Wang21_eq3'])
         X_Pet_Sorted=np.sort(cpx_comps_c['P_Petrelli21'])
         X_Put_32d32a=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32a'])
         X_Put_32d32b=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32b'])
@@ -2021,10 +1990,6 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
             plt.step(np.concatenate([X_Wangeq1_Sorted, X_Wangeq1_Sorted[[-1]]]),
             np.arange(X_Wangeq1_Sorted.size+1)/X_Wangeq1_Sorted.size, color='blue', linewidth=1,
             label="Wang21_eq1")
-
-            plt.step(np.concatenate([X_Wangeq3_Sorted, X_Wangeq3_Sorted[[-1]]]),
-            np.arange(X_Wangeq3_Sorted.size+1)/X_Wangeq3_Sorted.size, color='cyan', linewidth=1,
-            label="Wang21_eq3")
 
             plt.step(np.concatenate([X_Pet_Sorted, X_Pet_Sorted[[-1]]]),
             np.arange(X_Pet_Sorted.size+1)/X_Pet_Sorted.size, color='orange', linewidth=1,
@@ -2045,8 +2010,8 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
 
     return cpx_comps_c
 ## Function for calculating Cpx-only temperature
-Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol, T_Wang2021_eq4,
-T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O, T_Put2008_eq32dH}
+Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol,
+T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O, T_Put2008_eq32dH_Wang2021adap}
 Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
@@ -2068,7 +2033,8 @@ H2O_Liq=None, eq_tests=False):
         | T_Petrelli2020_Cpx_only (P-independent, H2O-independent)
         | T_Petrelli2020_Cpx_only_withH2O (P-independent, H2O-dependent)
         | T_Wang2021_eq2 (P-independent, H2O-dependent)
-        | T_Wang2021_eq4 (P-independent, H2O-dependent)
+        | T_Put2008_eq32dH_Wang2021adap (P-dependent, H2O-dependent)
+
 
 
 
@@ -2099,13 +2065,13 @@ H2O_Liq=None, eq_tests=False):
     cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps_c)
 
     if H2O_Liq is None:
-        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4" or equationT=="T_Put2008_eq32dH":
+        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4" or equationT=="T_Put2008_eq32dH_Wang2021adap":
             w.warn('This Cpx-only thermometer is sensitive to H2O content of the liquid. '
         ' By default, this function uses H2O=0 wt%, else you can enter a value of H2O_Liq in the function')
             cpx_components['H2O_Liq']=0
             cpx_comps_c['H2O_Liq']=0
     if H2O_Liq is not None:
-        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4" or equationT=="T_Put2008_eq32dH":
+        if equationT == "T_Petrelli2020_Cpx_only_withH2O" or  equationT == "T_Wang2021_eq2" or equationT == "T_Wang2021_eq4" or equationT=="T_Put2008_eq32dH_Wang2021adap":
             cpx_components['H2O_Liq']=H2O_Liq
             cpx_comps_c['H2O_Liq']=H2O_Liq
 
