@@ -328,7 +328,10 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
             my_input = pd.read_excel(filename)
             #my_input[my_input < 0] = 0
 
-
+    if suffix is not None:
+        if any(my_input.columns.str.contains(suffix)):
+            w.warn('We notice you have specified a suffix, but some of your columns already have this suffix. '
+        'e.g., If you already have _Liq in the file, you shouldnt specify suffix="_Liq" during the import')
 
 
     my_input_c = my_input.copy()
