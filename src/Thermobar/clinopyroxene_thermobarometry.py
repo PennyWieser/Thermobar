@@ -9,6 +9,7 @@ from pickle import load
 import pickle
 from pathlib import Path
 Thermobar_dir=Path(__file__).parent
+import joblib
 
 from Thermobar.core import *
 
@@ -1546,8 +1547,10 @@ def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
     with open(Thermobar_dir/'ML_scaler_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
         scaler_P2020_Cpx_only=load(f)
 
+    # with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
+    #     ETR_Press_P2020_Cpx_only=load(f)
     with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
-        ETR_Press_P2020_Cpx_only=load(f)
+        ETR_Press_P2020_Cpx_only=joblib.load(f)
 
 
     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
@@ -1587,7 +1590,7 @@ def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
         scaler_P2020_Cpx_only=load(f)
 
     with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
-        ETR_Press_P2020_Cpx_only=load(f)
+        ETR_Press_P2020_Cpx_only=joblib.load(f)
 
 
 
@@ -1772,7 +1775,7 @@ def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
         scaler_P2020_Cpx_only=load(f)
 
     with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
-        ETR_Temp_P2020_Cpx_only=load(f)
+        ETR_Temp_P2020_Cpx_only=joblib.load(f)
 
     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
     Pred_T_K=ETR_Temp_P2020_Cpx_only.predict(x_test_scaled)
@@ -1809,7 +1812,7 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
 
 
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
-        scaler_P2020_Cpx_only=load(f)
+        scaler_P2020_Cpx_only=joblib.load(f)
 
     with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
         ETR_Temp_P2020_Cpx_only=load(f)
