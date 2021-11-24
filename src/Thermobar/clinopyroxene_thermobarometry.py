@@ -227,7 +227,7 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
         scaler_P2020_Cpx_Liq=load(f)
 
     with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Liq.pkl', 'rb') as f:
-        ETR_Press_P2020_Cpx_Liq=load(f)
+        ETR_Press_P2020_Cpx_Liq=joblib.load(f)
 
 
     x_test_scaled=scaler_P2020_Cpx_Liq.transform(x_test)
@@ -439,7 +439,7 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
         scaler_P2020_Cpx_Liq=load(f)
 
     with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Liq.pkl', 'rb') as f:
-        ETR_Temp_P2020_Cpx_Liq=load(f)
+        ETR_Temp_P2020_Cpx_Liq=joblib.load(f)
 
     x_test_scaled=scaler_P2020_Cpx_Liq.transform(x_test)
     Pred_T_K=ETR_Temp_P2020_Cpx_Liq.predict(x_test_scaled)
@@ -1815,7 +1815,7 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
         scaler_P2020_Cpx_only=joblib.load(f)
 
     with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
-        ETR_Temp_P2020_Cpx_only=load(f)
+        ETR_Temp_P2020_Cpx_only=joblib.load(f)
 
 
 
