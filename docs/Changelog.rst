@@ -9,6 +9,8 @@ Version 0.12 Nov 23rd, 2021
 Added in capability for Plag-Liq, Kspar-Liq temperature calculations for melt matching,
 and Plag-Liq hygrometers.
 
+Added in warning if users specify Suffix, but already have the suffix.
+
 Version 0.11 Nov 15th, 2021
 ================================
 

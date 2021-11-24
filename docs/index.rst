@@ -47,7 +47,6 @@ Welcome to Thermobar's documentation!
    Examples/Feldspar_Thermobarometry/Fspar_Liq_Matching.ipynb
    Examples/Feldspar_Thermobarometry/Fspar_Ternary_Plot.ipynb
 
-
    %
    Examples/Two_Pyroxene_Thermobarometry/Two_Pyroxene_Example
    Examples/Two_Pyroxene_Thermobarometry/Two_Pyroxene_Matching
