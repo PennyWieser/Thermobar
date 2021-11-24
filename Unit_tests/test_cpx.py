@@ -50,7 +50,6 @@ class test_cpx_only_press(unittest.TestCase):
        self.assertAlmostEqual(pt.calculate_cpx_only_press(cpx_comps=CpxT, equationP="P_Put2008_eq32b",
          T=1300, H2O_Liq=6)[0], 1.142076, decimalPlace, "equation 32b (changed H2O) not equal to typed value")
 
-
     def test_press_Petrelli(self):
        self.assertAlmostEqual(pt.calculate_cpx_only_press(cpx_comps=CpxT, equationP="P_Petrelli2020_Cpx_only").P_kbar_calc[0],
        5.435313, decimalPlace, "Petrelli 2021 not equal to typed value")
