@@ -386,6 +386,8 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
         " thermobar only recognises columns with FeOt for all phases except liquid"
         " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")
 
+    if any(my_input.columns.str.contains("FeOT_")) and (all(my_input.columns.str.contains("FeOt_")==False)):
+        raise ValueError("No FeOt column found. You've got a column heading with FeOT. Change to a lower case t")
 
 
 

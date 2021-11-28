@@ -16,10 +16,6 @@ def std_dev(x, x2):
     RMSE=np.sqrt((1/N)*sum_squares)
     return RMSE
 
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from scipy import stats
 
 def Tukey_calc(x,y): #, name):
     x=pd.Series(x)

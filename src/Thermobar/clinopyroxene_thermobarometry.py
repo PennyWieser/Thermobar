@@ -12,6 +12,7 @@ Thermobar_dir=Path(__file__).parent
 import joblib
 
 from Thermobar.core import *
+from Thermobar.Nimis_1999 import *
 
 
 ## Equations for Cpx-Liquid Barometry written as functions
@@ -1674,7 +1675,10 @@ def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
 #     df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
 #
 #     return df_stats
-
+def P_Nimis1999_BA(T=None):
+    '''
+        This is a placeholder, function is being called from other .py file')
+    '''
 
 ## Clinopyroxene-only temperature equations
 def T_Wang2021_eq2(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
@@ -1828,7 +1832,7 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
 
 ## Function for calculationg Cpx-only pressure
 Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
- P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O}
+ P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA}
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
@@ -1845,6 +1849,7 @@ return_input=False):
         Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
 
     equationP: str
+        | P_Nimis1999_BA (T-independent)
         | P_Put2008_eq32a (T-dependent)
         | P_Put2008_eq32b (T-dependent, H2O dependent)
         | P_Petrelli2020_Cpx_only (T_independent, H2O-independent)
@@ -1870,6 +1875,9 @@ return_input=False):
     '''
 
     cpx_comps_c=cpx_comps.copy()
+
+
+
 
     if 'Petrelli' in equationP:
 
@@ -1925,6 +1933,9 @@ return_input=False):
     if 'Petrelli' in equationP:
         df_stats=func(cpx_comps=cpx_comps_c)
 
+    elif equationP=="P_Nimis1999_BA":
+        calc_Nimis=calculate_P_Nimmis_BA(cpx_comps)
+
     else:
         kwargs = {name: cpx_components[name] for name, p in sig.parameters.items()
         if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -1942,6 +1953,8 @@ return_input=False):
 
 
     if return_input is False:
+        if equationP =="P_Nimis1999_BA":
+            return calc_Nimis['P_kbar_calc']
         if equationP == "P_Petrelli2020_Cpx_only" or equationP == "P_Petrelli2020_Cpx_only_withH2O" or equationP == "P_Petrelli2020_Cpx_only_noCr":
             P_kbar=df_stats['P_kbar_calc']
             return df_stats
@@ -1949,6 +1962,8 @@ return_input=False):
             return P_kbar
 
     if return_input is True:
+        if equationP =="P_Nimis1999_BA":
+            return calc_Nimis
         if equationP == "P_Petrelli2020_Cpx_only" or equationP == "P_Petrelli2020_Cpx_only_withH2O" or equationP == "P_Petrelli2020_Cpx_only_noCr":
             out=pd.concat([df_stats, cpx_comps],axis=0)
             return out

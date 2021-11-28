@@ -26,8 +26,10 @@ from Thermobar.olivine_liquid_olivine_spinel_thermometry import *
 from Thermobar.noise_averaging import *
 # This has functions for orthopyroxene thermobarometry
 from Thermobar.orthopyroxene_thermobarometry import *
-# This has functions for orthopyroxene thermobarometry
+# This has functions for clinopyroxene thermobarometry
 from Thermobar.clinopyroxene_thermobarometry import *
+# This has functions for clinopyroxene thermobarometry
+from Thermobar.Nimis_1999 import *
 # This has functions for two-pyroxene thermobarometry
 from Thermobar.two_pyroxene import *
 # Feldspar functions
