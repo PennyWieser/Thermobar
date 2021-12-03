@@ -52,12 +52,12 @@ class test_cpx_only_press(unittest.TestCase):
 
     def test_press_Petrelli(self):
        self.assertAlmostEqual(pt.calculate_cpx_only_press(cpx_comps=CpxT, equationP="P_Petrelli2020_Cpx_only").P_kbar_calc[0],
-       5.435313, decimalPlace, "Petrelli 2021 not equal to typed value")
+       5.435313, decimalPlace-2, "Petrelli 2021 not equal to typed value")
 
     def test_press_Petrelli_withH2O(self):
        self.assertAlmostEqual(pt.calculate_cpx_only_press(cpx_comps=CpxT,
        equationP="P_Petrelli2020_Cpx_only_withH2O", H2O_Liq=5).P_kbar_calc[0],
-       5.463016, decimalPlace, "Petrelli 2021 not equal to typed value")
+       5.463016, decimalPlace-2, "Petrelli 2021 not equal to typed value")
 
 
 class test_cpx_only_temp(unittest.TestCase):

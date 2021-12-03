@@ -13,11 +13,13 @@ Make sure you give me enough information to troubleshoot- E.g., attach your .ipy
 Thermobar doesn't match the Putirka (2008) spreadsheets
 ==================================================================
 Q: Thermobar doesn't match the number from Putirka (2008) spreadsheets
+
 A: First, double check the spreadsheets are working how you think they are. If you are asking Thermobar to iterate equation 33 with say equation 32b, check the spreadsheet is doing that. By default, the Cpx-Liq spreadsheet uses pressure from Neave and Putirka (2017) to iterate with equation 33, and for 32c uses a therometer from 1996. If you change the cells iterating each other, your results should match thermobar. If you've double checked this and there is still a problem, let me know, if its a real bug in Thermobar i'll buy you a coffee at a conference!
 
 My temperatures are really hot!
 ================================
 Q: Why are my temperatures so hot?
+
 A: Remember, Thermobar outputs temperature in Kelvin, not celcius.
 
 
