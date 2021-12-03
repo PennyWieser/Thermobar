@@ -17,12 +17,16 @@ Welcome to Thermobar's documentation!
    FAQs
    Changelog
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Narrated YouTube Videos
+
+   youtube
 
 .. toctree::
    :maxdepth: 2
-   :caption: Introductory Examples and narrated YouTube Videos:
+   :caption: Introductory Examples
 
-   youtube
 
    Examples/Five_min_intro
    Examples/Exporting_to_Excel
@@ -30,7 +34,8 @@ Welcome to Thermobar's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption:  Liquid and Olivine-Liquid Equilibra Examples:
+   :caption:  Liquid and Olivine-Liquid Equilibra Examples
+
    Examples/Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_thermometry
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_hygrometry
