@@ -24,9 +24,11 @@ Welcome to Thermobar's documentation!
 
    youtube
 
+   :caption: Introduction:
    Examples/Five_min_intro
    Examples/Exporting_to_Excel
    %
+   :caption: Liquid and Olivine-Liquid Equilibra:
    Examples/Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_thermometry
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_hygrometry
