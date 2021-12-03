@@ -1548,8 +1548,6 @@ def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
     with open(Thermobar_dir/'ML_scaler_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
         scaler_P2020_Cpx_only=load(f)
 
-    # with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
-    #     ETR_Press_P2020_Cpx_only=load(f)
     with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
         ETR_Press_P2020_Cpx_only=joblib.load(f)
 

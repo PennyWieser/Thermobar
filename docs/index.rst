@@ -44,13 +44,14 @@ Welcome to Thermobar's documentation!
    %
    Examples/Amphibole/Amphibole_Examples
    %
-   Examples/Feldspar_Thermobarometry/Feldspar_Liquid
-   Examples/Feldspar_Thermobarometry/Two_Feldspar_Example
+   Examples/Feldspar_Thermobarometry/Feldspar_Liquid_Thermobarometry
+   Examples/Feldspar_Thermobarometry/Plag_Liquid_Hygrometry
+   Examples/Feldspar_Thermobarometry/Two_Feldspar_Thermobarometry
    Examples/Feldspar_Thermobarometry/Fspar_Liq_Matching
    Examples/Feldspar_Thermobarometry/Fspar_Ternary_Plot
 
    %
-   Examples/Two_Pyroxene_Thermobarometry/Two_Pyroxene_Example
+   Examples/Two_Pyroxene_Thermobarometry/Two_Pyroxene_Thermobarometry
    Examples/Two_Pyroxene_Thermobarometry/Two_Pyroxene_Matching
    %
    Examples/Error_propagation/Liquid_Thermometry_Error_prop
