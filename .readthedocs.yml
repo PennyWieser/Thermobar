@@ -11,4 +11,4 @@ python:
       path: .
 
 sphinx:
-  configuration: documentation/source/conf.py
+  configuration: docs/conf.py
