@@ -8,9 +8,9 @@ This tool is currently in progress, with planned submission to Volcanica in the 
 
 We welcome user feedback/requests for new functions to be included. You can either email the lead author (wieserp (at) oregonstate.edu), or post a enhancement request/report of a bug on the Issue page of the github page. https://github.com/PennyWieser/Thermobar/issues
 
-If you have used Thermobar in your work, please check back periodically for whether it has a DOI. At the moment, it is best to cite my GSA 2021 abstract:
+If you have used Thermobar in your work,  please cite my GSA 2021 abstract:
 
-Penny Wieser, Maurizio Petrelli, Jordan Lubbers, Eric Wieser, Adam Kent, Christy Till. Thermobar: A critical evaluation of mineral-melt thermobarometry and hygrometry in arc magmas using a new open-source Python3 tool. GSA connects 2021. Portland.
+Penny Wieser, Maurizio Petrelli, Jordan Lubbers, Eric Wieser, Adam Kent, Christy Till. Thermobar: A critical evaluation of mineral-melt thermobarometry and hygrometry in arc magmas using a new open-source Python3 tool. Geological Society of America Abstracts with Programs. Vol 53, No. 6. https://doi.org/10.1130/abs/2021AM-367080.
 
 Please also reference the original paper for the equation you have choosen as well as Thermobar.
 

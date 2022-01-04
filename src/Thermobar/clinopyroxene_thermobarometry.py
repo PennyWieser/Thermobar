@@ -22,6 +22,10 @@ def P_Put1996_eqP1(T, *, lnK_Jd_liq, Na_Liq_cat_frac, Al_Liq_cat_frac):
     Clinopyroxene-liquid barometer of Putirka (1996) EqP1
     :cite:`putirka1996thermobarometry`
 
+    SEE=+-1.36 kbar (1996 paper, calibration dataset)
+
+    Revised SEE by Putirka (2008)
+
     SEE=+-4.6 kbar (anhydrous)
 
     SEE=+-5.4 kbar (hydrous)
@@ -49,6 +53,9 @@ def P_Put1996_eqP2(T, *, lnK_Jd_liq, Na_Liq_cat_frac, Al_Liq_cat_frac):
     '''
     Clinopyroxene-liquid barometer of Putirka (1996) EqP2
     :cite:`putirka1996thermobarometry`
+
+    SEE=+-1.51 kbar (1996 paper, calibration dataset)
+
 
 
     '''
@@ -78,6 +85,9 @@ def P_Put2003(T, *, lnK_Jd_liq, Ca_Liq_cat_frac,
     Clinopyroxene-liquid barometer of Putirka (2003) Eq1.
     Cite :cite:`putirka2003new`
 
+    SEE (2003) paper = +-1.7 kbar
+
+    Stated errors Putirka (2008)
     SEE=+-4.8 kbar (anhydrous)
 
     SEE=+-5.0 kbar (hydrous)
@@ -249,6 +259,8 @@ def T_Put1996_eqT1(P=None, *, lnK_Jd_DiHd_liq_1996,
     Clinopyroxene-liquid thermometer of Putirka (1996) EqT1 (pressure-independent)
     :cite:`putirka1996thermobarometry`
 
+    SEE=+-26.8 K (1996 paper, calibration dataset)
+
     '''
     return (10 ** 4 / (6.73 - 0.26 * lnK_Jd_DiHd_liq_1996 - 0.86 * np.log(Mg_Number_Liq_NoFe3.astype(float))
                        + 0.52 * np.log(Ca_Liq_cat_frac.astype(float))))
@@ -272,6 +284,9 @@ def T_Put1996_eqT2(P, *, lnK_Jd_DiHd_liq_1996,
     '''
     Clinopyroxene-liquid thermometer of Putirka (1996) EqT2 (pressure-dependent)
     :cite:`putirka1996thermobarometry`
+
+    SEE=+-23.8 K (1996 paper, calibration dataset)
+
 
     '''
     return (10 ** 4 / (6.59 - 0.16 * lnK_Jd_DiHd_liq_1996 - 0.65 * np.log(Mg_Number_Liq_NoFe3.astype(float))
@@ -313,6 +328,9 @@ def T_Put2003(P, *, lnK_Jd_DiHd_liq_2003, Mg_Number_Liq_NoFe3,
     '''
     Clinopyroxene-liquid thermometer of Putirka (2003)
     :cite:`putirka2003new`
+
+    SEE=+-33 K (1996 paper, calibration dataset)
+
 
     '''
     return (10 ** 4 / (4.6 - 0.437 * lnK_Jd_DiHd_liq_2003 - 0.654 * np.log(Mg_Number_Liq_NoFe3.astype(float))
@@ -386,6 +404,14 @@ Fet_Liq_cat_frac, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac):
 10.8503727 * Fet_Liq_cat_frac + 33.6303471 * Mg_Liq_cat_frac
 + 15.4532888 * Ca_Liq_cat_frac + 15.6390115 * K_Liq_cat_frac))
 
+# Technically liquid only
+def T_Put2008_eq34_cpx_sat(P, *, H2O_Liq, Ca_Liq_cat_frac, Si_Liq_cat_frac, Mg_Liq_cat_frac):
+    '''
+    Liquid-only thermometer- temperature at which a liquid is saturated in clinopyroxene (for a given P). Equation 34 of Putirka et al. (2008)
+    '''
+    return (10 ** 4 / (6.39 + 0.076 * H2O_Liq - 5.55 * (Ca_Liq_cat_frac * Si_Liq_cat_frac)
+            - 0.386 * np.log(Mg_Liq_cat_frac) - 0.046 * P + 2.2 * (10 ** (-4)) * P**2))
+
 
 
 def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
@@ -449,10 +475,391 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     return df_stats
 
+
+## Clinopyroxene-only pressure equations
+
+def P_Wang2021_eq1(T=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
+Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
+    '''
+    Clinopyroxene-only barometer of Wang et al. (2021) equation 1
+    :cite:`wang2021new`
+
+    SEE=1.66 kbar
+
+    '''
+    NCT=(1.4844*Al_VI_cat_6ox/(1.4844*Al_VI_cat_6ox+7.7408*Ti_Cpx_cat_6ox
+    +1.1675*Cr_Cpx_cat_6ox+1.0604*Fet_Cpx_cat_6ox+0.0387*Mn_Cpx_cat_6ox-0.0628*Mg_Cpx_cat_6ox))
+
+
+
+    return (-7.9509*NCT*np.log(Al_VI_cat_6ox.astype(float))+0.6492*Si_Cpx_cat_6ox-5.9522*Fet_Cpx_cat_6ox-11.1942*Mg_Cpx_cat_6ox-24.2802*Ca_Cpx_cat_6ox+108.663*Na_Cpx_cat_6ox+25.0019)
+
+
+
+
+
+
+
+def P_Put2008_eq32a(T, *, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox,
+                    Al_VI_cat_6ox, DiHd_2003, EnFs):
+    '''
+    Clinopyroxene-only barometer of Putirka (2008) Eq32a
+    :cite:`putirka2008thermometers`
+
+    SEE=+-3.1 kbar (anhydrous)
+
+    '''
+    return (3205 - 5.62 * Mg_Cpx_cat_6ox + 83.2 * Na_Cpx_cat_6ox + 68.2 * DiHd_2003
+    + 2.52 * np.log(Al_VI_cat_6ox.astype(float)) - 51.1 * DiHd_2003**2 + 34.8 * EnFs**2
+    + 0.384 * T - 518 * np.log(T))
+
+
+def P_Put2008_eq32b(T, *, H2O_Liq, Ca_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Na_Cpx_cat_6ox,
+Al_Cpx_cat_6ox, K_Cpx_cat_6ox, Al_IV_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
+                    Al_VI_cat_6ox, Fet_Cpx_cat_6ox, DiHd_1996, Mg_Cpx_cat_6ox, Jd):
+    '''
+    Clinopyroxene-only barometer of Putirka (2008) Eq32b. Unlike 32a, requires H2O_Liq to be specified.
+    :cite:`putirka2008thermometers`
+
+    SEE=+-2.6 kbar (anhydrous)
+
+    '''
+
+    CNM = Ca_Cpx_cat_6ox + Na_Cpx_cat_6ox + Mn_Cpx_cat_6ox  # This is GQ
+    Lindley_Fe3_Cpx = Na_Cpx_cat_6ox + Al_IV_cat_6ox - Al_VI_cat_6ox - \
+        2 * Ti_Cpx_cat_6ox - Cr_Cpx_cat_6ox  # This is cell FR
+    Lindley_Fe3_Cpx[Lindley_Fe3_Cpx < 0] = 0
+    R3_plus = Al_VI_cat_6ox + Ti_Cpx_cat_6ox + \
+        Cr_Cpx_cat_6ox + Lindley_Fe3_Cpx  # This is cell GR
+    M1_M2_KD_Fe_Mg = np.exp(0.238 * R3_plus + 0.289 * CNM - 2.3315)
+    M1_M1_Fe2_tot = Fet_Cpx_cat_6ox - Lindley_Fe3_Cpx  # GV15
+    b = (M1_M2_KD_Fe_Mg * Mg_Cpx_cat_6ox) - \
+        (M1_M2_KD_Fe_Mg * (1 - CNM)) + M1_M1_Fe2_tot + (1 - CNM)  # GX
+    a_Kd_1 = 1 - M1_M2_KD_Fe_Mg  # GW
+    c = -M1_M1_Fe2_tot * (1 - CNM)  # GY
+    Fe_M2 = (-b + np.sqrt(b**2 - 4 * a_Kd_1 * c)) / 2 * a_Kd_1
+    Mg_M2 = 1 - CNM - Fe_M2
+    return (1458 + 0.197 * (T) - 241 * np.log(T) +
+    0.453 * H2O_Liq + 55.5 * Al_VI_cat_6ox +
+    8.05 * Fet_Cpx_cat_6ox - 277 * K_Cpx_cat_6ox + 18 * Jd
+    + 44.1 * DiHd_1996 + 2.2 * np.log(Jd.astype(float))
+    - 27.7 * Al_Cpx_cat_6ox**2 + 97.3 * Fe_M2**2
+    + 30.7 * Mg_M2**2 - 27.6 * DiHd_1996**2)
+
+def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  barometer of Petrelli et al. (2021) based on
+    Machine Learning.
+    :cite:`petrelli2020machine`
+
+    SEE==+-3.1 kbar
+    '''
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+
+    })
+
+    x_test=Cpx_test_noID_noT.values
+
+
+    with open(Thermobar_dir/'ML_scaler_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
+        scaler_P2020_Cpx_only=load(f)
+
+    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
+        ETR_Press_P2020_Cpx_only=joblib.load(f)
+
+
+    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+    Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
+
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+    return df_stats
+
+
+def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  barometer following the Machine learning approach of
+    Petrelli et al. (2021), but including the H2O content of the liquid while training the model.
+
+    :cite:`petrelli2020machine` and cite Thermobar.
+    '''
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+                                'H2O_Liq':cpx_comps['H2O_Liq'],
+
+    })
+
+    x_test=Cpx_test_noID_noT.values
+
+
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
+        scaler_P2020_Cpx_only=load(f)
+
+    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
+        ETR_Press_P2020_Cpx_only=joblib.load(f)
+
+
+
+    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+    Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+    return df_stats
+
+
+# def P_Petrelli2020_Cpx_only_noCr(T=None, *, cpx_comps):
+#     '''
+#     Clinopyroxene-only  barometer following the Machine learning approach of
+#     Petrelli et al. (2021),
+#     but including the H2O content of the liquid while training the model.
+#     '''
+#     Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+#                                 'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+#                                 'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+#                                 'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+#                                 'MnO_Cpx': cpx_comps['MnO_Cpx'],
+#                                 'MgO_Cpx': cpx_comps['MgO_Cpx'],
+#                                 'CaO_Cpx': cpx_comps['CaO_Cpx'],
+#                                 'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+#
+#
+#     })
+#     x_test=Cpx_test_noID_noT.values
+#
+#
+#     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_noCr.pkl', 'rb') as f:
+#         scaler_P2020_Cpx_only=load(f)
+#
+#     with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_noCr.pkl', 'rb') as f:
+#         ETR_Press_P2020_Cpx_only=load(f)
+#
+#
+#
+#     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+#     Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
+#     df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
+#     df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+#
+#     return df_stats
+#
+# def P_Petrelli2020_Cpx_only_components(T=None, *, cpx_comps):
+#     '''
+#     Clinopyroxene-only  barometer following the Machine learning approach of
+#     Petrelli et al. (2021),
+#     but including the H2O content of the liquid while training the model.
+#     '''
+#     cpx_test=cpx_comps.copy()
+#     Cpx_compnts_test=calculate_clinopyroxene_components(cpx_comps)
+#     Cpx_test_noID_noT=pd.DataFrame(data={'Mg_Cpx_cat_6ox': Cpx_compnts_test['Mg_Cpx_cat_6ox'],
+#                                       'Na_Cpx_cat_6ox': Cpx_compnts_test['Na_Cpx_cat_6ox'],
+#                                       'Al_VI_cat_6ox': Cpx_compnts_test['Al_VI_cat_6ox'],
+#                                        'DiHd_2003': Cpx_compnts_test['DiHd_2003'],
+#                                       'EnFs': Cpx_compnts_test['EnFs'],
+#                                                                            'Jd': Cpx_compnts_test['Jd'],
+#                                       'Ca_Cpx_cat_6ox': Cpx_compnts_test['Ca_Cpx_cat_6ox'],
+#                                       'Fet_Cpx_cat_6ox': Cpx_compnts_test['Fet_Cpx_cat_6ox'],
+#                                         'Cr_Cpx_cat_6ox': Cpx_compnts_test['Cr_Cpx_cat_6ox'],
+#                                        'Ti_Cpx_cat_6ox': Cpx_compnts_test['Ti_Cpx_cat_6ox'],
+#                                        'Mn_Cpx_cat_6ox': Cpx_compnts_test['Mn_Cpx_cat_6ox'],
+#                                      })
+#     x_test=Cpx_test_noID_noT.values
+#
+#
+#     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_Comp.pkl', 'rb') as f:
+#         scaler_P2020_Cpx_only=load(f)
+#
+#     with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_Comp.pkl', 'rb') as f:
+#         ETR_Press_P2020_Cpx_only=load(f)
+#
+#
+#
+#     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+#     Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
+#     df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
+#     df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+#
+#     return df_stats
+def P_Nimis1999_BA(T=None):
+    '''
+        This is a placeholder, function is being called from other .py file')
+    '''
+
+## Clinopyroxene-only temperature equations
+def T_Wang2021_eq2(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
+Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
+FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
+    '''
+    Clinopyroxene-only thermometer of Wang et al. (2021) Eq 2
+    :cite:`wang2021new`
+
+    SEE=36.6 C
+    '''
+    NCT=(1.4844*Al_VI_cat_6ox/(1.4844*Al_VI_cat_6ox+7.7408*Ti_Cpx_cat_6ox
+    +1.1675*Cr_Cpx_cat_6ox+1.0604*Fet_Cpx_cat_6ox+0.0387*Mn_Cpx_cat_6ox-0.0628*Mg_Cpx_cat_6ox))
+
+
+    return (273.15+312.4395*NCT+230.5194*Ti_Cpx_cat_6ox-568.698*Al_Cpx_cat_6ox
+    -3212*Mn_Cpx_cat_6ox-476.386*Mg_Cpx_cat_6ox-710.883*Ca_Cpx_cat_6ox
+    -651.019*FeII_Wang21-23.384*H2O_Liq+2321.929)
+
+
+
+
+
+def T_Put2008_eq32d(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
+                    Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En):
+    '''
+    Clinopyroxene-only thermometer of Putirka (2008) Eq32d.
+    Overestimates temperature for hydrous data
+    :cite:`putirka2008thermometers`
+
+    SEE=±58°C (anhydrous)
+    SEE=±87°C (hydrous)
+    '''
+
+    return (((93100 + 544 * P) / (61.1 + 36.6 * Ti_Cpx_cat_6ox + 10.9 * Fet_Cpx_cat_6ox
+    - 0.95 * (Al_Cpx_cat_6ox + Cr_Cpx_cat_6ox - Na_Cpx_cat_6ox - K_Cpx_cat_6ox)
+     + 0.395 * (np.log(a_cpx_En.astype(float)))**2)))
+
+
+def T_Put2008_eq32dH_Wang2021adap(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
+                    Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En, H2O_Liq):
+    '''
+    Adaptation of the clinopyroxene-only thermometer of Putirka (2008) Eq32d
+    by Wang et al. (2021) to account for the effect of H2O
+    :cite:`wang2021new` and :cite:`putirka2008thermometers`
+
+
+    '''
+
+    return (273.15+
+    (93100 + 544 * P) / (72.70276 + 74.24179 * Ti_Cpx_cat_6ox + 21.95727 * Fet_Cpx_cat_6ox
+    - 0.31648 * (Al_Cpx_cat_6ox + Cr_Cpx_cat_6ox - Na_Cpx_cat_6ox - K_Cpx_cat_6ox)
+     + 0.420385 * (np.log(a_cpx_En.astype(float)) )**2 +1.864215*H2O_Liq)
+     )
+
+# This is the version in the Putirka 2-pyroxene spreadsheet. The 544 coefficient is changed to 755, and the coefficient for the enstatie activity is
+# changed from 0.395 to 3.5. This is a better fit to subsolidus T
+# estimates, but provide poorer fits to pyroxenes from volcanic systems.
+
+
+def T_Put2008_eq32d_subsol(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
+                           Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En):
+    '''
+    Adapted version of clinopyroxene-only thermoter of Putirka (2008) Eq32d,
+    provides better fit to subsolidus T estimates
+    :cite:`putirka2008thermometers`
+
+    '''
+    return (((93100 + 755 * P) / (61.1 + 36.6 * Ti_Cpx_cat_6ox + 10.9 * Fet_Cpx_cat_6ox
+    - 0.95 * (Al_Cpx_cat_6ox + Cr_Cpx_cat_6ox - Na_Cpx_cat_6ox - K_Cpx_cat_6ox)
+    + 3.5 * (np.log(a_cpx_En.astype(float)))**2)))
+
+
+def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
+    Machine Learning.
+    :cite:`petrelli2020machine`
+
+    SEE==+-51°C
+    '''
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+
+    })
+
+    x_test=Cpx_test_noID_noT.values
+
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
+        scaler_P2020_Cpx_only=load(f)
+
+    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
+        ETR_Temp_P2020_Cpx_only=joblib.load(f)
+
+    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+    Pred_T_K=ETR_Temp_P2020_Cpx_only.predict(x_test_scaled)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_P2020_Cpx_only)
+    df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+    return df_stats
+
+
+def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
+    Machine Learning, but adding water.
+    :cite:`petrelli2020machine` and this study.
+
+    SEE==+-51°C
+    '''
+    cpx_test=cpx_comps.copy()
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+                                'H2O_Liq':cpx_comps['H2O_Liq'],
+
+    })
+    x_test=Cpx_test_noID_noT.values
+
+
+
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
+        scaler_P2020_Cpx_only=joblib.load(f)
+
+    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
+        ETR_Temp_P2020_Cpx_only=joblib.load(f)
+
+
+
+    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
+    Pred_T_K=ETR_Temp_P2020_Cpx_only.predict(x_test_scaled)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_P2020_Cpx_only)
+    df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+    return df_stats
+
 ## Function for calculatin clinopyroxene-liquid pressure
+# This also includes all the Cpx-only, so you can mix and match cpx and cpx-liq
 Cpx_Liq_P_funcs = {P_Put1996_eqP1, P_Mas2013_eqPalk1, P_Put1996_eqP2, P_Mas2013_eqPalk2,
 P_Put2003, P_Put2008_eq30, P_Put2008_eq31, P_Put2008_eq32c, P_Mas2013_eqalk32c,
-P_Mas2013_Palk2012, P_Wieser2021_H2O_indep, P_Neave2017, P_Petrelli2020_Cpx_Liq} # put on outside
+P_Mas2013_Palk2012, P_Wieser2021_H2O_indep, P_Neave2017, P_Petrelli2020_Cpx_Liq,
+P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
+P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA} # put on outside
 
 Cpx_Liq_P_funcs_by_name = {p.__name__: p for p in Cpx_Liq_P_funcs}
 
@@ -619,7 +1026,10 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
 ## Function for calculation Cpx-Liquid temperatures
 Cpx_Liq_T_funcs = {T_Put1996_eqT1, T_Mas2013_eqTalk1, T_Put1996_eqT2, T_Mas2013_eqTalk2,
 T_Put1999, T_Put2003, T_Put2008_eq33, T_Mas2013_eqalk33,
-T_Mas2013_Talk2012, T_Brug2019, T_Petrelli2020_Cpx_Liq} # put on outside
+T_Mas2013_Talk2012, T_Brug2019, T_Petrelli2020_Cpx_Liq,
+T_Put2008_eq32d, T_Put2008_eq32d_subsol,
+T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O,
+T_Put2008_eq32dH_Wang2021adap, T_Put2008_eq34_cpx_sat} # put on outside
 
 Cpx_Liq_T_funcs_by_name = {p.__name__: p for p in Cpx_Liq_T_funcs}
 
@@ -873,10 +1283,6 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         Eq Tests + cpx+liq comps + components
 
 
-    Returns:
-    -------
-    pandas.DataFrame: Pressure in Kbar, Temperature in K + Kd-Fe-Mg + cpx+liq comps (if eq_tests=True)
-
     '''
 
     # Gives users flexibility to reduce or increase iterations
@@ -987,6 +1393,119 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
             eq_tests.insert(a+3, "IQR_Trees_T", Std_T)
 
         return eq_tests
+## All popular option for Cpx-Liq thermobarometry
+
+def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
+    import warnings
+    with w.catch_warnings():
+        w.simplefilter('ignore')
+        cpx_comps_c=cpx_comps.reset_index(drop=True).copy()
+        liq_comps_c=liq_comps.reset_index(drop=True).copy()
+        print('We have reset the index on Cpx and Liq comps for the Petrelli expressions')
+        if isinstance(H2O_Liq, pd.Series):
+            H2O_Liq=H2O_Liq.reset_index(drop=True)
+        if H2O_Liq is not None:
+            liq_comps_c['H2O_Liq']=H2O_Liq
+        # Different options, only give P and T
+
+        N17_Teq33=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2008_eq33", equationP="P_Neave2017")
+
+        Eq30_Teq33=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2008_eq33", equationP="P_Put2008_eq30")
+
+        Eq31_Teq33=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2008_eq33", equationP="P_Put2008_eq31")
+
+        Eq32c_Teq33=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2008_eq33", equationP="P_Put2008_eq32c")
+
+        Eq32c_T2003=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2003", equationP="P_Put2008_eq32c")
+
+        Eq32c_P32d=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2008_eq32d", equationP="P_Put2008_eq32c")
+
+        # Default equation 32c when you download spreadsheet For 1st cell (2nd cell different,
+        # Emailed Keith about this on Dec 16th).
+
+        # First, calculate pressure using 1996 P1
+        T1996_P1_eq34=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2008_eq34_cpx_sat", equationP="P_Put1996_eqP1").P_kbar_calc
+
+        # Then uses equation T2 to get temp, referencing the calculated pressure above.
+        T1996_T2=calculate_cpx_liq_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put1996_eqT2", P=T1996_P1_eq34)
+
+        # The finally, feeds this into eq32c
+        P_eq32c_default_1stcell=calculate_cpx_liq_press(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationP="P_Put2008_eq32c", T=T1996_T2)
+
+        # Default for second cellon - 1st iterate T2 and P1, then feed in
+        T1996_P1_T2=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put1996_eqT2", equationP="P_Put1996_eqP1")
+
+        P_eq32c_default_restcell=calculate_cpx_liq_press(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationP="P_Put2008_eq32c", T=T1996_P1_T2.T_K_calc)
+
+        Put2003=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2003", equationP="P_Put2003")
+
+        Pet2020=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Petrelli2020_Cpx_Liq", equationP="P_Petrelli2020_Cpx_Liq")
+
+        Teq34_NP17=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2008_eq34_cpx_sat", equationP="P_Neave2017")
+
+        Teq34_eq32c=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Put2008_eq34_cpx_sat", equationP="P_Put2008_eq32c")
+
+
+        df_out=pd.DataFrame  (data={'P_kbar: (P_Neave17, T_Put2008_eq33)': N17_Teq33.P_kbar_calc,
+                                    'T_K: (P_Neave17, T_Put2008_eq33)': N17_Teq33.T_K_calc,
+
+                                    'P_kbar: (P_Neave17, T_Put2008_eq34_cpx_sat)': Teq34_NP17.P_kbar_calc,
+                                    'T_K: (P_Neave17, T_Put2008_eq34_cpx_sat)': Teq34_NP17.T_K_calc,
+
+                                    'P_kbar: (P_Put2008_eq30, T_Put2008_eq33)': Eq30_Teq33.P_kbar_calc,
+                                    'T_K: (P_Put2008_eq30, T_Put2008_eq33)': Eq30_Teq33.T_K_calc,
+
+                                    'P_kbar: (P_Put2008_eq31, T_Put2008_eq33)': Eq31_Teq33.P_kbar_calc,
+                                    'T_K: (P_Put2008_eq31, T_Put2008_eq33)': Eq31_Teq33.T_K_calc,
+
+                                    'P_kbar: (P_Put2008_eq32c, T_Put2008_eq33)': Eq32c_Teq33.P_kbar_calc,
+                                    'T_K: (P_Put2008_eq32c, T_Put2008_eq33)': Eq32c_Teq33.T_K_calc,
+
+                                    'P_kbar: (P_Put2008_eq32c, T_Put2003)': Eq32c_T2003.P_kbar_calc,
+                                    'T_K: (P_Put2008_eq32c, T_Put2003)': Eq32c_T2003.T_K_calc,
+
+
+                                    'P_kbar: (P_Put2008_eq32c, T_Put2008_eq32d)': Eq32c_P32d.P_kbar_calc,
+                                    'T_K: (P_Put2008_eq32c, T_Put2008_eq32d))': Eq32c_P32d.T_K_calc,
+
+                                    'P_kbar: (P_Put2008_eq32c, default spreadsheet 1st cell)': P_eq32c_default_1stcell,
+                                    'P_kbar: (P_Put2008_eq32c, default spreadsheet 2 on)':P_eq32c_default_restcell,
+
+                                    'P_kbar: (P_Put2008_eq32c, T_Put2008_eq34)': Teq34_eq32c.P_kbar_calc,
+                                    'T_K: (P_Put2008_eq32c, T_Put2008_eq34))': Teq34_eq32c.T_K_calc,
+
+
+
+                                    'P_kbar: (P2003 P&T)': Put2003.P_kbar_calc,
+                                    'T_K: (P2003 P&T)': Put2003.T_K_calc,
+
+                                    'P_kbar: (Petrelli, 2020)': Pet2020.P_kbar_calc,
+                                    'P_kbar: (Petrelli, 2020)': Pet2020.P_kbar_calc,
+                                    'T_K: (Petrelli, 2020)': Pet2020.T_K_calc,
+
+                                    'T_K: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.T_K_calc,
+                                    'P_kbar: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.P_kbar_calc,
+
+            })
+
+        return df_out
+
+
 
 ## Clinopyroxene melt-matching algorithm
 def arrange_all_cpx_liq_pairs(liq_comps, cpx_comps, H2O_Liq=None, Fe3Fet_Liq=None):
@@ -1451,382 +1970,7 @@ H2O_Liq=None, return_all_pairs=False):
     print('Done!')
     return {'Av_PTs': df1_M, 'All_PTs': combo_liq_cpx_fur_filt}
 
-## Clinopyroxene-only pressure equations
 
-def P_Wang2021_eq1(T=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
-    '''
-    Clinopyroxene-only barometer of Wang et al. (2021) equation 1
-    :cite:`wang2021new`
-
-    SEE=1.66 kbar
-
-    '''
-    NCT=(1.4844*Al_VI_cat_6ox/(1.4844*Al_VI_cat_6ox+7.7408*Ti_Cpx_cat_6ox
-    +1.1675*Cr_Cpx_cat_6ox+1.0604*Fet_Cpx_cat_6ox+0.0387*Mn_Cpx_cat_6ox-0.0628*Mg_Cpx_cat_6ox))
-
-
-
-    return (-7.9509*NCT*np.log(Al_VI_cat_6ox.astype(float))+0.6492*Si_Cpx_cat_6ox-5.9522*Fet_Cpx_cat_6ox-11.1942*Mg_Cpx_cat_6ox-24.2802*Ca_Cpx_cat_6ox+108.663*Na_Cpx_cat_6ox+25.0019)
-
-
-
-
-
-
-
-def P_Put2008_eq32a(T, *, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox,
-                    Al_VI_cat_6ox, DiHd_2003, EnFs):
-    '''
-    Clinopyroxene-only barometer of Putirka (2008) Eq32a
-    :cite:`putirka2008thermometers`
-
-    SEE=+-3.1 kbar (anhydrous)
-
-    '''
-    return (3205 - 5.62 * Mg_Cpx_cat_6ox + 83.2 * Na_Cpx_cat_6ox + 68.2 * DiHd_2003
-    + 2.52 * np.log(Al_VI_cat_6ox.astype(float)) - 51.1 * DiHd_2003**2 + 34.8 * EnFs**2
-    + 0.384 * T - 518 * np.log(T))
-
-
-def P_Put2008_eq32b(T, *, H2O_Liq, Ca_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Na_Cpx_cat_6ox,
-Al_Cpx_cat_6ox, K_Cpx_cat_6ox, Al_IV_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-                    Al_VI_cat_6ox, Fet_Cpx_cat_6ox, DiHd_1996, Mg_Cpx_cat_6ox, Jd):
-    '''
-    Clinopyroxene-only barometer of Putirka (2008) Eq32b. Unlike 32a, requires H2O_Liq to be specified.
-    :cite:`putirka2008thermometers`
-
-    SEE=+-2.6 kbar (anhydrous)
-
-    '''
-
-    CNM = Ca_Cpx_cat_6ox + Na_Cpx_cat_6ox + Mn_Cpx_cat_6ox  # This is GQ
-    Lindley_Fe3_Cpx = Na_Cpx_cat_6ox + Al_IV_cat_6ox - Al_VI_cat_6ox - \
-        2 * Ti_Cpx_cat_6ox - Cr_Cpx_cat_6ox  # This is cell FR
-    Lindley_Fe3_Cpx[Lindley_Fe3_Cpx < 0] = 0
-    R3_plus = Al_VI_cat_6ox + Ti_Cpx_cat_6ox + \
-        Cr_Cpx_cat_6ox + Lindley_Fe3_Cpx  # This is cell GR
-    M1_M2_KD_Fe_Mg = np.exp(0.238 * R3_plus + 0.289 * CNM - 2.3315)
-    M1_M1_Fe2_tot = Fet_Cpx_cat_6ox - Lindley_Fe3_Cpx  # GV15
-    b = (M1_M2_KD_Fe_Mg * Mg_Cpx_cat_6ox) - \
-        (M1_M2_KD_Fe_Mg * (1 - CNM)) + M1_M1_Fe2_tot + (1 - CNM)  # GX
-    a_Kd_1 = 1 - M1_M2_KD_Fe_Mg  # GW
-    c = -M1_M1_Fe2_tot * (1 - CNM)  # GY
-    Fe_M2 = (-b + np.sqrt(b**2 - 4 * a_Kd_1 * c)) / 2 * a_Kd_1
-    Mg_M2 = 1 - CNM - Fe_M2
-    return (1458 + 0.197 * (T) - 241 * np.log(T) +
-    0.453 * H2O_Liq + 55.5 * Al_VI_cat_6ox +
-    8.05 * Fet_Cpx_cat_6ox - 277 * K_Cpx_cat_6ox + 18 * Jd
-    + 44.1 * DiHd_1996 + 2.2 * np.log(Jd.astype(float))
-    - 27.7 * Al_Cpx_cat_6ox**2 + 97.3 * Fe_M2**2
-    + 30.7 * Mg_M2**2 - 27.6 * DiHd_1996**2)
-
-def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
-    '''
-    Clinopyroxene-only  barometer of Petrelli et al. (2021) based on
-    Machine Learning.
-    :cite:`petrelli2020machine`
-
-    SEE==+-3.1 kbar
-    '''
-    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
-                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
-                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
-                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
-                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
-                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
-                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
-                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
-                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
-                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
-
-    })
-
-    x_test=Cpx_test_noID_noT.values
-
-
-    with open(Thermobar_dir/'ML_scaler_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
-        scaler_P2020_Cpx_only=load(f)
-
-    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
-        ETR_Press_P2020_Cpx_only=joblib.load(f)
-
-
-    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
-    Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
-
-    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
-    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
-
-    return df_stats
-
-
-def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
-    '''
-    Clinopyroxene-only  barometer following the Machine learning approach of
-    Petrelli et al. (2021), but including the H2O content of the liquid while training the model.
-
-    :cite:`petrelli2020machine` and cite Thermobar.
-    '''
-    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
-                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
-                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
-                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
-                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
-                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
-                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
-                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
-                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
-                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
-                                'H2O_Liq':cpx_comps['H2O_Liq'],
-
-    })
-
-    x_test=Cpx_test_noID_noT.values
-
-
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
-        scaler_P2020_Cpx_only=load(f)
-
-    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
-        ETR_Press_P2020_Cpx_only=joblib.load(f)
-
-
-
-    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
-    Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
-    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
-    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
-
-    return df_stats
-
-
-# def P_Petrelli2020_Cpx_only_noCr(T=None, *, cpx_comps):
-#     '''
-#     Clinopyroxene-only  barometer following the Machine learning approach of
-#     Petrelli et al. (2021),
-#     but including the H2O content of the liquid while training the model.
-#     '''
-#     Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
-#                                 'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
-#                                 'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
-#                                 'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
-#                                 'MnO_Cpx': cpx_comps['MnO_Cpx'],
-#                                 'MgO_Cpx': cpx_comps['MgO_Cpx'],
-#                                 'CaO_Cpx': cpx_comps['CaO_Cpx'],
-#                                 'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
-#
-#
-#     })
-#     x_test=Cpx_test_noID_noT.values
-#
-#
-#     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_noCr.pkl', 'rb') as f:
-#         scaler_P2020_Cpx_only=load(f)
-#
-#     with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_noCr.pkl', 'rb') as f:
-#         ETR_Press_P2020_Cpx_only=load(f)
-#
-#
-#
-#     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
-#     Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
-#     df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
-#     df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
-#
-#     return df_stats
-#
-# def P_Petrelli2020_Cpx_only_components(T=None, *, cpx_comps):
-#     '''
-#     Clinopyroxene-only  barometer following the Machine learning approach of
-#     Petrelli et al. (2021),
-#     but including the H2O content of the liquid while training the model.
-#     '''
-#     cpx_test=cpx_comps.copy()
-#     Cpx_compnts_test=calculate_clinopyroxene_components(cpx_comps)
-#     Cpx_test_noID_noT=pd.DataFrame(data={'Mg_Cpx_cat_6ox': Cpx_compnts_test['Mg_Cpx_cat_6ox'],
-#                                       'Na_Cpx_cat_6ox': Cpx_compnts_test['Na_Cpx_cat_6ox'],
-#                                       'Al_VI_cat_6ox': Cpx_compnts_test['Al_VI_cat_6ox'],
-#                                        'DiHd_2003': Cpx_compnts_test['DiHd_2003'],
-#                                       'EnFs': Cpx_compnts_test['EnFs'],
-#                                                                            'Jd': Cpx_compnts_test['Jd'],
-#                                       'Ca_Cpx_cat_6ox': Cpx_compnts_test['Ca_Cpx_cat_6ox'],
-#                                       'Fet_Cpx_cat_6ox': Cpx_compnts_test['Fet_Cpx_cat_6ox'],
-#                                         'Cr_Cpx_cat_6ox': Cpx_compnts_test['Cr_Cpx_cat_6ox'],
-#                                        'Ti_Cpx_cat_6ox': Cpx_compnts_test['Ti_Cpx_cat_6ox'],
-#                                        'Mn_Cpx_cat_6ox': Cpx_compnts_test['Mn_Cpx_cat_6ox'],
-#                                      })
-#     x_test=Cpx_test_noID_noT.values
-#
-#
-#     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_Comp.pkl', 'rb') as f:
-#         scaler_P2020_Cpx_only=load(f)
-#
-#     with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_Comp.pkl', 'rb') as f:
-#         ETR_Press_P2020_Cpx_only=load(f)
-#
-#
-#
-#     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
-#     Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
-#     df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
-#     df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
-#
-#     return df_stats
-def P_Nimis1999_BA(T=None):
-    '''
-        This is a placeholder, function is being called from other .py file')
-    '''
-
-## Clinopyroxene-only temperature equations
-def T_Wang2021_eq2(P=None, *, Al_VI_cat_6ox, Si_Cpx_cat_6ox, Ti_Cpx_cat_6ox, Cr_Cpx_cat_6ox,
-Fet_Cpx_cat_6ox, Mn_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox,
-FeII_Wang21, H2O_Liq, Al_Cpx_cat_6ox, Ca_Cpx_cat_6ox):
-    '''
-    Clinopyroxene-only thermometer of Wang et al. (2021) Eq 2
-    :cite:`wang2021new`
-
-    SEE=36.6 C
-    '''
-    NCT=(1.4844*Al_VI_cat_6ox/(1.4844*Al_VI_cat_6ox+7.7408*Ti_Cpx_cat_6ox
-    +1.1675*Cr_Cpx_cat_6ox+1.0604*Fet_Cpx_cat_6ox+0.0387*Mn_Cpx_cat_6ox-0.0628*Mg_Cpx_cat_6ox))
-
-
-    return (273.15+312.4395*NCT+230.5194*Ti_Cpx_cat_6ox-568.698*Al_Cpx_cat_6ox
-    -3212*Mn_Cpx_cat_6ox-476.386*Mg_Cpx_cat_6ox-710.883*Ca_Cpx_cat_6ox
-    -651.019*FeII_Wang21-23.384*H2O_Liq+2321.929)
-
-
-
-
-
-def T_Put2008_eq32d(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
-                    Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En):
-    '''
-    Clinopyroxene-only thermometer of Putirka (2008) Eq32d.
-    Overestimates temperature for hydrous data
-    :cite:`putirka2008thermometers`
-
-    SEE=±58°C (anhydrous)
-    SEE=±87°C (anhydrous)
-    '''
-
-    return (((93100 + 544 * P) / (61.1 + 36.6 * Ti_Cpx_cat_6ox + 10.9 * Fet_Cpx_cat_6ox
-    - 0.95 * (Al_Cpx_cat_6ox + Cr_Cpx_cat_6ox - Na_Cpx_cat_6ox - K_Cpx_cat_6ox)
-     + 0.395 * (np.log(a_cpx_En.astype(float)))**2)))
-
-
-def T_Put2008_eq32dH_Wang2021adap(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
-                    Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En, H2O_Liq):
-    '''
-    Adaptation of the clinopyroxene-only thermometer of Putirka (2008) Eq32d
-    by Wang et al. (2021) to account for the effect of H2O
-    :cite:`wang2021new` and :cite:`putirka2008thermometers`
-
-
-    '''
-
-    return (273.15+
-    (93100 + 544 * P) / (72.70276 + 74.24179 * Ti_Cpx_cat_6ox + 21.95727 * Fet_Cpx_cat_6ox
-    - 0.31648 * (Al_Cpx_cat_6ox + Cr_Cpx_cat_6ox - Na_Cpx_cat_6ox - K_Cpx_cat_6ox)
-     + 0.420385 * (np.log(a_cpx_En.astype(float)) )**2 +1.864215*H2O_Liq)
-     )
-
-# This is the version in the Putirka 2-pyroxene spreadsheet. The 544 coefficient is changed to 755, and the coefficient for the enstatie activity is
-# changed from 0.395 to 3.5. This is a better fit to subsolidus T
-# estimates, but provide poorer fits to pyroxenes from volcanic systems.
-
-
-def T_Put2008_eq32d_subsol(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox,
-                           Cr_Cpx_cat_6ox, Na_Cpx_cat_6ox, K_Cpx_cat_6ox, a_cpx_En):
-    '''
-    Adapted version of clinopyroxene-only thermoter of Putirka (2008) Eq32d,
-    provides better fit to subsolidus T estimates
-    :cite:`putirka2008thermometers`
-
-    '''
-    return (((93100 + 755 * P) / (61.1 + 36.6 * Ti_Cpx_cat_6ox + 10.9 * Fet_Cpx_cat_6ox
-    - 0.95 * (Al_Cpx_cat_6ox + Cr_Cpx_cat_6ox - Na_Cpx_cat_6ox - K_Cpx_cat_6ox)
-    + 3.5 * (np.log(a_cpx_En.astype(float)))**2)))
-
-
-def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
-    '''
-    Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
-    Machine Learning.
-    :cite:`petrelli2020machine`
-
-    SEE==+-51°C
-    '''
-    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
-                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
-                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
-                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
-                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
-                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
-                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
-                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
-                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
-                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
-
-    })
-
-    x_test=Cpx_test_noID_noT.values
-
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
-        scaler_P2020_Cpx_only=load(f)
-
-    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only.pkl', 'rb') as f:
-        ETR_Temp_P2020_Cpx_only=joblib.load(f)
-
-    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
-    Pred_T_K=ETR_Temp_P2020_Cpx_only.predict(x_test_scaled)
-    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_P2020_Cpx_only)
-    df_stats.insert(0, 'T_K_calc', Pred_T_K)
-
-    return df_stats
-
-
-def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
-    '''
-    Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
-    Machine Learning, but adding water.
-    :cite:`petrelli2020machine` and this study.
-
-    SEE==+-51°C
-    '''
-    cpx_test=cpx_comps.copy()
-    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
-                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
-                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
-                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
-                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
-                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
-                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
-                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
-                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
-                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
-                                'H2O_Liq':cpx_comps['H2O_Liq'],
-
-    })
-    x_test=Cpx_test_noID_noT.values
-
-
-
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
-        scaler_P2020_Cpx_only=joblib.load(f)
-
-    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only_H2O.pkl', 'rb') as f:
-        ETR_Temp_P2020_Cpx_only=joblib.load(f)
-
-
-
-    x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
-    Pred_T_K=ETR_Temp_P2020_Cpx_only.predict(x_test_scaled)
-    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_P2020_Cpx_only)
-    df_stats.insert(0, 'T_K_calc', Pred_T_K)
-
-    return df_stats
 
 ## Function for calculationg Cpx-only pressure
 Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
@@ -1976,6 +2120,8 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
     with w.catch_warnings():
         w.simplefilter('ignore')
         cpx_comps_copy=cpx_comps.reset_index(drop=True).copy()
+        if isinstance(H2O_Liq, pd.Series):
+            H2O_Liq=H2O_Liq.reset_index(drop=True)
         cpx_comps_c=calculate_clinopyroxene_components(cpx_comps=cpx_comps_copy)
         cpx_comps_copy['H2O_Liq']=H2O_Liq
         cpx_comps_c['H2O_Liq']=H2O_Liq
@@ -1985,6 +2131,12 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
 
         cpx_comps_c['T_Petrelli21']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
         equationT="T_Petrelli2020_Cpx_only").T_K_calc
+
+        cpx_comps_c['T_Petrelli21_H2O']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
+        equationT="T_Petrelli2020_Cpx_only_withH2O").T_K_calc
+
+        cpx_comps_c['P_Petrelli21_H2O']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
+        equationP="P_Petrelli2020_Cpx_only_withH2O").P_kbar_calc
 
         cpx_comps_c['T_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").T_K_calc
@@ -1996,8 +2148,11 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
 
         cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
+
         cpx_comps_c['P_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).P_kbar_calc
+
+
         X_Wangeq1_Sorted=np.sort(cpx_comps_c['P_Wang21_eq1'])
         X_Pet_Sorted=np.sort(cpx_comps_c['P_Petrelli21'])
         X_Put_32d32a=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32a'])

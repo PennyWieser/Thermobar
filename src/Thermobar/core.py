@@ -3850,7 +3850,7 @@ def calculate_eq_plag_components(liq_comps, H2O_Liq, T,P):
 
 
 ## Tool to get Fe3Fet from logfo2 or buffer value.
-def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model=None, fo2, renorm=False, fo2_offset=0):
+def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", fo2, renorm=False, fo2_offset=0):
     '''
     Calculates Fe3Fet_Liq, FeO and Fe2O3 based on user-specified buffer
 

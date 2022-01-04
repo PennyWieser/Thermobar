@@ -1251,6 +1251,9 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
             T_evol.insert(2*i, new_col_name_T, T_sample[i, :])
             T_evol.insert(2*i+1, new_col_name_H, H2O_sample[i, :])
 
+
+
+
     return {'T_H_calc': Combined_output, 'T_H_Evolution':  T_evol}
 
 
@@ -1383,8 +1386,10 @@ P=None, eq_tests=False):
         return Combo_fspar_liqs_1
     if eq_tests is True:
         if kspar_comps is not None:
-            print('Sorry, no equilibrium tests implemented for Kspar-Liquid')
-            return T_K_calc
+            print('Sorry, no equilibrium tests implemented for Kspar-Liquid. Weve just returned the major elements')
+            Combo_fspar_liqs.insert(0, "T_K_calc", T_K_calc)
+            return Combo_fspar_liqs
+
         if plag_comps is not None:
             eq_tests=calculate_plag_liq_eq_tests(meltmatch=Combo_fspar_liqs_1,
             P=P, T=T_K_calc)

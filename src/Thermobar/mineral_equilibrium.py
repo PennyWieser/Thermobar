@@ -19,6 +19,10 @@ def calculate_ol_fo(ol_comps):
     Fo=(ol_comps['MgO_Ol']/40.3044)/((ol_comps['MgO_Ol']/40.3044)+(ol_comps['FeOt_Ol']/71.844))
     return Fo
 
+def calculate_cpx_mgno(cpx_comps):
+    Mgno=(cpx_comps['MgO_Cpx']/40.3044)/((cpx_comps['MgO_Cpx']/40.3044)+(cpx_comps['FeOt_Cpx']/71.844))
+    return Mgno
+
 def calculate_liq_mgno(liq_comps, Fe3Fet_Liq=None):
     liq_comps_c=liq_comps.copy()
     if Fe3Fet_Liq is not None:
@@ -462,6 +466,79 @@ def calculate_cpx_rhodes_diagram_lines(
     return Kd_out_mat
 
 
+def calculate_eq_cpx_Mg_number(liq_comps, Fe3Fet_Liq=None, Kd_model=None, T=None):
+    '''calculates equilibrium Cpx Mg#s  based on inputtted liquid compositions.
+
+    Parameters
+    -------
+
+    liq_comps: pandas.DataFrame
+        Liquid compositions with column headings SiO2_Ol, MgO_Ol etc.
+
+
+    Kd_model: str, int or float
+        Specify which Kd model you wish to use.
+        "Putirka2008": uses eq 35 of Putirka (2008), function of T.
+        "Masotta2013": Uses Masotta (2013), function of T, an Na and K in the melt.
+        if int or float, uses that Kd.
+
+    Returns
+    -------
+    DataFrame with equilibrium Mg#s, with column headings corresponding to model choosen.
+  '''
+    liq_comps_c=liq_comps.copy()
+
+    if Fe3Fet_Liq is not None:
+        liq_comps_c['Fe3Fet_Liq']=Fe3Fet_Liq
+
+    cat_fracs=calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+    Mgno = cat_fracs['Mg_Number_Liq_Fe3']
+    Mgno_Fet = cat_fracs['Mg_Number_Liq_NoFe3']
+
+    if Kd_model == "Putirka2008":
+        Kd=np.exp(-0.107 - 1719 / T)
+        Eq_Mgno_Fe2 = 1 / (( Kd / Mgno) + (1 - Kd))
+        Eq_Mgno_Fe2_m1sig = 1 / (( Kd / Mgno) + (1 - (Kd-0.08)))
+        Eq_Mgno_Fe2_p1sig = 1 / (( Kd / Mgno) + (1 - (Kd+0.08)))
+        Eq_Mgno_Fet = 1 / (( Kd / Mgno_Fet) + (1 - Kd))
+        Eq_Mgno_Fet_m1sig = 1 / (( Kd /Mgno_Fet) + (1 - (Kd-0.08)))
+        Eq_Mgno_Fet_p1sig = 1 / (( Kd / Mgno_Fet) + (1 - (Kd+0.08)))
+        Kd_out = pd.DataFrame(data={'Eq Mg# (Putirka 2008, Fe2)': Eq_Mgno_Fe2,
+                                       'Eq Mg# (Putirka 2008 -0.08, Fe2)': Eq_Mgno_Fe2_m1sig,
+                                       'Eq Mg# (Putirka 2008 +0.08, Fe2)': Eq_Mgno_Fe2_p1sig,
+                                       'Eq Mg# (Putirka 2008, Fet)': Eq_Mgno_Fet,
+                                       'Eq Mg# (Putirka 2008 -0.08, Fet)': Eq_Mgno_Fet_m1sig,
+                                       'Eq Mg# (Putirka 2008 +0.08, Fet)': Eq_Mgno_Fet_p1sig,
+
+                             })
+        return Kd_out
+
+    if Kd_model == "Masotta2013":
+
+        ratioMasotta = cat_fracs['Na_Liq_cat_frac'] / (
+        cat_fracs['Na_Liq_cat_frac'] + cat_fracs['K_Liq_cat_frac'])
+        Kd=np.exp(1.735 - 3056 / T - 1.668 * ratioMasotta)
+        Eq_Mgno_Fet = 1 / (( Kd / Mgno_Fet) + (1 - Kd))
+        Eq_Mgno_Fet_m1sig = 1 / (( Kd /Mgno_Fet) + (1 - (Kd-0.05)))
+        Eq_Mgno_Fet_p1sig = 1 / (( Kd / Mgno_Fet) + (1 - (Kd+0.05)))
+
+
+        Kd_out = pd.DataFrame(data={'Eq Mg# (Masotta 2013, Fet)': Eq_Mgno_Fet,
+                                       'Eq Mg# (Masotta 2013 -0.05, Fet)': Eq_Mgno_Fet_m1sig,
+                                       'Eq Mg# (Masotta 2013 +0.05, Fet)': Eq_Mgno_Fet_p1sig,
+
+                             })
+        return Kd_out
+
+
+    if isinstance(Kd_model, float) or isinstance(Kd_model, int):
+        Kd=Kd_model
+        Eq_Mgno_Fe2 = 1 / (( Kd / Mgno) + (1 - Kd))
+        Eq_Mgno_Fet = 1 / (( Kd / Mgno_Fet) + (1 - Kd))
+        Kd_out = pd.DataFrame(data={'Eq Mg# (User-selected Kd, Fe2)': Eq_Mgno_Fe2,
+            'Eq Mg# (User-selected Kd, Fet)': Eq_Mgno_Fet})
+        return Kd_out
+
 ## Amphibole classification diagram
 
 def add_Leake_Amp_Fields_Fig3bot(plot_axes, fontsize=8, color=[0.3, 0.3, 0.3],
@@ -736,7 +813,241 @@ plots="Ca_Amphiboles", marker='.k'):
 
 
 
-## Feldspar Ternary Diagram
+## Equilirium things for Feldspar.
+def calculate_eq_plag_An_number(liq_comps, T=None, P=None, An_model=None):
+    '''calculates equilibrium Plag An#s  based on inputtted liquid compositions.
+
+    Parameters
+    -------
+
+    liq_comps: pandas.DataFrame
+        Liquid compositions with column headings SiO2_Ol, MgO_Ol etc.
+
+    T: pandas.Series, float, int
+        T in Kelvin, optional for 3 of the 4 outputs from Namur
+
+    P: pandas.Series, float, int
+        P in kbar. Optional for Namur
+
+
+    An_model: str, int or float
+        Specify which An model you wish to use.
+        "Putirka2005": uses equilibrium An-Ab-Or from the Putirka (2005), as implemented
+        in the spreadsheets of K. Putirka
+        "Namur2011": Uses equilibrium An from Namur (2011)
+        "All": returns values from Putirka2005 and Namur
+
+    Returns
+    -------
+    DataFrame with equilibrium An values, with column headings corresponding to model choosen.
+  '''
+    cat_liqs = calculate_anhydrous_cat_fractions_liquid(liq_comps)
+
+    if isinstance(P, int):
+        P=float(P)
+    if isinstance(T, int):
+        T=float(T)
+
+    if An_model == "Putirka2005" or An_model == "All":
+        Pred_An_EqE = (np.exp(-3.485 + 22.93 * cat_liqs['Ca_Liq_cat_frac'].astype(float)
+         + 0.0805 * cat_liqs['H2O_Liq'].astype(float)
+        + 1.0925 * cat_liqs['Ca_Liq_cat_frac'].astype(float)
+         / (cat_liqs['Ca_Liq_cat_frac'].astype(float) + cat_liqs['Na_Liq_cat_frac'].astype(float))
+         +13.11 * cat_liqs['Al_Liq_cat_frac'].astype(float) / (
+        cat_liqs['Al_Liq_cat_frac'].astype(float) + cat_liqs['Si_Liq_cat_frac'].astype(float))
+        + 5.59258 *cat_liqs['Si_Liq_cat_frac'].astype(float)**3 -
+        38.786 *P  / (T)- 125.04 *cat_liqs['Ca_Liq_cat_frac'].astype(float)
+        *cat_liqs['Al_Liq_cat_frac'].astype(float)
+        + 8.958 * cat_liqs['Si_Liq_cat_frac'].astype(float) * cat_liqs['K_Liq_cat_frac'].astype(float)
+         - 2589.27 / (T)))
+
+        Pred_Ab_EqF = (np.exp(-2.748 - 0.1553 * cat_liqs['H2O_Liq'].astype(float) + 1.017 * cat_liqs['Mg_Number_Liq_NoFe3'].astype(float) - 1.997 * cat_liqs['Si_Liq_cat_frac'].astype(float)**3
+         + 54.556 *P  / T- 67.878 *cat_liqs['K_Liq_cat_frac'].astype(float) *
+         cat_liqs['Al_Liq_cat_frac'].astype(float)
+        - 99.03 * cat_liqs['Ca_Liq_cat_frac'].astype(float) * cat_liqs['Al_Liq_cat_frac'].astype(float) + 4175.307 / T))
+
+        Pred_Or_EqG = (np.exp(19.42 - 12.5 * cat_liqs['Mg_Liq_cat_frac'].astype(float)
+         - 161.4 * cat_liqs['Na_Liq_cat_frac'].astype(float)
+         - 16.65 * cat_liqs['Ca_Liq_cat_frac'].astype(float) / (
+        cat_liqs['Ca_Liq_cat_frac'].astype(float) + cat_liqs['Na_Liq_cat_frac'].astype(float))
+         - 528.1 * cat_liqs['K_Liq_cat_frac'] * cat_liqs['Al_Liq_cat_frac'] -
+        19.38 * cat_liqs['Si_Liq_cat_frac']**3
+         + 168.2 *cat_liqs['Si_Liq_cat_frac'] *
+         cat_liqs['Na_Liq_cat_frac']
+         - 1951.2 * cat_liqs['Ca_Liq_cat_frac'] * cat_liqs['K_Liq_cat_frac'] - 10190 / T))
+
+        df_out_Put=pd.DataFrame(data={'Pred_An_EqE_P2005': Pred_An_EqE, 'Pred_Ab_EqF_P2005': Pred_Ab_EqF,
+                                 'Pred_Or_EqG_P2005': Pred_Or_EqG})
+    if An_model == "Namur2011" or An_model == "All":
+        df_out_Nam=calculate_An_Namur2011(liq_comps, T=T)
+    if An_model == "Namur2011":
+        return df_out_Nam
+    if An_model == "Putirka2005":
+        return df_out_Put
+    if An_model == "All":
+        df_out=pd.concat([df_out_Put, df_out_Nam], axis=1)
+        return df_out
+
+
+def calculate_An_Namur2011(liq_comps, T=None):
+    '''calculates equilibrium An contents using the T and H2O-independent
+    model of Namur et al. (2011). Returns An calculated using all 3 models,
+    and selects the most suitable model based on the melt composition.
+
+    Parameters
+    -------
+
+    liq_comps: pandas.DataFrame
+        Liquid compositions with column headings SiO2_Ol, MgO_Ol etc.
+
+    T: pandas.Series, int, float
+        Temperature in Kelvin, needed for thermodynamic model.
+
+    Returns
+    -------
+    DataFrame with An contents for all three equations, and an indication of the most
+    suitable model using the major element filters of Namur et al. (2011) based on Si-Na-K.
+  '''
+
+    Liqs_c=liq_comps.copy()
+    Liqs_c['MnO_Liq']=0
+    Liqs_c['Cr2O3_Liq']=0
+    mol_props=calculate_anhydrous_mol_fractions_liquid(liq_comps=Liqs_c)
+    ox_cat_8_den=(2*mol_props['SiO2_Liq_mol_frac'] + mol_props['MgO_Liq_mol_frac']+
+                 mol_props['FeOt_Liq_mol_frac']+mol_props['CaO_Liq_mol_frac']
+                  +3*mol_props['Al2O3_Liq_mol_frac']+mol_props['Na2O_Liq_mol_frac']+
+                 mol_props['K2O_Liq_mol_frac']+2*mol_props['TiO2_Liq_mol_frac']+
+                 5*mol_props['P2O5_Liq_mol_frac'])
+    ox_cat_8_den
+    mol_prop_8_den=8*mol_props.divide(ox_cat_8_den, axis='rows')
+    mol_prop_8_den_c=mol_prop_8_den.copy()
+    mol_prop_8_den_c['Al2O3_Liq_mol_frac']=2*mol_prop_8_den_c['Al2O3_Liq_mol_frac']
+    mol_prop_8_den_c['Na2O_Liq_mol_frac']=2*mol_prop_8_den_c['Na2O_Liq_mol_frac']
+    mol_prop_8_den_c['K2O_Liq_mol_frac']=2*mol_prop_8_den_c['K2O_Liq_mol_frac']
+    mol_prop_8_den_c['P2O5_Liq_mol_frac']=2*mol_prop_8_den_c['P2O5_Liq_mol_frac']
+
+    mol_prop_8_den_c.columns = [str(col).replace('_mol_frac', '_8_ox')
+                          for col in mol_prop_8_den_c.columns]
+    Sum_8_ox=mol_prop_8_den_c.sum(axis=1)
+
+    ox_8_cat_5=5*mol_prop_8_den_c.divide(Sum_8_ox, axis='rows')
+    ox_8_cat_5.columns = [str(col).replace('_8_ox', '_8_ox_5_cat')
+                          for col in ox_8_cat_5.columns]
+    ox_8_cat_5['Ca_Ca_Na']=((ox_8_cat_5['CaO_Liq_8_ox_5_cat'])/
+                            (ox_8_cat_5['CaO_Liq_8_ox_5_cat']+ox_8_cat_5['Na2O_Liq_8_ox_5_cat']))
+    ox_8_cat_5['Al_Al_Si']=((ox_8_cat_5['Al2O3_Liq_8_ox_5_cat'])/
+                            (ox_8_cat_5['Al2O3_Liq_8_ox_5_cat']+ox_8_cat_5['SiO2_Liq_8_ox_5_cat']))
+
+    # For ultramafic-mafic, liquids with < 52 w% SiO2, and <5 wt% Na and K.
+    Si_M_Um=0.55
+    Al_M_Um=-0.04
+    Fe_M_Um=0.35
+    Mg_M_Um=0.19
+    Ca_M_Um=0.19
+    Na_M_Um=0.45
+    Ca_Ca_Na_Um=1.09
+    Al_Al_Si_Um=3.68
+
+    An_Eq_Um=(-2.71 + (ox_8_cat_5['SiO2_Liq_8_ox_5_cat']*Si_M_Um)
+              +(ox_8_cat_5['Al2O3_Liq_8_ox_5_cat']*Al_M_Um)
+              +(ox_8_cat_5['FeOt_Liq_8_ox_5_cat']*Fe_M_Um)
+              +(ox_8_cat_5['MgO_Liq_8_ox_5_cat']*Mg_M_Um)
+              +(ox_8_cat_5['CaO_Liq_8_ox_5_cat']*Ca_M_Um)
+              +(ox_8_cat_5['Na2O_Liq_8_ox_5_cat']*Na_M_Um)
+              +(ox_8_cat_5['Ca_Ca_Na']*Ca_Ca_Na_Um)
+              +(ox_8_cat_5['Al_Al_Si']*Al_Al_Si_Um))
+
+    # For Alkaline melts, liquids with < 52 w% SiO2, and >5 wt% Na and K.
+
+    Si_M_Alk=1.16
+    Al_M_Alk=-3.14
+    Fe_M_Alk=-0.34
+    Mg_M_Alk=-0.16
+    Ca_M_Alk=-0.82
+    Na_M_Alk=0.58
+    Ca_Ca_Na_Alk=2.17
+    Al_Al_Si_Alk=16.48
+
+    An_Eq_Alk=(-4.66 + (ox_8_cat_5['SiO2_Liq_8_ox_5_cat']*Si_M_Alk)
+              +(ox_8_cat_5['Al2O3_Liq_8_ox_5_cat']*Al_M_Alk)
+              +(ox_8_cat_5['FeOt_Liq_8_ox_5_cat']*Fe_M_Alk)
+              +(ox_8_cat_5['MgO_Liq_8_ox_5_cat']*Mg_M_Alk)
+              +(ox_8_cat_5['CaO_Liq_8_ox_5_cat']*Ca_M_Alk)
+              +(ox_8_cat_5['Na2O_Liq_8_ox_5_cat']*Na_M_Alk)
+              +(ox_8_cat_5['Ca_Ca_Na']*Ca_Ca_Na_Alk)
+              +(ox_8_cat_5['Al_Al_Si']*Al_Al_Si_Alk))
+
+    # Intermediate - Felsic, >52 wt% SiO2
+    Si_M_IF=-0.22
+    Al_M_IF=0.94
+    Fe_M_IF=-0.49
+    Mg_M_IF=0.07
+    Ca_M_IF=0.41
+    Na_M_IF=-0.04
+    Ca_Ca_Na_IF=0.31
+    Al_Al_Si_IF=-3.86
+
+    An_Eq_IF=(1.17 + (ox_8_cat_5['SiO2_Liq_8_ox_5_cat']*Si_M_IF)
+              +(ox_8_cat_5['Al2O3_Liq_8_ox_5_cat']*Al_M_IF)
+              +(ox_8_cat_5['FeOt_Liq_8_ox_5_cat']*Fe_M_IF)
+              +(ox_8_cat_5['MgO_Liq_8_ox_5_cat']*Mg_M_IF)
+              +(ox_8_cat_5['CaO_Liq_8_ox_5_cat']*Ca_M_IF)
+              +(ox_8_cat_5['Na2O_Liq_8_ox_5_cat']*Na_M_IF)
+              +(ox_8_cat_5['Ca_Ca_Na']*Ca_Ca_Na_IF)
+              +(ox_8_cat_5['Al_Al_Si']*Al_Al_Si_IF))
+
+    # Thermodynamic model
+    if T is None:
+        print('Cant use thermodynamic model, as you havent entered a temperature')
+    if T is not None:
+        Si_M_Thermo=0.41
+        Al_M_Thermo=-1.69
+        Fe_M_Thermo=-0.34
+        Mg_M_Thermo=-0.51
+        Ca_M_Thermo=-0.5
+        Na_M_Thermo=0.54
+        Ca_Ca_Na_Thermo=1.99
+        Al_Al_Si_Thermo=8.2
+
+        ln_a_An_Liq=(5.72 - 15339/T + (ox_8_cat_5['SiO2_Liq_8_ox_5_cat']*Si_M_Thermo)
+                +(ox_8_cat_5['Al2O3_Liq_8_ox_5_cat']*Al_M_Thermo)
+                +(ox_8_cat_5['FeOt_Liq_8_ox_5_cat']*Fe_M_Thermo)
+                +(ox_8_cat_5['MgO_Liq_8_ox_5_cat']*Mg_M_Thermo)
+                +(ox_8_cat_5['CaO_Liq_8_ox_5_cat']*Ca_M_Thermo)
+                +(ox_8_cat_5['Na2O_Liq_8_ox_5_cat']*Na_M_Thermo)
+                +(ox_8_cat_5['Ca_Ca_Na']*Ca_Ca_Na_Thermo)
+                +(ox_8_cat_5['Al_Al_Si']*Al_Al_Si_Thermo))
+
+        ln_xAn_plag=46.58-0.0018*T-(5.77*np.log(T))+ln_a_An_Liq
+
+        An_Eq_Thermo=np.exp(ln_xAn_plag)
+
+
+    ox_8_cat_5['Choice']="Int_Fels"
+    ox_8_cat_5['An_Eq_best_non_thermo_choice']=An_Eq_IF
+
+
+
+    Low_Si=Liqs_c['SiO2_Liq']<52
+    Low_Na_K=(Liqs_c['K2O_Liq']+Liqs_c['Na2O_Liq'])<5
+
+    ox_8_cat_5.loc[(Low_Si&Low_Na_K), 'Choice']="Maf_Ultra"
+    ox_8_cat_5.loc[(Low_Si&(~Low_Na_K)), 'Choice']="Alk_Maf_Ultra"
+
+    ox_8_cat_5.loc[(Low_Si&Low_Na_K), 'An_Eq_best_choice']=An_Eq_Um
+    ox_8_cat_5.loc[(Low_Si&(~Low_Na_K)), 'An_Eq_best_choice']=An_Eq_Alk
+    An_out=pd.DataFrame(data={'An_Eq_best_non-thermo_choice_N2011':ox_8_cat_5['An_Eq_best_choice'],
+                              'Selected non-thermo model_N2011': ox_8_cat_5['Choice'],
+                                'An_Eq_Mafic_Ultramafic_eq33_N2011':An_Eq_Um,
+                              'An_Eq_Alk_Mafic_Ultramafic_eq34_N2011':An_Eq_Alk,
+                              'An_Eq_Int_Fels_eq35_N2011':An_Eq_IF
+
+                             })
+    if T is not None:
+        An_out.insert(0, 'An_Eq_Thermo_eq31_N2011', An_Eq_Thermo)
+    return An_out
+
+## Feldspar Ternary Diagram things
 
 # The function to create the classification diagram
 def plot_fspar_classification(
