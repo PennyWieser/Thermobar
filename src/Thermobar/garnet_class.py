@@ -8,7 +8,7 @@ import os,sys
 import itertools
 from Thermobar.core import *
 
-def garnet_CARP_class_Griffin2002(gt_comps):
+def garnet_CARP_class_Griffin2002(gt_comps, depth_fields = None):
 
     h1 = []
     h2 = []
@@ -195,6 +195,80 @@ def garnet_CARP_class_Griffin2002(gt_comps):
     carp_fertile_lherz.sort()
     carp_melt_metas.sort()
     carp_unclass.sort()
+
+	
+
+	if depth_fields != None:
+
+		deplet_harz_pct_list = []
+		deplet_lherz_pct_list = []
+		deplet_metas_pct_list = []
+		fertile_pct_list = []
+		melt_pct_metas = []
+		l10a_over_fert = []
+		unclass_pct = []
+		total_list = []
+		total_classified = []
+
+		def count_arrays(array,depth_array,depth_grid,index_depth):
+
+			idx = 0
+
+			for index in array:
+				if (depth_array[index] < depth_grid[j]) and (depth_array[index] >= depth_grid[j-1]):
+					idx = idx + 1
+
+			return idx
+
+		def pct_count(count,tot_num):
+
+			try:
+				pct = (float(count) / float(tot_num)) * 100.0
+			except ZeroDivisionError:
+				pct = 0
+			return pct
+
+		for j in range(1,len(self.depth_fields)):
+
+			tot_num_depth = 0
+
+			carp_deplet_harz_count = count_arrays(self.carp_depleted_harz,self.depth,self.depth_fields,j)
+			carp_deplet_lherz_count = count_arrays(self.carp_depleted_lherz,self.depth,self.depth_fields,j)
+			carp_depleted_metasomatised_count = count_arrays(self.carp_depleted_metasomatised,self.depth,self.depth_fields,j)
+			carp_fertile_lherz_count = count_arrays(self.carp_fertile_lherz,self.depth,self.depth_fields,j)
+			carp_melt_metas_count = count_arrays(self.carp_melt_metas,self.depth,self.depth_fields,j)
+			carp_unclass_count = count_arrays(self.carp_unclass,self.depth,self.depth_fields,j)
+			carp_l10a_count = count_arrays(self.l10a,self.depth,self.depth_fields,j)
+
+			for i in range(0,len_tot):
+				if (self.depth[i] < self.depth_fields[j]) and (self.depth[i] >= self.depth_fields[j-1]):
+					tot_num_depth = tot_num_depth + 1
+
+			depth_count = carp_melt_metas_count + carp_fertile_lherz_count +\
+			 carp_depleted_metasomatised_count + carp_deplet_harz_count + carp_deplet_lherz_count
+
+			carp_deplet_harz_pct = pct_count(carp_deplet_harz_count,tot_num_depth)
+			carp_deplet_lherz_pct = pct_count(carp_deplet_lherz_count,tot_num_depth)
+			carp_depleted_metasomatised_pct = pct_count(carp_depleted_metasomatised_count,tot_num_depth)
+			carp_fertile_lherz_pct = pct_count(carp_fertile_lherz_count,tot_num_depth)
+			carp_l10a_pct = pct_count(carp_l10a_count,tot_num_depth)
+			carp_melt_metas_pct = pct_count(carp_melt_metas_count,tot_num_depth)
+			carp_unclass_pct = pct_count(carp_unclass_count,tot_num_depth)
+
+			total = carp_melt_metas_pct + carp_fertile_lherz_pct + carp_depleted_metasomatised_pct +\
+			carp_deplet_harz_pct + carp_deplet_lherz_pct
+
+			self.deplet_harz_pct_list.append(carp_deplet_harz_pct)
+			self.deplet_lherz_pct_list.append(carp_deplet_lherz_pct)
+			self.deplet_metas_pct_list.append(carp_depleted_metasomatised_pct)
+			self.fertile_pct_list.append(carp_fertile_lherz_pct)
+			self.l10a_over_fert.append(carp_l10a_pct)
+			self.melt_pct_metas.append(carp_melt_metas_pct)
+			self.unclass_pct.append(carp_unclass_pct)
+			self.total_list.append(tot_num_depth)
+			self.total_classified.append(depth_count)
+
+
 
     return carp_depleted_harz, carp_depleted_lherz, carp_depleted_metasomatised, carp_fertile_lherz, carp_melt_metas, carp_unclass
 

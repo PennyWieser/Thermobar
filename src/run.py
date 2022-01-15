@@ -7,6 +7,8 @@ from Thermobar.core import *
 from Thermobar.import_export import import_excel
 from Thermobar.garnet import *
 from Thermobar.garnet_class import *
+from Thermobar.geotherm import *
+from Thermobar.garnet_plot import *
 
 file = "/home/sinan/src/Thermobar_Sinan/Examples/Garnet/Garnet.xlsx"
 data = import_excel(file, sheet_name = "Sheet1")
@@ -20,5 +22,7 @@ P = P_Ryan_1996(my_input_gt, T, xMg, xCa, xFe, xAl, xCr)
 
 CARP_CLASS = garnet_CARP_class_Griffin2002(my_input_gt)
 GRUTTER_CLASS = garnet_class_Grutter2003(my_input_gt)
-CA_CR_CLASS = garnet_ca_cr_class_Griffin2002(my_input_gt)
 Y_ZR_CLASS = y_zr_classification_Griffin2002(my_input_gt)
+
+
+plot_CA_CR(garnet_comps = my_input_gt, T_Ni = T, P_Cr = P, BDL_T = 1250, SHF_low = 35, SHF_high = 45, SHF_chosen = 35, max_depth = 300, temp_unit = 'Celsius', plot_type = 'show')
