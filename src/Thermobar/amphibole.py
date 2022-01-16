@@ -498,7 +498,6 @@ classification=False, Ridolfi_Filter=True):
                                             [col for col in Calcs_R.columns if col not in cols_to_move]]
 
 
-
             return Calcs_R # was P_kbar
 
         if equationP == "P_Ridolfi2012_1a":
