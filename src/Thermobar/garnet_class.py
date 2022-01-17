@@ -196,81 +196,7 @@ def garnet_CARP_class_Griffin2002(gt_comps, depth_fields = None):
     carp_melt_metas.sort()
     carp_unclass.sort()
 
-	
-
-	if depth_fields != None:
-
-		deplet_harz_pct_list = []
-		deplet_lherz_pct_list = []
-		deplet_metas_pct_list = []
-		fertile_pct_list = []
-		melt_pct_metas = []
-		l10a_over_fert = []
-		unclass_pct = []
-		total_list = []
-		total_classified = []
-
-		def count_arrays(array,depth_array,depth_grid,index_depth):
-
-			idx = 0
-
-			for index in array:
-				if (depth_array[index] < depth_grid[j]) and (depth_array[index] >= depth_grid[j-1]):
-					idx = idx + 1
-
-			return idx
-
-		def pct_count(count,tot_num):
-
-			try:
-				pct = (float(count) / float(tot_num)) * 100.0
-			except ZeroDivisionError:
-				pct = 0
-			return pct
-
-		for j in range(1,len(self.depth_fields)):
-
-			tot_num_depth = 0
-
-			carp_deplet_harz_count = count_arrays(self.carp_depleted_harz,self.depth,self.depth_fields,j)
-			carp_deplet_lherz_count = count_arrays(self.carp_depleted_lherz,self.depth,self.depth_fields,j)
-			carp_depleted_metasomatised_count = count_arrays(self.carp_depleted_metasomatised,self.depth,self.depth_fields,j)
-			carp_fertile_lherz_count = count_arrays(self.carp_fertile_lherz,self.depth,self.depth_fields,j)
-			carp_melt_metas_count = count_arrays(self.carp_melt_metas,self.depth,self.depth_fields,j)
-			carp_unclass_count = count_arrays(self.carp_unclass,self.depth,self.depth_fields,j)
-			carp_l10a_count = count_arrays(self.l10a,self.depth,self.depth_fields,j)
-
-			for i in range(0,len_tot):
-				if (self.depth[i] < self.depth_fields[j]) and (self.depth[i] >= self.depth_fields[j-1]):
-					tot_num_depth = tot_num_depth + 1
-
-			depth_count = carp_melt_metas_count + carp_fertile_lherz_count +\
-			 carp_depleted_metasomatised_count + carp_deplet_harz_count + carp_deplet_lherz_count
-
-			carp_deplet_harz_pct = pct_count(carp_deplet_harz_count,tot_num_depth)
-			carp_deplet_lherz_pct = pct_count(carp_deplet_lherz_count,tot_num_depth)
-			carp_depleted_metasomatised_pct = pct_count(carp_depleted_metasomatised_count,tot_num_depth)
-			carp_fertile_lherz_pct = pct_count(carp_fertile_lherz_count,tot_num_depth)
-			carp_l10a_pct = pct_count(carp_l10a_count,tot_num_depth)
-			carp_melt_metas_pct = pct_count(carp_melt_metas_count,tot_num_depth)
-			carp_unclass_pct = pct_count(carp_unclass_count,tot_num_depth)
-
-			total = carp_melt_metas_pct + carp_fertile_lherz_pct + carp_depleted_metasomatised_pct +\
-			carp_deplet_harz_pct + carp_deplet_lherz_pct
-
-			self.deplet_harz_pct_list.append(carp_deplet_harz_pct)
-			self.deplet_lherz_pct_list.append(carp_deplet_lherz_pct)
-			self.deplet_metas_pct_list.append(carp_depleted_metasomatised_pct)
-			self.fertile_pct_list.append(carp_fertile_lherz_pct)
-			self.l10a_over_fert.append(carp_l10a_pct)
-			self.melt_pct_metas.append(carp_melt_metas_pct)
-			self.unclass_pct.append(carp_unclass_pct)
-			self.total_list.append(tot_num_depth)
-			self.total_classified.append(depth_count)
-
-
-
-    return carp_depleted_harz, carp_depleted_lherz, carp_depleted_metasomatised, carp_fertile_lherz, carp_melt_metas, carp_unclass
+    return carp_depleted_harz, carp_depleted_lherz, carp_depleted_metasomatised, carp_fertile_lherz, carp_melt_metas, carp_unclass, len_tot
 
 def garnet_class_Grutter2003(gt_comps):
 
@@ -571,3 +497,51 @@ def y_zr_classification_Griffin2002(gt_comps):
             yzr_class.append('Unclassified')
 
     return yzr_class
+
+def calculate_ol_mg(gt_comps, T_Ni):
+
+    mg_ol = np.zeros(len(gt_comps['MgO_Gt']))
+
+    sT_Ni = np.array(T_Ni) - 273.0 #converting to celsius for calculations
+
+    for i in range(0,len(np.array(gt_comps['MgO_Gt']))):
+
+        sf = 12.0/((gt_comps['SiO2_Gt'][i]/30.0424) + (gt_comps['TiO2_Gt'][i]/39.95) + (gt_comps['Al2O3_Gt'][i]/33.987) +\
+        (gt_comps['Cr2O3_Gt'][i]/50.6634) + (gt_comps['FeOt_Gt'][i]/71.846) + (gt_comps['MnO_Gt'][i]/70.937) +\
+        (gt_comps['MgO_Gt'][i]/40.311) + (gt_comps['CaO_Gt'][i]/56.0794) + (gt_comps['Na2O_Gt'][i]/61.979))
+        mgo = gt_comps['MgO_Gt'][i]*sf / (40.311)
+        feo = gt_comps['FeOt_Gt'][i]*sf / (71.846)
+        cao = gt_comps['CaO_Gt'][i]*sf / (56.0794)
+        xmg = mgo / (mgo+feo+cao)
+        xfe = feo / (mgo+feo+cao)
+        xca = cao / (mgo+feo+cao)
+        p_calc = (0.00001786*(T_Ni[i]**2.0)) + (0.027419*T_Ni[i]) - 1.198
+        p1 = p_calc - (0.000263*(p_calc**2.0)) - 29.76
+        p2 = p_calc - (0.00039*(p_calc**2.0)) - 29.65
+        p3 = p_calc - (0.000236*(p_calc**2.0)) - 29.79
+        p4 = p_calc - (0.00045*(p_calc**2.0)) - 29.6
+        tk = T_Ni[i] + 273.0
+        dv1 = -462.5*(1.0191+((tk-1073)*0.0000287))*p1
+        dv2 = -262.4*(1.0292+((tk-1073)*0.000045))*p2
+        dv3 = 454.0*(1.02+((tk-1073)*0.0000284))*p3
+        dv4 = 278.3*(1.0234+((tk-1073)*0.000023))*p4
+        #(1347*V2+902+AJ2+(0.9-(1-0.9))*(498+1.51*(R2-30))-98*(T2-U2))/W2-0.357
+        dv = dv1 + dv2 + dv3 + dv4
+        kd = np.exp((((1347*xca)+902+dv+(0.9-(1-0.9))*(498+1.51*(p_calc-30))-98*(xmg-xfe))/tk) - 0.357)
+        xmgfe = kd * (xmg/xfe)
+        mg_ol[i] = xmgfe / (1+xmgfe)
+
+    return mg_ol
+
+def calculate_al2o3_whole_rock(gt_comps):
+
+    wr_al_y = np.zeros(len(gt_comps['Y_Gt']))
+
+    for i in range(0,len(gt_comps['Y_Gt'])):
+
+        if (gt_comps['Y_Gt'][i] > 0.0):
+            wr_al_y[i] = (10.0**(0.778-0.14*(-3.2253*np.log(gt_comps['Y_Gt'][i])+13.006)))
+        else:
+            wr_al_y[i] = None
+
+    return wr_al_y

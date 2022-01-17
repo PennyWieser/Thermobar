@@ -199,4 +199,4 @@ def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked):
 		T[idx_geotherm_nearest:] = kinked_geotherm[idx_geotherm_nearest:]
 
 
-	return T, depth, p
+	return T, depth, p, idx_geotherm_nearest
