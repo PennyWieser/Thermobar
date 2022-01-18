@@ -10,11 +10,23 @@ from Thermobar.core import *
 
 def T_Ryan1996(gt_comps):
 
+	'''
+    Ni-in-garnet thermometer of Ryan et al. (1996)
+    :cite:`ryan1996`
+    SEE=+-50C
+    '''
+
     temp = (1000.0/(1.506-(0.189*np.log(np.array(gt_comps['Ni_Gt'])))))
 
     return temp
 
 def T_Sudholz2021(gt_comps, xCa, xCr):
+
+	'''
+    Ni-in-garnet thermometer of Sudholz et al. (2021)
+    :cite:`sudholz2021`
+    SEE=+-50C
+    '''
 
     ni_ol = 3e3
 
@@ -26,6 +38,12 @@ def T_Sudholz2021(gt_comps, xCa, xCr):
 
 def T_Canil1999(gt_comps):
 
+	'''
+    Ni-in-garnet thermometer of Canil (1996)
+    :cite:`canil1999`
+    SEE=+-50C
+    '''
+
     ni_ol = 3e3
 
     ni_gt_ol = np.array(gt_comps['Ni_Gt']) / ni_ol
@@ -35,6 +53,12 @@ def T_Canil1999(gt_comps):
     return temp
 
 def P_Ryan_1996(gt_comps, T_K, xMg, xCa, xFe, xAl, xCr):
+
+	'''
+    Cr-pyrope garnet barometer of Ryan et al. (1996)
+    :cite:`ryan1996`
+    SEE=+-50C
+    '''
 
     P_cr = np.zeros(len(T_K))
 

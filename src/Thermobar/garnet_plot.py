@@ -11,7 +11,7 @@ from Thermobar.geotherm import *
 from Thermobar.garnet import *
 from Thermobar.garnet_class import *
 
-def plot_CA_CR(garnet_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', plot_path = None):
+def plot_CA_CR(garnet_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', filename_save = None):
 
 	geotherms = []
 	pressures = []
@@ -170,7 +170,10 @@ def plot_CA_CR(garnet_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SH
 			save_str = os.path.join((os.getcwd(),'CA_CR_PLOT.png'))
 			plt.savefig(save_str, dpi = 300.0)
 		else:
-			plt.savefig(plot_path, dpi = 300.0)
+			try:
+				plt.savefig(filename_save, dpi = 300.0,bbox_inches = "tight")
+			except ValueError:
+				print('Not a proper format for the filename_save')
 
 def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth, max_section_depth, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', filename_save = None):
 
@@ -752,12 +755,10 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 		plt.show()
 	elif plot_type == 'save':
 		if filename_save == None:
-
-				save_str = os.path.join((os.getcwd(),'CARP_PLOT.png'))
-				plt.savefig(save_str, dpi = 300.0)
-
+			save_str = os.path.join((os.getcwd(),'CARP_PLOT.png'),bbox_inches = "tight")
+			plt.savefig(save_str, dpi = 300.0)
 		else:
 			try:
-				plt.savefig(plot_path, dpi = 300.0)
+				plt.savefig(filename_save, dpi = 300.0,bbox_inches = "tight")
 			except ValueError:
-				print('Not a proper format for the plot_filename')
+				print('Not a proper format for the filename_save')
