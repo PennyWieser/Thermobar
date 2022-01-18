@@ -172,7 +172,7 @@ def plot_CA_CR(garnet_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SH
 		else:
 			plt.savefig(plot_path, dpi = 300.0)
 
-def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth, max_section_depth, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', plot_path = None):
+def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth, max_section_depth, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', filename_save = None):
 
 	#Calculating range of geotherms to be plotted
 	geotherms = []
@@ -208,19 +208,25 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	MG = calculate_ol_mg(gt_comps = gt_comps, T_Ni = T_Ni) #calculating olivine magnesium number from garnet composition
 	AL = calculate_al2o3_whole_rock(gt_comps = gt_comps) #calculating Al2O3 whole rock from garnet compostion
 
-	P_normal = np.zeros(len(P_Cr)) #creating empty array for the downprojected P_Cr
 	depth_normal = np.zeros(len(P_Cr))
 
 	#Creating the chosen geotherm for the garnet
 	if SHF_chosen != None:
 		T_chosen, depth_chosen, p_chosen, depth_intercept = calculate_hasterok2011_geotherm(SHF = SHF_chosen, BDL_T = BDL_T + 273, T_0 = 0, max_depth = max_section_depth, moho = 38, kinked = True)
 
+		if temp_unit == 'Celsius':
+			T_chosen = T_chosen - 273.0
+
+		interp_T = np.arange(np.amin(T_chosen),np.amax(T_chosen),3)
+		interp_depth = np.interp(interp_T, T_chosen, depth_chosen)
+
+		BDL_depth = depth_chosen[depth_intercept]
+
 		for i in range(0,len(P_Cr)):
 			#for look that downprojects the P_Cr onto the selected
 			#geotherö
-			idx_fnd = (np.abs(T_chosen-T_Ni[i])).argmin()
-			P_normal[i] = p_chosen[idx_fnd]
-			depth_normal[i] = depth_chosen[idx_fnd]
+			idx_fnd = (np.abs(interp_T-T_Ni[i])).argmin()
+			depth_normal[i] = interp_depth[idx_fnd]
 
 	def count_arrays(array,depth_array,depth_grid,index_depth):
 		#local def to count arrays
@@ -344,7 +350,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	#ax1.set_ylim(max(depth_plot) + 20,40)
 	ax1.set_xlabel('Percent')
 	ax1.set_ylabel('Depth (km)')
-	ax1.axhline(depth_intercept / 1e3,linewidth = 2,color = 'k',linestyle = ':',label = 'Y-edge')
+	ax1.axhline(BDL_depth / 1e3,linewidth = 2,color = 'k',linestyle = ':',label = 'Y-edge')
 
 	depth_second = []
 	for i in range(1,len(depth_fields)):
@@ -369,7 +375,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	ax2.grid(alpha = 0.6)
 	#ax2.set_title('CARP - analysed samples,\n total = ' + str(len(T_Ni)),fontsize = 4)
 	ax2.set_yticklabels([])
-	ax2.axhline(depth_intercept / 1e3,linewidth = 2,color = 'k',linestyle = ':')
+	ax2.axhline(BDL_depth / 1e3,linewidth = 2,color = 'k',linestyle = ':')
 	ax2.set_xscale('log')
 	ax2.set_xlim((1,10000))
 	ax2.set_xticks([1,10,100,1000,1e4])
@@ -478,7 +484,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	ax3.set_ylim((np.amax(depth_fields) / 1e3)+10,(np.amin(depth_fields)/1e3)-10)
 	#ax3.set_ylim(max(depth_plot) + 20,40)
 	ax3.set_yticklabels([])
-	ax3.axhline(depth_intercept / 1e3,linewidth = 2,color = 'k',linestyle = ':')
+	ax3.axhline(BDL_depth / 1e3,linewidth = 2,color = 'k',linestyle = ':')
 
 	g10_list = []
 	g10d_list = []
@@ -597,7 +603,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	ax4.set_ylim((np.amax(depth_fields) / 1e3)+10,(np.amin(depth_fields)/1e3)-10)
 	#ax4.set_ylim(max(depth_plot) + 20,40)
 	ax4.set_yticklabels([])
-	ax4.axhline(depth_intercept/1e3,linewidth = 2,color = 'k',linestyle = ':')
+	ax4.axhline(BDL_depth/1e3,linewidth = 2,color = 'k',linestyle = ':')
 
 
 	ax5 = plt.subplot2grid((16,16),(0,7), rowspan = 16,colspan = 5, fig = fig1)
@@ -611,7 +617,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	d_g_depth = ((z_1[0] * d_g_p**6.0) + (z_1[1] * d_g_p**5.0) + (z_1[2] * d_g_p**4.0) + (z_1[3] * d_g_p**3.0) + (z_1[4] * d_g_p**2.0) + (z_1[5] * d_g_p) + z_1[6]) * d_g_p
 
 	ax5.plot(d_g_t,d_g_depth,'-',color = '#a832a4')
-	ax5.plot(T_chosen-273.0,depth_chosen/1e3,'--', color = 'k', linewidth = 2)
+	ax5.plot(T_chosen,depth_chosen/1e3,'--', color = 'k', linewidth = 2)
 
 	ax5.set_facecolor('#f7f7f2')
 
@@ -670,7 +676,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 		carp_unclass_t.append(T_Ni[i])
 	ax5.plot(carp_unclass_t,carp_unclass_p,'x', color = color_list_carp[5],label = 'Unclassified')
 
-	ax5.axhline(depth_intercept/1e3,linewidth = 2,color = 'k',linestyle = ':')
+	ax5.axhline(BDL_depth/1e3,linewidth = 2,color = 'k',linestyle = ':')
 	ax5.set_xlim((500,1500))
 	ax5.set_ylim((np.amax(depth_fields)/1e3)+10,(np.amin(depth_fields)/1e3)-10)
 	#ax5.set_ylim(max(depth_plot) + 20,40)
@@ -707,7 +713,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 		ax6.axhline(depth_fields[i]/1e3, linewidth = 0.75, alpha = 0.5, color = 'k',linestyle = '-.')
 	ax6.legend(fontsize = 6,framealpha = 1.0)
 	ax6.set_xlim((0,3))
-	ax6.axhline(depth_intercept/1e3,linewidth = 2,color = 'k',linestyle = ':')
+	ax6.axhline(BDL_depth/1e3,linewidth = 2,color = 'k',linestyle = ':')
 	ax6.set_xlabel(r'WR $Al_2O_3$')
 	ax6.set_yticklabels([])
 
@@ -733,7 +739,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	#ax7.set_ylim(max(depth_plot) + 20, 40)
 	for i in range(0,len(depth_fields)):
 		ax7.axhline(depth_fields[i]/1e3, linewidth = 0.75, alpha = 0.5, color = 'k',linestyle = '-.')
-	ax7.axhline(depth_intercept / 1e3,linewidth = 2,color = 'k',linestyle = ':')
+	ax7.axhline(BDL_depth / 1e3,linewidth = 2,color = 'k',linestyle = ':')
 
 	ax7.legend(fontsize = 6,framealpha = 1.0)
 	ax7.set_xlabel(r'#${Mg}^{ol}$')
@@ -742,7 +748,16 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	ax7.set_xticks([0.88,0.9,0.92,0.94])
 	ax7.set_xticklabels([88,90,92,94],fontsize = 7)
 
+	if plot_type == 'show':
+		plt.show()
+	elif plot_type == 'save':
+		if filename_save == None:
 
+				save_str = os.path.join((os.getcwd(),'CARP_PLOT.png'))
+				plt.savefig(save_str, dpi = 300.0)
 
-
-	plt.show()
+		else:
+			try:
+				plt.savefig(plot_path, dpi = 300.0)
+			except ValueError:
+				print('Not a proper format for the plot_filename')
