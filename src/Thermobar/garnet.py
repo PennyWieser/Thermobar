@@ -10,7 +10,7 @@ from Thermobar.core import *
 
 def T_Ryan1996(gt_comps):
 
-	'''
+    '''
     Ni-in-garnet thermometer of Ryan et al. (1996)
     :cite:`ryan1996`
     SEE=+-50C
@@ -22,7 +22,7 @@ def T_Ryan1996(gt_comps):
 
 def T_Sudholz2021(gt_comps, xCa, xCr):
 
-	'''
+    '''
     Ni-in-garnet thermometer of Sudholz et al. (2021)
     :cite:`sudholz2021`
     SEE=+-50C
@@ -38,7 +38,7 @@ def T_Sudholz2021(gt_comps, xCa, xCr):
 
 def T_Canil1999(gt_comps):
 
-	'''
+    '''
     Ni-in-garnet thermometer of Canil (1996)
     :cite:`canil1999`
     SEE=+-50C
@@ -54,7 +54,7 @@ def T_Canil1999(gt_comps):
 
 def P_Ryan_1996(gt_comps, T_K, xMg, xCa, xFe, xAl, xCr):
 
-	'''
+    '''
     Cr-pyrope garnet barometer of Ryan et al. (1996)
     :cite:`ryan1996`
     SEE=+-50C

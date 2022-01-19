@@ -83,6 +83,10 @@ df_ideal_opx_Err = pd.DataFrame(columns=['SiO2_Opx_Err', 'TiO2_Opx_Err',
 'Al2O3_Opx_Err', 'FeOt_Opx_Err', 'MnO_Opx_Err', 'MgO_Opx_Err', 'CaO_Opx_Err',
  'Na2O_Opx_Err', 'K2O_Opx_Err', 'Cr2O3_Opx_Err', 'P_kbar_Err', 'T_K_Err'])
 
+df_ideal_Gt_Err = pd.DataFrame(columns = ['SiO2_Gt_Err', 'TiO2_Gt_Err', 'Al2O3_Gt_Err',
+'Cr2O3_Gt_Err', 'FeOt_Gt_Err', 'MnO_Gt_Err', 'MgO_Gt_Err', 'CaO_Gt_Err', 'Na2O_Gt_Err',
+'Ni_Gt_Err', 'Ti_Gt_Err', 'Zr_Gt_Err', 'Zn_Gt_Err', 'Ga_Gt_Err', 'Sr_Gt_Err', 'Y_Gt_Err'])
+
 df_ideal_plag_Err = pd.DataFrame(columns=['SiO2_Plag_Err', 'TiO2_Plag_Err',
 'Al2O3_Plag_Err', 'FeOt_Plag_Err', 'MnO_Plag_Err', 'MgO_Plag_Err',
 'CaO_Plag_Err', 'Na2O_Plag_Err', 'K2O_Plag_Err', 'Cr2O3_Plag_Err',
@@ -257,13 +261,6 @@ cation_num_gt = {'SiO2_Gt': 1, 'MgO_Gt': 1, 'FeOt_Gt': 1, 'CaO_Gt': 1,
 cation_num_gt_df = pd.DataFrame.from_dict(cation_num_gt, orient = 'index').T
 cation_num_gt_df['Sample_ID_Gt'] = 'CatNum'
 cation_num_gt_df.set_index('Sample_ID_Gt', inplace=True)
-
-oxy_over_cat_gt = {'SiO2_Gt': 2, 'MgO_Gt': 1, 'FeOt_Gt': 1, 'CaO_Gt': 1,
-'Al2O3_Gt': 0.75, 'NaO2_Gt': 0.5, 'K2O_Gt': 0.5, 'MnO_Gt': 1, 'TiO2_Gt': 2,
-'Cr2O3_Gt': 0.75, 'Ni_Gt': 1}
-oxy_over_cat_gt_df = pd.DataFrame.from_dict(oxy_over_cat_gt, orient = 'index').T
-oxy_over_cat_gt_df['Sample_ID_Gt'] = 'OxyCatNum'
-oxy_over_cat_gt_df.set_index('Sample_ID_Gt', inplace=True)
 
 # Plagioclase: Specifying Cation numbers, oxide masses etc.
 cation_num_plag = {'SiO2_Plag': 1, 'MgO_Plag': 1, 'FeOt_Plag': 1, 'CaO_Plag': 1, 'Al2O3_Plag': 2, 'Na2O_Plag': 2,
@@ -987,6 +984,14 @@ def calculate_cat_fractions_olivine(ol_comps):
 
 def calculate_mol_proportions_garnet(gt_comps):
 
+    #Exchanging oxide measurements with element one if it exists.
+	
+    for i in range(0,len(gt_comps['SiO2_Gt'])):
+
+        if gt_comps['Ti_Gt'][i] != None:
+
+            gt_comps['TiO2_Gt'][i] = (gt_comps['Ti_Gt'][i] * 1.6685) / 1e4
+
     # This makes the input match the columns in the oxide mass dataframe
     gt_wt = gt_comps.reindex(oxide_mass_gt_df.columns, axis=1).fillna(0)
     gt_wt_combo = pd.concat([oxide_mass_gt_df, gt_wt],)
@@ -998,7 +1003,7 @@ def calculate_mol_proportions_garnet(gt_comps):
 
     return mol_prop_anhyd
 
-def calculate_cations_garnet(gt_comps):
+def calculate_fractions_garnet(gt_comps):
 
     no_oxygen = 12.0
     mol_prop = calculate_mol_proportions_garnet(gt_comps=gt_comps)

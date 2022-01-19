@@ -534,7 +534,7 @@ def y_zr_classification_Griffin2002(gt_comps):
 
     return yzr_class
 
-def calculate_ol_mg(gt_comps, T_Ni):
+def calculate_ol_mg(gt_comps, T_Ni, xMg, xCa, xFe):
 
     '''
     A function to derive olivine Mg# from coxisting Cr-pyrope garnet xenocrysts.
@@ -548,19 +548,10 @@ def calculate_ol_mg(gt_comps, T_Ni):
 
     mg_ol = np.zeros(len(gt_comps['MgO_Gt']))
 
-    sT_Ni = np.array(T_Ni) - 273.0 #converting to celsius for calculations
+    T_Ni = np.array(T_Ni) - 273.0 #converting to celsius for calculations
 
     for i in range(0,len(np.array(gt_comps['MgO_Gt']))):
 
-        sf = 12.0/((gt_comps['SiO2_Gt'][i]/30.0424) + (gt_comps['TiO2_Gt'][i]/39.95) + (gt_comps['Al2O3_Gt'][i]/33.987) +\
-        (gt_comps['Cr2O3_Gt'][i]/50.6634) + (gt_comps['FeOt_Gt'][i]/71.846) + (gt_comps['MnO_Gt'][i]/70.937) +\
-        (gt_comps['MgO_Gt'][i]/40.311) + (gt_comps['CaO_Gt'][i]/56.0794) + (gt_comps['Na2O_Gt'][i]/61.979))
-        mgo = gt_comps['MgO_Gt'][i]*sf / (40.311)
-        feo = gt_comps['FeOt_Gt'][i]*sf / (71.846)
-        cao = gt_comps['CaO_Gt'][i]*sf / (56.0794)
-        xmg = mgo / (mgo+feo+cao)
-        xfe = feo / (mgo+feo+cao)
-        xca = cao / (mgo+feo+cao)
         p_calc = (0.00001786*(T_Ni[i]**2.0)) + (0.027419*T_Ni[i]) - 1.198
         p1 = p_calc - (0.000263*(p_calc**2.0)) - 29.76
         p2 = p_calc - (0.00039*(p_calc**2.0)) - 29.65
@@ -573,8 +564,8 @@ def calculate_ol_mg(gt_comps, T_Ni):
         dv4 = 278.3*(1.0234+((tk-1073)*0.000023))*p4
         #(1347*V2+902+AJ2+(0.9-(1-0.9))*(498+1.51*(R2-30))-98*(T2-U2))/W2-0.357
         dv = dv1 + dv2 + dv3 + dv4
-        kd = np.exp((((1347*xca)+902+dv+(0.9-(1-0.9))*(498+1.51*(p_calc-30))-98*(xmg-xfe))/tk) - 0.357)
-        xmgfe = kd * (xmg/xfe)
+        kd = np.exp((((1347*xCa[i])+902+dv+(0.9-(1-0.9))*(498+1.51*(p_calc-30))-98*(xMg[i]-xFe[i]))/tk) - 0.357)
+        xmgfe = kd * (xMg[i]/xFe[i])
         mg_ol[i] = xmgfe / (1+xmgfe)
 
     return mg_ol

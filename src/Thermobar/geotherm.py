@@ -2,7 +2,7 @@ import numpy as np
 import os, sys
 import matplotlib.pyplot as plt
 
-def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0 = 0, max_depth, moho, kinked):
+def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked):
 
 	'''
 
@@ -14,8 +14,9 @@ def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0 = 0, max_depth, moho, kinked
 	cited study. Generalized continental geotherm can be creating assuming
 	26% of the heat generation occurs in the upper crustal layer.
 
-	###Parameters###
-	
+	Parameters
+	-------
+
 	SHF: Surface Heat Flow value in mW/m^2
 
 	BDL_T: is Temperature at the base of the depleted lithosphere in Celsius
@@ -28,6 +29,11 @@ def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0 = 0, max_depth, moho, kinked
 
 	kinked: Boolean parameter to determine whether the conductive
 	geotherm will be kinked parallel to D-G transition curve after the BDL.
+
+	Returns
+	-------
+	Temperature (Kelvin), Depth (meters), Pressure (GPa), index point where the geotherm
+	is kinked
 
 	'''
 

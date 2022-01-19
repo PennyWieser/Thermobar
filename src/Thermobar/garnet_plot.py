@@ -273,10 +273,11 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	depth_fields = np.arange(min_section_depth, max_section_depth + depth_interval, depth_interval) * 1e3 #Creating depth ranges for the plot sections with the
 	#interval inputted with min_section_depth, max_section_depth and depth_interval
 
+	xMg, xCa, xFe, xAl, xCr = calculate_fractions_garnet(gt_comps = gt_comps)
 	carp_depleted_harz, carp_depleted_lherz, carp_depleted_metasomatised, carp_fertile_lherz, carp_melt_metas, carp_unclass, len_tot = garnet_CARP_class_Griffin2002(gt_comps = gt_comps) #determining CARP classes from garnet composition
 	cacr_class = garnet_ca_cr_class_Griffin2002(gt_comps = gt_comps)
 	g_class = garnet_class_Grutter2003(gt_comps = gt_comps)
-	MG = calculate_ol_mg(gt_comps = gt_comps, T_Ni = T_Ni) #calculating olivine magnesium number from garnet composition
+	MG = calculate_ol_mg(gt_comps = gt_comps, T_Ni = T_Ni, xMg = xMg, xCa = xCa, xFe = xFe) #calculating olivine magnesium number from garnet composition
 	AL = calculate_al2o3_whole_rock(gt_comps = gt_comps) #calculating Al2O3 whole rock from garnet compostion
 
 	depth_normal = np.zeros(len(P_Cr))
@@ -427,21 +428,15 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	for i in range(1,len(depth_fields)):
 		depth_second.append((depth_fields[i] + depth_fields[i-1])/2e3)
 	ax2 = plt.subplot2grid((16,16),(0,2), rowspan = 16,colspan = 1, fig = fig1)
-	ax2.plot(total_classified,depth_second,label = 'Total Classified', color = '#b02f1e')
-	ax2.plot(total_list,depth_second, linestyle = '--',dashes=(5, 12), label = 'Total Analysed', color = 'k')
-	for i in range(0,len(depth_second)):
-		try:
-			print('Depth: '  + str(depth_second[i]) + '   -  ' + str(100.0*((total_list[i]-total_classified[i])/float(total_list[i]))))
-		except ZeroDivisionError:
-			print('Depth: ' + str(depth_second[i]) + '   -  ' + '0.0')
-
+	ax2.plot(total_classified,depth_second,label = 'Classified', color = '#b02f1e')
+	ax2.plot(total_list,depth_second, linestyle = '--',dashes=(5, 12), label = 'Analysed', color = 'k')
 	ax2.set_ylim((np.amax(depth_fields) / 1e3)+10,(np.amin(depth_fields) / 1e3)-10)
 	ax2.set_facecolor('#f7f7f2')
 	#ax2.set_ylim(max(depth_plot) + 20,40)
 	for i in range(0,len(depth_fields)):
 		ax2.axhline((depth_fields[i] / 1e3), linewidth = 0.75, alpha = 0.5, color = 'k',linestyle = '-.')
 	ax2.fill_betweenx(depth_second,total_list,total_classified,color = 'k',alpha = 0.1)
-	#ax2.legend(fontsize = 4)
+	ax2.legend(fontsize = 6)
 	ax2.set_xlabel('No.Samples - Log')
 	ax2.grid(alpha = 0.6)
 	#ax2.set_title('CARP - analysed samples,\n total = ' + str(len(T_Ni)),fontsize = 4)
@@ -814,10 +809,10 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 
 	ax7.legend(fontsize = 6,framealpha = 1.0)
 	ax7.set_xlabel(r'#${Mg}^{ol}$')
-	ax7.set_xlim((0.87,0.95))
+	ax7.set_xlim((0.87,0.96))
 	ax7.set_yticklabels([])
-	ax7.set_xticks([0.88,0.9,0.92,0.94])
-	ax7.set_xticklabels([88,90,92,94],fontsize = 7)
+	ax7.set_xticks([0.88,0.9,0.92,0.94,0.96])
+	ax7.set_xticklabels([88,90,92,94,96],fontsize = 7)
 
 	if plot_type == 'show':
 		plt.show()
