@@ -11,7 +11,38 @@ from Thermobar.geotherm import *
 from Thermobar.garnet import *
 from Thermobar.garnet_class import *
 
-def plot_CA_CR(garnet_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', filename_save = None):
+def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', filename_save = None):
+
+	'''
+	A function to plot the CaO CR2O3 based garnet xenocryst classifications
+	and to determine the base of the depleted lithosphere BDL_T.
+
+	###Parameters###
+	gt_comps: garnet composition dataframe imported from core function
+
+	BDL_T: is Temperature at the base of the depleted lithosphere in Celsius
+
+	T_Ni: Temperature output taken from one of the garnet thermometry methods in
+	Kelvin.
+
+	P_Cr: Cr2O3 based pressure estimate of the garnet xenocrysts in GPa
+
+	SHF_low: Surface heat flow value for the lower end of the geotherms to be plotted in mW/m^2
+
+	SHF_high: Surface heat flow value for the higher end of the geotherms to be plotted in mW/m^2
+
+	max_depth: maximum depth for calculations and plotting
+
+	SHF_chosen: Surface heat flow value for the chosen geotherm to be plotted in mW/m^2
+
+	temp_unit: temperature unit 'Celsius' or 'Kelvin'
+
+	plot_type: parameter to decide whether to 'show' the plot or 'save' it as a png file.
+
+	filename_save: str parameter to determine the filename to be saved. If none entered it
+	defaults to a certain name.
+
+	'''
 
 	geotherms = []
 	pressures = []
@@ -36,7 +67,7 @@ def plot_CA_CR(garnet_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SH
 		d_g_t = np.array([600,700,800,900,1000,1100,1200,1300,1400,1500,1600]) + 273
 
 
-	ca_cr_class = garnet_ca_cr_class_Griffin2002(garnet_comps)
+	ca_cr_class = garnet_ca_cr_class_Griffin2002(gt_comps)
 
 	lherz_p = []
 	lherz_t = []
@@ -123,22 +154,22 @@ def plot_CA_CR(garnet_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SH
 	for i in range(0,len(T_Ni)):
 		if ca_cr_class[i] == 'Lherzolite':
 			lherz_t.append(float(T_Ni[i]))
-			lherz_y.append(garnet_comps['Y_Gt'][i])
+			lherz_y.append(gt_comps['Y_Gt'][i])
 		elif ca_cr_class[i] == 'Low-Ca Harzburgite':
 			lowcaharz_t.append(float(T_Ni[i]))
-			lowcaharz_y.append(garnet_comps['Y_Gt'][i])
+			lowcaharz_y.append(gt_comps['Y_Gt'][i])
 		elif ca_cr_class[i] == 'Ca-Harzburgite':
 			harz_t.append(float(T_Ni[i]))
-			harz_y.append(garnet_comps['Y_Gt'][i])
+			harz_y.append(gt_comps['Y_Gt'][i])
 		elif ca_cr_class[i] == 'Low-Cr Peridotite':
 			low_cr_gt_t.append(float(T_Ni[i]))
-			low_cr_gt_y.append(garnet_comps['Y_Gt'][i])
+			low_cr_gt_y.append(gt_comps['Y_Gt'][i])
 		elif ca_cr_class[i] == 'Wehrlite':
 			wehrlite_t.append(float(T_Ni[i]))
-			wehrlite_y.append(garnet_comps['Y_Gt'][i])
+			wehrlite_y.append(gt_comps['Y_Gt'][i])
 		else:
 			unclass_t.append(float(T_Ni[i]))
-			unclass_y.append(garnet_comps['Y_Gt'][i])
+			unclass_y.append(gt_comps['Y_Gt'][i])
 
 	if len(lherz_t) != 0:
 		ax2.plot(lherz_t,lherz_y,'*',color = '#339e51', label = 'Lherzolite',markersize = 3)
@@ -176,6 +207,43 @@ def plot_CA_CR(garnet_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SH
 				print('Not a proper format for the filename_save')
 
 def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth, max_section_depth, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', filename_save = None):
+
+	'''
+	A function to plot a collection of the garnet xenocryst based classifications
+
+	###Parameters###
+	gt_comps: garnet composition dataframe imported from core function
+
+	depth_interval: depth interval for the histogram sections in km
+
+	min_section_depth: depth for the minimum depth to be plotted in km
+
+	max_section_depth: depth for the maximum depth to be plotted in km
+
+	T_Ni: Temperature output taken from one of the garnet thermometry methods in
+	Kelvin.
+
+	P_Cr: Cr2O3 based pressure estimate of the garnet xenocrysts in GPa
+
+	BDL_T: is Temperature at the base of the depleted lithosphere in Celsius
+
+	SHF_low: Surface heat flow value for the lower end of the geotherms to be plotted in mW/m^2
+
+	SHF_high: Surface heat flow value for the higher end of the geotherms to be plotted in mW/m^2
+
+	SHF_chosen: Surface heat flow value for the chosen geotherm to be plotted in mW/m^2
+
+	temp_unit: temperature unit 'Celsius' or 'Kelvin'
+
+	max_depth: maximum depth for geotherm calculations in km
+
+	plot_type: parameter to decide whether to 'show' the plot or 'save' it as a png file.
+
+	filename_save: str parameter to determine the filename to be saved. If none entered it
+	defaults to a certain name.
+
+	'''
+
 
 	#Calculating range of geotherms to be plotted
 	geotherms = []

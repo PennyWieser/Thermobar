@@ -8,7 +8,16 @@ import os,sys
 import itertools
 from Thermobar.core import *
 
-def garnet_CARP_class_Griffin2002(gt_comps, depth_fields = None):
+def garnet_CARP_class_Griffin2002(gt_comps):
+
+    '''
+    A function to classify Cr-pyrope garnet xenocrysts according to
+    the study of Griffin et al. (2002)
+    :cite: `griffin2002`
+
+    ###Parameters###
+    gt_comps: garnet composition dataframe imported from core function
+    '''
 
     h1 = []
     h2 = []
@@ -200,6 +209,15 @@ def garnet_CARP_class_Griffin2002(gt_comps, depth_fields = None):
 
 def garnet_class_Grutter2003(gt_comps):
 
+    '''
+    A function to classify Cr-pyrope garnet xenocrysts according to
+    the study of Grutter et al. (2003)
+    :cite: `grutter2003`
+
+    ###Parameters###
+    gt_comps: garnet composition dataframe imported from core function
+    '''
+
     ca_int = []
     mg_num_g = []
     g10 = []
@@ -348,6 +366,15 @@ def garnet_class_Grutter2003(gt_comps):
 
 def garnet_ca_cr_class_Griffin2002(gt_comps):
 
+    '''
+    A function to make CaO-Cr2O3 classifications of Cr-pyrope garnet xenocrysts
+    according to the study of Griffin et al. (2002)
+    :cite: `griffin2002`
+
+    ###Parameters###
+    gt_comps: garnet composition dataframe imported from core function
+    '''
+
     low_cr_ca = [0,9,9,0]
     low_cr_cr = [0,0,1.52,1.52]
 
@@ -420,6 +447,15 @@ def garnet_ca_cr_class_Griffin2002(gt_comps):
     return cacr_class
 
 def y_zr_classification_Griffin2002(gt_comps):
+
+    '''
+    A function to make Y-Zr classifications of Cr-pyrope garnet xenocrysts
+    according to the study of Griffin et al. (2002)
+    :cite: `griffin2002`
+
+    ###Parameters###
+    gt_comps: garnet composition dataframe imported from core function
+    '''
 
     Zr_depleted = [0.1003,3.634,7.168,10.14,13.49,15.91,17.96,19.81,
     21.67,23.34,24.45,25.38,26.49,27.41,28.15,28.88,29.25,29.98,29.98,
@@ -500,6 +536,16 @@ def y_zr_classification_Griffin2002(gt_comps):
 
 def calculate_ol_mg(gt_comps, T_Ni):
 
+    '''
+    A function to derive olivine Mg# from coxisting Cr-pyrope garnet xenocrysts.
+    :cite: `gaul2000`
+
+    ###Parameters###
+    gt_comps: garnet composition dataframe imported from core function
+    T_Ni: Temperature output taken from one of the garnet thermometry methods in
+    Kelvin.
+    '''
+
     mg_ol = np.zeros(len(gt_comps['MgO_Gt']))
 
     sT_Ni = np.array(T_Ni) - 273.0 #converting to celsius for calculations
@@ -534,6 +580,15 @@ def calculate_ol_mg(gt_comps, T_Ni):
     return mg_ol
 
 def calculate_al2o3_whole_rock(gt_comps):
+
+    '''
+    A function to derive whole-rock Al2O3 from coxisting Cr-pyrope garnets xenocrysts.
+    :cite: `oreilly2006`
+
+    ###Parameters###
+    gt_comps: garnet composition dataframe imported from core function
+
+    '''
 
     wr_al_y = np.zeros(len(gt_comps['Y_Gt']))
 

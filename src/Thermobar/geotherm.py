@@ -2,19 +2,34 @@ import numpy as np
 import os, sys
 import matplotlib.pyplot as plt
 
-def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked):
+def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0 = 0, max_depth, moho, kinked):
 
-	#Creating the depth array for calculating the 1-d steady state geotherm
-	#by using different intervals for 1.Upper crust where heat generation
-	#is high 2. Lower crust where it is intermediate and 3. Lithosperic mantle
-	#where it is negligible but does not hurt to calculate.
-	#Local function for calculating thermal conductivity, from Hasterok (2010), PhD
-	#Thesis.
+	'''
 
-	#SHF in mW/m^2
-	#T_0 in c
-	#max_depth in km
-	#moho in km
+	A function to calculate the generalized steady-state geotherm for the
+	continental lithosphere as taken from Hasterok & Chapman (2011).
+	:cite: `hasterok2011`
+
+	All the parameters used in constructing the geotherm are derived from the
+	cited study. Generalized continental geotherm can be creating assuming
+	26% of the heat generation occurs in the upper crustal layer.
+
+	###Parameters###
+	
+	SHF: Surface Heat Flow value in mW/m^2
+
+	BDL_T: is Temperature at the base of the depleted lithosphere in Celsius
+
+	T_0: is Temperature at the surface in Celsius
+
+	max_depth: Maximum depth the geotherm is going to be calculated for.
+
+	moho: The depth of Mohorivicic discontinuity (i.e. crustal thickness)
+
+	kinked: Boolean parameter to determine whether the conductive
+	geotherm will be kinked parallel to D-G transition curve after the BDL.
+
+	'''
 
 	if kinked == False:
 		BDL_T = 0
