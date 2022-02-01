@@ -44,11 +44,14 @@ def Ridolfi21_cali_plot(amp_comps, P_kbar=None, T_K=None, figsize=(7, 5),x=None,
 
 
     fig, (ax1) = plt.subplots(1, 1, figsize=figsize)
-    ax1.plot(Ridolfi_Cali_input[x], Ridolfi_Cali_input[y], shape_cali,
-    mfc=mfc_cali, mec=mec_cali, ms=ms_cali)
+
 
     ax1.plot(amp_comps_c[x], amp_comps_c[y], shape_data,
     mfc=mfc_data, mec=mec_data, ms=ms_data)
+
+    ax1.plot(Ridolfi_Cali_input[x], Ridolfi_Cali_input[y], shape_cali,
+    mfc=mfc_cali, mec=mec_cali, ms=ms_cali)
+
     xlabel=x.replace('_', ' ')
     ylabel=y.replace('_', ' ')
     ax1.set_xlabel(xlabel)
