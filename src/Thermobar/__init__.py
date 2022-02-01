@@ -40,9 +40,11 @@ from Thermobar.amphibole import *
 from Thermobar.plotting import *
 # Viscosity
 from Thermobar.viscosity import *
-# version
-from ._version import __version__
 # calibration
 from Thermobar.calibration_plots import *
+
+# version
+from ._version import __version__
+
 
 
