@@ -42,5 +42,7 @@ from Thermobar.plotting import *
 from Thermobar.viscosity import *
 # version
 from ._version import __version__
+# calibration
+from Thermobar.calibration_plots import *
 
 

@@ -667,6 +667,7 @@ K_Amp_cat_23ox, Al2O3_Liq_mol_frac_hyd, Na2O_Liq_mol_frac_hyd,
 H2O_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd):
     '''
     Amphibole-Liquid barometer: Equation 7a of Putirka et al. (2016)
+    Preferred equation
     :cite:`putirka2016amphibole`
 
     '''
@@ -680,6 +681,7 @@ def P_Put2016_eq7b(T=None, *, Al2O3_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd, Al_
     SiO2_Liq_mol_frac_hyd, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd, CaO_Liq_mol_frac_hyd):
     '''
     Amphibole-Liquid barometer: Equation 7b of Putirka et al. (2016)
+    While 7a is preferred, Putirka (2008) say that 7b may be more precise at low T, and >10 kbar
     :cite:``
 
     '''
@@ -1407,10 +1409,73 @@ equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
          equationP=equationP, equationT=equationT)
         P_guess = PT_out['P_kbar_calc'].astype('float64')
         T_K_guess = PT_out['T_K_calc'].astype('float64')
-        Combo_liq_amp_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
-        Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
-        Combo_liq_amp_fur_filt.insert(2, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
-    return Combo_liq_amp_fur_filt
+
+    if equationP is not None and equationT is None:
+        P_guess = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
+        equationP=equationP, T=T)
+        T_K_guess = T
+    # Same if user doesnt specify an equation for P, but a real P
+    if equationT is not None and equationP is None:
+        T_guess = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
+        equationT=equationT, P=P)
+        P_guess = P
+
+
+    Combo_liq_amp_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
+    Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+    Combo_liq_amp_fur_filt.insert(2, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
+
+    # Final step, calcuate a 3rd output which is the average and standard
+    # deviation for each Amp (e.g., Amp1-Melt1, Amp1-melt3 etc. )
+    AmpNumbers = Combo_liq_amp_fur_filt['ID_AMP'].unique()
+    if len(AmpNumbers) > 0:
+        df1_Mean_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).mean()
+        df1_Std_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).std()
+        count=Combo_liq_amp_fur_filt.groupby('ID_AMP',as_index=False).count().iloc[:, 1]
+        df1_Mean_nopref['# of Liqs Averaged']=count
+        Sample_ID_Amp_Mean=df1_Mean_nopref['Sample_ID_Amp']
+        Sample_ID_Amp_Std=df1_Std_nopref['Sample_ID_Amp']
+        df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+        df1_Std=df1_Std_nopref.add_prefix('Std_')
+
+        df1_Mean.rename(columns={"Mean_ID_AMP": "ID_AMP"}, inplace=True)
+        df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
+        df1_Std.rename(columns={"Std_ID_AMP": "ID_AMP"}, inplace=True)
+
+
+
+        df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_AMP'])
+        df1_M['Sample_ID_Amp']=Sample_ID_Amp_Mean
+
+        if equationT is not None and equationP is not None:
+            cols_to_move = ['Sample_ID_Amp', '# of Liqs Averaged',
+                        'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+                        'Std_P_kbar_calc']
+
+        if equationT is not None and equationP is None:
+            cols_to_move = ['Sample_ID_Amp',
+                        'Mean_P_kbar_input',
+                        'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
+
+        if equationT is None and equationP is not None:
+            cols_to_move = ['Sample_ID_Amp',
+                        'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
+                        'Std_P_kbar_calc']
+
+        df1_M = df1_M[cols_to_move +
+                    [col for col in df1_M.columns if col not in cols_to_move]]
+
+
+    else:
+        raise Exception(
+            'No Matches - to set less strict filters, change our Kd filter')
+
+
+
+    print('Done!')
+    return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_amp_fur_filt}
+
+
 
 ## Amphibole-Plag temperatures, Holland and Blundy 1994
 

@@ -349,8 +349,9 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None,
         Data frame of oxide compositions. Can have suffixes like "_Amp"
         in which case you need to specify suffix="_Amp"
 
-    remove_oxygen: str
-        default False, so element wt% doesnt sum to 100.
+    without_oxygen: str
+        default False, element wt% doesnt sum to 100.]
+        if true, all elements sum to 100 w/o oxygen.
 
     returns: pandas.DataFrame
     wt% of elements
