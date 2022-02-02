@@ -10,6 +10,9 @@ import pickle
 from pathlib import Path
 Thermobar_dir=Path(__file__).parent
 import joblib
+# Things for machine learning onnx
+# from skl2onnx import convert_sklearn
+# import onnxruntime as rt
 
 from Thermobar.core import *
 from Thermobar.Nimis_1999 import *
