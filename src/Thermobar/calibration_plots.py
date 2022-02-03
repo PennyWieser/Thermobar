@@ -20,20 +20,113 @@ def return_Petrelli2020_cali_dataset(all=True):
         Petrelli20_Cali_input=load(f)
     return Petrelli20_Cali_input
 
-def generic_cali_plot(df, model=None, P_kbar=None, T_K=None, figsize=(7, 5),x=None, y=None,
+def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, figsize=(7, 5),
  shape_cali='o', mfc_cali='white', mec_cali='k', ms_cali=5,
- shape_data='^', mfc_data='red', alpha_cali=1, alpha_data=1, mec_data='k', ms_data=10, order="cali top"):
+ shape_data='^', mfc_data='red', alpha_cali=1, alpha_data=1, mec_data='k', ms_data=10, order="cali bottom"):
+
+    """
+    This function plots your compositions amongst the calibration dataset for a variety of models where we could
+    obtain the exact calibration dataset. see model for option.
+
+    Parameters
+    -------
+
+    df: pandas DataFrame
+        dataframe of your compositions, e.g. a dataframe of Cpx composition
+
+    x and y: str
+        What you want to plotted against each other. E.g. x="SiO2_Cpx", y="Al2O3_Cpx"
+
+    model: str
+        Ridolfi2021:  Ridolfi et al. (2012) for Amphibole
+        Putirka2016:  Putirka (2016) for Amphibole
+
+        Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
+        Neave2017:  Neave and Putirka (2017) for Cpx-Liq
+        Putirka2008: Putirka (2008) - entire database for Cpx-Liq,
+        not used for all calibrations.
+
+        Waters2015: Waters and Lange (2015) for plag-liq hygrometry
+        Masotta2019: Masotta et al. (2019) plag-liq hygrometry
+
+
+
+
+
+
+
+    P_kbar and T_K: pd.Series
+        if you want to plot calculated pressure and temperature against the calibration range,
+        specify those panda series here, and it will append them onto your dataframe
+
+    Plot customization options.
+    -------
+
+
+    figsize: (x, y)
+        figure size
+
+    order: 'cali top' or 'cali bottom':
+        whether cali or user data is plotted ontop. default, cali data bottom
+
+    shape_cali, shape_data:
+        matplotlib symbol, e.g. shape_cali='o' and shape_data='^' are the defaults
+
+    ms_cali, ms_data:
+        marker size for cali and user data
+
+    mfc_cali, mfc_data:
+        marker face color for cali and data (can be different)
+
+    mec_cali, mfc_data:
+        marker edge color for cali and data.
+
+    alpha_cali, alpha_data:
+        transparency of symbols
+
+
+
+    liq_comps: pandas DataFrame
+        liquid compositions (SiO2_Liq, TiO2_Liq etc.)
+
+
+    """
+
     df_c=df.copy()
     if P_kbar is not None:
         df_c['P_kbar']=P_kbar
     if T_K is not None:
         df_c['T_K']=T_K
-    if model=="Ridolfi21":
+
+    # Amphibole models
+    if model=="Ridolfi2021":
         with open(Thermobar_dir/'Ridolfi_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
-    if model=="Petrelli20":
+
+    if model=="Putirka2016":
+        with open(Thermobar_dir/'Putirka16_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    # Cpx model
+    if model=="Petrelli2020":
         with open(Thermobar_dir/'Petrelli20_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
+
+    if model=="Putirka2008":
+        with open(Thermobar_dir/'Putirka2008_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    if model=="Neave2017":
+        with open(Thermobar_dir/'NeavePutirka_2017_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    #
+
+    if model=="Waters2015":
+        with open(Thermobar_dir/'Waters_Lange2015_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+
 
     if x not in df_c:
         print(df_c.columns)
