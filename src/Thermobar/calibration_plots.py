@@ -20,6 +20,8 @@ def return_Petrelli2020_cali_dataset(all=True):
         Petrelli20_Cali_input=load(f)
     return Petrelli20_Cali_input
 
+
+
 def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, figsize=(7, 5),
  shape_cali='o', mfc_cali='white', mec_cali='k', ms_cali=5,
  shape_data='^', mfc_data='red', alpha_cali=1, alpha_data=1, mec_data='k', ms_data=10, order="cali bottom"):
@@ -40,6 +42,7 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
     model: str
         Ridolfi2021:  Ridolfi et al. (2012) for Amphibole
         Putirka2016:  Putirka (2016) for Amphibole
+        Mutch2016: Mutch et al. (2016) for Amphibole
 
         Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
         Neave2017:  Neave and Putirka (2017) for Cpx-Liq
@@ -92,7 +95,16 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
 
     """
 
-    df_c=df.copy()
+    #df_c=df.copy()
+    if model=="Ridolfi2021" or model=="Putirka2016" or model=="Mutch2016":
+        Amp_sites=calculate_sites_ridolfi(amp_comps=df)
+        df_c=pd.concat([df, Amp_sites], axis=1)
+
+
+    if model=="Petrelli2020" or model=="Putirka2008" or model=="Neave2017":
+        Cpx_sites=calculate_clinopyroxene_components(cpx_comps=df)
+        df_c=pd.concat([df, Cpx_sites], axis=1)
+
     if P_kbar is not None:
         df_c['P_kbar']=P_kbar
     if T_K is not None:
@@ -105,6 +117,10 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
 
     if model=="Putirka2016":
         with open(Thermobar_dir/'Putirka16_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    if model=="Mutch2016":
+        with open(Thermobar_dir/'Mutch_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
 
     # Cpx model
