@@ -165,10 +165,10 @@ Demonstrates how to combine Thermobar and VESIcal to calculate temperatures at w
 
 **Useful files:
 
-    * Download :download:`Python Notebook (Two_Feldspar_Example.ipynb) <Examples/Integration_with_VESIcal/Combining_VESIcal_Thermobar_SatPs.ipynb>`
-    * Download :download:`Excel Workbook (Two_Feldspar_input.xlsx) <Examples/Integration_with_VESIcal/Ol_hosted_melt_inclusions.xlsx>`
+    * Download :download:`Python Notebook (Integration_with_VESIcal.ipynb) <Examples/Integration_with_VESIcal/Combining_VESIcal_Thermobar_SatPs.ipynb>`
+    * Download :download:`Excel Workbook (Ol_hosted_melt_inclusions.xlsx) <Examples/Integration_with_VESIcal/Ol_hosted_melt_inclusions.xlsx>`
 
 .. raw:: html
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/FRpsDbouuec" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/FRpsDbouuec" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 ---------
