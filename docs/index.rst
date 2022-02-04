@@ -98,7 +98,12 @@ Welcome to Thermobar's documentation!
    Examples/Error_propagation/Cpx_Liq_Thermobarometry_Error_prop
    Examples/Error_propagation/Cpx_only_contour_plot
 
+   %
+.. toctree::
+   :maxdepth: 2
+   :caption:  Integration with VESIcal
 
+   Examples/Integration_with_VESIcal/Combining_VESIcal_Thermobar_SatPs
 
 .. toctree::
    :maxdepth: 2
