@@ -10,15 +10,77 @@ from Thermobar.core import *
 
 
 
-def return_Ridolfi21_cali_dataset(all=True):
-    with open(Thermobar_dir/'Ridolfi_Cali_input.pkl', 'rb') as f:
-        Ridolfi_Cali_input=load(f)
-    return Ridolfi_Cali_input
+def return_cali_dataset(model=None):
+    """
+    This function returns the calibration dataset for different models, often with mineral components returned.
+    This allows you to make your own plots rather than using the generic_cali_plot() option.
 
-def return_Petrelli2020_cali_dataset(all=True):
-    with open(Thermobar_dir/'Petrelli20_Cali_input.pkl', 'rb') as f:
-        Petrelli20_Cali_input=load(f)
-    return Petrelli20_Cali_input
+
+    Parameters
+    -------
+
+
+    model: str
+        AMPHIBOLE:
+        Ridolfi2021:  Ridolfi et al. (2012)
+        Putirka2016:  Putirka (2016)
+        Mutch2016: Mutch et al. (2016)
+
+        CPX:
+        Putirka2008: Putirka (2008) - entire database for Cpx-Liq,
+        (not used for all equations).
+        Masotta2013: Masotta et al. (2013)
+        Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
+        Neave2017:  Neave and Putirka (2017) for Cpx-Liq
+        Brugman2019: Brugman and Till 2019
+
+        PLAGIOCLASE
+        Waters2015: Waters and Lange (2015) for plag-liq hygrometry
+        Masotta2019: Masotta et al. (2019) plag-liq hygrometry
+    """
+
+    # Amphibole models
+    if model=="Ridolfi2021":
+        with open(Thermobar_dir/'Ridolfi_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    if model=="Putirka2016":
+        with open(Thermobar_dir/'Putirka16_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    if model=="Mutch2016":
+        with open(Thermobar_dir/'Mutch_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    # Cpx model
+    if model=="Petrelli2020":
+        with open(Thermobar_dir/'Petrelli20_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    if model=="Putirka2008":
+        with open(Thermobar_dir/'Putirka2008_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    if model=="Neave2017":
+        with open(Thermobar_dir/'NeavePutirka_2017_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    if model=="Brugman2019":
+        with open(Thermobar_dir/'Brugman_2019_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    if model=="Masotta2013":
+        with open(Thermobar_dir/'Masotta_2013_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    # Plag models
+
+    if model=="Waters2015":
+        with open(Thermobar_dir/'Waters_Lange2015_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    return Cali_input
+
 
 
 
@@ -40,23 +102,22 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         What you want to plotted against each other. E.g. x="SiO2_Cpx", y="Al2O3_Cpx"
 
     model: str
-        Ridolfi2021:  Ridolfi et al. (2012) for Amphibole
-        Putirka2016:  Putirka (2016) for Amphibole
-        Mutch2016: Mutch et al. (2016) for Amphibole
+        AMPHIBOLE:
+        Ridolfi2021:  Ridolfi et al. (2012)
+        Putirka2016:  Putirka (2016)
+        Mutch2016: Mutch et al. (2016)
 
+        CPX:
+        Putirka2008: Putirka (2008) - entire database for Cpx-Liq,
+        (not used for all equations).
+        Masotta2013: Masotta et al. (2013)
         Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
         Neave2017:  Neave and Putirka (2017) for Cpx-Liq
-        Putirka2008: Putirka (2008) - entire database for Cpx-Liq,
-        not used for all calibrations.
+        Brugman2019: Brugman and Till 2019
 
+        PLAGIOCLASE
         Waters2015: Waters and Lange (2015) for plag-liq hygrometry
         Masotta2019: Masotta et al. (2019) plag-liq hygrometry
-
-
-
-
-
-
 
     P_kbar and T_K: pd.Series
         if you want to plot calculated pressure and temperature against the calibration range,
@@ -101,9 +162,12 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         df_c=pd.concat([df, Amp_sites], axis=1)
 
 
-    if model=="Petrelli2020" or model=="Putirka2008" or model=="Neave2017":
-        Cpx_sites=calculate_clinopyroxene_components(cpx_comps=df)
-        df_c=pd.concat([df, Cpx_sites], axis=1)
+    if model=="Petrelli2020" or model=="Putirka2008" or model=="Neave2017" or model=="Brugman2019" or model=="Masotta2013":
+        if "Jd" not in df:
+            Cpx_sites=calculate_clinopyroxene_components(cpx_comps=df)
+            df_c=Cpx_sites
+        else:
+            df_c=df
 
     if P_kbar is not None:
         df_c['P_kbar']=P_kbar
@@ -136,7 +200,16 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         with open(Thermobar_dir/'NeavePutirka_2017_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
 
-    #
+    if model=="Brugman2019":
+        with open(Thermobar_dir/'Brugman_2019_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+    if model=="Masotta2013":
+        with open(Thermobar_dir/'Masotta_2013_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
+
+    # Plag models
 
     if model=="Waters2015":
         with open(Thermobar_dir/'Waters_Lange2015_Cali_input.pkl', 'rb') as f:
