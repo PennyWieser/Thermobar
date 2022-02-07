@@ -245,7 +245,7 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
     mfc=mfc_data, mec=mec_data, ms=ms_data, alpha=alpha_data, label='Data', zorder=zorder_cali)
 
     ax1.plot(Cali_input[x], Cali_input[y], shape_cali,
-    mfc=mfc_cali, mec=mec_cali, ms=ms_cali, alpha=alpha_cali, label='Cali', zorder=zorder_data)
+    mfc=mfc_cali, mec=mec_cali, ms=ms_cali, alpha=alpha_cali, label=model, zorder=zorder_data)
 
     xlabel=x.replace('_', ' ')
     ylabel=y.replace('_', ' ')
