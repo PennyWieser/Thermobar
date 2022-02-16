@@ -20,13 +20,15 @@ def T_Ryan1996(gt_comps):
 
     return temp
 
-def T_Sudholz2021(gt_comps, xCa, xCr):
+def T_Sudholz2021(gt_comps):
 
     '''
     Ni-in-garnet thermometer of Sudholz et al. (2021)
     :cite:`sudholz2021`
     SEE=+-50C
     '''
+
+    xMg, xCa, xFe, xAl, xCr = calculate_fractions_garnet(gt_comps = gt_comps)
 
     ni_ol = 3e3
 
@@ -52,13 +54,15 @@ def T_Canil1999(gt_comps):
 
     return temp
 
-def P_Ryan_1996(gt_comps, T_K, xMg, xCa, xFe, xAl, xCr):
+def P_Ryan_1996(gt_comps, T_K):
 
     '''
     Cr-pyrope garnet barometer of Ryan et al. (1996)
     :cite:`ryan1996`
     SEE=+-50C
     '''
+
+    xMg, xCa, xFe, xAl, xCr = calculate_fractions_garnet(gt_comps = gt_comps)
 
     P_cr = np.zeros(len(T_K))
 
@@ -69,7 +73,7 @@ def P_Ryan_1996(gt_comps, T_K, xMg, xCa, xFe, xAl, xCr):
     Cr_veto = 0.1
     R = 1.9872
 
-    T_C = T_K - 273.0
+    T_C = T_K - 273.15
 
     def xCropx(ca_opx, p_ref, temp):
 
@@ -92,11 +96,12 @@ def P_Ryan_1996(gt_comps, T_K, xMg, xCa, xFe, xAl, xCr):
 
     def xCaopx(ca,cr,p_ref,temp):
 
-        xCa_opx_lherz = np.exp((-1.0 * (6424 + (26.4*p_ref)) / temp) + 1.84)  #temp thing might be other way around
+        tk = temp + 273.15
+        xCa_opx_lherz = np.exp((-1.0 * (6424 + (26.4*p_ref)) / tk) + 1.84)  #Correct
         xCa_gt_lherz = CaLherz_(ca, cr)
 
         Kdc = xCa_gt_lherz / xCa_opx_lherz
-        Kdc = Kdc * np.exp(-1.27 + (0.000738 * (temp - 273.0)) + (0.0236 * p_ref) - ((0.577 * cr) / (ca + 0.02)) + (1.79 * ca))
+        Kdc = Kdc * np.exp(-1.27 + (0.000738 * (temp)) + (0.0236 * p_ref) - ((0.577 * cr) / (ca + 0.02)) + (1.79 * ca))
 
         xCa_opx = ca / Kdc
 
@@ -108,10 +113,11 @@ def P_Ryan_1996(gt_comps, T_K, xMg, xCa, xFe, xAl, xCr):
         P_last = 50.0
         a = 0
         Dp_converge = 0.1
+		
         while True:
 
             #Breaking after 1000 iteration
-            a = a+1
+            a = a + 1
             if a > 1000:
                  Dp_converge = Dp_converge * 2.0
 
@@ -119,7 +125,7 @@ def P_Ryan_1996(gt_comps, T_K, xMg, xCa, xFe, xAl, xCr):
             Beta = np.exp(Alpha) * (xMg[i] / xFe[i]) #Good
             mf_Opx = Beta / (1 + Beta) #Good
 
-            Xca_opx = xCaopx(xCa[i], xCr[i], P, T_K[i])
+            Xca_opx = xCaopx(xCa[i], xCr[i], P, T_C[i])
 
             Xcr_opx = xCropx(Xca_opx, P, T_C[i])
 
@@ -147,7 +153,7 @@ def P_Ryan_1996(gt_comps, T_K, xMg, xCa, xFe, xAl, xCr):
                 continue
             else:
 
-                if P >= 0:
+                if P > 0:
                     P_cr[i] = P / 10.0
                     break
                 else:

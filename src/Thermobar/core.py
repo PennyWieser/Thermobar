@@ -243,7 +243,7 @@ oxygen_num_opx_df.set_index('Sample_ID_Opx', inplace=True)
 oxide_mass_gt = {'SiO2_Gt': 60.0843, 'MgO_Gt': 40.3044, 'FeOt_Gt': 71.8464,
  'CaO_Gt': 56.0774, 'Al2O3_Gt': 101.961,'Na2O_Gt': 61.9789,
  'K2O_Gt': 94.196, 'MnO_Gt': 70.9375, 'TiO2_Gt': 79.8788,
- 'Cr2O3_Gt': 151.9982, 'Ni_Gt':  74.6994 * (1.2725*1e4)}
+ 'Cr2O3_Gt': 151.9982, 'Ni_Gt':  74.6994 * (1.2725*1e-4)}
 oxide_mass_gt_df = pd.DataFrame.from_dict(oxide_mass_gt, orient='index').T
 oxide_mass_gt_df['Sample_ID_Gt'] = 'MolWt'
 oxide_mass_gt_df.set_index('Sample_ID_Gt', inplace=True)
@@ -985,7 +985,7 @@ def calculate_cat_fractions_olivine(ol_comps):
 def calculate_mol_proportions_garnet(gt_comps):
 
     #Exchanging oxide measurements with element one if it exists.
-	
+
     for i in range(0,len(gt_comps['SiO2_Gt'])):
 
         if gt_comps['Ti_Gt'][i] != None:
