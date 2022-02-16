@@ -988,9 +988,11 @@ def calculate_mol_proportions_garnet(gt_comps):
 
     for i in range(0,len(gt_comps['SiO2_Gt'])):
 
-        if gt_comps['Ti_Gt'][i] != None:
-
+        try:
             gt_comps['TiO2_Gt'][i] = (gt_comps['Ti_Gt'][i] * 1.6685) / 1e4
+        except KeyError:
+            pass
+            # print('There is no Ti_Gt in the spreadsheet, getting the values from TiO2_Gt.')
 
     # This makes the input match the columns in the oxide mass dataframe
     gt_wt = gt_comps.reindex(oxide_mass_gt_df.columns, axis=1).fillna(0)
