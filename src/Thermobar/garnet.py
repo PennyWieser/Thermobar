@@ -34,7 +34,7 @@ def T_Sudholz2021(gt_comps):
 
     ni_gt_ol = np.array(gt_comps['Ni_Gt']) / ni_ol
 
-    temp = ((-8254.568) / ((xCa*3.032) + (xCr*2.307) + (np.log(ni_gt_ol) - 2.639)))
+    temp = ((-8254.568) / ((xCa*3.023) + (xCr*2.307) + (np.log(ni_gt_ol) - 2.639)))
 
     return temp
 
@@ -113,7 +113,7 @@ def P_Ryan_1996(gt_comps, T_K):
         P_last = 50.0
         a = 0
         Dp_converge = 0.1
-		
+
         while True:
 
             #Breaking after 1000 iteration
