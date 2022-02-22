@@ -11,8 +11,11 @@ from pathlib import Path
 Thermobar_dir=Path(__file__).parent
 import joblib
 # Things for machine learning onnx
-# from skl2onnx import convert_sklearn
-# import onnxruntime as rt
+from sklearn.preprocessing import StandardScaler
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+import onnxruntime as rt
+
 
 from Thermobar.core import *
 from Thermobar.Nimis_1999 import *
@@ -464,7 +467,7 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     x_test=Cpx_Liq_ML_in.values
 
-
+    # Old version using pickles
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq.pkl', 'rb') as f:
         scaler_P2020_Cpx_Liq=load(f)
 
@@ -475,6 +478,16 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     Pred_T_K=ETR_Temp_P2020_Cpx_Liq.predict(x_test_scaled)
     df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_P2020_Cpx_Liq)
     df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+    # New using Onnx
+    # sess = rt.InferenceSession("Petrelli2020_Cpx_Liq_Temp.onnx")
+    # input_name = sess.get_inputs()[0].name
+    # label_name = sess.get_outputs()[0].name
+    # Pred_T_K = sess.run([label_name], {input_name: x_test.astype(np.float32)})[0]
+
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test, ETR_Temp_P2020_Cpx_Liq)
+
+
 
     return df_stats
 

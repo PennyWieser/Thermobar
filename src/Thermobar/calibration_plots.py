@@ -30,9 +30,12 @@ def return_cali_dataset(model=None):
         Putirka2008: Putirka (2008) - entire database for Cpx-Liq,
         (not used for all equations).
         Masotta2013: Masotta et al. (2013)
-        Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
         Neave2017:  Neave and Putirka (2017) for Cpx-Liq
         Brugman2019: Brugman and Till 2019
+        Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
+        Wang2021: Wang et al. (2021) Cpx-only,but contains Liq compositions too.
+
+
 
         PLAGIOCLASE
         Waters2015: Waters and Lange (2015) for plag-liq hygrometry
@@ -53,6 +56,10 @@ def return_cali_dataset(model=None):
             Cali_input=load(f)
 
     # Cpx model
+    if model=="Wang2021":
+        with open(Thermobar_dir/'Wang21_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
     if model=="Petrelli2020":
         with open(Thermobar_dir/'Petrelli20_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
@@ -111,9 +118,10 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         Putirka2008: Putirka (2008) - entire database for Cpx-Liq,
         (not used for all equations).
         Masotta2013: Masotta et al. (2013)
-        Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
         Neave2017:  Neave and Putirka (2017) for Cpx-Liq
         Brugman2019: Brugman and Till 2019
+        Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
+        Wang2021: Wang et al. (2021) Cpx-only,but contains Liq compositions too.
 
         PLAGIOCLASE
         Waters2015: Waters and Lange (2015) for plag-liq hygrometry
@@ -162,7 +170,7 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         df_c=pd.concat([df, Amp_sites], axis=1)
 
 
-    if model=="Petrelli2020" or model=="Putirka2008" or model=="Neave2017" or model=="Brugman2019" or model=="Masotta2013":
+    if model=="Petrelli2020" or model=="Wang2021" or model=="Putirka2008" or model=="Neave2017" or model=="Brugman2019" or model=="Masotta2013":
         if "Jd" not in df:
             Cpx_sites=calculate_clinopyroxene_components(cpx_comps=df)
             df_c=Cpx_sites
@@ -188,6 +196,10 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
             Cali_input=load(f)
 
     # Cpx model
+    if model=="Wang2021":
+        with open(Thermobar_dir/'Wang21_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
     if model=="Petrelli2020":
         with open(Thermobar_dir/'Petrelli20_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
@@ -255,47 +267,4 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
 
     return fig
 
-def Ridolfi21_cali_plot(amp_comps, P_kbar=None, T_K=None, figsize=(7, 5),x=None, y=None,
- shape_cali='o', mfc_cali='white', mec_cali='k', ms_cali=5,
- shape_data='^', mfc_data='red', mec_data='k', ms_data=10):
-    amp_comps_c=amp_comps.copy()
-    if P_kbar is not None:
-        amp_comps_c['P_kbar']=P_kbar
-    if T_K is not None:
-        amp_comps_c['T_K']=T_K
 
-    with open(Thermobar_dir/'Ridolfi_Cali_input.pkl', 'rb') as f:
-        Ridolfi_Cali_input=load(f)
-
-    if x not in amp_comps_c:
-        print(amp_comps_c.columns)
-        raise TypeError('x variable no present in input dataframe. Choose one of the columns printed above instead')
-    if y not in amp_comps_c:
-        print(amp_comps_c.columns)
-        raise TypeError('y variable no present in input dataframe')
-    if x not in Ridolfi_Cali_input:
-        print(Ridolfi_Cali_input.columns)
-        raise TypeError('x variable no present in calibration dataframe')
-    if y not in Ridolfi_Cali_input:
-        print(Ridolfi_Cali_input.columns)
-        raise TypeError('y variable no present in calibration dataframe')
-
-
-
-
-    fig, (ax1) = plt.subplots(1, 1, figsize=figsize)
-
-
-    ax1.plot(amp_comps_c[x], amp_comps_c[y], shape_data,
-    mfc=mfc_data, mec=mec_data, ms=ms_data, label='Data')
-
-    ax1.plot(Ridolfi_Cali_input[x], Ridolfi_Cali_input[y], shape_cali,
-    mfc=mfc_cali, mec=mec_cali, ms=ms_cali, label='Cali')
-
-    xlabel=x.replace('_', ' ')
-    ylabel=y.replace('_', ' ')
-    ax1.set_xlabel(xlabel)
-    ax1.set_ylabel(ylabel)
-    ax1.legend()
-
-    return fig

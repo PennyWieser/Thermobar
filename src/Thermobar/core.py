@@ -3913,6 +3913,9 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
         +(3.201*mol_frac_hyd['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd['K2O_Liq_mol_frac_hyd']))
         -3.36*(1-(To/T_K) - np.log(T_K/To)) -0.000000701*((P_kbar*100000000)/T_K)
          + -0.000000000154*(((T_K-1673)*(P_kbar*100000000))/T_K) + 0.0000000000000000385*((P_kbar*100000000)**2/T_K))
+        print(ln_XFe2FeO3_XFeO)
+        print(fo2)
+
     if model=="Put2016_eq6b":
         ln_XFe2FeO3_XFeO=(-6.35+10813.8/T_K + 0.19*np.log(fo2)+ 12.4*(mol_frac_hyd['Na2O_Liq_mol_frac_hyd']
          +mol_frac_hyd['K2O_Liq_mol_frac_hyd'])
@@ -3967,7 +3970,153 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
     else:
         return New_Oxide_out_New_old_total
 
-## Machine Learning Voting
+## Need some functions for calculating mole proportions with Fe partition
+oxide_mass_liq_hyd_redox = {'SiO2_Liq': 60.0843, 'MgO_Liq': 40.3044,
+'MnO_Liq': 70.9375, 'FeO_Liq': 71.844, 'Fe2O3_Liq': 159.69, 'CaO_Liq': 56.0774,
+'Al2O3_Liq': 101.961,'Na2O_Liq': 61.9789, 'K2O_Liq': 94.196,
+ 'TiO2_Liq': 79.8788, 'P2O5_Liq': 141.937, 'Cr2O3_Liq': 151.9982,
+  'H2O_Liq': 18.01528}
+# Turns dictionary into a dataframe so pandas matrix math functions can be used
+oxide_mass_liq_hyd_df_redox = pd.DataFrame.from_dict(
+    oxide_mass_liq_hyd_redox, orient='index').T
+oxide_mass_liq_hyd_df_redox['Sample_ID_Liq'] = 'MolWt'
+oxide_mass_liq_hyd_df_redox.set_index('Sample_ID_Liq', inplace=True)
+
+def calculate_hydrous_mol_proportions_liquid_redox(liq_comps):
+    '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous mole proportions
+
+   Parameters
+    -------
+
+
+    liq_comps: pandas.DataFrame
+        liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
+
+    Returns
+    -------
+    pandas DataFrame
+        anhydrous mole proportions for the liquid with column headings of the ..Liq_mol_prop
+
+    '''
+    # This makes the input match the columns in the oxide mass dataframe
+    liq_wt = liq_comps.reindex(oxide_mass_liq_hyd_df_redox.columns, axis=1).fillna(0)
+    # Combine the molecular weight and weight percent dataframes
+    liq_wt_combo = pd.concat([oxide_mass_liq_hyd_df_redox, liq_wt],)
+    # Drop the calculation column
+    mol_prop_hyd = liq_wt_combo.div(
+        liq_wt_combo.loc['MolWt', :], axis='columns').drop(['MolWt'])
+    mol_prop_hyd.columns = [
+        str(col) + '_mol_prop_hyd' for col in mol_prop_hyd.columns]
+    return mol_prop_hyd
+
+def calculate_hydrous_mol_fractions_liquid_redox(liq_comps):
+    '''Import Liq compositions using liq_comps=My_Liquids, returns anhydrous mole fractions
+
+   Parameters
+    -------
+
+    liq_comps: pandas.DataFrame
+        liquid compositions with column headings SiO2_Liq, TiO2_Liq etc.
+
+
+
+    Returns
+    -------
+    pandas DataFrame
+        anhydrous mole fractions for the liquid with column headings of the form SiO2_Liq_mol_frac
+
+    '''
+    mol_prop = calculate_hydrous_mol_proportions_liquid_redox(liq_comps)
+    mol_prop['sum'] = mol_prop.sum(axis='columns')
+    mol_frac_hyd = mol_prop.div(mol_prop['sum'], axis='rows')
+    mol_frac_hyd.drop(['sum'], axis='columns', inplace=True)
+    mol_frac_hyd.columns = [str(col).replace('prop', 'frac')
+                            for col in mol_frac_hyd.columns]
+    return mol_frac_hyd
+
+
+
+def convert_fe_partition_to_fo2(*, liq_comps, T_K, P_kbar,  model="Kress1991", renorm=False):
+    '''
+    Calculates delta fo2 relative to QFM and NNO buffer for liq compositions with FeO and Fe2O3
+
+   Parameters
+    -------
+
+    liq_comps: pandas.DataFrame
+        Liquid compositions with column headings SiO2_Liq, MgO_Liq, FeO_Liq and Fe2O3_Liq etc.
+
+    T_K:  int, flt, pandas.Series
+        Temperature in Kelvin (buffer positions are very T-sensitive)
+
+    P_kbar: int, flt, pandas.Series
+        Pressure in Kbar (Buffer positions are slightly sensitive to pressure)
+
+
+
+
+
+
+    model: str
+        "Kress1991" - Uses Kress and Carmichael 1991 to calculate XFe2Fe3 from fo2
+        "Put2016_eq6b" - Uses Putirka (2016) expression to calculate XFe2Fe3 from fo2
+
+    renorm: bool
+        Following excel code of K. Iacovino.
+        If True, renormalizes other oxide concentrations
+        to account for change in total following partitioning of Fe into FeO and Fe2O3.
+
+    Returns
+    -------
+
+    liquid compositions with calculated Fe3Fet_Liq, FeO_Liq, Fe2O3_Liq, and XFe3Fe2.
+
+    '''
+
+    liq_comps_c=liq_comps.copy()
+    mol_frac_hyd_redox=calculate_hydrous_mol_fractions_liquid_redox(liq_comps=liq_comps_c)
+    liq_comps_FeOt=liq_comps_c.copy()
+    liq_comps_FeOt['FeOt_Liq']=liq_comps_FeOt['FeO_Liq']+liq_comps_FeOt['Fe2O3_Liq']*0.8998
+    hyd_mol_frac_test=calculate_hydrous_mol_fractions_liquid(liq_comps=liq_comps_FeOt)
+
+    # Calculating buffer positions from Frost 1991
+
+    To= 1673.15
+
+    logfo2_NNO=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
+    fo2_NNO=10**logfo2_NNO
+
+
+
+    logfo2_QFM=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K
+    fo2_QFM=10**logfo2_QFM
+
+    # This is Ln (XFe2O3/XFeO) from the Kress and Carmichael 1991 paper
+    Z=np.log(mol_frac_hyd_redox['Fe2O3_Liq_mol_frac_hyd']/
+         (mol_frac_hyd_redox['FeO_Liq_mol_frac_hyd']))
+
+    # We've simplified the equatoin down to Z= a ln fo2 + rightside
+
+    rightside=( (11492/T_K)-6.675+((-2.243*mol_frac_hyd_redox['Al2O3_Liq_mol_frac_hyd'])+(-1.828*hyd_mol_frac_test['FeOt_Liq_mol_frac_hyd'])
+    +(3.201*mol_frac_hyd_redox['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd_redox['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd_redox['K2O_Liq_mol_frac_hyd']))
+    -3.36*(1-(To/T_K) - np.log(T_K/To)) -0.000000701*((P_kbar*100000000)/T_K)
+    + -0.000000000154*(((T_K-1673)*(P_kbar*100000000))/T_K) + 0.0000000000000000385*((P_kbar*100000000)**2/T_K)
+    )
+
+    ln_fo2_calc=(Z-rightside)/0.196
+    fo2_calc=np.exp(ln_fo2_calc)
+    # and back to log base 10
+    log_fo2_calc=np.log10(fo2_calc)
+    DeltaQFM=log_fo2_calc-logfo2_QFM
+    DeltaNNO=log_fo2_calc-logfo2_NNO
+
+
+    liq_comps_c.insert(0, 'DeltaQFM', DeltaQFM)
+    liq_comps_c.insert(1, 'DeltaNNO', DeltaNNO)
+    liq_comps_c.insert(2, 'fo2_calc', fo2_calc)
+    return liq_comps_c
+
+## Machine Learning Voting using the old format where things were a pickle
 def get_voting_ExtraTreesRegressor(X, reg):
     voting = []
     for tree in reg.estimators_:
@@ -3990,6 +4139,10 @@ def get_voting_stats_ExtraTreesRegressor(X, reg, central_tendency='aritmetic_mea
     df_voting=pd.DataFrame(voting).T.add_prefix('Tree_')
 
     return  df_stats, df_voting
+
+## Machine learning voting using new pickle format
+
+
 
 
 def classify_phases(filename=None, sheet_name=None, df=None, return_end_members=False, str_to_drop=None):
