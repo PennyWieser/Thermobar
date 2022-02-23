@@ -40,6 +40,10 @@ df_ideal_opx = pd.DataFrame(columns=['SiO2_Opx', 'TiO2_Opx', 'Al2O3_Opx',
 'FeOt_Opx', 'MnO_Opx', 'MgO_Opx', 'CaO_Opx', 'Na2O_Opx', 'K2O_Opx',
 'Cr2O3_Opx'])
 
+df_ideal_gt = pd.DataFrame(columns=['SiO2_Gt', 'TiO2_Gt', 'Al2O3_Gt',
+'Cr2O3_Gt', 'FeOt_Gt', 'MnO_Gt', 'MgO_Gt', 'CaO_Gt', 'K2O_Gt', 'Na2O_Gt',
+'Ni_Gt', 'Ti_Gt', 'Zr_Gt', 'Zn_Gt', 'Ga_Gt', 'Sr_Gt', 'Y_Gt'])
+
 df_ideal_plag = pd.DataFrame(columns=['SiO2_Plag', 'TiO2_Plag', 'Al2O3_Plag',
 'FeOt_Plag', 'MnO_Plag', 'MgO_Plag', 'CaO_Plag', 'Na2O_Plag', 'K2O_Plag',
 'Cr2O3_Plag'])
@@ -75,6 +79,10 @@ df_ideal_sp_Err = pd.DataFrame(columns=['SiO2_Sp_Err', 'TiO2_Sp_Err',
 df_ideal_opx_Err = pd.DataFrame(columns=['SiO2_Opx_Err', 'TiO2_Opx_Err',
 'Al2O3_Opx_Err', 'FeOt_Opx_Err', 'MnO_Opx_Err', 'MgO_Opx_Err', 'CaO_Opx_Err',
  'Na2O_Opx_Err', 'K2O_Opx_Err', 'Cr2O3_Opx_Err', 'P_kbar_Err', 'T_K_Err'])
+
+df_ideal_Gt_Err = pd.DataFrame(columns = ['SiO2_Gt_Err', 'TiO2_Gt_Err', 'Al2O3_Gt_Err',
+'Cr2O3_Gt_Err', 'FeOt_Gt_Err', 'MnO_Gt_Err', 'MgO_Gt_Err', 'CaO_Gt_Err', 'K2O_Gt_Err', 'Na2O_Gt_Err',
+'Ni_Gt_Err', 'Ti_Gt_Err', 'Zr_Gt_Err', 'Zn_Gt_Err', 'Ga_Gt_Err', 'Sr_Gt_Err', 'Y_Gt_Err'])
 
 df_ideal_plag_Err = pd.DataFrame(columns=['SiO2_Plag_Err', 'TiO2_Plag_Err',
 'Al2O3_Plag_Err', 'FeOt_Plag_Err', 'MnO_Plag_Err', 'MgO_Plag_Err',
@@ -227,6 +235,31 @@ oxygen_num_opx = {'SiO2_Opx': 2, 'MgO_Opx': 1, 'FeOt_Opx': 1, 'CaO_Opx': 1,
 oxygen_num_opx_df = pd.DataFrame.from_dict(oxygen_num_opx, orient='index').T
 oxygen_num_opx_df['Sample_ID_Opx'] = 'OxNum'
 oxygen_num_opx_df.set_index('Sample_ID_Opx', inplace=True)
+
+#Pyrope Garnet
+
+oxide_mass_gt = {'SiO2_Gt': 60.0843, 'MgO_Gt': 40.3044, 'FeOt_Gt': 71.8464,
+ 'CaO_Gt': 56.0774, 'Al2O3_Gt': 101.961,'Na2O_Gt': 61.9789,
+ 'K2O_Gt': 94.196, 'MnO_Gt': 70.9375, 'TiO2_Gt': 79.8788,
+ 'Cr2O3_Gt': 151.9982, 'Ni_Gt':  74.6994 * (1.2725*1e-4)}
+
+oxide_mass_gt_df = pd.DataFrame.from_dict(oxide_mass_gt, orient='index').T
+oxide_mass_gt_df['Sample_ID_Gt'] = 'MolWt'
+oxide_mass_gt_df.set_index('Sample_ID_Gt', inplace=True)
+
+oxygen_num_gt = {'SiO2_Gt': 2, 'MgO_Gt': 1, 'FeOt_Gt': 1, 'CaO_Gt': 1,
+'Al2O3_Gt': 3, 'Na2O_Gt': 1, 'K2O_Gt': 1, 'MnO_Gt': 1, 'TiO2_Gt': 2,
+'Cr2O3_Gt': 3, 'Ni_Gt': 1}
+oxygen_num_gt_df = pd.DataFrame.from_dict(oxygen_num_gt, orient = 'index').T
+oxygen_num_gt_df['Sample_ID_Gt'] = 'OxNum'
+oxygen_num_gt_df.set_index('Sample_ID_Gt', inplace=True)
+
+cation_num_gt = {'SiO2_Gt': 1, 'MgO_Gt': 1, 'FeOt_Gt': 1, 'CaO_Gt': 1,
+'Al2O3_Gt': 2, 'Na2O_Gt': 1, 'K2O_Gt': 2, 'MnO_Gt': 1, 'TiO2_Gt': 1,
+'Cr2O3_Gt': 2, 'Ni_Gt': 1}
+cation_num_gt_df = pd.DataFrame.from_dict(cation_num_gt, orient = 'index').T
+cation_num_gt_df['Sample_ID_Gt'] = 'CatNum'
+cation_num_gt_df.set_index('Sample_ID_Gt', inplace=True)
 
 # Plagioclase: Specifying Cation numbers, oxide masses etc.
 cation_num_plag = {'SiO2_Plag': 1, 'MgO_Plag': 1, 'FeOt_Plag': 1, 'CaO_Plag': 1, 'Al2O3_Plag': 2, 'Na2O_Plag': 2,
@@ -969,6 +1002,64 @@ def calculate_cat_fractions_olivine(ol_comps):
                               for col in cat_frac_anhyd.columns]
 
     return cat_frac_anhyd
+
+def calculate_mol_proportions_garnet(gt_comps):
+
+    #Exchanging oxide measurements with element one if it exists.
+
+    for i in range(0,len(gt_comps['SiO2_Gt'])):
+
+        try:
+            gt_comps['TiO2_Gt'][i] = (gt_comps['Ti_Gt'][i] * 1.6685) / 1e4
+        except KeyError:
+            pass
+
+    # This makes the input match the columns in the oxide mass dataframe
+    gt_wt = gt_comps.reindex(oxide_mass_gt_df.columns, axis=1).fillna(0)
+    gt_wt_combo = pd.concat([oxide_mass_gt_df, gt_wt],)
+
+    mol_prop_anhyd = gt_wt_combo.div(
+        gt_wt_combo.loc['MolWt', :], axis='columns').drop(['MolWt'])
+    mol_prop_anhyd.columns = [
+        str(col) + '_mol_prop' for col in mol_prop_anhyd.columns]
+
+    return mol_prop_anhyd
+
+def calculate_fractions_garnet(gt_comps):
+
+    no_oxygen = 12.0
+    mol_prop = calculate_mol_proportions_garnet(gt_comps=gt_comps)
+    mol_prop.columns = [str(col).replace('_mol_prop', '')
+                        for col in mol_prop.columns]
+
+    si_ = np.array(mol_prop['SiO2_Gt']) * 2.0
+    ti_ = np.array(mol_prop['TiO2_Gt']) * 2.0
+    al_ = np.array(mol_prop['Al2O3_Gt']) * 1.5
+    cr_ = np.array(mol_prop['Cr2O3_Gt']) * 1.5
+    fe_ = np.array(mol_prop['FeOt_Gt'])
+    mn_ = np.array(mol_prop['MnO_Gt'])
+    mg_ = np.array(mol_prop['MgO_Gt'])
+    ca_ = np.array(mol_prop['CaO_Gt'])
+    na_ = np.array(mol_prop['Na2O_Gt']) * 0.5
+    ni_ = np.array(mol_prop['Ni_Gt'])
+    k_ = np.array(mol_prop['K2O_Gt']) * 0.5
+
+    sum_oxygens = si_ + ti_ + al_ + cr_ + fe_ +\
+    mn_ + mg_ + ca_ + na_ + ni_ + k_
+
+    mg_cat = (mg_ * no_oxygen) / sum_oxygens
+    fe_cat = (fe_ * no_oxygen) / sum_oxygens
+    ca_cat = (ca_ * no_oxygen) / sum_oxygens
+    al_cat = (al_ * no_oxygen) / sum_oxygens
+    cr_cat = (cr_ * no_oxygen) / sum_oxygens
+
+    xMg = mg_cat / (mg_cat + fe_cat + ca_cat)
+    xCa = ca_cat / (mg_cat + fe_cat + ca_cat)
+    xFe = fe_cat / (mg_cat + fe_cat + ca_cat)
+    xAl = al_cat / (al_cat + cr_cat)
+    xCr = cr_cat / (al_cat + cr_cat)
+
+    return xMg, xCa, xFe, xAl, xCr
 
 ## Orthopyroxene mole proportions, fractions, cation proportions and fractions
 
@@ -4281,7 +4372,6 @@ def classify_phases(filename=None, sheet_name=None, df=None, return_end_members=
 
 
     return Oxides_out
-
 
 
 def check_consecative(df):
