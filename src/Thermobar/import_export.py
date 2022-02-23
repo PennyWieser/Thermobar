@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from functools import partial
@@ -300,8 +299,8 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
    Parameters
     -------
 
-    filename: pExcel file
-        Excel file of oxides in wt% with columns labelled SiO2_Liq, SiO2_Ol, SiO2_Cpx etc.
+    filename: .xlsx, .csv, .xls file
+        Compositional data as an Excel spreadsheet (.xlsx, .xls) or a comma separated values (.csv) file with columns labelled SiO2_Liq, SiO2_Ol, SiO2_Cpx etc, and each row corresponding to an analysis.
 
     filename: str
         specifies the file name (e.g., Python_OlLiq_Thermometers_Test.xlsx)
@@ -332,7 +331,10 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
             my_input = pd.read_excel(filename)
             #my_input[my_input < 0] = 0
 
-
+    if suffix is not None:
+        if any(my_input.columns.str.contains(suffix)):
+            w.warn('We notice you have specified a suffix, but some of your columns already have this suffix. '
+        'e.g., If you already have _Liq in the file, you shouldnt specify suffix="_Liq" during the import')
 
 
     my_input_c = my_input.copy()
@@ -387,6 +389,8 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
         " thermobar only recognises columns with FeOt for all phases except liquid"
         " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")
 
+    if any(my_input.columns.str.contains("FeOT_")) and (all(my_input.columns.str.contains("FeOt_")==False)):
+        raise ValueError("No FeOt column found. You've got a column heading with FeOT. Change to a lower case t")
 
 
 
@@ -462,6 +466,23 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
         myAmphs1['Sample_ID_Amp'] = my_input_c['Sample_ID_Amp']
     else:
         myAmphs1['Sample_ID_Amp'] = my_input.index
+
+    if "Sample_ID_Ol" in my_input_c:
+        myOls1['Sample_ID_Ol'] = my_input_c['Sample_ID_Ol']
+    else:
+        myOls1['Sample_ID_Ol'] = my_input.index
+
+
+    if "Sample_ID_Kspar" in my_input_c:
+        myKspars1['Sample_ID_Kspar'] = my_input_c['Sample_ID_Kspar']
+    else:
+        myKspars1['Sample_ID_Kspar'] = my_input.index
+
+    if "Sample_ID_Sp" in my_input_c:
+        mySps1['Sample_ID_Sp'] = my_input_c['Sample_ID_Sp']
+    else:
+        mySps1['Sample_ID_Sp'] = my_input.index
+
 
     # if "P_kbar" in my_input:
     #     myAmphs1['P_kbar'] = my_input['P_kbar']
@@ -688,7 +709,7 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
 # Gets liquid dataframe into a format that can be used in VESical. Have to
 # have VESIcal installed for the final step, which we do in the script for
 # simplicity
-def convert_to_vesical(liq_comps, T1):
+def convert_to_vesical(liq_comps, T1, Fe3Fet_Liq=None):
     ''' Takes liquid dataframe in the format used for PyMME, and strips the _Liq string so that it can be input into VESical. Also removes the Fe3FeTcolumn, and appends temperature (converted from Kevlin to celcius)
 
 
@@ -707,8 +728,17 @@ def convert_to_vesical(liq_comps, T1):
     '''
     df = liq_comps.copy()
     df['Temp'] = T1 - 273.15
-    df.drop('Fe3Fet_Liq', inplace=True, axis=1)
+    if Fe3Fet_Liq is None:
+        Fe3Fet_Liq=df['Fe3Fet_Liq']
+    FeOt=df['FeOt_Liq']
+    df.drop(['Fe3Fet_Liq', 'FeOt_Liq'], inplace=True, axis=1)
     df.columns = [str(col).replace('_Liq', '') for col in df.columns]
+
+    df['FeO']=FeOt*(1-Fe3Fet_Liq)
+    df['Fe2O3']=FeOt*Fe3Fet_Liq*1.111111
+
+
+    # This bit gets rid of Fe3Fet_Liq
     return df
 
 

@@ -8,7 +8,8 @@ from functools import partial
 import inspect
 import warnings as w
 import numbers
-
+import ternary
+from scipy import interpolate
 
 
 # This has the core calculations, e.g., molar fractions, cation fractions etc.
@@ -25,8 +26,10 @@ from Thermobar.olivine_liquid_olivine_spinel_thermometry import *
 from Thermobar.noise_averaging import *
 # This has functions for orthopyroxene thermobarometry
 from Thermobar.orthopyroxene_thermobarometry import *
-# This has functions for orthopyroxene thermobarometry
+# This has functions for clinopyroxene thermobarometry
 from Thermobar.clinopyroxene_thermobarometry import *
+# This has functions for clinopyroxene thermobarometry
+from Thermobar.Nimis_1999 import *
 # This has functions for two-pyroxene thermobarometry
 from Thermobar.two_pyroxene import *
 # Feldspar functions
@@ -37,7 +40,11 @@ from Thermobar.amphibole import *
 from Thermobar.plotting import *
 # Viscosity
 from Thermobar.viscosity import *
+# calibration
+from Thermobar.calibration_plots import *
+
 # version
 from ._version import __version__
+
 
 

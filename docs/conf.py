@@ -83,6 +83,9 @@ nbsphinx_prolog = r"""
 
             Interactive online version:
             <a href="https://mybinder.org/v2/gh/PennyWieser/Thermobar/{{ git_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.
+    </p>
+    <p>
+    <a class="reference download internal" download="" href="https://github.com/PennyWieser/Thermobar/blob/{{ git_ref|e }}/{{ docname|e }}"><code class="xref download docutils literal notranslate"><span class="pre">Python</span> <span class="pre">Notebook</span> <span class="pre">Download</span></code></a>
       </p>
       <script>
         if (document.location.host) {

@@ -50,6 +50,11 @@ jobs:
     - name: Build
       run: |
         python setup.py sdist bdist_wheel
+        
+    - uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: dist
 
 #     - name: Publish to Test PyPI (always)
 #       uses: pypa/gh-action-pypi-publish@master

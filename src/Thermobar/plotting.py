@@ -16,10 +16,6 @@ def std_dev(x, x2):
     RMSE=np.sqrt((1/N)*sum_squares)
     return RMSE
 
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from scipy import stats
 
 def Tukey_calc(x,y): #, name):
     x=pd.Series(x)
@@ -113,7 +109,7 @@ def calculate_R2_Tukey(x, y):
     #R="R\N{SUPERSCRIPT TWO} = " +  str(np.round(r2_score(regy, Y_pred), 2))
     R=(np.round(r2_score(regy, Y_pred), 2))
     RMSE=std_dev(regx, regy)
-    RMSEp=np.round(RMSE, 2)
+    RMSEp=np.round(RMSE, 1)
     Median=np.nanmedian(regy-regx)#
     Medianp=np.round(Median, 2)
     Mean=np.nanmean(regy-regx)
@@ -275,6 +271,29 @@ def Experimental_av_values(LEPRin, calc, name):
     df1_M.insert(0, "No. of Exp. averaged",  df1_S['st_dev_N'])
     df1_M.insert(1, "std_P_kbar_calc",  df1_S['st_dev_P_kbar_calc'])
     return df1_M
+
+def calculate_average_values2(LEPRin, calc, name):
+    ExperimentNumbers=LEPRin[name].unique()
+
+    for exp in ExperimentNumbers:
+        dff_M=calc.loc[LEPRin[name]==exp].mean(axis=0)
+        dff_Med=calc.loc[LEPRin[name]==exp].median(axis=0)
+        dff_SD=calc.loc[LEPRin[name]==exp].std(axis=0)
+        mean_H2O=np.nanmean(LEPRin.loc[LEPRin[name]==exp, 'H2O_Liq'])
+        #Sample_ID=LEPRin.loc[LEPRin[name]==exp, ''].iloc[0]
+        P_Exp=np.nanmean(LEPRin.loc[LEPRin[name]==exp, 'P_kbar_x'])
+        T_Exp=np.nanmean(LEPRin.loc[LEPRin[name]==exp, 'T_K_x'])
+        Exp=exp
+        NExp=len(LEPRin.loc[LEPRin[name]==exp, 'P_kbar_x'])
+        df=pd.DataFrame(data={'Mean': dff_M, 'Median': dff_Med, 'Std': dff_SD,
+                               'P_Exp': P_Exp, 'Av_H2O_Exp': mean_H2O, 'T_Exp': T_Exp, 'Exp': exp, 'NExp': NExp}, index=[0])
+
+        if exp==ExperimentNumbers[0]:
+            df1_M=df
+        else:
+            df1_M=pd.concat([df1_M, df],  sort=False)
+    return df1_M
+
 def Experimental_av_plot(LEPRin, calc, name="name"):
  # before, was Experiment_P_Name_y rather than name
     ExperimentNumbers=LEPRin[name].unique()
