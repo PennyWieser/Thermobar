@@ -39,6 +39,7 @@ Welcome to Thermobar's documentation!
    Examples/Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_thermometry
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_hygrometry
+
    %
 .. toctree::
    :maxdepth: 2
@@ -101,8 +102,10 @@ Welcome to Thermobar's documentation!
    %
 .. toctree::
    :maxdepth: 2
-   :caption:  Integration with VESIcal
+   :caption:  Melt Inclusion
 
+   Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg#_Eq_MultipleSamples
+   Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg#_Eq_SingleSamples
    Examples/Integration_with_VESIcal/Combining_VESIcal_Thermobar_SatPs
 
 .. toctree::
