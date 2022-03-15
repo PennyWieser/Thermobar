@@ -38,7 +38,8 @@ setup(
             'scipy',
             'statsmodels',
             'openpyxl',
-            'skl2onnx'
+            'skl2onnx',
+            'onnxruntime'
             ],
     classifiers=[
         "Programming Language :: Python :: 3",
