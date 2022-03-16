@@ -104,8 +104,8 @@ Welcome to Thermobar's documentation!
    :maxdepth: 2
    :caption:  Melt Inclusion
 
-   Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg#_Eq_MultipleSamples
-   Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg#_Eq_SingleSamples
+   Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg_Fe_Eq_MultipleSamples
+   Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg_Fe_Eq_SingleSamples
    Examples/Integration_with_VESIcal/Combining_VESIcal_Thermobar_SatPs
 
 .. toctree::
