@@ -50,6 +50,9 @@ def return_cali_dataset(model=None):
     if model=="Putirka2016":
         with open(Thermobar_dir/'Putirka16_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
+            Cali_input['F_Amp']=0
+            Cali_input['Cl_Amp']=0
+
 
     if model=="Mutch2016":
         with open(Thermobar_dir/'Mutch_Cali_input.pkl', 'rb') as f:
