@@ -3982,12 +3982,13 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
 
     '''
     if isinstance(fo2, str):
-        if fo2=="NNO":
+        fo2_int=fo2
+        if fo2_int=="NNO":
         # Buffer position from frost (1991)
             logfo2=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K+fo2_offset
             fo2=10**logfo2
 
-        if fo2=="QFM":
+        if fo2_int=="QFM":
         # Buffer position from frost (1991)
             logfo2=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K+fo2_offset
             fo2=10**logfo2
@@ -4004,8 +4005,8 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
         +(3.201*mol_frac_hyd['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd['K2O_Liq_mol_frac_hyd']))
         -3.36*(1-(To/T_K) - np.log(T_K/To)) -0.000000701*((P_kbar*100000000)/T_K)
          + -0.000000000154*(((T_K-1673)*(P_kbar*100000000))/T_K) + 0.0000000000000000385*((P_kbar*100000000)**2/T_K))
-        print(ln_XFe2FeO3_XFeO)
-        print(fo2)
+        #print(ln_XFe2FeO3_XFeO)
+        #print(fo2)
 
     if model=="Put2016_eq6b":
         ln_XFe2FeO3_XFeO=(-6.35+10813.8/T_K + 0.19*np.log(fo2)+ 12.4*(mol_frac_hyd['Na2O_Liq_mol_frac_hyd']

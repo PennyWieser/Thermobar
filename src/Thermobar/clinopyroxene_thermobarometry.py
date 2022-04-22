@@ -2195,7 +2195,13 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
             plt.xlabel('P_kbar')
             plt.xlim([-3, 16])
 
-    return cpx_comps_c
+    cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Petrelli21', 'T_Petrelli21_H2O',
+    'P_Petrelli21_H2O', 'T_Put_Teq32d_Peq32a', 'T_Put_Teq32d_Peq32b', 'P_Petrelli21',
+    'P_Put_Teq32d_Peq32a', 'P_Put_Teq32d_Peq32b']
+    cpx_comps_c_move = cpx_comps_c[cols_to_move + [
+        col for col in cpx_comps_c.columns if col not in cols_to_move]]
+
+    return cpx_comps_c_move
 ## Function for calculating Cpx-only temperature
 Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol,
 T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O, T_Put2008_eq32dH_Wang2021adap}

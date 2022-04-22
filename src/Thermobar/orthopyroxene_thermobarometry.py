@@ -801,7 +801,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     if equationP is not None and equationT is not None:
 
         PT_out = calculate_opx_liq_press_temp(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
-        print(PT_out)
+        #print(PT_out)
         P_guess = PT_out['P_kbar_calc'].astype('float64')
         T_K_guess = PT_out['T_K_calc'].astype('float64')
         Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
