@@ -736,7 +736,7 @@ def calculate_Leake_Diagram_Class(amp_comps):
 
 def plot_amp_class_Leake(amp_comps, fontsize=8, color=[0.3, 0.3, 0.3],
 linewidth=0.5, lower_text=0.3, upper_text=0.7, text_labels=True, site_check=True,
-plots="Ca_Amphiboles", marker='.k'):
+plots="Ca_Amphiboles", marker='.k', dpi=300):
 
 
     cat_23ox=calculate_23oxygens_amphibole(amp_comps)
@@ -760,8 +760,9 @@ plots="Ca_Amphiboles", marker='.k'):
             #print(str(sum(low_NaK_A=))+ " amphiboles have Na_A+K_A<1.5, so arent shown on this plot")
             w.warn(str(sum(low_NaK_A))+ " of your amphiboles have Na_A+K_A>0.5"
             " so shouldn\'t be plotted on this diagram based on Leake. site_check=True filters these out, but youve choosen site_check is False", stacklevel=2)
+        plt.rcParams['figure.dpi'] = dpi
+        fig, (ax1) = plt.subplots(1, 1, figsize = (7,5), dpi=dpi)
 
-        fig, (ax1) = plt.subplots(1, 1, figsize = (7,5))
 
         ax1.plot(cat_23ox['Si_Amp_cat_23ox'], cat_23ox['Mgno_Amp'], 'ok')
         add_Leake_Amp_Fields_Fig3bot(ax1, fontsize=fontsize, color=color,
