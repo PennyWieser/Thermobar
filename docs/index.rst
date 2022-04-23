@@ -51,7 +51,7 @@ Welcome to Thermobar's documentation!
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liq_Thermobarometry
    Examples/Cpx_Cpx_Liq_Thermobarometry/Pyroxene_Ternary_Cpx_Example
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liquid_melt_matching/Cpx_MeltMatch1_Gleeson2020
-   Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_MeltMatch2_ScruggsPutirka2018
+   Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liquid_melt_matching/Cpx_MeltMatch2_ScruggsPutirka2018
 
 
 .. toctree::
@@ -105,11 +105,22 @@ Welcome to Thermobar's documentation!
    %
 .. toctree::
    :maxdepth: 2
-   :caption:  Melt Inclusion
+   :caption:  Melt Inclusions
 
    Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg_Fe_Eq_MultipleSamples
    Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg_Fe_Eq_SingleSamples
    Examples/Integration_with_VESIcal/Combining_VESIcal_Thermobar_SatPs
+
+   %
+.. toctree::
+   :maxdepth: 2
+   :caption:  Other useful functions
+
+   Examples/Mineral_Eq_Contents_from_LLD/Calculating_Eq_Min_Contents
+   Examples/Other_features/Calculating_Viscosity
+   Examples/Other_features/oxide_to_wtperc
+   Examples/Other_features/fo2_to_Fe3FeT
+
 
 .. toctree::
    :maxdepth: 2
