@@ -116,7 +116,9 @@ Welcome to Thermobar's documentation!
    :maxdepth: 2
    :caption:  Other Functions
 
+
    Examples/Mineral_Eq_Contents_from_LLD/Calculating_Eq_Min_Contents
+   Examples/Other_features/Calibration_Plot_Examples
    Examples/Other_features/Calculating_Viscosity
    Examples/Other_features/oxide_to_wtperc
    Examples/Other_features/fo2_to_Fe3FeT
