@@ -428,19 +428,23 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None,
 
                                 })
     sum_element=wt_perc2.sum(axis=1)
-    Oxy=100-sum_element
-    wt_perc2['O_wt_make_to_100']=Oxy
+
+
 
 
 
     if without_oxygen is True:
         wt_perc3=wt_perc2.div(sum_element/100,  axis=0)
         wt_perc3=wt_perc3.add_suffix('_noO2')
-
         return wt_perc3
-
-    else:
+    if without_oxygen is False:
+        Oxy=100-sum_element
+        wt_perc2['O_wt_make_to_100']=Oxy
         return wt_perc2
+
+
+
+
 
 
 
@@ -4143,8 +4147,6 @@ def convert_fe_partition_to_fo2(*, liq_comps, T_K, P_kbar,  model="Kress1991", r
 
     P_kbar: int, flt, pandas.Series
         Pressure in Kbar (Buffer positions are slightly sensitive to pressure)
-
-
 
 
 
