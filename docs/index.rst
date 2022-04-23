@@ -114,7 +114,7 @@ Welcome to Thermobar's documentation!
    %
 .. toctree::
    :maxdepth: 2
-   :caption:  Other useful functions
+   :caption:  Other Functions
 
    Examples/Mineral_Eq_Contents_from_LLD/Calculating_Eq_Min_Contents
    Examples/Other_features/Calculating_Viscosity
