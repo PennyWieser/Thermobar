@@ -5,9 +5,9 @@ from functools import partial
 import inspect
 import warnings as w
 import numbers
-from Thermobar.import_export import *
 from pathlib import Path
 Thermobar_dir=Path(__file__).parent
+from Thermobar.import_export import *
 from Thermobar.core import *
 
 def convert_F2O_to_F_ppm(F2O_wt=None):
