@@ -3963,8 +3963,9 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
         Pressure in Kbar (Buffer positions are slightly sensitive to pressure)
 
     fo2:  str ("QFM", "NNO") or int, flt, pandas.Series
-        Either a value of fo2 (enter 10*logfo2), or buffer position.
+        Either a value of fo2 (enter 10*logfo2), or buffer position as a string
         So far, includes QFM or NNO
+        fo2 in bars.
 
     fo2_offset: int, flt, pandas.Series
         log units offset from buffer, e.g., could specify fo2=QFM, fo2_offset=1
