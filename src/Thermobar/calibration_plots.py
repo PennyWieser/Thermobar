@@ -22,9 +22,10 @@ def return_cali_dataset(model=None):
 
     model: str
         AMPHIBOLE:
-        Ridolfi2021:  Ridolfi et al. (2012)
+        Ridolfi2021:  Ridolfi et al. (2021)
         Putirka2016:  Putirka (2016)
         Mutch2016: Mutch et al. (2016)
+        Zhang2017: Zhang et al. (2017)
 
         CPX:
         Putirka2008: Putirka (2008) - entire database for Cpx-Liq,
@@ -34,8 +35,7 @@ def return_cali_dataset(model=None):
         Brugman2019: Brugman and Till 2019
         Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
         Wang2021: Wang et al. (2021) Cpx-only,but contains Liq compositions too.
-
-
+        Jorgenson2022: Jorgenson et al. (2022) Cpx-Liq and Cpx-only,
 
         PLAGIOCLASE
         Waters2015: Waters and Lange (2015) for plag-liq hygrometry
@@ -46,6 +46,12 @@ def return_cali_dataset(model=None):
     if model=="Ridolfi2021":
         with open(Thermobar_dir/'Ridolfi_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
+
+    if model=="Zhang2017":
+        with open(Thermobar_dir/'Zhang17_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+            Cali_input['F_Amp']=0
+            Cali_input['Cl_Amp']=0
 
     if model=="Putirka2016":
         with open(Thermobar_dir/'Putirka16_Cali_input.pkl', 'rb') as f:
@@ -83,6 +89,10 @@ def return_cali_dataset(model=None):
         with open(Thermobar_dir/'Masotta_2013_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
 
+    if model=="Jorgenson2022":
+        with open(Thermobar_dir/'Jorgenson2022_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
     # Plag models
 
     if model=="Waters2015":
@@ -96,7 +106,8 @@ def return_cali_dataset(model=None):
 
 def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, figsize=(7, 5),
  shape_cali='o', mfc_cali='white', mec_cali='k', ms_cali=5,
- shape_data='^', mfc_data='red', alpha_cali=1, alpha_data=1, mec_data='k', ms_data=10, order="cali bottom"):
+ shape_data='^', mfc_data='red', alpha_cali=1, alpha_data=1, mec_data='k',
+ ms_data=10, order="cali bottom", save_fig=False, fig_name=None,  dpi=200):
 
     """
     This function plots your compositions amongst the calibration dataset for a variety of models where we could
@@ -116,6 +127,8 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         Ridolfi2021:  Ridolfi et al. (2012)
         Putirka2016:  Putirka (2016)
         Mutch2016: Mutch et al. (2016)
+        Zhang2017: Zhang et al. (2017)
+
 
         CPX:
         Putirka2008: Putirka (2008) - entire database for Cpx-Liq,
@@ -125,6 +138,7 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         Brugman2019: Brugman and Till 2019
         Petrelli2020:  Petrelli et al. (2020) for Cpx and Cpx-Liq
         Wang2021: Wang et al. (2021) Cpx-only,but contains Liq compositions too.
+        Jorgenson2022: Jorgenson et al. (2022) Cpx-Liq and Cpx-only,
 
         PLAGIOCLASE
         Waters2015: Waters and Lange (2015) for plag-liq hygrometry
@@ -159,21 +173,20 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
     alpha_cali, alpha_data:
         transparency of symbols
 
-
-
-    liq_comps: pandas DataFrame
-        liquid compositions (SiO2_Liq, TiO2_Liq etc.)
+    save_fig: bool
+        if True, saves figure
+        Uses fig_name to give filename,  dpi to give dpi
 
 
     """
 
     #df_c=df.copy()
-    if model=="Ridolfi2021" or model=="Putirka2016" or model=="Mutch2016":
+    if model=="Ridolfi2021" or model=="Putirka2016" or model=="Mutch2016" or model=="Zhang2017":
         Amp_sites=calculate_sites_ridolfi(amp_comps=df)
         df_c=pd.concat([df, Amp_sites], axis=1)
 
 
-    if model=="Petrelli2020" or model=="Wang2021" or model=="Putirka2008" or model=="Neave2017" or model=="Brugman2019" or model=="Masotta2013":
+    if model=="Petrelli2020" or model=="Wang2021" or model=="Putirka2008" or model=="Neave2017" or model=="Brugman2019" or model=="Masotta2013" or model=="Jorgenson2022":
         if "Jd" not in df:
             Cpx_sites=calculate_clinopyroxene_components(cpx_comps=df)
             df_c=Cpx_sites
@@ -197,6 +210,11 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
     if model=="Mutch2016":
         with open(Thermobar_dir/'Mutch_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
+
+    if model=="Zhang2017":
+        with open(Thermobar_dir/'Zhang17_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+            Cali_input['F_Amp']=0
 
     # Cpx model
     if model=="Wang2021":
@@ -223,6 +241,10 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         with open(Thermobar_dir/'Masotta_2013_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
 
+    if model=="Jorgenson2022":
+        with open(Thermobar_dir/'Jorgenson2022_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+            Cali_input['Cl_Amp']=0
 
     # Plag models
 
@@ -257,7 +279,7 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         zorder_cali=5
         zorder_data=0
     ax1.plot(df_c[x], df_c[y], shape_data,
-    mfc=mfc_data, mec=mec_data, ms=ms_data, alpha=alpha_data, label='Data', zorder=zorder_cali)
+    mfc=mfc_data, mec=mec_data, ms=ms_data, alpha=alpha_data, label='User Data', zorder=zorder_cali)
 
     ax1.plot(Cali_input[x], Cali_input[y], shape_cali,
     mfc=mfc_cali, mec=mec_cali, ms=ms_cali, alpha=alpha_cali, label=model, zorder=zorder_data)
@@ -267,6 +289,9 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
     ax1.legend()
     ax1.set_xlabel(xlabel)
     ax1.set_ylabel(ylabel)
+
+    if save_fig is True:
+        fig.savefig(fig_name, dpi=200)
 
     return fig
 

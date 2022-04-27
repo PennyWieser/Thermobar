@@ -709,7 +709,7 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
 # Gets liquid dataframe into a format that can be used in VESical. Have to
 # have VESIcal installed for the final step, which we do in the script for
 # simplicity
-def convert_to_vesical(liq_comps, T1, Fe3Fet_Liq=None):
+def convert_to_vesical(liq_comps, T1, unit='Kelvin', Fe3Fet_Liq=None):
     ''' Takes liquid dataframe in the format used for PyMME, and strips the _Liq string so that it can be input into VESical. Also removes the Fe3FeTcolumn, and appends temperature (converted from Kevlin to celcius)
 
 
@@ -719,7 +719,10 @@ def convert_to_vesical(liq_comps, T1, Fe3Fet_Liq=None):
         DataFrame of liquid compositions.
 
     T1: Panda series, int, float
-        Temperature in Kelvin (e.g., from a thermometer of choice)
+        Temperature in Kelvin by default (e.g., from a thermometer of choice)
+
+    unit: Kelvin or Celcius
+        What unit supplied temperature is in
 
    Returns
     -------
@@ -727,7 +730,10 @@ def convert_to_vesical(liq_comps, T1, Fe3Fet_Liq=None):
 
     '''
     df = liq_comps.copy()
-    df['Temp'] = T1 - 273.15
+    if unit is Kelvin:
+        df['Temp'] = T1 - 273.15
+    else:
+        df['Temp'] = T1
     if Fe3Fet_Liq is None:
         Fe3Fet_Liq=df['Fe3Fet_Liq']
     FeOt=df['FeOt_Liq']

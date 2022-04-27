@@ -760,7 +760,7 @@ plots="Ca_Amphiboles", marker='.k', dpi=300):
             #print(str(sum(low_NaK_A=))+ " amphiboles have Na_A+K_A<1.5, so arent shown on this plot")
             w.warn(str(sum(low_NaK_A))+ " of your amphiboles have Na_A+K_A>0.5"
             " so shouldn\'t be plotted on this diagram based on Leake. site_check=True filters these out, but youve choosen site_check is False", stacklevel=2)
-        plt.rcParams['figure.dpi'] = dpi
+
         fig, (ax1) = plt.subplots(1, 1, figsize = (7,5), dpi=dpi)
 
 

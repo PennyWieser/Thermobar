@@ -20,6 +20,9 @@ import onnxruntime as rt
 from Thermobar.core import *
 from Thermobar.Nimis_1999 import *
 
+# Machine learning training scripts are in the src/Thermobar folder, both traditional and onnx.
+
+
 
 ## Equations for Cpx-Liquid Barometry written as functions
 
@@ -256,13 +259,13 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     return df_stats
 
-def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
+def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
-    Clinopyroxene-liquid  barometer of Petrelli et al. (2021) based on
+    Clinopyroxene-liquid  barometer of Jorgenson et al. (2022) based on
     Machine Learning.
-    :cite:`petrelli2020machine`
+    :cite:`jorgenson2021machine`
 
-    SEE==+-2.6 kbar
+    SEE==+-2.7 kbar
     '''
     if meltmatch is None:
         cpx_test=cpx_comps.copy()
@@ -302,17 +305,17 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     x_test=Cpx_Liq_ML_in.values
 
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq_Jan22.pkl', 'rb') as f:
-        scaler_P2020_Cpx_Liq=load(f)
+    with open(Thermobar_dir/'scaler_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
+        scaler_J22_Cpx_Liq=load(f)
 
-    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Liq_Jan22.pkl', 'rb') as f:
-        ETR_Press_P2020_Cpx_Liq=joblib.load(f)
+    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
+        ETR_Press_J22_Cpx_Liq=joblib.load(f)
 
 
-    x_test_scaled=scaler_P2020_Cpx_Liq.transform(x_test)
-    Pred_P_kbar=ETR_Press_P2020_Cpx_Liq.predict(x_test_scaled)
+    x_test_scaled=scaler_J22_Cpx_Liq.transform(x_test)
+    Pred_P_kbar=ETR_Press_J22_Cpx_Liq.predict(x_test_scaled)
 
-    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_Liq)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_J22_Cpx_Liq)
     df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
 
 
@@ -603,6 +606,70 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     return df_stats
 
+
+def T_Jorgenson2022_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
+    '''
+    Clinopyroxene-liquid  thermometer of Jorgenson et al. (2022) based on
+    Machine Learning.
+    :cite:`jorgenson2021machine`
+
+    SEE==+-44.9°C
+    '''
+    if meltmatch is None:
+        cpx_test=cpx_comps.copy()
+        liq_test=liq_comps.copy()
+        cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
+
+    if meltmatch is not None:
+        cpx_liq_combo=meltmatch
+
+
+
+    Cpx_Liq_ML_in=pd.DataFrame(data={
+                                'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
+                                'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
+                                'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
+                                'FeOt_Liq': cpx_liq_combo['FeOt_Liq'],
+                                'MnO_Liq': cpx_liq_combo['MnO_Liq'],
+                                'MgO_Liq': cpx_liq_combo['MgO_Liq'],
+                                'CaO_Liq': cpx_liq_combo['CaO_Liq'],
+                                'Na2O_Liq': cpx_liq_combo['Na2O_Liq'],
+                                'K2O_Liq': cpx_liq_combo['K2O_Liq'],
+                                'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
+                                'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
+                                'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
+                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
+                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
+
+    })
+
+
+    x_test=Cpx_Liq_ML_in.values
+
+    # Old version using pickles
+    with open(Thermobar_dir/'scaler_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
+        scaler_J22_Cpx_Liq=load(f)
+
+    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
+        ETR_Temp_J22_Cpx_Liq=joblib.load(f)
+
+    x_test_scaled=scaler_J22_Cpx_Liq.transform(x_test)
+    Pred_T_K=ETR_Temp_J22_Cpx_Liq.predict(x_test_scaled)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_J22_Cpx_Liq)
+    df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+
+    return df_stats
+
+
+
 def T_Petrelli2020_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
     Clinopyroxene-liquid  thermometer of Petrelli et al. (2021) based on
@@ -813,6 +880,45 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
     return P_kbar
 
 
+def P_Jorgenson2022_Cpx_only(T=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  barometer of Jorgenson et al. (2022) based on
+    Machine Learning.
+    :cite:`jorgenson2021machine`
+
+    SEE==+-3.2 kbar
+    '''
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+
+    })
+
+    x_test=Cpx_test_noID_noT.values
+
+
+    with open(Thermobar_dir/'scaler_Jorg21_Cpx_only_April24.pkl', 'rb') as f:
+        scaler_J21_Cpx_only=load(f)
+
+    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_only_April24.pkl', 'rb') as f:
+        ETR_Press_J21_Cpx_only=joblib.load(f)
+
+
+    x_test_scaled=scaler_J21_Cpx_only.transform(x_test)
+    Pred_P_kbar=ETR_Press_J21_Cpx_only.predict(x_test_scaled)
+
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_J21_Cpx_only)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+    return df_stats
+
 def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
     '''
     Clinopyroxene-only  barometer following the Machine learning approach of
@@ -849,6 +955,67 @@ def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
     Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
     df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
     df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+    return df_stats
+
+def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
+    '''
+    Clinopyroxene-liquid  barometer of Jorgenson et al. (2022) based on
+    Machine Learning.
+    :cite:`jorgenson2021machine`
+
+    SEE==+-2.7 kbar
+    '''
+    if meltmatch is None:
+        cpx_test=cpx_comps.copy()
+        liq_test=liq_comps.copy()
+        cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
+
+    if meltmatch is not None:
+        cpx_liq_combo=meltmatch
+
+
+
+    Cpx_Liq_ML_in=pd.DataFrame(data={
+                                'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
+                                'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
+                                'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
+                                'FeOt_Liq': cpx_liq_combo['FeOt_Liq'],
+                                'MnO_Liq': cpx_liq_combo['MnO_Liq'],
+                                'MgO_Liq': cpx_liq_combo['MgO_Liq'],
+                                'CaO_Liq': cpx_liq_combo['CaO_Liq'],
+                                'Na2O_Liq': cpx_liq_combo['Na2O_Liq'],
+                                'K2O_Liq': cpx_liq_combo['K2O_Liq'],
+                                'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
+                                'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
+                                'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
+                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
+                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
+    })
+
+
+    x_test=Cpx_Liq_ML_in.values
+
+    with open(Thermobar_dir/'scaler_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
+        scaler_J22_Cpx_Liq=load(f)
+
+    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
+        ETR_Press_J22_Cpx_Liq=joblib.load(f)
+
+
+    x_test_scaled=scaler_J22_Cpx_Liq.transform(x_test)
+    Pred_P_kbar=ETR_Press_J22_Cpx_Liq.predict(x_test_scaled)
+
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_J22_Cpx_Liq)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
 
     return df_stats
 
@@ -1038,6 +1205,42 @@ def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
 
     return df_stats
 
+def T_Jorgenson2022_Cpx_only(P=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  thermometer of Jorgenson et al (2022) based on
+    Machine Learning.
+    :cite:`jorgenson2021machine`
+
+    SEE==+-51°C
+    '''
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+
+    })
+
+    x_test=Cpx_test_noID_noT.values
+
+    with open(Thermobar_dir/'scaler_Jorg21_Cpx_only_April24.pkl', 'rb') as f:
+        scaler_J22_Cpx_only=load(f)
+
+    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_only_April24.pkl', 'rb') as f:
+        ETR_Temp_J22_Cpx_only=joblib.load(f)
+
+    x_test_scaled=scaler_J22_Cpx_only.transform(x_test)
+    Pred_T_K=ETR_Temp_J22_Cpx_only.predict(x_test_scaled)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_J22_Cpx_only)
+    df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+    return df_stats
+
 def T_Petrelli2020_Cpx_only_onnx(P=None, *, cpx_comps):
     '''
     Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
@@ -1120,6 +1323,7 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
 Cpx_Liq_P_funcs = {P_Put1996_eqP1, P_Mas2013_eqPalk1, P_Put1996_eqP2, P_Mas2013_eqPalk2,
 P_Put2003, P_Put2008_eq30, P_Put2008_eq31, P_Put2008_eq32c, P_Mas2013_eqalk32c,
 P_Mas2013_Palk2012, P_Wieser2021_H2O_indep, P_Neave2017, P_Petrelli2020_Cpx_Liq,
+P_Jorgenson2022_Cpx_Liq,
 P_Petrelli2020_Cpx_Liq_onnx,
 P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
 P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA} # put on outside
@@ -1157,6 +1361,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         |  P_Put2008_eq32c (T-dep, H2O-dep)
         |  P_Mas2013_eqalk32c (T-dep, H2O-dep, alk adaption of 32c)
         |  P_Petrelli2020_Cpx_Liq (Returns voting)
+        |  P_Jorgenson2022_Cpx_Liq (Returns voting)
         |  P_Petrelli2020_Cpx_Liq_onnx (Uses onnx, so consistent results, no voting)
         |  P_Wang2021_eq1
 
@@ -1210,6 +1415,9 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         if Fe3Fet_Liq is not None:
             liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
+    if 'Jorgenson' in equationP:
+        liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
+
 
     if equationP == "P_Mas2013_eqalk32c" or equationP == "P_Mas2013_eqPalk2" or equationP == "P_Mas2013_eqPalk1":
         if liq_comps is not None and np.max(liq_comps_c['Fe3Fet_Liq']) > 0:
@@ -1238,11 +1446,11 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
             print('Youve selected a T-independent function')
     # Easiest to treat Machine Learning ones differently
 
-    if equationP == "P_Petrelli2020_Cpx_Liq_onnx":
-        P_kbar=P_Petrelli2020_Cpx_Liq_onnx(meltmatch=Combo_liq_cpxs)
+    if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" in equationP:
+        P_kbar=func(meltmatch=Combo_liq_cpxs)
 
-    elif equationP == "P_Petrelli2020_Cpx_Liq":
-        df_stats=P_Petrelli2020_Cpx_Liq(meltmatch=Combo_liq_cpxs)
+    elif ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
+        df_stats=func(meltmatch=Combo_liq_cpxs)
         P_kbar=df_stats['P_kbar_calc']
 
     else:
@@ -1266,7 +1474,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
             P_kbar_is_bad = (P_kbar == 0) | (P_kbar == 273.15) | (P_kbar ==  -np.inf) | (P_kbar ==  np.inf)
             P_kbar[P_kbar_is_bad] = np.nan
 
-            if equationP == "P_Petrelli2020_Cpx_Liq":
+            if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
                 return df_stats
             else:
                 return P_kbar
@@ -1294,6 +1502,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
 Cpx_Liq_T_funcs = {T_Put1996_eqT1, T_Mas2013_eqTalk1, T_Put1996_eqT2, T_Mas2013_eqTalk2,
 T_Put1999, T_Put2003, T_Put2008_eq33, T_Mas2013_eqalk33,
 T_Mas2013_Talk2012, T_Brug2019, T_Petrelli2020_Cpx_Liq,
+T_Jorgenson2022_Cpx_Liq,
 T_Petrelli2020_Cpx_Liq_onnx,
 T_Put2008_eq32d, T_Put2008_eq32d_subsol,
 T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O,
@@ -1337,6 +1546,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
         |  T_Mas2013_eqalk33  (P-dep, H2O-dep, alk adaption of eq33)
         |  T_Mas2013_Palk2012 (P-indep, H2O_dep)
         |  T_Petrelli2020_Cpx_Liq (gives voting)
+        |  T_Jorgenson2022_Cpx_Liq (gives voting)
         |  T_Petrelli2020_Cpx_Liq_onnx (gives consistent result every time)
 
 
@@ -1396,6 +1606,9 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
         if Fe3Fet_Liq is not None:
             liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
+    if 'Jorgenson' in equationT:
+        liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
+
         if equationT == "T_Mas2013_Palk2012" or equationT == "T_Mas2013_eqalk33" or equationT == "T_Mas2013_eqTalk2" or equationT == "T_Mas2013_eqTalk1":
             if np.max(liq_comps_c['Fe3Fet_Liq']) > 0:
                 w.warn('Some Fe3Fet_Liq are greater than 0. Masotta et al. (2013) calibrate their equations assuming all Fe is Fe2+. You should set Fe3Fet_Liq=0 in the function for consistency. ')
@@ -1419,12 +1632,12 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
             w.warn("which is outside the recomended calibration range of Brugman and Till (2019)")
 
     # Easiest to treat Machine Learning ones differently
-    if equationT == "T_Petrelli2020_Cpx_Liq":
-        df_stats=T_Petrelli2020_Cpx_Liq(meltmatch=Combo_liq_cpxs)
+    if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
+        df_stats=func(meltmatch=Combo_liq_cpxs)
         T_K=df_stats['T_K_calc']
 
-    elif equationT == "T_Petrelli2020_Cpx_Liq_onnx":
-        T_K=T_Petrelli2020_Cpx_Liq_onnx(meltmatch=Combo_liq_cpxs)
+    elif ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" in equationT:
+        T_K=func(meltmatch=Combo_liq_cpxs)
     else:
         kwargs = {name: Combo_liq_cpxs[name] for name, p in sig.parameters.items()
         if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -1448,7 +1661,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
             T_K_is_bad = (T_K == 0) | (T_K == 273.15) | (T_K ==  -np.inf) | (T_K ==  np.inf)
             T_K[T_K_is_bad] = np.nan
 
-            if equationT == "T_Petrelli2020_Cpx_Liq":
+            if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
                 return df_stats
             else:
                 return T_K
@@ -1580,11 +1793,16 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
 
+        if 'Jorgenson' in equationT:
+            liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
+        if 'Jorgenson' in equationP:
+            liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
+
         Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(liq_comps=liq_comps_c,
         cpx_comps=cpx_comps)
 
 
-    if "Petrelli" in equationT:
+    if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
         T_func_all=calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs,
         equationT=equationT, P="Solve")
         T_func = T_func_all.T_K_calc
@@ -1594,7 +1812,7 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
     else:
         T_func = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs, equationT=equationT, P="Solve")
 
-    if "Petrelli" in equationP:
+    if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
         P_func_all=calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs,
             equationP=equationP, T="Solve")
         P_func = P_func_all.P_kbar_calc
@@ -1635,12 +1853,13 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         PT_out = pd.DataFrame(
             data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
 
-        if "Petrelli" in equationP:
+        if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
+
             PT_out.insert(2, "Median_Trees_P", Median_P)
             PT_out.insert(3, "Std_Trees_P", Std_P)
             PT_out.insert(4, "IQR_Trees_P", Std_P)
 
-        if "Petrelli" in equationT:
+        if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
             PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
             PT_out.insert(len(PT_out.columns), "Std_Trees_T", Std_T)
             PT_out.insert(len(PT_out.columns), "IQR_Trees_T", Std_T)
@@ -1652,12 +1871,12 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         if meltmatch is None:
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps, P=P_guess, T=T_K_guess)
-        if "Petrelli" in equationP:
+        if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
             eq_tests.insert(2, "Median_Trees_P", Median_P)
             eq_tests.insert(3, "Std_Trees_P", Std_P)
             eq_tests.insert(4, "IQR_Trees_P", Std_P)
-        if "Petrelli" in equationT:
-            if "Petrelli" in equationP:
+        if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
+            if "Petrelli" in equationP or "Jorgenson" in equationP:
                 a=4
             else:
                 a=0
@@ -2247,7 +2466,8 @@ H2O_Liq=None, return_all_pairs=False):
 
 ## Function for calculationg Cpx-only pressure
 Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
- P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_onnx, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA}
+ P_Petrelli2020_Cpx_only, P_Jorgenson2022_Cpx_only,
+ P_Petrelli2020_Cpx_only_onnx, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA}
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
@@ -2294,7 +2514,7 @@ return_input=False):
 
 
 
-    if 'Petrelli' in equationP:
+    if 'Petrelli' in equationP or 'Jorgenson' in equationP:
 
         if  check_consecative(cpx_comps_c)==False:
             cpx_comps_c=cpx_comps_c.reset_index(drop=True)
@@ -2345,10 +2565,10 @@ return_input=False):
     # if equationP == "
     #     df_stats=P_Petrelli2020_Cpx_only_noCr(cpx_comps=cpx_comps_c)
     #     P_kbar=df_stats['P_kbar_calc']
-    if 'Petrelli' in equationP and "onnx" not in equationP:
+    if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
         df_stats=func(cpx_comps=cpx_comps_c)
 
-    elif 'Petrelli' in equationP and "onnx" in equationP:
+    elif ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" in equationP:
         P_kbar=func(cpx_comps=cpx_comps_c)
 
 
@@ -2374,7 +2594,7 @@ return_input=False):
     if return_input is False:
         if equationP =="P_Nimis1999_BA":
             return calc_Nimis['P_kbar_calc']
-        if equationP == "P_Petrelli2020_Cpx_only" or equationP == "P_Petrelli2020_Cpx_only_withH2O" or equationP == "P_Petrelli2020_Cpx_only_noCr":
+        if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
             P_kbar=df_stats['P_kbar_calc']
             return df_stats
         else:
@@ -2465,7 +2685,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
     return cpx_comps_c_move
 ## Function for calculating Cpx-only temperature
 Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol,
-T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_onnx, T_Petrelli2020_Cpx_only_withH2O, T_Put2008_eq32dH_Wang2021adap}
+T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Jorgenson2022_Cpx_only,  T_Petrelli2020_Cpx_only_onnx, T_Petrelli2020_Cpx_only_withH2O, T_Put2008_eq32dH_Wang2021adap}
 Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
@@ -2486,6 +2706,7 @@ H2O_Liq=None, eq_tests=False):
         | T_Put2008_eq32d_subsol (P-dependent)
         | T_Petrelli2020_Cpx_only (P-independent, H2O-independent)
         | T_Petrelli2020_Cpx_only_withH2O (P-independent, H2O-dependent)
+        | T_Jorgenson2022_Cpx_only (P-independent, H2O-independent)
         | T_Wang2021_eq2 (P-independent, H2O-dependent)
         | T_Put2008_eq32dH_Wang2021adap (P-dependent, H2O-dependent)
 
@@ -2509,7 +2730,7 @@ H2O_Liq=None, eq_tests=False):
     '''
     cpx_comps_c=cpx_comps.copy()
 
-    if 'Petrelli' in equationT:
+    if 'Petrelli' in equationT or 'Jorgenson' in equationT:
 
         if  check_consecative(cpx_comps_c)==False:
             cpx_comps_c=cpx_comps_c.reset_index(drop=True)
@@ -2549,19 +2770,15 @@ H2O_Liq=None, eq_tests=False):
             'length as the dataframe of Cpx compositions')
 
 
-    if equationT == "T_Petrelli2020_Cpx_only":
+    if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
 
-        df_stats=T_Petrelli2020_Cpx_only(cpx_comps=cpx_comps_c)
+        df_stats=func(cpx_comps=cpx_comps_c)
         T_K=df_stats['T_K_calc']
 
     elif equationT ==  "T_Petrelli2020_Cpx_only_onnx":
 
-        T_K=T_Petrelli2020_Cpx_only_onnx(cpx_comps=cpx_comps_c)
+        T_K=func(cpx_comps=cpx_comps_c)
 
-
-    elif equationT == "T_Petrelli2020_Cpx_only_withH2O":
-        df_stats=T_Petrelli2020_Cpx_only_withH2O(cpx_comps=cpx_comps_c)
-        T_K=df_stats['T_K_calc']
 
 
     else:
@@ -2582,12 +2799,12 @@ H2O_Liq=None, eq_tests=False):
             T_K.replace([np.inf, -np.inf], np.nan, inplace=True)
 
     if eq_tests is False:
-        if equationT == "T_Petrelli2020_Cpx_only" or  equationT == "T_Petrelli2020_Cpx_only_withH2O":
+        if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
             return df_stats
         else:
             return T_K
     if eq_tests is True:
-        if equationT == "T_Petrelli2020_Cpx_only" or equationT == "T_Petrelli2020_Cpx_only_withH2O":
+        if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
             out=pd.concat([df_stats, cpx_components],axis=1)
             return out
         else:
@@ -2642,7 +2859,7 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
 
 
     cpx_comps_c=cpx_comps.copy()
-    if 'Petrelli' in equationT or "Petrelli" in equationP:
+    if ('Petrelli' in equationT or "Petrelli" in equationP) or ('Jorgenson' in equationT or "Jorgenson" in equationP):
 
         if  check_consecative(cpx_comps_c)==False:
             cpx_comps_c=cpx_comps_c.reset_index(drop=True)
@@ -2661,23 +2878,13 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
         P_func = calculate_cpx_only_press(
             cpx_comps=cpx_comps_c, equationP=equationP, H2O_Liq=H2O_Liq, T="Solve")
 
-    if equationP == "P_Petrelli2020_Cpx_only" or equationP == "P_Petrelli2020_Cpx_only_withH2O" or equationP == "P_Petrelli2020_Cpx_only_noCr":
+    if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
         P_func=P_func.P_kbar_calc
 
-    # if equationP == "P_Petrelli2020_Cpx_only_onnx":
-    #     P_func=P_func
-    print(type(P_func))
-    print(type(T_func))
 
-    if equationT == "T_Petrelli2020_Cpx_only" or equationT ==  "T_Petrelli2020_Cpx_only_withH2O":
+    if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
          T_func=T_func.T_K_calc
 
-    # If using onnx, these are numpy.array
-    if isinstance(P_func, np.ndarray) and isinstance(T_func, np.ndarray):
-        print('yes')
-        P_guess = P_func
-        T_K_guess = T_func
-        print(P_func)
     if isinstance(P_func, pd.Series) and isinstance(T_func, partial):
         P_guess = P_func
         T_K_guess = T_func(P_guess)

@@ -3948,7 +3948,7 @@ def calculate_eq_plag_components(liq_comps, H2O_Liq, T,P):
 ## Tool to get Fe3Fet from logfo2 or buffer value.
 def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", fo2, renorm=False, fo2_offset=0):
     '''
-    Calculates Fe3Fet_Liq, FeO and Fe2O3 based on user-specified buffer
+    Calculates Fe3Fet_Liq, FeO and Fe2O3 based on user-specified buffer or fo2 value (in bars)
 
    Parameters
     -------
@@ -4387,3 +4387,19 @@ def check_consecative(df):
         return True
     else:
         return False
+
+def normalize_liquid_jorgenson(liq_comps):
+    """ Normalizes for Jorgenson Thermometers"""
+
+    Liq_test=liq_comps.copy()
+    Liq_no_H2O=Liq_test.drop(labels=['Sample_ID_Liq', 'Fe3Fet_Liq', 'NiO_Liq',
+                                   'CoO_Liq', 'CO2_Liq', 'H2O_Liq'], axis=1)
+    Liq_no_H2O
+    sum_row= 0.01*Liq_no_H2O.sum(axis=1)
+    Liq_norm=Liq_no_H2O.divide(sum_row, axis='rows')
+    Liq_norm['Fe3Fet_Liq']=liq_comps['Fe3Fet_Liq']
+    Liq_norm['Sample_ID_Liq']=liq_comps['Sample_ID_Liq']
+    Liq_norm['NiO_Liq']=liq_comps['NiO_Liq']
+    Liq_norm['CoO_Liq']=liq_comps['CoO_Liq']
+    Liq_norm['H2O_Liq']=liq_comps['H2O_Liq']
+    return Liq_norm
