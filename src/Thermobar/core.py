@@ -4398,7 +4398,8 @@ def normalize_liquid_jorgenson(liq_comps):
     Liq_no_H2O
     sum_row= 0.01*Liq_no_H2O.sum(axis=1)
     Liq_norm1=Liq_no_H2O.divide(sum_row, axis='rows')
-    Liq_norm=Liq_norm1.round(decimals=1)
+    Liq_norm=Liq_norm1.round(decimals=2)
+
     Liq_norm['Fe3Fet_Liq']=liq_comps['Fe3Fet_Liq']
     Liq_norm['Sample_ID_Liq']=liq_comps['Sample_ID_Liq']
     Liq_norm['NiO_Liq']=liq_comps['NiO_Liq']
