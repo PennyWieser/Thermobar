@@ -259,10 +259,10 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     return df_stats
 
-def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
+def P_Jorgenson2022_Cpx_Liq_Norm(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
     Clinopyroxene-liquid  barometer of Jorgenson et al. (2022) based on
-    Machine Learning.
+    Machine Learning. Normalizes, unlike published model.
     :cite:`jorgenson2021machine`
 
     SEE==+-2.7 kbar
@@ -289,7 +289,6 @@ def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch
                                 'K2O_Liq': cpx_liq_combo['K2O_Liq'],
                                 'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
                                 'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
-                                'H2O_Liq': cpx_liq_combo['H2O_Liq'],
                                 'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
                                 'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
                                 'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
@@ -320,6 +319,66 @@ def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch
 
 
     return df_stats
+
+def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
+    '''
+    Clinopyroxene-liquid  barometer of Jorgenson et al. (2022) based on
+    Machine Learning.
+    :cite:`jorgenson2021machine`
+
+    SEE==+-2.7 kbar
+    '''
+    if meltmatch is None:
+        cpx_test=cpx_comps.copy()
+        liq_test=liq_comps.copy()
+        cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
+
+    if meltmatch is not None:
+        cpx_liq_combo=meltmatch
+
+
+
+    Cpx_Liq_ML_in=pd.DataFrame(data={
+                                'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
+                                'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
+                                'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
+                                'FeOt_Liq': cpx_liq_combo['FeOt_Liq'],
+                                'MnO_Liq': cpx_liq_combo['MnO_Liq'],
+                                'MgO_Liq': cpx_liq_combo['MgO_Liq'],
+                                'CaO_Liq': cpx_liq_combo['CaO_Liq'],
+                                'Na2O_Liq': cpx_liq_combo['Na2O_Liq'],
+                                'K2O_Liq': cpx_liq_combo['K2O_Liq'],
+                                'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
+                                'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
+                                'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
+                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
+                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
+    })
+
+
+    x_test=Cpx_Liq_ML_in.values
+
+
+
+    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_April24_NotNorm.pkl', 'rb') as f:
+        ETR_Press_J22_Cpx_Liq=joblib.load(f)
+
+
+    Pred_P_kbar=ETR_Press_J22_Cpx_Liq.predict(x_test)
+
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test, ETR_Press_J22_Cpx_Liq)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+
+    return df_stats
+
 
 def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
@@ -607,10 +666,10 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     return df_stats
 
 
-def T_Jorgenson2022_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
+def T_Jorgenson2022_Cpx_Liq_Norm(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
     Clinopyroxene-liquid  thermometer of Jorgenson et al. (2022) based on
-    Machine Learning.
+    Machine Learning. Normalizes, unlike Jorgenson model.
     :cite:`jorgenson2021machine`
 
     SEE==+-44.9°C
@@ -668,7 +727,64 @@ def T_Jorgenson2022_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch
 
     return df_stats
 
+def T_Jorgenson2022_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
+    '''
+    Clinopyroxene-liquid  thermometer of Jorgenson et al. (2022) based on
+    Machine Learning.
+    :cite:`jorgenson2021machine`
 
+    SEE==+-44.9°C
+    '''
+    if meltmatch is None:
+        cpx_test=cpx_comps.copy()
+        liq_test=liq_comps.copy()
+        cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
+
+    if meltmatch is not None:
+        cpx_liq_combo=meltmatch
+
+
+
+    Cpx_Liq_ML_in=pd.DataFrame(data={
+                                'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
+                                'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
+                                'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
+                                'FeOt_Liq': cpx_liq_combo['FeOt_Liq'],
+                                'MnO_Liq': cpx_liq_combo['MnO_Liq'],
+                                'MgO_Liq': cpx_liq_combo['MgO_Liq'],
+                                'CaO_Liq': cpx_liq_combo['CaO_Liq'],
+                                'Na2O_Liq': cpx_liq_combo['Na2O_Liq'],
+                                'K2O_Liq': cpx_liq_combo['K2O_Liq'],
+                                'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
+                                'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
+                                'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
+                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
+                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
+
+    })
+
+
+    x_test=Cpx_Liq_ML_in.values
+
+
+
+    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_Liq_April24_NotNorm.pkl', 'rb') as f:
+        ETR_Temp_J22_Cpx_Liq=joblib.load(f)
+
+
+    Pred_T_K=ETR_Temp_J22_Cpx_Liq.predict(x_test)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test, ETR_Temp_J22_Cpx_Liq)
+    df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+
+    return df_stats
 
 def T_Petrelli2020_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
     '''
@@ -880,10 +996,10 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
     return P_kbar
 
 
-def P_Jorgenson2022_Cpx_only(T=None, *, cpx_comps):
+def P_Jorgenson2022_Cpx_only_Norm(T=None, *, cpx_comps):
     '''
     Clinopyroxene-only  barometer of Jorgenson et al. (2022) based on
-    Machine Learning.
+    Machine Learning. Normalizes inputs unlike published model
     :cite:`jorgenson2021machine`
 
     SEE==+-3.2 kbar
@@ -915,6 +1031,43 @@ def P_Jorgenson2022_Cpx_only(T=None, *, cpx_comps):
     Pred_P_kbar=ETR_Press_J21_Cpx_only.predict(x_test_scaled)
 
     df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_J21_Cpx_only)
+    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
+
+    return df_stats
+
+def P_Jorgenson2022_Cpx_only(T=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  barometer of Jorgenson et al. (2022) based on
+    Machine Learning.
+    :cite:`jorgenson2021machine`
+
+    SEE==+-3.2 kbar
+    '''
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+
+    })
+
+    x_test=Cpx_test_noID_noT.values
+
+
+
+    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_only_April24_NoNorm.pkl', 'rb') as f:
+        ETR_Press_J21_Cpx_only=joblib.load(f)
+
+
+
+    Pred_P_kbar=ETR_Press_J21_Cpx_only.predict(x_test)
+
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test, ETR_Press_J21_Cpx_only)
     df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
 
     return df_stats
@@ -955,67 +1108,6 @@ def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
     Pred_P_kbar=ETR_Press_P2020_Cpx_only.predict(x_test_scaled)
     df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_P2020_Cpx_only)
     df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
-
-    return df_stats
-
-def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
-    '''
-    Clinopyroxene-liquid  barometer of Jorgenson et al. (2022) based on
-    Machine Learning.
-    :cite:`jorgenson2021machine`
-
-    SEE==+-2.7 kbar
-    '''
-    if meltmatch is None:
-        cpx_test=cpx_comps.copy()
-        liq_test=liq_comps.copy()
-        cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
-
-    if meltmatch is not None:
-        cpx_liq_combo=meltmatch
-
-
-
-    Cpx_Liq_ML_in=pd.DataFrame(data={
-                                'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
-                                'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
-                                'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
-                                'FeOt_Liq': cpx_liq_combo['FeOt_Liq'],
-                                'MnO_Liq': cpx_liq_combo['MnO_Liq'],
-                                'MgO_Liq': cpx_liq_combo['MgO_Liq'],
-                                'CaO_Liq': cpx_liq_combo['CaO_Liq'],
-                                'Na2O_Liq': cpx_liq_combo['Na2O_Liq'],
-                                'K2O_Liq': cpx_liq_combo['K2O_Liq'],
-                                'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
-                                'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
-                                'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
-                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
-                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
-                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
-                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
-                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
-                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
-                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
-                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
-                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
-    })
-
-
-    x_test=Cpx_Liq_ML_in.values
-
-    with open(Thermobar_dir/'scaler_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
-        scaler_J22_Cpx_Liq=load(f)
-
-    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
-        ETR_Press_J22_Cpx_Liq=joblib.load(f)
-
-
-    x_test_scaled=scaler_J22_Cpx_Liq.transform(x_test)
-    Pred_P_kbar=ETR_Press_J22_Cpx_Liq.predict(x_test_scaled)
-
-    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Press_J22_Cpx_Liq)
-    df_stats.insert(0, 'P_kbar_calc', Pred_P_kbar)
-
 
     return df_stats
 
@@ -1205,10 +1297,10 @@ def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
 
     return df_stats
 
-def T_Jorgenson2022_Cpx_only(P=None, *, cpx_comps):
+def T_Jorgenson2022_Cpx_only_Norm(P=None, *, cpx_comps):
     '''
     Clinopyroxene-only  thermometer of Jorgenson et al (2022) based on
-    Machine Learning.
+    Machine Learning. Normalized, unlike published model
     :cite:`jorgenson2021machine`
 
     SEE==+-51°C
@@ -1237,6 +1329,41 @@ def T_Jorgenson2022_Cpx_only(P=None, *, cpx_comps):
     x_test_scaled=scaler_J22_Cpx_only.transform(x_test)
     Pred_T_K=ETR_Temp_J22_Cpx_only.predict(x_test_scaled)
     df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test_scaled, ETR_Temp_J22_Cpx_only)
+    df_stats.insert(0, 'T_K_calc', Pred_T_K)
+
+    return df_stats
+
+
+def T_Jorgenson2022_Cpx_only(P=None, *, cpx_comps):
+    '''
+    Clinopyroxene-only  thermometer of Jorgenson et al (2022) based on
+    Machine Learning.
+    :cite:`jorgenson2021machine`
+
+    SEE==+-51°C
+    '''
+    Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
+                                'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
+                                'Al2O3_Cpx': cpx_comps['Al2O3_Cpx'],
+                                'FeOt_Cpx': cpx_comps['FeOt_Cpx'],
+                                'MnO_Cpx': cpx_comps['MnO_Cpx'],
+                                'MgO_Cpx': cpx_comps['MgO_Cpx'],
+                                'CaO_Cpx': cpx_comps['CaO_Cpx'],
+                                'Na2O_Cpx': cpx_comps['Na2O_Cpx'],
+                                'K2O_Cpx': cpx_comps['K2O_Cpx'],
+                                'Cr2O3_Cpx': cpx_comps['Cr2O3_Cpx'],
+
+    })
+
+    x_test=Cpx_test_noID_noT.values
+
+
+    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_only_April24_NoNorm.pkl', 'rb') as f:
+        ETR_Temp_J22_Cpx_only=joblib.load(f)
+
+
+    Pred_T_K=ETR_Temp_J22_Cpx_only.predict(x_test)
+    df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test, ETR_Temp_J22_Cpx_only)
     df_stats.insert(0, 'T_K_calc', Pred_T_K)
 
     return df_stats
@@ -1323,7 +1450,7 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
 Cpx_Liq_P_funcs = {P_Put1996_eqP1, P_Mas2013_eqPalk1, P_Put1996_eqP2, P_Mas2013_eqPalk2,
 P_Put2003, P_Put2008_eq30, P_Put2008_eq31, P_Put2008_eq32c, P_Mas2013_eqalk32c,
 P_Mas2013_Palk2012, P_Wieser2021_H2O_indep, P_Neave2017, P_Petrelli2020_Cpx_Liq,
-P_Jorgenson2022_Cpx_Liq,
+P_Jorgenson2022_Cpx_Liq, P_Jorgenson2022_Cpx_Liq_Norm,
 P_Petrelli2020_Cpx_Liq_onnx,
 P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
 P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA} # put on outside
@@ -1415,8 +1542,8 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         if Fe3Fet_Liq is not None:
             liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
-    if 'Jorgenson' in equationP:
-        liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
+        if 'Jorgenson' in equationP:
+            liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
 
 
     if equationP == "P_Mas2013_eqalk32c" or equationP == "P_Mas2013_eqPalk2" or equationP == "P_Mas2013_eqPalk1":
@@ -1502,7 +1629,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
 Cpx_Liq_T_funcs = {T_Put1996_eqT1, T_Mas2013_eqTalk1, T_Put1996_eqT2, T_Mas2013_eqTalk2,
 T_Put1999, T_Put2003, T_Put2008_eq33, T_Mas2013_eqalk33,
 T_Mas2013_Talk2012, T_Brug2019, T_Petrelli2020_Cpx_Liq,
-T_Jorgenson2022_Cpx_Liq,
+T_Jorgenson2022_Cpx_Liq,T_Jorgenson2022_Cpx_Liq_Norm,
 T_Petrelli2020_Cpx_Liq_onnx,
 T_Put2008_eq32d, T_Put2008_eq32d_subsol,
 T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O,
@@ -1606,8 +1733,8 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
         if Fe3Fet_Liq is not None:
             liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
-    if 'Jorgenson' in equationT:
-        liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
+        if 'Jorgenson' in equationT:
+            liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
 
         if equationT == "T_Mas2013_Palk2012" or equationT == "T_Mas2013_eqalk33" or equationT == "T_Mas2013_eqTalk2" or equationT == "T_Mas2013_eqTalk1":
             if np.max(liq_comps_c['Fe3Fet_Liq']) > 0:
@@ -1782,6 +1909,7 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
 
     if meltmatch is None:
         liq_comps_c = liq_comps.copy()
+
         # This overwrites the Fe3Fet in their inputted dataframe
         if Fe3Fet_Liq is not None:
             liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
@@ -2466,7 +2594,7 @@ H2O_Liq=None, return_all_pairs=False):
 
 ## Function for calculationg Cpx-only pressure
 Cpx_only_P_funcs = {P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
- P_Petrelli2020_Cpx_only, P_Jorgenson2022_Cpx_only,
+ P_Petrelli2020_Cpx_only, P_Jorgenson2022_Cpx_only,  P_Jorgenson2022_Cpx_only_Norm,
  P_Petrelli2020_Cpx_only_onnx, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA}
 Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
@@ -2490,6 +2618,8 @@ return_input=False):
         | P_Petrelli2020_Cpx_only (T_independent, H2O-independent)
         | P_Petrelli2020_Cpx_only_withH2O (T_independent, H2O-dependent)
         | P_Wang2021_eq1 (T_independent, H2O-independent)
+        | P_Jorgenson2022_Cpx_only (T_independent, H2O-independent)
+        | P_Jorgenson2022_Cpx_only_Norm (T_independent, H2O-independent)* v similar, uses standard scalar
 
 
 
@@ -2685,7 +2815,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
     return cpx_comps_c_move
 ## Function for calculating Cpx-only temperature
 Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol,
-T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Jorgenson2022_Cpx_only,  T_Petrelli2020_Cpx_only_onnx, T_Petrelli2020_Cpx_only_withH2O, T_Put2008_eq32dH_Wang2021adap}
+T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Jorgenson2022_Cpx_only, T_Jorgenson2022_Cpx_only_Norm, T_Petrelli2020_Cpx_only_onnx, T_Petrelli2020_Cpx_only_withH2O, T_Put2008_eq32dH_Wang2021adap}
 Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
@@ -2704,12 +2834,12 @@ H2O_Liq=None, eq_tests=False):
     equationT: str
         | T_Put2008_eq32d (P-dependent)
         | T_Put2008_eq32d_subsol (P-dependent)
+        | T_Put2008_eq32dH_Wang2021adap (P-dependent, H2O-dependent)
         | T_Petrelli2020_Cpx_only (P-independent, H2O-independent)
         | T_Petrelli2020_Cpx_only_withH2O (P-independent, H2O-dependent)
-        | T_Jorgenson2022_Cpx_only (P-independent, H2O-independent)
         | T_Wang2021_eq2 (P-independent, H2O-dependent)
-        | T_Put2008_eq32dH_Wang2021adap (P-dependent, H2O-dependent)
-
+        | T_Jorgenson2022_Cpx_only (P-independent, H2O-independent)
+        | T_Jorgenson2022_Cpx_only_Norm (P-independent, H2O-independent)*As above, uses python scalar
 
 
 

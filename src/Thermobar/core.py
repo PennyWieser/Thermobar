@@ -4389,17 +4389,20 @@ def check_consecative(df):
         return False
 
 def normalize_liquid_jorgenson(liq_comps):
-    """ Normalizes for Jorgenson Thermometers"""
+    """ Normalizes for Jorgenson Thermometers, rounds to 2 dp"""
+    print('Im normalizing using the Jorgenson method, e.g. 100 total, 2dp')
 
     Liq_test=liq_comps.copy()
     Liq_no_H2O=Liq_test.drop(labels=['Sample_ID_Liq', 'Fe3Fet_Liq', 'NiO_Liq',
                                    'CoO_Liq', 'CO2_Liq', 'H2O_Liq'], axis=1)
     Liq_no_H2O
     sum_row= 0.01*Liq_no_H2O.sum(axis=1)
-    Liq_norm=Liq_no_H2O.divide(sum_row, axis='rows')
+    Liq_norm1=Liq_no_H2O.divide(sum_row, axis='rows')
+    Liq_norm=Liq_norm1.round(decimals=1)
     Liq_norm['Fe3Fet_Liq']=liq_comps['Fe3Fet_Liq']
     Liq_norm['Sample_ID_Liq']=liq_comps['Sample_ID_Liq']
     Liq_norm['NiO_Liq']=liq_comps['NiO_Liq']
     Liq_norm['CoO_Liq']=liq_comps['CoO_Liq']
+    Liq_norm['CO2_Liq']=liq_comps['CO2_Liq']
     Liq_norm['H2O_Liq']=liq_comps['H2O_Liq']
     return Liq_norm
