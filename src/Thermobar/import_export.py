@@ -554,6 +554,32 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
 # E.g., if users only enter FeO (not FeOt and Fe2O3), allocates a FeOt
 # column. If enter FeO and Fe2O3, put a FeOt column
 
+# Give warnings if no FeOt
+    cols=my_input.columns
+    if any(cols.str.startswith(" ")):
+        w.warn('We have found some spaces  at the start of your column headings. Check these arent oxide headings, it wont read them')
+    if ("FeOt_Cpx" not in my_input) and (any(cols.str.contains('_Cpx'))):
+        w.warn('No FeOt_Cpx column, please check of you wanted any Fe in calcs')
+
+    if ("FeOt_Opx" not in my_input) and (any(cols.str.contains('_Opx'))):
+        w.warn('No FeOt_Opx column, please check of you wanted any Fe in calcs')
+
+    if ("FeOt_Amp" not in my_input) and (any(cols.str.contains('_Amp'))):
+        w.warn('No FeOt_Amp column, please check of you wanted any Fe in calcs')
+
+    if ("FeOt_Sp" not in my_input) and (any(cols.str.contains('_Sp'))):
+        w.warn('No FeOt_Sp column, please check of you wanted any Fe in calcs')
+
+
+    if ("FeOt_Ol" not in my_input) and (any(cols.str.contains('_Ol'))):
+        w.warn('No FeOt_Ol column, please check of you wanted any Fe in calcs')
+
+    if ("FeOt_Plag" not in my_input) and (any(cols.str.contains('_Plag'))):
+        w.warn('No FeOt_Plag column, please check of you wanted any Fe in calcs')
+
+    if ("FeOt_Kspar" not in my_input) and (any(cols.str.contains('_Kspar'))):
+        w.warn('No FeOt_Kspar column, please check of you wanted any Fe in calcs')
+
     if "FeO_Cpx_Err" in my_input and "FeOt_Cpx" not in my_input and "Fe2O3_Cpx" not in my_input:
         my_input_c['FeOt_Cpx_Err'] = my_input_c['FeO_Cpx_Err']
         print('Only FeO_Cpx found in input, the code has allocated this to FeOt_Cpx')
