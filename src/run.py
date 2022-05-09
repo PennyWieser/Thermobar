@@ -12,28 +12,34 @@ from Thermobar.garnet_class import *
 from Thermobar.geotherm import *
 from Thermobar.garnet_plot import *
 
-
-file = "../Examples/Garnet/Group1_Kimberley.xlsx"
+#Now load the data
+file = "../Examples/Garnet/Group1_Kimberley.xlsx" #Wherever that /Examples/Garnet is
 data = import_excel(file, sheet_name = "Sheet1")
 my_input_gt = data['my_input']
 
+#Ryan1996
 T = T_Ryan1996(my_input_gt) #Calculating T_Ryan1996
 
+#Creating fig object
 fig = plt.figure(figsize = (12,6))
 # y = np.arange(0,12,1)
 y = np.arange(0,2500,10)
 x = y
 ax1 = plt.subplot(121)
 ax2 = plt.subplot(122)
+#1:1 line
 ax1.plot(x,y,color = 'r',linewidth = 1)
 
+#Loading external file
 file_ext = "../Benchmarking/garnet/Group_1_PT_solution.xlsx"
 data_ext = import_excel(file_ext, sheet_name = "Group_1_PT_solution")
 input_gt_ext = data_ext['my_input']
 p_ext = np.array(input_gt_ext['P_Kb']) / 10.0
 t_ext = np.array(input_gt_ext['T_C'] + 273.0)
 
+#plotting calculated vs read T_Ryan1996
 ax1.plot(t_ext,T, 'o')
+#Creating histogram of differences
 counts, edges, patches = ax2.hist(t_ext - T,
 bins = np.linspace(np.amin(t_ext - T),np.amax(t_ext - T), 10),color = '#2d8e5f')
 centers = 0.5*(edges[:-1] + edges[1:])

@@ -2,7 +2,7 @@ import numpy as np
 import os, sys
 import matplotlib.pyplot as plt
 
-def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked):
+def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked, adiabat):
 
 	'''
 
@@ -219,9 +219,153 @@ def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked):
 
 		T[idx_geotherm_nearest:] = kinked_geotherm[idx_geotherm_nearest:]
 
+		if adiabat == True:
+			adiabat = False
+			print('Both "kinked" and "adiabat" cannot be True. Turning adiabat==False.')
+
 	else:
 
 		idx_geotherm_nearest = 0
 
+	if adiabat == True:
+
+		T_C_Adiabat, T_K_Adiabat = T_Katsura_2022_Adiabat(p)
+
+		idx_T = np.argwhere(np.diff(np.sign(T - T_K_Adiabat)) != 0)
+
+		try:
+			T[idx_T[0][0]:] = T_K_Adiabat[idx_T[0][0]:]
+		except IndexError:
+			pass
 
 	return T, depth, p, idx_geotherm_nearest
+
+def T_Katsura_2022_Adiabat(P_input):
+
+	'''
+	A function that calculates the mantle adiabat temperature for given pressure
+	range. Taken from Katsura (2022).
+
+	###Parameters###
+	P_input: Pressure in GPa
+
+	'''
+
+	Depth = [50,70,90,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,
+	400,410,410,420,440,460,480,500]
+	P = [1.5,2.1,2.8,3.1,3.8,4.4,5.1,5.8,6.4,7.1,7.8,8.5,9.2,9.9,10.6,11.2,
+	11.9,12.6,13.4,13.7,13.7,14.1,14.9,15.6,16.4,17.1]
+	T = [1646,1657,1667,1672,1682,1691,1700,1709,1718,1726,1735,1743,1751,
+	1759,1766,1774,1781,1788,1796,1799,1860,1863,1871,1878,1885,1892]
+
+	Depth = np.array(Depth)
+	T_C = np.array(T) - 273.15
+
+	# T_C_out = np.interp(P_input[P_input_idx_1:P_input_idx_2], P, T_C)
+	T_C_out = np.interp(P_input ,P ,T_C)
+	T_K_out = T_C_out + 273.15
+
+	return T_C_out, T_K_out
+
+def invert_generalised_mantle_geotherm(P_sample, T_sample, std_P, std_T, SHF_start, SHF_end, SHF_increment, max_depth, kinked, BDL_T, adiabat, plot_solution):
+
+	'''
+	A function to invert a generalized geotherm to the input thermobarometric
+	data.
+
+	###Parameters###
+
+	P_sample: Pressure of thermobarometric solution in GPa.
+	T_sample: Temperature of thermobarometric solution in Kelvin.
+	std_P: Standard deviation of thermobarometric solution in GPa.
+	std_T: Standard deviation of thermobarometric solution in K.
+	SHF_start: Starting Surface Heat Flow value to search solution (mW/m^2).
+	SHF_end: The Last Surface Heat Flow value to search solution (mW/m^2).
+	SHF_increment: Solution search invrement in (mW/m^2).
+	max_depth: Maximum depth of the geotherm calculation in km.
+	kinked: Boolean parameter to determine whether geotherm is kinked at the
+	 Base of the Depelted lithosphere.
+	BDL_T: Temperature at the Base of the Depleted Lithosphere in K.
+	adiabat: Boolean parameter to determine whether geotherm is
+	calculated with an adiabat after LAB.
+	plot_solution: Boolean parameter to choose whether plot a small
+	graph of the solution.
+
+	'''
+
+	#Setting up initial geotherm to calculate P equivalents.
+	T, depth, P, idx_geotherm_nearest = calculate_hasterok2011_geotherm(SHF = SHF_start,
+	 BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38,
+	  kinked = kinked, adiabat = adiabat)
+
+	depth_xen = []
+	index_depth_xen = []
+	t_exclude = []
+
+	for i in range(0,len(P_sample)):
+		if P_sample[i] < np.amax(P):
+			idx = (np.abs(P-P_sample[i])).argmin()
+			index_depth_xen.append(idx)
+		else:
+			t_exclude.append(i)
+
+	t_exclude = t_exclude[::-1]
+	T_xen_plot = np.asarray(T_sample)
+	p_xen_plot = np.asarray(P_sample)
+
+	for i in t_exclude:
+		T_xen_plot = np.delete(T_xen_plot,i)
+		p_xen_plot = np.delete(p_xen_plot,i)
+
+	if type(std_T) is not list:
+		temp_err = np.ones(len(T_sample)) * std_T
+	elif type(std_T) is list:
+		temp_err = np.array(std_T)
+
+	if type(std_T) is not list:
+		pres_err = np.ones(len(P_sample)) * std_P
+	elif type(std_T) is list:
+		pres_err = np.array(std_P)
+
+	heat_flow_search = np.arange(SHF_start, SHF_end, SHF_increment)
+
+	misfit_list = []
+
+	for i in range(0,len(heat_flow_search)):
+
+		T, depth, p, idx_geotherm_nearest = calculate_hasterok2011_geotherm(SHF = heat_flow_search[i],
+		 BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38,
+		  kinked = kinked, adiabat = adiabat)
+
+		P_equivalent = []
+		T_equivalent = []
+		for i in index_depth_xen:
+			P_equivalent.append(p[i])
+			T_equivalent.append(T[i])
+
+		P_equivalent = np.asarray(P_equivalent)
+		T_equivalent = np.asarray(T_equivalent)
+
+		RMS = ((1.0/float(len(T_sample))) * np.sum((((T_sample-T_equivalent)**2.0)) / (std_T**2.0))) ** 0.5
+		misfit_list.append(RMS)
+
+	index_rms_misfit = misfit_list.index(min(misfit_list))
+	shf_min = heat_flow_search[index_rms_misfit]
+
+	T, depth, p, idx_geotherm_nearest = calculate_hasterok2011_geotherm(SHF = shf_min,
+	 BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38,
+	  kinked = kinked, adiabat = adiabat)
+
+	if plot_solution == True:
+		plt.figure(figsize = (5,5))
+		ax = plt.subplot(111)
+		ax.plot(heat_flow_search, misfit_list, '-', color = 'k')
+		ax.plot(shf_min, misfit_list[index_rms_misfit], 'o', color = 'g', label = 'Best Solution')
+		ax.set_xlabel('Surface Heat Flow ($mW/m^2$)')
+		ax.set_ylabel('RMS misfit of T (Thermometry - Geotherm)')
+		ax.grid()
+		ax.legend()
+
+		plt.show()
+
+	return shf_min, T, depth, p, misfit_list
