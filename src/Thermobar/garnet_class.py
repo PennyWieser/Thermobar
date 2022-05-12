@@ -544,6 +544,11 @@ def calculate_ol_mg(gt_comps, T_Ni, xMg, xCa, xFe):
     gt_comps: garnet composition dataframe imported from core function
     T_Ni: Temperature output taken from one of the garnet thermometry methods in
     Kelvin.
+
+    Returns
+    --------------
+    Numpy array
+        Ol Mg#
     '''
 
     mg_ol = np.zeros(len(gt_comps['MgO_Gt']))
@@ -578,6 +583,11 @@ def calculate_al2o3_whole_rock(gt_comps):
 
     ###Parameters###
     gt_comps: garnet composition dataframe imported from core function
+
+    Returns
+    --------------
+    Numpy array
+        Whole rock Al2O3 values.
 
     '''
 

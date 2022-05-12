@@ -267,7 +267,7 @@ def T_Katsura_2022_Adiabat(P_input):
 
 	return T_C_out, T_K_out
 
-def invert_generalised_mantle_geotherm(P_sample, T_sample, std_P, std_T, SHF_start, SHF_end, SHF_increment, max_depth, plot_solution):
+def invert_generalised_mantle_geotherm(P_sample, T_sample, std_P, std_T, SHF_start, SHF_end, SHF_increment, max_depth, plot_solution,**kwargs):
 
 	'''
 	A function to invert a generalized geotherm to the input thermobarometric
@@ -365,9 +365,9 @@ def invert_generalised_mantle_geotherm(P_sample, T_sample, std_P, std_T, SHF_sta
 		misfit_list.append(RMS)
 
 	index_rms_misfit = misfit_list.index(min(misfit_list))
-	shf_min = heat_flow_search[index_rms_misfit]
+	shf_solution = heat_flow_search[index_rms_misfit]
 
-	T, depth, p, idx_geotherm_nearest = calculate_hasterok2011_geotherm(SHF = shf_min,
+	T, depth, p, idx_geotherm_nearest = calculate_hasterok2011_geotherm(SHF = shf_solution,
 	 BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38,
 	  kinked = kinked, adiabat = adiabat)
 
@@ -375,7 +375,7 @@ def invert_generalised_mantle_geotherm(P_sample, T_sample, std_P, std_T, SHF_sta
 		plt.figure(figsize = (5,5))
 		ax = plt.subplot(111)
 		ax.plot(heat_flow_search, misfit_list, '-', color = 'k')
-		ax.plot(shf_min, misfit_list[index_rms_misfit], 'o', color = 'g', label = 'Best Solution')
+		ax.plot(shf_solution, misfit_list[index_rms_misfit], 'o', color = 'g', label = 'Best Solution')
 		ax.set_xlabel('Surface Heat Flow ($mW/m^2$)')
 		ax.set_ylabel('RMS misfit of T (Thermometry - Geotherm)')
 		ax.grid()
@@ -383,4 +383,4 @@ def invert_generalised_mantle_geotherm(P_sample, T_sample, std_P, std_T, SHF_sta
 
 		plt.show()
 
-	return shf_min, T, depth, p, misfit_list
+	return shf_solution, T, depth, p, misfit_list
