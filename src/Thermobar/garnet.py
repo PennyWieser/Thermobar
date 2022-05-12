@@ -54,7 +54,7 @@ def T_Canil1999(gt_comps):
 
     return temp
 
-def P_Ryan_1996(gt_comps, T_K):
+def P_Ryan1996(gt_comps, T_K):
 
     '''
     Cr-pyrope garnet barometer of Ryan et al. (1996)
@@ -67,9 +67,9 @@ def P_Ryan_1996(gt_comps, T_K):
     P_cr = np.zeros(len(T_K))
 
     Dp_converge = 0.1
-    Gasp_1 = 270.0
-    Gasp_2 = 4500.0
-    Gasp_3 = 15.0
+    Gasp_1 = 270
+    Gasp_2 = 4500
+    Gasp_3 = 15
     Cr_veto = 0.1
     R = 1.9872
 
@@ -97,12 +97,11 @@ def P_Ryan_1996(gt_comps, T_K):
     def xCaopx(ca,cr,p_ref,temp):
 
         tk = temp + 273.15
-        xCa_opx_lherz = np.exp((-1.0 * (6424 + (26.4*p_ref)) / tk) + 1.84)  #Correct
+        xCa_opx_lherz = np.exp((-1.0 * (6425 + (26.4*p_ref)) / tk) + 1.84)  #Correct
         xCa_gt_lherz = CaLherz_(ca, cr)
 
         Kdc = xCa_gt_lherz / xCa_opx_lherz
         Kdc = Kdc * np.exp(-1.27 + (0.000738 * (temp)) + (0.0236 * p_ref) - ((0.577 * cr) / (ca + 0.02)) + (1.79 * ca))
-
         xCa_opx = ca / Kdc
 
         return xCa_opx
@@ -116,7 +115,7 @@ def P_Ryan_1996(gt_comps, T_K):
 
         while True:
 
-            #Breaking after 1000 iteration
+            # Breaking after 1000 iteration
             a = a + 1
             if a > 1000:
                  Dp_converge = Dp_converge * 2.0
@@ -142,12 +141,12 @@ def P_Ryan_1996(gt_comps, T_K):
 
             Kd = Kd * Kd
 
-            P = (-R * T_K[i] * np.log(Kd)) - (14412.0 * (xCa[i]**2.0)) + ((49782.0 - (23.5 * T_K[i])) *\
-             xCa[i] * (xAl[i] - xCr[i])) + (23900.0 * (Xca_opx**2.0)) - 2783.0 - (3.94*T_K[i])
+            P = (-R * T_K[i] * np.log(Kd)) - (14412.0 * (xCa[i]**2.0)) + (49782.0 - (23.5 * T_K[i])) *\
+             (xCa[i] * (xAl[i] - xCr[i])) + (23900.0 * (Xca_opx**2.0)) - 2873.0 - (3.94*T_K[i])
 
             P = P / ((146.0 * (xCa[i]**2.0)) - 397.0)
 
-            if (np.abs(P-P_last) > Dp_converge):
+            if (abs(P-P_last) >= Dp_converge):
 
                 P_last = P
                 continue
@@ -161,3 +160,118 @@ def P_Ryan_1996(gt_comps, T_K):
                     break
 
     return P_cr
+
+#--------------------Function for solving for temperature for garnets-----------------------------------------------------#
+Gt_T_funcs = {T_Ryan1996, T_Canil1999, T_Sudholz2021} # put on outside
+
+Gt_T_funcs_by_name = {p.__name__: p for p in Gt_T_funcs}
+
+def calculate_gt_temp(*, gt_comps=None, equationT=None, out_format=None):
+
+    '''
+
+    Parameters
+    ------------
+
+    gt_comps: pandas.DataFrame
+        Gt compositions with column headings SiO2_Gt, MgO_Gt etc.
+
+    equationT: str
+        Choose from:
+
+        |  T_Ryan1996
+        |  T_Canil1999
+        |  T_Sudholz2021
+
+    out_format: str
+        Choose from:
+
+        |  'Array' - A numpy array output
+        |  'DataFrame' - Pandas dataframe output
+
+    Returns
+    -----------
+    If out_format is 'Array'
+        numpy.array: Temperature in K
+    If out_format is 'DataFrame'
+        pandas.DataFrame: Temperature in K
+    '''
+
+    try:
+        func = Gt_T_funcs_by_name[equationT]
+    except KeyError:
+        raise ValueError(f'{equationT} is not a valid equation') from None
+    sig=inspect.signature(func)
+
+    if gt_comps is not None:
+        if gt_comps['Ni_Gt'] is not None:
+
+            T_K = func(gt_comps)
+
+    else:
+        raise ValueError(f'{equationT} requires you to enter gt_comps that involves Ni_Gt [ppm]')
+
+    if out_format == 'DataFrame':
+
+        T_K = pd.DataFrame(T_K, columns = ['Temperature_K'])
+
+    return T_K
+
+#--------------------Function for solving for pressure for garnets-----------------------------------------------------#
+Gt_P_funcs = {P_Ryan1996} # put on outside
+
+Gt_P_funcs_by_name = {p.__name__: p for p in Gt_P_funcs}
+
+def calculate_gt_press(*, gt_comps=None, equationP=None, T=None, out_format=None):
+
+    '''
+
+    Parameters
+    ------------
+
+    gt_comps: pandas.DataFrame
+        Gt compositions with column headings SiO2_Gt, MgO_Gt etc.
+
+    equationP: str
+        Choose from:
+
+        |  P_Ryan1996
+
+    T: Array
+        Estimated temperature of garnet the sample
+
+    out_format: str
+        Choose from:
+
+        |  'Array' - A numpy array output
+        |  'DataFrame' - Pandas dataframe output
+
+    Returns
+    -----------
+    If out_format is 'Array'
+        numpy.array: Temperature in K
+    If out_format is 'DataFrame'
+        pandas.DataFrame: Temperature in K
+    '''
+
+    try:
+        func = Gt_P_funcs_by_name[equationP]
+    except KeyError:
+        raise ValueError(f'{equationT} is not a valid equation') from None
+    sig=inspect.signature(func)
+
+    if gt_comps is not None:
+        if T is not None:
+            if len(gt_comps) == len(T):
+
+                P = func(gt_comps,T)
+
+    else:
+        raise ValueError(f'{equationP} requires you to enter gt_comps and T [K]')
+
+
+    if out_format == 'DataFrame':
+
+        P = pd.DataFrame(P, columns = ['P_GPa'])
+
+    return P

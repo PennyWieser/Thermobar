@@ -379,5 +379,144 @@ def Tukey_Plot_np_values(x,y, name, xlower=-1, xupper=13, yupper=17, ylower=-3):
 
     return pd.DataFrame(data={'X_Av':X_Av, 'Y_Av':Y_Av, 'X_std':X_std, 'Y_std':Y_std})
 
+def mantle_geotherm_plot(T, P, Depth, plot_style, Temp_unit, T_Sample, P_Sample, T_std, P_std, max_depth, plot_type, **kwargs):
 
+    '''
+    A function to plot calculate geotherm alongside the thermobarometric
+    calculations.
 
+    ###Parameters###
+    T: Temperature array of the geotherm.
+
+    P: Pressure array of the geotherm.
+
+    Depth: Depth array of the geotherm in meters.
+
+    plot_style: String parameter for the y-axis of the geotherm plot 'Pressure' or 'Depth'.
+
+    Temp_unit: String parameter for the temperature unit, 'Celsius' or 'Kelvin'.
+
+    T_Sample: Array of temperature of the thermobarometric solutions.
+
+    P_Sample: Array of pressure of the thermobarometric solutions in GPa.
+
+    T_std: Standart deviation of thermobarometric temperature estimation. Could be array or a single value.
+
+    P_std: Standart deviation of thermobarometric pressure estimation. Could be array or a single value.
+
+    max_depth: Maximum depth to show the plot.
+
+    plot_type: 'show' or 'save' the figure.
+
+    moho: moho depth in km.
+
+    lab: lab depth in km.
+
+    Depth_Sample: Array of depths of the thermobarometric solutions.
+
+    filename_save: string parameter for filename to save the figures.
+    '''
+
+    moho = kwargs.pop('moho', None)
+    lab = kwargs.pop('lab', None)
+    Depth_Sample = kwargs.pop('Depth_Sample', None)
+    filename_save = kwargs.pop('filename_save', 'Geotherm_Plot.png')
+
+    Depth = Depth/1e3
+
+    fig = plt.figure(figsize = (4,10))
+    ax1 = plt.subplot(111)
+    if Temp_unit == 'Celsius':
+        T = np.array(T) - 273.15
+        ax1.set_xlabel('Temperature [$^{\circ} C$]')
+    else:
+        ax1.set_xlabel('Temperature [$^{\circ} K$]')
+
+    if P_std is not list:
+        P_std = np.ones(len(P_Sample)) * P_std
+    if T_std is not list:
+        T_std = np.ones(len(T_Sample)) * T_std
+
+    if plot_style == 'Pressure':
+        ax1.plot(T,P,'k',lw = 1.5)
+        ax1.set_ylabel('Pressure [GPa]')
+        if (T_Sample is not None) and (P_Sample is not None):
+
+            if (Temp_unit == 'Celsius'):
+                T_Sample = np.array(T_Sample) - 273.15
+
+            ax1.errorbar(T_Sample, P_Sample, yerr = [P_std,P_std],xerr = [T_std,T_std],
+            fmt = 'o',color = '#bd3b24',markersize = 5,label = 'Xenolith Data',
+            ecolor = 'k',elinewidth = 0.5,alpha = 0.6, markeredgecolor = 'k')
+
+        ax1.set_ylim(np.amax(P),0)
+
+        ax1.set_xlim(0, np.amax(np.concatenate((T,T_Sample))) + 100.0)
+
+    elif plot_style == 'Depth':
+        ax1.plot(T,Depth,'k',lw = 1.5)
+        ax1.set_ylabel('Depth [km]')
+
+        if (T_Sample is not None):
+            if (Temp_unit == 'Celsius'):
+                T_Sample = np.array(T_Sample) - 273.15
+            positive_pressure_diff_list = []
+            negative_pressure_diff_list = []
+            if Depth_Sample is None:
+                Depth_Sample = np.zeros(len(P_Sample))
+                run_dep = True
+            for i in range(0,len(P_std)):
+
+                if run_dep == True:
+                    Depth_Sample[i] = Depth[(np.abs(P-P_Sample[i])).argmin()]
+                positive_pressure = P_Sample[i] + P_std[i]
+                positive_pressure_depth = Depth[(np.abs(P-positive_pressure)).argmin()]
+                positive_pressure_diff_list.append((positive_pressure_depth - Depth_Sample[i]))
+                negative_pressure = P_Sample[i] - P_std[i]
+                negative_pressure_depth = Depth[(np.abs(P-negative_pressure)).argmin()]
+                negative_pressure_diff_list.append((Depth_Sample[i] - positive_pressure_depth))
+
+            ax1.errorbar(T_Sample, Depth_Sample, yerr = [negative_pressure_diff_list,positive_pressure_diff_list],xerr = [T_std,T_std],
+            fmt = 'o',color = '#bd3b24',markersize = 5,label = 'Xenolith Data',
+            ecolor = 'k',elinewidth = 0.5,alpha = 0.6, markeredgecolor = 'k')
+
+        ax1.set_ylim(np.amax(Depth),0)
+
+        ax1.set_xlim(0, np.amax(np.concatenate((T,T_Sample))) + 100.0)
+
+    if (moho != None) or (lab != None):
+
+        import matplotlib.patches as patches
+
+    if moho != None:
+
+        if plot_style == 'Depth':
+            ax1.axhline(moho, linestyle = '--', color = 'k')
+            crust_obj = patches.Rectangle((0,0) ,100000.0, moho, color = '#6cc1c7', alpha = 0.6)
+            ax1.add_patch(crust_obj)
+
+        elif plot_style == 'Pressure':
+            pressure_equivalent_moho = P[(np.abs((Depth / 1e3)-moho)).argmin()]
+            ax1.axhline(pressure_equivalent_moho, linestyle = '--', color = 'k')
+            crust_obj = patches.Rectangle((0,0) ,100000.0, pressure_equivalent_moho, color = '#6cc1c7', alpha = 0.6)
+            ax1.add_patch(crust_obj)
+
+    if lab != None:
+
+        if plot_style == 'Depth':
+            ax1.axhline(lab, linestyle = '--', color = 'k')
+            mantle_obj = patches.Rectangle((0,lab) ,100000.0, 1e5, color = '#c76c75', alpha = 0.6)
+            ax1.add_patch(mantle_obj)
+
+        elif plot_style == 'Pressure':
+            pressure_equivalent_lab = P[(np.abs((Depth / 1e3)-lab)).argmin()]
+            ax1.axhline(pressure_equivalent_lab, linestyle = '--', color = 'k')
+            mantle_obj = patches.Rectangle((0,pressure_equivalent_lab) ,100000.0, 1e5, color = '#c76c75', alpha = 0.6)
+            ax1.add_patch(mantle_obj)
+
+    ax1.grid()
+
+    if plot_type == 'show':
+        plt.show()
+    elif plot_type == 'save':
+        plt.savefig(filename_save, dpi = 300)

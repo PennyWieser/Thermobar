@@ -267,7 +267,7 @@ def T_Katsura_2022_Adiabat(P_input):
 
 	return T_C_out, T_K_out
 
-def invert_generalised_mantle_geotherm(P_sample, T_sample, std_P, std_T, SHF_start, SHF_end, SHF_increment, max_depth, kinked, BDL_T, adiabat, plot_solution):
+def invert_generalised_mantle_geotherm(P_sample, T_sample, std_P, std_T, SHF_start, SHF_end, SHF_increment, max_depth, plot_solution):
 
 	'''
 	A function to invert a generalized geotherm to the input thermobarometric
@@ -276,22 +276,37 @@ def invert_generalised_mantle_geotherm(P_sample, T_sample, std_P, std_T, SHF_sta
 	###Parameters###
 
 	P_sample: Pressure of thermobarometric solution in GPa.
+
 	T_sample: Temperature of thermobarometric solution in Kelvin.
+
 	std_P: Standard deviation of thermobarometric solution in GPa.
+
 	std_T: Standard deviation of thermobarometric solution in K.
+
 	SHF_start: Starting Surface Heat Flow value to search solution (mW/m^2).
+
 	SHF_end: The Last Surface Heat Flow value to search solution (mW/m^2).
+
 	SHF_increment: Solution search invrement in (mW/m^2).
+
 	max_depth: Maximum depth of the geotherm calculation in km.
+
 	kinked: Boolean parameter to determine whether geotherm is kinked at the
-	 Base of the Depelted lithosphere.
+		Base of the Depelted lithosphere.
+
 	BDL_T: Temperature at the Base of the Depleted Lithosphere in K.
+
 	adiabat: Boolean parameter to determine whether geotherm is
 	calculated with an adiabat after LAB.
+
 	plot_solution: Boolean parameter to choose whether plot a small
 	graph of the solution.
 
 	'''
+
+	kinked = kwargs.pop('kinked', False)
+	BDL_T = kwargs.pop('BDL_T', 180)
+	adiabat = kwargs.pop('adiabat', False)
 
 	#Setting up initial geotherm to calculate P equivalents.
 	T, depth, P, idx_geotherm_nearest = calculate_hasterok2011_geotherm(SHF = SHF_start,

@@ -49,7 +49,7 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 
 	for i in range(SHF_low, SHF_high):
 
-		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True)
+		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True, adiabat = False)
 		if temp_unit == 'Celsius':
 			geotherms.append(T-273.0)
 		pressures.append(p)
@@ -128,7 +128,7 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 	ax1.axvline(BDL_T,linestyle = '--',color = 'k',linewidth = 2)
 
 	if SHF_chosen != None:
-		T_chosen, depth_chosen, p_chosen, depth_intercept = calculate_hasterok2011_geotherm(SHF = SHF_chosen, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True)
+		T_chosen, depth_chosen, p_chosen, depth_intercept = calculate_hasterok2011_geotherm(SHF = SHF_chosen, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True, adiabat = False)
 		ax1.plot(T_chosen-273.0,p_chosen,'--', color = 'k', linewidth = 2)
 
 	ax1.set_xlim((600,1800))
@@ -252,7 +252,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 
 	for i in range(SHF_low, SHF_high):
 
-		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_section_depth, moho = 38, kinked = True)
+		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_section_depth, moho = 38, kinked = True, adiabat = False)
 		if temp_unit == 'Celsius':
 			geotherms.append(T-273.0)
 		pressures.append(p)
@@ -284,7 +284,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 
 	#Creating the chosen geotherm for the garnet
 	if SHF_chosen != None:
-		T_chosen, depth_chosen, p_chosen, depth_intercept = calculate_hasterok2011_geotherm(SHF = SHF_chosen, BDL_T = BDL_T + 273, T_0 = 0, max_depth = max_section_depth, moho = 38, kinked = True)
+		T_chosen, depth_chosen, p_chosen, depth_intercept = calculate_hasterok2011_geotherm(SHF = SHF_chosen, BDL_T = BDL_T + 273, T_0 = 0, max_depth = max_section_depth, moho = 38, kinked = True, adiabat = False)
 
 		if temp_unit == 'Celsius':
 			T_chosen = T_chosen - 273.0

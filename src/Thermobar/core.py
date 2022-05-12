@@ -244,7 +244,7 @@ oxygen_num_opx_df.set_index('Sample_ID_Opx', inplace=True)
 oxide_mass_gt = {'SiO2_Gt': 60.0843, 'MgO_Gt': 40.3044, 'FeOt_Gt': 71.8464,
  'CaO_Gt': 56.0774, 'Al2O3_Gt': 101.961,'Na2O_Gt': 61.9789,
  'K2O_Gt': 94.196, 'MnO_Gt': 70.9375, 'TiO2_Gt': 79.8788,
- 'Cr2O3_Gt': 151.9982, 'Ni_Gt':  74.6994 * (1.2725*1e-4)}
+ 'Cr2O3_Gt': 151.9982, 'Ni_Gt':  74.6994}
 
 oxide_mass_gt_df = pd.DataFrame.from_dict(oxide_mass_gt, orient='index').T
 oxide_mass_gt_df['Sample_ID_Gt'] = 'MolWt'
@@ -258,7 +258,7 @@ oxygen_num_gt_df['Sample_ID_Gt'] = 'OxNum'
 oxygen_num_gt_df.set_index('Sample_ID_Gt', inplace=True)
 
 cation_num_gt = {'SiO2_Gt': 1, 'MgO_Gt': 1, 'FeOt_Gt': 1, 'CaO_Gt': 1,
-'Al2O3_Gt': 2, 'Na2O_Gt': 1, 'K2O_Gt': 2, 'MnO_Gt': 1, 'TiO2_Gt': 1,
+'Al2O3_Gt': 2, 'Na2O_Gt': 2, 'K2O_Gt': 2, 'MnO_Gt': 1, 'TiO2_Gt': 1,
 'Cr2O3_Gt': 2, 'Ni_Gt': 1}
 cation_num_gt_df = pd.DataFrame.from_dict(cation_num_gt, orient = 'index').T
 cation_num_gt_df['Sample_ID_Gt'] = 'CatNum'
@@ -1008,31 +1008,53 @@ def calculate_mol_proportions_garnet(gt_comps):
 
 def calculate_fractions_garnet(gt_comps):
 
-    no_oxygen = 12.0
+    no_oxygen = 6.0
     mol_prop = calculate_mol_proportions_garnet(gt_comps=gt_comps)
     mol_prop.columns = [str(col).replace('_mol_prop', '')
                         for col in mol_prop.columns]
 
-    si_ = np.array(mol_prop['SiO2_Gt']) * 2.0
-    ti_ = np.array(mol_prop['TiO2_Gt']) * 2.0
-    al_ = np.array(mol_prop['Al2O3_Gt']) * 1.5
-    cr_ = np.array(mol_prop['Cr2O3_Gt']) * 1.5
-    fe_ = np.array(mol_prop['FeOt_Gt'])
-    mn_ = np.array(mol_prop['MnO_Gt'])
-    mg_ = np.array(mol_prop['MgO_Gt'])
-    ca_ = np.array(mol_prop['CaO_Gt'])
-    na_ = np.array(mol_prop['Na2O_Gt']) * 0.5
-    ni_ = np.array(mol_prop['Ni_Gt'])
-    k_ = np.array(mol_prop['K2O_Gt']) * 0.5
 
-    sum_oxygens = si_ + ti_ + al_ + cr_ + fe_ +\
-    mn_ + mg_ + ca_ + na_ + ni_ + k_
+    si_mol = np.array(mol_prop['SiO2_Gt'])
+    ti_mol = np.array(mol_prop['TiO2_Gt'])
+    al_mol = np.array(mol_prop['Al2O3_Gt']) * 2
+    cr_mol = np.array(mol_prop['Cr2O3_Gt']) * 2
+    fe_mol = np.array(mol_prop['FeOt_Gt'])
+    mn_mol = np.array(mol_prop['MnO_Gt'])
+    mg_mol = np.array(mol_prop['MgO_Gt'])
+    ca_mol = np.array(mol_prop['CaO_Gt'])
+    na_mol = np.array(mol_prop['Na2O_Gt']) * 2
+    ni_mol = np.array(mol_prop['Ni_Gt'])
+    k_mol = np.array(mol_prop['K2O_Gt']) * 2
 
-    mg_cat = (mg_ * no_oxygen) / sum_oxygens
-    fe_cat = (fe_ * no_oxygen) / sum_oxygens
-    ca_cat = (ca_ * no_oxygen) / sum_oxygens
-    al_cat = (al_ * no_oxygen) / sum_oxygens
-    cr_cat = (cr_ * no_oxygen) / sum_oxygens
+    si_oxy = np.array(mol_prop['SiO2_Gt']) * 2
+    ti_oxy = np.array(mol_prop['TiO2_Gt']) * 2
+    al_oxy = np.array(mol_prop['Al2O3_Gt']) * 3
+    cr_oxy = np.array(mol_prop['Cr2O3_Gt']) * 3
+    fe_oxy = np.array(mol_prop['FeOt_Gt'])
+    mn_oxy = np.array(mol_prop['MnO_Gt'])
+    mg_oxy = np.array(mol_prop['MgO_Gt'])
+    ca_oxy = np.array(mol_prop['CaO_Gt'])
+    na_oxy = np.array(mol_prop['Na2O_Gt'])
+    ni_oxy = np.array(mol_prop['Ni_Gt'])
+    k_oxy = np.array(mol_prop['K2O_Gt'])
+
+    sum_oxygen = si_oxy + ti_oxy + al_oxy + cr_oxy + fe_oxy + mn_oxy + mg_oxy +\
+    ca_oxy + na_oxy + k_oxy
+
+    sum_mol = si_mol + ti_mol + al_mol + cr_mol + fe_mol + mn_mol + mg_mol +\
+    ca_mol + na_mol + k_mol
+
+    si_cat = (12 * si_mol) / sum_oxygen
+    ti_cat = (12 * ti_mol) / sum_oxygen
+    al_cat = (12 * al_mol) / sum_oxygen
+    cr_cat = (12 * cr_mol) / sum_oxygen
+    fe_cat = (12 * fe_mol) / sum_oxygen
+    mn_cat = (12 * mn_mol) / sum_oxygen
+    mg_cat = (12 * mg_mol) / sum_oxygen
+    ca_cat = (12 * ca_mol) / sum_oxygen
+    na_cat = (12 * na_mol) / sum_oxygen
+    ni_cat = (12 * ni_mol) / sum_oxygen
+    k_cat = (12 * k_mol) / sum_oxygen
 
     xMg = mg_cat / (mg_cat + fe_cat + ca_cat)
     xCa = ca_cat / (mg_cat + fe_cat + ca_cat)
