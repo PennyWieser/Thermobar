@@ -2,7 +2,7 @@ import numpy as np
 import os, sys
 import matplotlib.pyplot as plt
 
-def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked, adiabat):
+def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked, adiabat, **kwargs):
 
 	'''
 
@@ -30,12 +30,20 @@ def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked, ad
 	kinked: Boolean parameter to determine whether the conductive
 	geotherm will be kinked parallel to D-G transition curve after the BDL.
 
+	out_format: str
+        Choose from:
+
+        |  'Array' - A numpy array output
+        |  'DataFrame' - Pandas dataframe output
+
 	Returns
 	-------
 	Temperature (Kelvin), Depth (meters), Pressure (GPa), index point where the geotherm
 	is kinked
 
 	'''
+
+	out_format = kwargs.pop('out_format', 'Array')
 
 	if kinked == False:
 		BDL_T = 0
@@ -238,7 +246,17 @@ def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked, ad
 		except IndexError:
 			pass
 
-	return T, depth, p, idx_geotherm_nearest
+
+	if out_format == 'Array':
+
+		return T, depth, p, idx_geotherm_nearest
+		
+	elif out_format == 'DataFrame':
+
+		out = pd.DataFrame(
+	            data={'T_K': T, 'Depth_Km': depth, 'Pressure_GPa': p})
+
+		return out
 
 def T_Katsura_2022_Adiabat(P_input):
 

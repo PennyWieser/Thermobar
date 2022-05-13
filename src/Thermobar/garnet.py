@@ -28,7 +28,10 @@ def T_Sudholz2021(gt_comps):
     SEE=+-50C
     '''
 
-    xMg, xCa, xFe, xAl, xCr = calculate_fractions_garnet(gt_comps = gt_comps)
+    gt_calc = calculate_garnet_components(gt_comps = gt_comps)
+
+    xCa = np.array(gt_calc['Ca_MgFeCa'])
+    xCr = np.array(gt_calc['Cr_AlCr'])
 
     ni_ol = 3e3
 
@@ -62,7 +65,13 @@ def P_Ryan1996(gt_comps, T_K):
     SEE=+-50C
     '''
 
-    xMg, xCa, xFe, xAl, xCr = calculate_fractions_garnet(gt_comps = gt_comps)
+    gt_calc = calculate_garnet_components(gt_comps = gt_comps)
+
+    xMg = np.array(gt_calc['Mg_MgFeCa'])
+    xCa = np.array(gt_calc['Ca_MgFeCa'])
+    xFe = np.array(gt_calc['Fe_MgFeCa'])
+    xAl = np.array(gt_calc['Al_AlCr'])
+    xCr = np.array(gt_calc['Cr_AlCr'])
 
     P_cr = np.zeros(len(T_K))
 

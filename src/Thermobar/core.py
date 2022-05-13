@@ -1006,63 +1006,72 @@ def calculate_mol_proportions_garnet(gt_comps):
 
     return mol_prop_anhyd
 
-def calculate_fractions_garnet(gt_comps):
+def calculate_oxygens_garnet(gt_comps):
 
-    no_oxygen = 6.0
     mol_prop = calculate_mol_proportions_garnet(gt_comps=gt_comps)
     mol_prop.columns = [str(col).replace('_mol_prop', '')
                         for col in mol_prop.columns]
+    ox_num_reindex = oxygen_num_gt_df.reindex(
+        mol_prop.columns, axis=1).fillna(0)
+    df_calc_comb = pd.concat([ox_num_reindex, mol_prop])
+    oxygens_anhyd = df_calc_comb.multiply(
+        df_calc_comb.loc['OxNum', :], axis='columns').drop(['OxNum'])
+    oxygens_anhyd.columns = [str(col) + '_ox' for col in oxygens_anhyd.columns]
 
+    return oxygens_anhyd
 
-    si_mol = np.array(mol_prop['SiO2_Gt'])
-    ti_mol = np.array(mol_prop['TiO2_Gt'])
-    al_mol = np.array(mol_prop['Al2O3_Gt']) * 2
-    cr_mol = np.array(mol_prop['Cr2O3_Gt']) * 2
-    fe_mol = np.array(mol_prop['FeOt_Gt'])
-    mn_mol = np.array(mol_prop['MnO_Gt'])
-    mg_mol = np.array(mol_prop['MgO_Gt'])
-    ca_mol = np.array(mol_prop['CaO_Gt'])
-    na_mol = np.array(mol_prop['Na2O_Gt']) * 2
-    ni_mol = np.array(mol_prop['Ni_Gt'])
-    k_mol = np.array(mol_prop['K2O_Gt']) * 2
+def calculate_moles_garnet(gt_comps):
 
-    si_oxy = np.array(mol_prop['SiO2_Gt']) * 2
-    ti_oxy = np.array(mol_prop['TiO2_Gt']) * 2
-    al_oxy = np.array(mol_prop['Al2O3_Gt']) * 3
-    cr_oxy = np.array(mol_prop['Cr2O3_Gt']) * 3
-    fe_oxy = np.array(mol_prop['FeOt_Gt'])
-    mn_oxy = np.array(mol_prop['MnO_Gt'])
-    mg_oxy = np.array(mol_prop['MgO_Gt'])
-    ca_oxy = np.array(mol_prop['CaO_Gt'])
-    na_oxy = np.array(mol_prop['Na2O_Gt'])
-    ni_oxy = np.array(mol_prop['Ni_Gt'])
-    k_oxy = np.array(mol_prop['K2O_Gt'])
+    mol_prop = calculate_mol_proportions_garnet(gt_comps=gt_comps)
+    mol_prop.columns = [str(col).replace('_mol_prop', '')
+                        for col in mol_prop.columns]
+    mole_num_reindex = cation_num_gt_df.reindex(
+        mol_prop.columns, axis=1).fillna(0)
+    df_calc_comb = pd.concat([mole_num_reindex, mol_prop])
+    moles_anhyd = df_calc_comb.multiply(
+        df_calc_comb.loc['CatNum', :], axis='columns').drop(['CatNum'])
+    moles_anhyd.columns = [str(col) + '_Mole' for col in moles_anhyd.columns]
 
-    sum_oxygen = si_oxy + ti_oxy + al_oxy + cr_oxy + fe_oxy + mn_oxy + mg_oxy +\
-    ca_oxy + na_oxy + k_oxy
+    return moles_anhyd
 
-    sum_mol = si_mol + ti_mol + al_mol + cr_mol + fe_mol + mn_mol + mg_mol +\
-    ca_mol + na_mol + k_mol
+def calculate_garnet_components(gt_comps):
 
-    si_cat = (12 * si_mol) / sum_oxygen
-    ti_cat = (12 * ti_mol) / sum_oxygen
-    al_cat = (12 * al_mol) / sum_oxygen
-    cr_cat = (12 * cr_mol) / sum_oxygen
-    fe_cat = (12 * fe_mol) / sum_oxygen
-    mn_cat = (12 * mn_mol) / sum_oxygen
-    mg_cat = (12 * mg_mol) / sum_oxygen
-    ca_cat = (12 * ca_mol) / sum_oxygen
-    na_cat = (12 * na_mol) / sum_oxygen
-    ni_cat = (12 * ni_mol) / sum_oxygen
-    k_cat = (12 * k_mol) / sum_oxygen
+    no_oxygen = 12.0
+    
+    oxy_prop = calculate_oxygens_garnet(gt_comps = gt_comps)
+    cat_prop = calculate_moles_garnet(gt_comps = gt_comps)
 
-    xMg = mg_cat / (mg_cat + fe_cat + ca_cat)
-    xCa = ca_cat / (mg_cat + fe_cat + ca_cat)
-    xFe = fe_cat / (mg_cat + fe_cat + ca_cat)
-    xAl = al_cat / (al_cat + cr_cat)
-    xCr = cr_cat / (al_cat + cr_cat)
+    gt_calc = pd.concat([oxy_prop, cat_prop],axis = 1, join = 'inner')
 
-    return xMg, xCa, xFe, xAl, xCr
+    gt_calc['Oxygen_Sum_Gt'] = gt_calc['SiO2_Gt_ox'] + gt_calc['TiO2_Gt_ox'] +\
+    gt_calc['Al2O3_Gt_ox'] + gt_calc['Cr2O3_Gt_ox'] + gt_calc['FeOt_Gt_ox'] +\
+    gt_calc['MnO_Gt_ox'] + gt_calc['MgO_Gt_ox'] + gt_calc['CaO_Gt_ox'] +\
+    gt_calc['Na2O_Gt_ox'] + gt_calc['K2O_Gt_ox']
+
+    gt_calc['Si_Gt_Cat'] = (no_oxygen * gt_calc['SiO2_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+    gt_calc['Ti_Gt_Cat'] = (no_oxygen * gt_calc['TiO2_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+    gt_calc['Al_Gt_Cat'] = (no_oxygen * gt_calc['Al2O3_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+    gt_calc['Cr_Gt_Cat'] = (no_oxygen * gt_calc['Cr2O3_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+    gt_calc['Fe_Gt_Cat'] = (no_oxygen * gt_calc['FeOt_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+    gt_calc['Mn_Gt_Cat'] = (no_oxygen * gt_calc['MnO_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+    gt_calc['Mg_Gt_Cat'] = (no_oxygen * gt_calc['MgO_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+    gt_calc['Ca_Gt_Cat'] = (no_oxygen * gt_calc['CaO_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+    gt_calc['Na_Gt_Cat'] = (no_oxygen * gt_calc['Na2O_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+    gt_calc['K_Gt_Cat'] = (no_oxygen * gt_calc['K2O_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
+
+    gt_calc['Mg_MgFeCa'] = gt_calc['Mg_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
+     gt_calc['Fe_Gt_Cat'] + gt_calc['Ca_Gt_Cat'])
+    gt_calc['Fe_MgFeCa'] = gt_calc['Fe_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
+     gt_calc['Fe_Gt_Cat'] + gt_calc['Ca_Gt_Cat'])
+    gt_calc['Ca_MgFeCa'] = gt_calc['Ca_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
+     gt_calc['Fe_Gt_Cat'] + gt_calc['Ca_Gt_Cat'])
+
+    gt_calc['Al_AlCr'] = gt_calc['Al_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
+     gt_calc['Cr_Gt_Cat'])
+    gt_calc['Cr_AlCr'] = gt_calc['Cr_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
+     gt_calc['Cr_Gt_Cat'])
+
+    return gt_calc
 
 ## Orthopyroxene mole proportions, fractions, cation proportions and fractions
 

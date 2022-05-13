@@ -12,12 +12,15 @@ from Thermobar.garnet_class import *
 from Thermobar.geotherm import *
 from Thermobar.garnet_plot import *
 
-#Now load the data
+
+
+
+#Now load the data from Ozaydin et al. (2021)
 file = "../Examples/Garnet/Group1_Kimberley.xlsx" #Wherever that /Examples/Garnet is
 data = import_excel(file, sheet_name = "Sheet1")
 my_input_gt = data['my_input']
 
-#Ryan1996
+#Calculating T from Ryan_1996
 T = calculate_gt_temp(gt_comps = my_input_gt, equationT = 'T_Ryan1996', out_format = 'Array') #Calculating T_Ryan1996
 
 #Creating fig object
@@ -30,7 +33,7 @@ ax2 = plt.subplot(122)
 #1:1 line
 ax1.plot(x,y,color = 'r',linewidth = 1)
 
-#Loading external file
+#Loading external file including the solution from Ozaydin et al. (2021)
 file_ext = "../Benchmarking/garnet/Group_1_PT_solution.xlsx"
 data_ext = import_excel(file_ext, sheet_name = "Group_1_PT_solution")
 input_gt_ext = data_ext['my_input']
@@ -49,7 +52,9 @@ ax2.set_xlabel('Difference (T_Ryan1996_Ozaydin2021 - T_Thermobar)')
 ax2.set_ylabel('Count')
 plt.show()
 
-#P_Ryan_1996
+
+#####
+#Calculating P_Ryan_1996
 P = calculate_gt_press(gt_comps = my_input_gt, equationP = 'P_Ryan1996', T = T, out_format = 'Array')
 fig = plt.figure(figsize = (12,6))
 y = np.arange(0,12,1)
@@ -68,7 +73,8 @@ ax2.set_xlabel('Difference (P_Ryan1996_Ozaydin2021 - P_Thermobar)')
 ax2.set_ylabel('Count')
 plt.show()
 
-#T_Sudholz2021
+#Loading data from Sudholz et al. (2021) for benchmarking tests of
+#Sudholz2021 and Canil1999. This file consists both the solution and composition data
 file_sudholz = "../Benchmarking/garnet/PT_Sudholz.xlsx"
 data_sudholz = import_excel(file_sudholz, sheet_name = "PT_Sudholz")
 input_sudholz_ext = data_sudholz['my_input']
@@ -111,6 +117,7 @@ ax2.set_xlabel('Difference (T_Canil1999 - T_Thermobar)')
 ax2.set_ylabel('Count')
 plt.show()
 
+#These are not benchmarking tests but an example for plotting functions
 plot_CA_CR(gt_comps = my_input_gt, T_Ni = T, P_Cr = P, BDL_T = 1125,
  SHF_low = 35, SHF_high = 45, SHF_chosen = 37, max_depth = 300,
   temp_unit = 'Celsius', plot_type = 'show')
