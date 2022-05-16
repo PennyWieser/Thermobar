@@ -441,6 +441,11 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
     myAmphs1 = my_input_c.reindex(df_ideal_amp.columns, axis=1).fillna(0)
     myAmphs1 = myAmphs1.apply(pd.to_numeric, errors='coerce').fillna(0)
     myAmphs1[myAmphs1 < 0] = 0
+
+    myGts1 = my_input_c.reindex(df_ideal_gt.columns, axis=1).fillna(0)
+    myGts1 = myGts1.apply(pd.to_numeric, errors='coerce').fillna(0)
+    myGts1[myGts1 < 0] = 0
+
     # Adding sample Names
     if "Sample_ID_Cpx" in my_input_c:
         myCPXs1['Sample_ID_Cpx'] = my_input_c['Sample_ID_Cpx']
@@ -466,6 +471,11 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
         myAmphs1['Sample_ID_Amp'] = my_input_c['Sample_ID_Amp']
     else:
         myAmphs1['Sample_ID_Amp'] = my_input.index
+
+    if "Sample_ID_Gt" in my_input_c:
+        myGts1['Sample_ID_Gt'] = my_input_c['Sample_ID_Gt']
+    else:
+        myGts1['Sample_ID_Gt'] = my_input.index
 
     if "Sample_ID_Ol" in my_input_c:
         myOls1['Sample_ID_Ol'] = my_input_c['Sample_ID_Ol']
@@ -502,7 +512,7 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
     #     mySps1['T_K'] = my_input['T_K']
     #     myLiquids1['T_K'] = my_input['T_K']
 
-    return {'my_input': my_input, 'my_oxides': myOxides1, 'Experimental_press_temp': Experimental_press_temp1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs': myLiquids1,
+    return {'my_input': my_input, 'my_oxides': myOxides1, 'Experimental_press_temp': Experimental_press_temp1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs': myLiquids1, 'Gts': myGts1,
             'Plags': myPlags1, 'Kspars': myKspars1, 'Amps': myAmphs1, 'Ols': myOls1, 'Sps': mySps1}  # , 'y1': y1 ,'y2': y2}
 
 
@@ -728,8 +738,16 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
         mySps1['T_K_Err'] = my_input['T_K_Err']
         myLiquids1['T_K_Err'] = my_input['T_K_Err']
 
-    return {'my_input_Err': my_input, 'Experimental_press_temp_Err': Experimental_press_temp1, 'Cpxs_Err': myCPXs1,
-            'Opxs_Err': myOPXs1, 'Liqs_Err': myLiquids1, 'Plags_Err': myPlags1, 'Kspars_Err': myKspars1, 'Amps_Err': myAmphs1, 'Ols_Err': myOls1, 'Sps_Err': mySps1}
+    return {'my_input_Err': my_input,
+    'Experimental_press_temp_Err': Experimental_press_temp1,
+    'Cpxs_Err': myCPXs1,
+    'Opxs_Err': myOPXs1,
+    'Liqs_Err': myLiquids1,
+    'Plags_Err': myPlags1,
+    'Kspars_Err': myKspars1,
+    'Amps_Err': myAmphs1,
+    'Ols_Err': myOls1,
+    'Sps_Err': mySps1}
 
 
 # Gets liquid dataframe into a format that can be used in VESical. Have to
