@@ -379,7 +379,7 @@ def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch
 
     return df_stats
 
-def P_Jorgenson2022_Cpx_Liq_onnx_local(T=None, *, cpx_comps=None,
+def P_Jorgenson2022_Cpx_Liq_onnx(T=None, *, cpx_comps=None,
 liq_comps=None, meltmatch=None):
     '''
     Clinopyroxene-liquid  barometer of Jorgenson et al. (2022) based on
@@ -431,7 +431,7 @@ liq_comps=None, meltmatch=None):
     try:
         import Thermobar_onnx
     except ImportError:
-        raise RuntimeError('Please install Thermobar onnx - see ReadMe')
+        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Press.onnx"))
     input_name = sess.get_inputs()[0].name
@@ -443,63 +443,8 @@ liq_comps=None, meltmatch=None):
 
     return df_stats
 
-def P_Jorgenson2022_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
-    '''
-    Clinopyroxene-liquid  barometer of Jorgenson et al. (2022) based on
-    Machine Learning. Uses onnx, so doesnt return voting
-    :cite:`jorgenson2021machine`
-
-    SEE==+-2.7 kbar
-    '''
-    if meltmatch is None:
-        cpx_test=cpx_comps.copy()
-        liq_test=liq_comps.copy()
-        cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
-
-    if meltmatch is not None:
-        cpx_liq_combo=meltmatch
 
 
-
-    Cpx_Liq_ML_in=pd.DataFrame(data={
-                                'SiO2_Liq': cpx_liq_combo['SiO2_Liq'],
-                                'TiO2_Liq': cpx_liq_combo['TiO2_Liq'],
-                                'Al2O3_Liq': cpx_liq_combo['Al2O3_Liq'],
-                                'FeOt_Liq': cpx_liq_combo['FeOt_Liq'],
-                                'MnO_Liq': cpx_liq_combo['MnO_Liq'],
-                                'MgO_Liq': cpx_liq_combo['MgO_Liq'],
-                                'CaO_Liq': cpx_liq_combo['CaO_Liq'],
-                                'Na2O_Liq': cpx_liq_combo['Na2O_Liq'],
-                                'K2O_Liq': cpx_liq_combo['K2O_Liq'],
-                                'Cr2O3_Liq': cpx_liq_combo['Cr2O3_Liq'],
-                                'P2O5_Liq': cpx_liq_combo['P2O5_Liq'],
-                                'SiO2_Cpx': cpx_liq_combo['SiO2_Cpx'],
-                                'TiO2_Cpx': cpx_liq_combo['TiO2_Cpx'],
-                                'Al2O3_Cpx': cpx_liq_combo['Al2O3_Cpx'],
-                                'FeOt_Cpx': cpx_liq_combo['FeOt_Cpx'],
-                                'MnO_Cpx': cpx_liq_combo['MnO_Cpx'],
-                                'MgO_Cpx': cpx_liq_combo['MgO_Cpx'],
-                                'CaO_Cpx': cpx_liq_combo['CaO_Cpx'],
-                                'Na2O_Cpx': cpx_liq_combo['Na2O_Cpx'],
-                                'K2O_Cpx': cpx_liq_combo['K2O_Cpx'],
-                                'Cr2O3_Cpx': cpx_liq_combo['Cr2O3_Cpx'],
-    })
-
-
-    x_test=Cpx_Liq_ML_in.values
-
-
-
-    sess = rt.InferenceSession(str(Thermobar_dir/"Jorg21_Cpx_Liq_Press.onnx"))
-    #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
-    input_name = sess.get_inputs()[0].name
-    label_name = sess.get_outputs()[0].name
-    Pred_P_kbar = sess.run([label_name], {input_name: x_test.astype(np.float32)})[0]
-
-    P_kbar=pd.Series(Pred_P_kbar[:, 0])
-    return P_kbar
-
-    return df_stats
 
 
 def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=None):
@@ -550,7 +495,18 @@ def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltm
 
     # using Onnx #Thermobar_dir/
     #str(load_dir / "model.onnx")
-    sess = rt.InferenceSession(str(Thermobar_dir/"Petrelli2020_Cpx_Liq_Press.onnx"))
+
+
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+    path=Path(Thermobar_onnx.__file__).parent
+    sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Press.onnx"))
+
+
+
+
     #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
@@ -954,10 +910,15 @@ def T_Jorgenson2022_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, melt
 
     x_test=Cpx_Liq_ML_in.values
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+    path=Path(Thermobar_onnx.__file__).parent
+    sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Temp.onnx"))
 
 
-
-    sess = rt.InferenceSession(str(Thermobar_dir/"Jorg21_Cpx_Liq_Temp.onnx"))
+    #sess = rt.InferenceSession(str(Thermobar_dir/"Jorg21_Cpx_Liq_Temp.onnx"))
     #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
@@ -1166,7 +1127,14 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
     x_test=Cpx_test_noID_noT.values
 
 
-    sess = rt.InferenceSession(str(Thermobar_dir/"Petrelli2020_Cpx_only_Press.onnx"))
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+    path=Path(Thermobar_onnx.__file__).parent
+    sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Press.onnx"))
+
+
     #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
@@ -1279,9 +1247,13 @@ def P_Jorgenson2022_Cpx_only_onnx(T=None, *, cpx_comps):
     x_test=Cpx_test_noID_noT.values
 
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+    path=Path(Thermobar_onnx.__file__).parent
+    sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Press.onnx"))
 
-    sess = rt.InferenceSession(str(Thermobar_dir/"Jorg21_Cpx_only_Press.onnx"))
-    #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
     Pred_P_kbar = sess.run([label_name], {input_name: x_test.astype(np.float32)})[0]
@@ -1610,8 +1582,14 @@ def T_Jorgenson2022_Cpx_only_onnx(P=None, *, cpx_comps):
     x_test=Cpx_test_noID_noT.values
 
 
-    sess = rt.InferenceSession(str(Thermobar_dir/"Jorg21_Cpx_only_Temp.onnx"))
-    #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+    path=Path(Thermobar_onnx.__file__).parent
+    sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Temp.onnx"))
+
+
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
     Pred_T_K = sess.run([label_name], {input_name: x_test.astype(np.float32)})[0]
@@ -1705,8 +1683,8 @@ Cpx_Liq_P_funcs = {P_Put1996_eqP1, P_Mas2013_eqPalk1, P_Put1996_eqP2, P_Mas2013_
 P_Put2003, P_Put2008_eq30, P_Put2008_eq31, P_Put2008_eq32c, P_Mas2013_eqalk32c,
 P_Mas2013_Palk2012, P_Wieser2021_H2O_indep, P_Neave2017, P_Petrelli2020_Cpx_Liq,
 P_Jorgenson2022_Cpx_Liq, P_Jorgenson2022_Cpx_Liq_onnx, P_Jorgenson2022_Cpx_Liq_Norm,
- P_Jorgenson2022_Cpx_Liq_onnx_local,
-P_Petrelli2020_Cpx_Liq_onnx,
+ P_Jorgenson2022_Cpx_Liq_onnx,
+ P_Petrelli2020_Cpx_Liq_onnx,
 P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
 P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA} # put on outside
 
