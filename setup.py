@@ -41,6 +41,9 @@ setup(
             'skl2onnx',
             'onnxruntime'
             ],
+    extra_requires={
+        'onnx': ["https://github.com/PennyWieser/Thermobar_onnx/archive/refs/tags/0.0.1dev.zip"]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",

@@ -380,7 +380,7 @@ def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch
     return df_stats
 
 def P_Jorgenson2022_Cpx_Liq_onnx_local(T=None, *, cpx_comps=None,
-liq_comps=None, meltmatch=None, path=None):
+liq_comps=None, meltmatch=None):
     '''
     Clinopyroxene-liquid  barometer of Jorgenson et al. (2022) based on
     Machine Learning. Uses onnx, so doesnt return voting
@@ -388,8 +388,6 @@ liq_comps=None, meltmatch=None, path=None):
 
     SEE==+-2.7 kbar
     '''
-    if path is None:
-        TypeError('Please enter a local path with the onnx files downloaded from Github, these are too big to pip install')
     if meltmatch is None:
         cpx_test=cpx_comps.copy()
         liq_test=liq_comps.copy()
@@ -428,10 +426,14 @@ liq_comps=None, meltmatch=None, path=None):
     x_test=Cpx_Liq_ML_in.values
 
 
-    Thermobar_dir=path
 
-    sess = rt.InferenceSession(path+'/'+'Jorg21_Cpx_Liq_Press.onnx')
-    #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
+    #sess = rt.InferenceSession(path+'/'+'Jorg21_Cpx_Liq_Press.onnx')
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('Please install Thermobar onnx - see ReadMe')
+    path=Path(Thermobar_onnx.__file__).parent
+    sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Press.onnx"))
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
     Pred_P_kbar = sess.run([label_name], {input_name: x_test.astype(np.float32)})[0]
@@ -1713,7 +1715,7 @@ Cpx_Liq_P_funcs_by_name = {p.__name__: p for p in Cpx_Liq_P_funcs}
 
 def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltmatch=None,
                             T=None, eq_tests=False, Fe3Fet_Liq=None, H2O_Liq=None,
-                           sigma=1, Kd_Err=0.03, path=None):
+                           sigma=1, Kd_Err=0.03):
     '''
     Clinopyroxene-Liquid barometer, calculates pressure in kbar
     (and equilibrium tests as an option)
@@ -1827,7 +1829,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
     # Easiest to treat Machine Learning ones differently
 
     if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" in equationP:
-        P_kbar=func(meltmatch=Combo_liq_cpxs, path=path)
+        P_kbar=func(meltmatch=Combo_liq_cpxs)
 
     elif ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
         df_stats=func(meltmatch=Combo_liq_cpxs)
