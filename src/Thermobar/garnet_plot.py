@@ -49,7 +49,7 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 
 	for i in range(SHF_low, SHF_high):
 
-		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True)
+		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True, adiabat = False)
 		if temp_unit == 'Celsius':
 			geotherms.append(T-273.0)
 		pressures.append(p)
@@ -128,7 +128,7 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 	ax1.axvline(BDL_T,linestyle = '--',color = 'k',linewidth = 2)
 
 	if SHF_chosen != None:
-		T_chosen, depth_chosen, p_chosen, depth_intercept = calculate_hasterok2011_geotherm(SHF = SHF_chosen, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True)
+		T_chosen, depth_chosen, p_chosen, depth_intercept = calculate_hasterok2011_geotherm(SHF = SHF_chosen, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True, adiabat = False)
 		ax1.plot(T_chosen-273.0,p_chosen,'--', color = 'k', linewidth = 2)
 
 	ax1.set_xlim((600,1800))
@@ -252,7 +252,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 
 	for i in range(SHF_low, SHF_high):
 
-		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_section_depth, moho = 38, kinked = True)
+		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_section_depth, moho = 38, kinked = True, adiabat = False)
 		if temp_unit == 'Celsius':
 			geotherms.append(T-273.0)
 		pressures.append(p)
@@ -273,7 +273,14 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	depth_fields = np.arange(min_section_depth, max_section_depth + depth_interval, depth_interval) * 1e3 #Creating depth ranges for the plot sections with the
 	#interval inputted with min_section_depth, max_section_depth and depth_interval
 
-	xMg, xCa, xFe, xAl, xCr = calculate_fractions_garnet(gt_comps = gt_comps)
+	gt_calc = calculate_garnet_components(gt_comps = gt_comps)
+
+	xMg = np.array(gt_calc['Mg_MgFeCa'])
+	xCa = np.array(gt_calc['Ca_MgFeCa'])
+	xFe = np.array(gt_calc['Fe_MgFeCa'])
+	xAl = np.array(gt_calc['Al_AlCr'])
+	xCr = np.array(gt_calc['Cr_AlCr'])
+
 	carp_depleted_harz, carp_depleted_lherz, carp_depleted_metasomatised, carp_fertile_lherz, carp_melt_metas, carp_unclass, len_tot = garnet_CARP_class_Griffin2002(gt_comps = gt_comps) #determining CARP classes from garnet composition
 	cacr_class = garnet_ca_cr_class_Griffin2002(gt_comps = gt_comps)
 	g_class = garnet_class_Grutter2003(gt_comps = gt_comps)
@@ -284,7 +291,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 
 	#Creating the chosen geotherm for the garnet
 	if SHF_chosen != None:
-		T_chosen, depth_chosen, p_chosen, depth_intercept = calculate_hasterok2011_geotherm(SHF = SHF_chosen, BDL_T = BDL_T + 273, T_0 = 0, max_depth = max_section_depth, moho = 38, kinked = True)
+		T_chosen, depth_chosen, p_chosen, depth_intercept = calculate_hasterok2011_geotherm(SHF = SHF_chosen, BDL_T = BDL_T + 273, T_0 = 0, max_depth = max_section_depth, moho = 38, kinked = True, adiabat = False)
 
 		if temp_unit == 'Celsius':
 			T_chosen = T_chosen - 273.0
