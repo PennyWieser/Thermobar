@@ -42,6 +42,13 @@ from Thermobar.plotting import *
 from Thermobar.viscosity import *
 # calibration
 from Thermobar.calibration_plots import *
+# Garnet
+from Thermobar.garnet import *
+from Thermobar.garnet_plot import*
+from Thermobar.garnet_class import*
+# Geotherm
+from Thermobar.geotherm import *
+
 
 # version
 from ._version import __version__

@@ -14,6 +14,7 @@ Welcome to Thermobar's documentation!
    installation
    importing_data
    available_functions_pdf
+   Adding_new_models
    FAQs
    Changelog
 
