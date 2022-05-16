@@ -8,7 +8,7 @@ import pandas as pd
 from pickle import load
 import pickle
 from pathlib import Path
-Thermobar_dir=Path(__file__).parent
+#Thermobar_dir=Path(__file__).parent
 import joblib
 # Things for machine learning onnx
 from sklearn.preprocessing import StandardScaler
@@ -243,6 +243,13 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     x_test=Cpx_Liq_ML_in.values
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
+
+
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq_Jan22.pkl', 'rb') as f:
         scaler_P2020_Cpx_Liq=load(f)
 
@@ -303,6 +310,12 @@ def P_Jorgenson2022_Cpx_Liq_Norm(T=None, *, cpx_comps=None, liq_comps=None, melt
 
 
     x_test=Cpx_Liq_ML_in.values
+
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'scaler_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
         scaler_J22_Cpx_Liq=load(f)
@@ -365,7 +378,11 @@ def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch
 
     x_test=Cpx_Liq_ML_in.values
 
-
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_April24_NotNorm.pkl', 'rb') as f:
         ETR_Press_J22_Cpx_Liq=joblib.load(f)
@@ -431,7 +448,7 @@ liq_comps=None, meltmatch=None):
     try:
         import Thermobar_onnx
     except ImportError:
-        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Press.onnx"))
     input_name = sess.get_inputs()[0].name
@@ -500,7 +517,7 @@ def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltm
     try:
         import Thermobar_onnx
     except ImportError:
-        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Press.onnx"))
 
@@ -728,6 +745,12 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     x_test=Cpx_Liq_ML_in.values
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
+
     # Old version using pickles
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq.pkl', 'rb') as f:
         scaler_P2020_Cpx_Liq=load(f)
@@ -790,6 +813,12 @@ def T_Jorgenson2022_Cpx_Liq_Norm(P=None, *, cpx_comps=None, liq_comps=None, melt
 
     x_test=Cpx_Liq_ML_in.values
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
+
     # Old version using pickles
     with open(Thermobar_dir/'scaler_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
         scaler_J22_Cpx_Liq=load(f)
@@ -851,7 +880,11 @@ def T_Jorgenson2022_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch
 
     x_test=Cpx_Liq_ML_in.values
 
-
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_Liq_April24_NotNorm.pkl', 'rb') as f:
         ETR_Temp_J22_Cpx_Liq=joblib.load(f)
@@ -913,7 +946,7 @@ def T_Jorgenson2022_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, melt
     try:
         import Thermobar_onnx
     except ImportError:
-        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Temp.onnx"))
 
@@ -1086,6 +1119,12 @@ def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
 
     x_test=Cpx_test_noID_noT.values
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
+
 
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_Jan22.pkl', 'rb') as f:
         scaler_P2020_Cpx_only=load(f)
@@ -1130,7 +1169,7 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
     try:
         import Thermobar_onnx
     except ImportError:
-        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Press.onnx"))
 
@@ -1209,7 +1248,11 @@ def P_Jorgenson2022_Cpx_only(T=None, *, cpx_comps):
 
     x_test=Cpx_test_noID_noT.values
 
-
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_only_April24_NoNorm.pkl', 'rb') as f:
         ETR_Press_J21_Cpx_only=joblib.load(f)
@@ -1250,7 +1293,7 @@ def P_Jorgenson2022_Cpx_only_onnx(T=None, *, cpx_comps):
     try:
         import Thermobar_onnx
     except ImportError:
-        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Press.onnx"))
 
@@ -1285,6 +1328,11 @@ def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
 
     x_test=Cpx_test_noID_noT.values
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O_Jan22.pkl', 'rb') as f:
         scaler_P2020_Cpx_only=load(f)
@@ -1474,6 +1522,13 @@ def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
 
     x_test=Cpx_test_noID_noT.values
 
+
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
+
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_Jan22.pkl', 'rb') as f:
         scaler_P2020_Cpx_only=load(f)
 
@@ -1509,6 +1564,12 @@ def T_Jorgenson2022_Cpx_only_Norm(P=None, *, cpx_comps):
     })
 
     x_test=Cpx_test_noID_noT.values
+
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'scaler_Jorg21_Cpx_only_April24.pkl', 'rb') as f:
         scaler_J22_Cpx_only=load(f)
@@ -1547,6 +1608,11 @@ def T_Jorgenson2022_Cpx_only(P=None, *, cpx_comps):
 
     x_test=Cpx_test_noID_noT.values
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_only_April24_NoNorm.pkl', 'rb') as f:
         ETR_Temp_J22_Cpx_only=joblib.load(f)
@@ -1585,7 +1651,7 @@ def T_Jorgenson2022_Cpx_only_onnx(P=None, *, cpx_comps):
     try:
         import Thermobar_onnx
     except ImportError:
-        raise RuntimeError('Please do pip install Thermobar[onnx] to be able to access onnx files')
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Temp.onnx"))
 
@@ -1660,6 +1726,11 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
     })
     x_test=Cpx_test_noID_noT.values
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
 
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O_Jan22.pkl', 'rb') as f:
