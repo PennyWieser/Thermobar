@@ -62,7 +62,6 @@ def P_Ryan1996(gt_comps, T_K):
     '''
     Cr-pyrope garnet barometer of Ryan et al. (1996)
     :cite:`ryan1996`
-    SEE=+-50C
     '''
 
     gt_calc = calculate_garnet_components(gt_comps = gt_comps)
@@ -175,7 +174,7 @@ Gt_T_funcs = {T_Ryan1996, T_Canil1999, T_Sudholz2021} # put on outside
 
 Gt_T_funcs_by_name = {p.__name__: p for p in Gt_T_funcs}
 
-def calculate_gt_temp(*, gt_comps=None, equationT=None, out_format=None):
+def calculate_gt_temp(*, gt_comps=None, equationT=None):
 
     '''
 
@@ -200,10 +199,7 @@ def calculate_gt_temp(*, gt_comps=None, equationT=None, out_format=None):
 
     Returns
     -----------
-    If out_format is 'Array'
-        numpy.array: Temperature in K
-    If out_format is 'DataFrame'
-        pandas.DataFrame: Temperature in K
+        pandas.Series: Temperature in K
     '''
 
     try:
@@ -220,18 +216,16 @@ def calculate_gt_temp(*, gt_comps=None, equationT=None, out_format=None):
     else:
         raise ValueError(f'{equationT} requires you to enter gt_comps that involves Ni_Gt [ppm]')
 
-    if out_format == 'DataFrame':
+    T_K_series= pd.Series(T_K)
 
-        T_K = pd.DataFrame(T_K, columns = ['Temperature_K'])
-
-    return T_K
+    return T_K_series
 
 #--------------------Function for solving for pressure for garnets-----------------------------------------------------#
 Gt_P_funcs = {P_Ryan1996} # put on outside
 
 Gt_P_funcs_by_name = {p.__name__: p for p in Gt_P_funcs}
 
-def calculate_gt_press(*, gt_comps=None, equationP=None, T=None, out_format=None):
+def calculate_gt_press(*, gt_comps=None, equationP=None, T=None):
 
     '''
 
@@ -249,18 +243,10 @@ def calculate_gt_press(*, gt_comps=None, equationP=None, T=None, out_format=None
     T: Array
         Estimated temperature of garnet the sample
 
-    out_format: str
-        Choose from:
-
-        |  'Array' - A numpy array output
-        |  'DataFrame' - Pandas dataframe output
 
     Returns
     -----------
-    If out_format is 'Array'
-        numpy.array: Temperature in K
-    If out_format is 'DataFrame'
-        pandas.DataFrame: Temperature in K
+        pandas.Series: Pressure in kbar
     '''
 
     try:
@@ -279,8 +265,6 @@ def calculate_gt_press(*, gt_comps=None, equationP=None, T=None, out_format=None
         raise ValueError(f'{equationP} requires you to enter gt_comps and T [K]')
 
 
-    if out_format == 'DataFrame':
+    P_kbar_series= 10*pd.Series(P)
 
-        P = pd.DataFrame(P, columns = ['P_GPa'])
-
-    return P
+    return P_kbar_series

@@ -12,16 +12,13 @@ from Thermobar.garnet_class import *
 from Thermobar.geotherm import *
 from Thermobar.garnet_plot import *
 
-
-
-
 #Now load the data from Ozaydin et al. (2021)
 file = "../Examples/Garnet/Group1_Kimberley.xlsx" #Wherever that /Examples/Garnet is
 data = import_excel(file, sheet_name = "Sheet1")
 my_input_gt = data['my_input']
 
 #Calculating T from Ryan_1996
-T = calculate_gt_temp(gt_comps = my_input_gt, equationT = 'T_Ryan1996', out_format = 'Array') #Calculating T_Ryan1996
+T = calculate_gt_temp(gt_comps = my_input_gt, equationT = 'T_Ryan1996') #Calculating T_Ryan1996
 
 #Creating fig object
 fig = plt.figure(figsize = (12,6))
@@ -37,7 +34,7 @@ ax1.plot(x,y,color = 'r',linewidth = 1)
 file_ext = "../Benchmarking/garnet/Group_1_PT_solution.xlsx"
 data_ext = import_excel(file_ext, sheet_name = "Group_1_PT_solution")
 input_gt_ext = data_ext['my_input']
-p_ext = np.array(input_gt_ext['P_Kb']) / 10.0
+p_ext = np.array(input_gt_ext['P_Kb'])
 t_ext = np.array(input_gt_ext['T_C'] + 273.0)
 
 #plotting calculated vs read T_Ryan1996
@@ -55,22 +52,25 @@ plt.show()
 
 #####
 #Calculating P_Ryan_1996
-P = calculate_gt_press(gt_comps = my_input_gt, equationP = 'P_Ryan1996', T = T, out_format = 'Array')
-fig = plt.figure(figsize = (12,6))
-y = np.arange(0,12,1)
-x = y
-ax1 = plt.subplot(121)
-ax2 = plt.subplot(122)
-ax1.plot(x,y,color = 'r', linewidth = 1)
+P = calculate_gt_press(gt_comps = my_input_gt, equationP = 'P_Ryan1996', T = T)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,5))
 
-ax1.plot(p_ext, P, 'o')
-counts, edges, patches = ax2.hist(t_ext - T,
-bins = np.linspace(np.amin(p_ext - P),np.amax(p_ext - P), 10),color = '#2d8e5f')
-centers = 0.5*(edges[:-1] + edges[1:])
-ax1.set_xlabel('P_Ryan1996 taken from Ryan1996_Ozaydin2021')
-ax1.set_ylabel('P_Ryan1996 calculated with Thermobar')
-ax2.set_xlabel('Difference (P_Ryan1996_Ozaydin2021 - P_Thermobar)')
-ax2.set_ylabel('Count')
+ax1.plot([0, 100], [0, 100],color = 'r',linewidth = 1)
+
+#plotting calculated vs read T_Ryan1996
+ax1.plot(p_ext,P, 'o')
+
+ax2.plot(p_ext, p_ext-P, 'ok')
+#ax2.set_yticks([-0.05, 0, 0.05])
+
+ax1.set_ylabel('P Thermobar')
+ax1.set_xlabel('P Published')
+
+
+ax2.set_ylabel('P Published - P Thermobar')
+ax2.set_xlabel('P Published')
+fig.tight_layout()
+
 plt.show()
 
 #Loading data from Sudholz et al. (2021) for benchmarking tests of
@@ -83,7 +83,7 @@ fig = plt.figure(figsize = (12,6))
 ax1 = plt.subplot(121)
 ax2 = plt.subplot(122)
 
-T2 = calculate_gt_temp(gt_comps = input_sudholz_ext, equationT = 'T_Sudholz2021', out_format = 'Array')
+T2 = calculate_gt_temp(gt_comps = input_sudholz_ext, equationT = 'T_Sudholz2021')
 t_ext_sudholz = np.array(input_sudholz_ext['T_Sudholz'])
 
 y = np.arange(0,1800,10)
@@ -101,7 +101,7 @@ plt.show()
 
 #T_Canil1999
 t_ext_canil = np.array(input_sudholz_ext['T_Canil'])
-T3 = calculate_gt_temp(gt_comps = input_sudholz_ext, equationT = 'T_Canil1999', out_format = 'Array')
+T3 = calculate_gt_temp(gt_comps = input_sudholz_ext, equationT = 'T_Canil1999')
 
 fig = plt.figure(figsize = (12,6))
 ax1 = plt.subplot(121)
@@ -118,7 +118,7 @@ ax2.set_ylabel('Count')
 plt.show()
 
 #These are not benchmarking tests but an example for plotting functions
-plot_CA_CR(gt_comps = my_input_gt, T_Ni = T, P_Cr = P, BDL_T = 1125,
+plot_garnet_geotherm(gt_comps = my_input_gt, T_Ni = T, P_Cr = P, BDL_T = 1125,
  SHF_low = 35, SHF_high = 45, SHF_chosen = 37, max_depth = 300,
   temp_unit = 'Celsius', plot_type = 'show')
 
