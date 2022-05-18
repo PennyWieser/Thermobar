@@ -25,70 +25,70 @@ def P_Kraw2012(T=None, *, Mgno_Amp, deltaNNO):
 
     return 0.01*((Mgno_Amp/52.7 -0.014*deltaNNO)**15.12)
 
-def P_Ridolfi2012_1a(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
-                     MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1a(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat,
+                     Mg_Amp_13_cat, Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1a of Ridolfi and Renzulli (2012).
     Calibrated between 1.3-22 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return 0.01 * (np.exp(125.9332115 - 9.587571403 * SiO2_Amp_13_cat - 10.11615567 * TiO2_Amp_13_cat
-    - 8.173455128 * Al2O3_Amp_13_cat- 9.226076274 * FeOt_Amp_13_cat - 8.793390507 * MgO_Amp_13_cat
-    - 1.6658613 * CaO_Amp_13_cat + 2.48347198 * Na2O_Amp_13_cat + 2.519184959 * K2O_Amp_13_cat))
+    return 0.01 * (np.exp(125.9332115 - 9.587571403 * Si_Amp_13_cat - 10.11615567 * Ti_Amp_13_cat
+    - 8.173455128 * Al_Amp_13_cat- 9.226076274 * Fet_Amp_13_cat - 8.793390507 * Mg_Amp_13_cat
+    - 1.6658613 * Ca_Amp_13_cat + 2.48347198 * Na_Amp_13_cat + 2.519184959 * K_Amp_13_cat))
 
 
-def P_Ridolfi2012_1b(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
-                     MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1b(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat,
+                     Mg_Amp_13_cat, Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1b of Ridolfi and Renzulli (2012).
     Calibrated between 1.3-5 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return (0.01 * (np.exp(38.722545085 - 2.695663047 * SiO2_Amp_13_cat - 2.35647038717941 * TiO2_Amp_13_cat
-            - 1.30063975020919 * Al2O3_Amp_13_cat - 2.7779767369382 * FeOt_Amp_13_cat
-            - 2.48384821395444 * MgO_Amp_13_cat- 0.661386638563983 * CaO_Amp_13_cat
-            - 0.270530207793162 * Na2O_Amp_13_cat + 0.111696322092308 * K2O_Amp_13_cat)))
+    return (0.01 * (np.exp(38.722545085 - 2.695663047 * Si_Amp_13_cat - 2.35647038717941 * Ti_Amp_13_cat
+            - 1.30063975020919 * Al_Amp_13_cat - 2.7779767369382 * Fet_Amp_13_cat
+            - 2.48384821395444 * Mg_Amp_13_cat- 0.661386638563983 * Ca_Amp_13_cat
+            - 0.270530207793162 * Na_Amp_13_cat + 0.111696322092308 * K_Amp_13_cat)))
 
 
-def P_Ridolfi2012_1c(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat, MgO_Amp_13_cat,
-                     CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1c(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat, Mg_Amp_13_cat,
+                     Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1c of Ridolfi and Renzulli (2012).
     Calibrated between 1.3-5 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return (0.01 * (24023.367332 - 1925.298250* SiO2_Amp_13_cat
-    - 1720.63250944418 * TiO2_Amp_13_cat - 1478.53847391822 * Al2O3_Amp_13_cat
-    - 1843.19249824537 * FeOt_Amp_13_cat - 1746.94437497404 * MgO_Amp_13_cat
-    - 158.279055907371 * CaO_Amp_13_cat - 40.4443246813322 * Na2O_Amp_13_cat
-    + 253.51576430265 * K2O_Amp_13_cat))
+    return (0.01 * (24023.367332 - 1925.298250* Si_Amp_13_cat
+    - 1720.63250944418 * Ti_Amp_13_cat - 1478.53847391822 * Al_Amp_13_cat
+    - 1843.19249824537 * Fet_Amp_13_cat - 1746.94437497404 * Mg_Amp_13_cat
+    - 158.279055907371 * Ca_Amp_13_cat - 40.4443246813322 * Na_Amp_13_cat
+    + 253.51576430265 * K_Amp_13_cat))
 
 
-def P_Ridolfi2012_1d(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat, MgO_Amp_13_cat, CaO_Amp_13_cat,
-                     K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1d(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat, Mg_Amp_13_cat, Ca_Amp_13_cat,
+                     K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1d of Ridolfi and Renzulli (2012).
     Calibrated between 4-15 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return (0.01 * (26105.7092067 - 1991.93398583468 * SiO2_Amp_13_cat
-    - 3034.9724955129 * TiO2_Amp_13_cat - 1472.2242262718 * Al2O3_Amp_13_cat - 2454.76485311127 * FeOt_Amp_13_cat
-    - 2125.79095875747 * MgO_Amp_13_cat - 830.644984403603 * CaO_Amp_13_cat
-    + 2708.82902160291 * Na2O_Amp_13_cat + 2204.10480275638 * K2O_Amp_13_cat))
+    return (0.01 * (26105.7092067 - 1991.93398583468 * Si_Amp_13_cat
+    - 3034.9724955129 * Ti_Amp_13_cat - 1472.2242262718 * Al_Amp_13_cat - 2454.76485311127 * Fet_Amp_13_cat
+    - 2125.79095875747 * Mg_Amp_13_cat - 830.644984403603 * Ca_Amp_13_cat
+    + 2708.82902160291 * Na_Amp_13_cat + 2204.10480275638 * K_Amp_13_cat))
 
 
-def P_Ridolfi2012_1e(T=None, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
-                     MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def P_Ridolfi2012_1e(T=None, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat,
+                     Mg_Amp_13_cat, Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only barometer: Equation 1e of Ridolfi and Renzulli (2012).
     Calibrated between 9.3-22 kbars
     :cite:`ridolfi2012calcic`
     '''
-    return (0.01 * np.exp(26.5426319326957 - 1.20851740386237 * SiO2_Amp_13_cat
-    - 3.85930939071001 * TiO2_Amp_13_cat - 1.10536070667051 * Al2O3_Amp_13_cat
-    - 2.90677947035468 * FeOt_Amp_13_cat - 2.64825741548332 *MgO_Amp_13_cat
-    + 0.513357584438019 * CaO_Amp_13_cat
-    + 2.9751971464851 * Na2O_Amp_13_cat + 1.81467032749331 * K2O_Amp_13_cat))
+    return (0.01 * np.exp(26.5426319326957 - 1.20851740386237 * Si_Amp_13_cat
+    - 3.85930939071001 * Ti_Amp_13_cat - 1.10536070667051 * Al_Amp_13_cat
+    - 2.90677947035468 * Fet_Amp_13_cat - 2.64825741548332 *Mg_Amp_13_cat
+    + 0.513357584438019 * Ca_Amp_13_cat
+    + 2.9751971464851 * Na_Amp_13_cat + 1.81467032749331 * K_Amp_13_cat))
 
 
 def P_Ridolfi2010(T=None, *, Al_Amp_cat_23ox, cation_sum_Si_Ca):
@@ -228,16 +228,16 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
     if T is None:
         w.warn('You must enter a value for T in Kelvin to get results from equation3 and 5 from Zhang, and SiO2 from Putrka (2016)')
 
-    amp_sites['SiO2_Eq1_Zhang17']=(-736.7170+288.733*np.log(amp_sites['Si_T_ideal'])+56.536*amp_sites['Al_VI_C_ideal']
+    amp_sites['SiO2_Eq1_Zhang17']=(-736.7170+288.733*np.log(amp_sites['Si_T_ideal'].astype(float))+56.536*amp_sites['Al_VI_C_ideal']
     +27.169*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal'])
 + 62.665*amp_sites['Fe3_C_ideal']+34.814*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal'])
 +83.989*(amp_sites['Ti_T_ideal']+amp_sites['Ti_C_ideal'])+44.225*amp_sites['Ca_B_ideal']+14.049*amp_sites['Na_A_ideal'])
 
-    amp_sites['SiO2_Eq2_Zhang17']=(-399.9891 + 212.9463*np.log(amp_sites['Si_T_ideal']) + 11.7464*amp_sites['Al_VI_C_ideal'] +
+    amp_sites['SiO2_Eq2_Zhang17']=(-399.9891 + 212.9463*np.log(amp_sites['Si_T_ideal'].astype(float)) + 11.7464*amp_sites['Al_VI_C_ideal'] +
     23.5653*amp_sites['Fe3_C_ideal'] + 6.8467*(amp_sites['Fe2_C_ideal']+amp_sites['Fe2_B_ideal']) +
     24.7743*(amp_sites['Ti_T_ideal']+amp_sites['Ti_C_ideal']) + 24.4399 * amp_sites['Ca_B_ideal'])
 
-    amp_sites['SiO2_Eq4_Zhang17']=(-222.614 + 167.517*np.log(amp_sites['Si_T_ideal']) -7.156*(amp_sites['Mg_C_ideal']
+    amp_sites['SiO2_Eq4_Zhang17']=(-222.614 + 167.517*np.log(amp_sites['Si_T_ideal'].astype(float)) -7.156*(amp_sites['Mg_C_ideal']
     +amp_sites['Mg_B_ideal']))
 
     amp_sites['TiO2_Eq6_Zhang17']=(np.exp(22.4650  -2.5975*amp_sites['Si_T_ideal']
@@ -281,7 +281,7 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
 
 
     if T is not None:
-        SiO2_Eq3=(-228 + 0.01065*(T-273.15) + 165*np.log(amp_sites['Si_T_ideal'])
+        SiO2_Eq3=(-228 + 0.01065*(T-273.15) + 165*np.log(amp_sites['Si_T_ideal'].astype(float))
         -7.219*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal']))
         amp_sites.insert(4, "SiO2_Eq3_Zhang17", SiO2_Eq3)
 
@@ -498,7 +498,6 @@ classification=False, Ridolfi_Filter=True):
                                             [col for col in Calcs_R.columns if col not in cols_to_move]]
 
 
-
             return Calcs_R # was P_kbar
 
         if equationP == "P_Ridolfi2012_1a":
@@ -641,17 +640,17 @@ def T_Put2016_SiHbl(P=None, *, Si_Amp_cat_23ox):
     '''
     return (273.15 + 2061 - 178.4 * Si_Amp_cat_23ox)
 
-def T_Ridolfi2012(P, *, SiO2_Amp_13_cat, TiO2_Amp_13_cat, FeOt_Amp_13_cat,
-                  MgO_Amp_13_cat, CaO_Amp_13_cat, K2O_Amp_13_cat, Na2O_Amp_13_cat, Al2O3_Amp_13_cat):
+def T_Ridolfi2012(P, *, Si_Amp_13_cat, Ti_Amp_13_cat, Fet_Amp_13_cat,
+                  Mg_Amp_13_cat, Ca_Amp_13_cat, K_Amp_13_cat, Na_Amp_13_cat, Al_Amp_13_cat):
     '''
     Amphibole-only thermometer of Ridolfi and Renzuli, 2012
     :cite:`ridolfi2012calcic`
 
     SEE=22C
     '''
-    return (273.15 + 8899.682 - 691.423 * SiO2_Amp_13_cat - 391.548 * TiO2_Amp_13_cat - 666.149 * Al2O3_Amp_13_cat
-    - 636.484 * FeOt_Amp_13_cat -584.021 * MgO_Amp_13_cat - 23.215 * CaO_Amp_13_cat
-    + 79.971 * Na2O_Amp_13_cat - 104.134 * K2O_Amp_13_cat + 78.993 * np.log(P * 100))
+    return (273.15 + 8899.682 - 691.423 * Si_Amp_13_cat - 391.548 * Ti_Amp_13_cat - 666.149 * Al_Amp_13_cat
+    - 636.484 * Fet_Amp_13_cat -584.021 * Mg_Amp_13_cat - 23.215 * Ca_Amp_13_cat
+    + 79.971 * Na_Amp_13_cat - 104.134 * K_Amp_13_cat + 78.993 * np.log(P * 100))
 
 def T_Put2016_eq8(P, *, Si_Amp_cat_23ox, Ti_Amp_cat_23ox,
                   Mg_Amp_cat_23ox, Na_Amp_cat_23ox):
@@ -668,27 +667,29 @@ K_Amp_cat_23ox, Al2O3_Liq_mol_frac_hyd, Na2O_Liq_mol_frac_hyd,
 H2O_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd):
     '''
     Amphibole-Liquid barometer: Equation 7a of Putirka et al. (2016)
+    Preferred equation
     :cite:`putirka2016amphibole`
 
     '''
-    return (10 * (-3.093 - 4.274 * np.log(Al_Amp_cat_23ox / Al2O3_Liq_mol_frac_hyd)
-    - 4.216 * np.log(Al2O3_Liq_mol_frac_hyd) + 63.3 * P2O5_Liq_mol_frac_hyd +
+    return (10 * (-3.093 - 4.274 * np.log(Al_Amp_cat_23ox.astype(float) / Al2O3_Liq_mol_frac_hyd.astype(float))
+    - 4.216 * np.log(Al2O3_Liq_mol_frac_hyd.astype(float)) + 63.3 * P2O5_Liq_mol_frac_hyd +
     1.264 * H2O_Liq_mol_frac_hyd + 2.457 * Al_Amp_cat_23ox + 1.86 * K_Amp_cat_23ox
-    + 0.4 * np.log(Na_Amp_cat_23ox / Na2O_Liq_mol_frac_hyd)))
+    + 0.4 * np.log(Na_Amp_cat_23ox.astype(float) / Na2O_Liq_mol_frac_hyd.astype(float))))
 
 
 def P_Put2016_eq7b(T=None, *, Al2O3_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd, Al_Amp_cat_23ox,
     SiO2_Liq_mol_frac_hyd, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd, CaO_Liq_mol_frac_hyd):
     '''
     Amphibole-Liquid barometer: Equation 7b of Putirka et al. (2016)
+    While 7a is preferred, Putirka (2008) say that 7b may be more precise at low T, and >10 kbar
     :cite:``
 
     '''
-    return (-64.79 - 6.064 * np.log(Al_Amp_cat_23ox / Al2O3_Liq_mol_frac_hyd)
+    return (-64.79 - 6.064 * np.log(Al_Amp_cat_23ox.astype(float) / Al2O3_Liq_mol_frac_hyd.astype(float))
     + 61.75 * SiO2_Liq_mol_frac_hyd + 682 * P2O5_Liq_mol_frac_hyd
     - 101.9 *CaO_Liq_mol_frac_hyd + 7.85 * Al_Amp_cat_23ox
-    - 46.46 * np.log(SiO2_Liq_mol_frac_hyd)
-    - 4.81 * np.log(Na2O_Liq_mol_frac_hyd + K2O_Liq_mol_frac_hyd))
+    - 46.46 * np.log(SiO2_Liq_mol_frac_hyd.astype(float))
+    - 4.81 * np.log(Na2O_Liq_mol_frac_hyd.astype(float) + K2O_Liq_mol_frac_hyd.astype(float)))
 
 
 def P_Put2016_eq7c(T=None, *, Al_Amp_cat_23ox, K_Amp_cat_23ox,
@@ -699,9 +700,9 @@ def P_Put2016_eq7c(T=None, *, Al_Amp_cat_23ox, K_Amp_cat_23ox,
 
     '''
     return (-45.55 + 26.65 * Al_Amp_cat_23ox + 22.52 * K_Amp_cat_23ox
-    + 439 * P2O5_Liq_mol_frac - 51.1 * np.log(Al2O3_Liq_mol_frac) -
-    46.3 * np.log(Al_Amp_cat_23ox / (Al2O3_Liq_mol_frac))
-    + 5.231 * np.log(Na_Amp_cat_23ox / (Na2O_Liq_mol_frac)))
+    + 439 * P2O5_Liq_mol_frac - 51.1 * np.log(Al2O3_Liq_mol_frac.astype(float)) -
+    46.3 * np.log(Al_Amp_cat_23ox.astype(float) / (Al2O3_Liq_mol_frac.astype(float)))
+    + 5.231 * np.log(Na_Amp_cat_23ox.astype(float) / (Na2O_Liq_mol_frac.astype(float))))
 
 ## Equations: Amphibole-Liquid thermometers
 
@@ -714,10 +715,10 @@ def T_Put2016_eq4b(P=None, *, H2O_Liq_mol_frac_hyd, Fet_Amp_cat_23ox, FeOt_Liq_m
 
     '''
     return (273.15 + (8037.85 / (3.69 - 2.62 * H2O_Liq_mol_frac_hyd + 0.66 * Fet_Amp_cat_23ox
-    - 0.416 * np.log(TiO2_Liq_mol_frac_hyd) + 0.37 * np.log(MgO_Liq_mol_frac_hyd)
-    -1.05 * np.log((FeOt_Liq_mol_frac_hyd + MgO_Liq_mol_frac_hyd
-    + MnO_Liq_mol_frac_hyd) * Al2O3_Liq_mol_frac_hyd)
-    - 0.462 * np.log(Ti_Amp_cat_23ox / TiO2_Liq_mol_frac_hyd))))
+    - 0.416 * np.log(TiO2_Liq_mol_frac_hyd.astype(float)) + 0.37 * np.log(MgO_Liq_mol_frac_hyd.astype(float))
+    -1.05 * np.log((FeOt_Liq_mol_frac_hyd.astype(float) + MgO_Liq_mol_frac_hyd.astype(float)
+    + MnO_Liq_mol_frac_hyd.astype(float)) * Al2O3_Liq_mol_frac_hyd)
+    - 0.462 * np.log(Ti_Amp_cat_23ox.astype(float) / TiO2_Liq_mol_frac_hyd.astype(float)))))
 
 
 def T_Put2016_eq4a_amp_sat(P=None, *, FeOt_Liq_mol_frac_hyd, TiO2_Liq_mol_frac_hyd, Al2O3_Liq_mol_frac_hyd,
@@ -728,10 +729,10 @@ def T_Put2016_eq4a_amp_sat(P=None, *, FeOt_Liq_mol_frac_hyd, TiO2_Liq_mol_frac_h
 
     '''
     return (273.15 + (6383.4 / (-12.07 + 45.4 * Al2O3_Liq_mol_frac_hyd + 12.21 * FeOt_Liq_mol_frac_hyd -
-    0.415 * np.log(TiO2_Liq_mol_frac_hyd) - 3.555 * np.log(Al2O3_Liq_mol_frac_hyd)
-     - 0.832 * np.log(Na2O_Liq_mol_frac_hyd) -0.481 * np.log((FeOt_Liq_mol_frac_hyd
-     + MgO_Liq_mol_frac_hyd + MnO_Liq_mol_frac_hyd) * Al2O3_Liq_mol_frac_hyd)
-     - 0.679 * np.log(Na_Amp_cat_23ox / Na2O_Liq_mol_frac_hyd))))
+    0.415 * np.log(TiO2_Liq_mol_frac_hyd.astype(float)) - 3.555 * np.log(Al2O3_Liq_mol_frac_hyd.astype(float))
+     - 0.832 * np.log(Na2O_Liq_mol_frac_hyd.astype(float)) -0.481 * np.log((FeOt_Liq_mol_frac_hyd.astype(float)
+     + MgO_Liq_mol_frac_hyd.astype(float) + MnO_Liq_mol_frac_hyd.astype(float)) * Al2O3_Liq_mol_frac_hyd.astype(float))
+     - 0.679 * np.log(Na_Amp_cat_23ox.astype(float) / Na2O_Liq_mol_frac_hyd.astype(float)))))
 
 
 def T_Put2016_eq9(P=None, *, Si_Amp_cat_23ox, Ti_Amp_cat_23ox, Mg_Amp_cat_23ox,
@@ -752,11 +753,11 @@ K_Amp_cat_23ox, Ca_Amp_cat_23ox, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd):
             NaM4[i]=NaM4_1[i]
 
     HelzA=Na_Amp_cat_23ox-NaM4
-    ln_KD_Na_K=np.log((K_Amp_cat_23ox/HelzA)*(Na2O_Liq_mol_frac_hyd/K2O_Liq_mol_frac_hyd))
+    ln_KD_Na_K=np.log((K_Amp_cat_23ox.astype(float)/HelzA)*(Na2O_Liq_mol_frac_hyd.astype(float)/K2O_Liq_mol_frac_hyd.astype(float)))
 
     return (273.15+(10073.5/(9.75+0.934*Si_Amp_cat_23ox-1.454*Ti_Amp_cat_23ox
-    -0.882*Mg_Amp_cat_23ox-1.123*Na_Amp_cat_23ox-0.322*np.log(FeOt_Liq_mol_frac_hyd)
-    -0.7593*np.log(Al_Amp_cat_23ox/Al2O3_Liq_mol_frac_hyd)-0.15*ln_KD_Na_K)))
+    -0.882*Mg_Amp_cat_23ox-1.123*Na_Amp_cat_23ox-0.322*np.log(FeOt_Liq_mol_frac_hyd.astype(float))
+    -0.7593*np.log(Al_Amp_cat_23ox.astype(float)/Al2O3_Liq_mol_frac_hyd.astype(float))-0.15*ln_KD_Na_K)))
 
 
 
@@ -1408,10 +1409,73 @@ equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
          equationP=equationP, equationT=equationT)
         P_guess = PT_out['P_kbar_calc'].astype('float64')
         T_K_guess = PT_out['T_K_calc'].astype('float64')
-        Combo_liq_amp_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
-        Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
-        Combo_liq_amp_fur_filt.insert(2, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
-    return Combo_liq_amp_fur_filt
+
+    if equationP is not None and equationT is None:
+        P_guess = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
+        equationP=equationP, T=T)
+        T_K_guess = T
+    # Same if user doesnt specify an equation for P, but a real P
+    if equationT is not None and equationP is None:
+        T_guess = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
+        equationT=equationT, P=P)
+        P_guess = P
+
+
+    Combo_liq_amp_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
+    Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+    Combo_liq_amp_fur_filt.insert(2, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
+
+    # Final step, calcuate a 3rd output which is the average and standard
+    # deviation for each Amp (e.g., Amp1-Melt1, Amp1-melt3 etc. )
+    AmpNumbers = Combo_liq_amp_fur_filt['ID_AMP'].unique()
+    if len(AmpNumbers) > 0:
+        df1_Mean_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).mean()
+        df1_Std_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).std()
+        count=Combo_liq_amp_fur_filt.groupby('ID_AMP',as_index=False).count().iloc[:, 1]
+        df1_Mean_nopref['# of Liqs Averaged']=count
+        Sample_ID_Amp_Mean=df1_Mean_nopref['Sample_ID_Amp']
+        Sample_ID_Amp_Std=df1_Std_nopref['Sample_ID_Amp']
+        df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+        df1_Std=df1_Std_nopref.add_prefix('Std_')
+
+        df1_Mean.rename(columns={"Mean_ID_AMP": "ID_AMP"}, inplace=True)
+        df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
+        df1_Std.rename(columns={"Std_ID_AMP": "ID_AMP"}, inplace=True)
+
+
+
+        df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_AMP'])
+        df1_M['Sample_ID_Amp']=Sample_ID_Amp_Mean
+
+        if equationT is not None and equationP is not None:
+            cols_to_move = ['Sample_ID_Amp', '# of Liqs Averaged',
+                        'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+                        'Std_P_kbar_calc']
+
+        if equationT is not None and equationP is None:
+            cols_to_move = ['Sample_ID_Amp',
+                        'Mean_P_kbar_input',
+                        'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
+
+        if equationT is None and equationP is not None:
+            cols_to_move = ['Sample_ID_Amp',
+                        'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
+                        'Std_P_kbar_calc']
+
+        df1_M = df1_M[cols_to_move +
+                    [col for col in df1_M.columns if col not in cols_to_move]]
+
+
+    else:
+        raise Exception(
+            'No Matches - to set less strict filters, change our Kd filter')
+
+
+
+    print('Done!')
+    return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_amp_fur_filt}
+
+
 
 ## Amphibole-Plag temperatures, Holland and Blundy 1994
 
@@ -1486,12 +1550,12 @@ def calculate_amp_plag_temp(amp_comps, plag_comps=None, XAn=None, XAb=None, equa
     YAb[HighXAb]=0
 
     Ta=((-76.95+P*0.79+YAb+39.4*XNa_A+22.4*XK_A+(41.5-2.89*P)*XAl_M2)/
-        (-0.065-0.0083144*np.log(Ked_trA)))
+        (-0.065-0.0083144*np.log(Ked_trA.astype(float))))
 
     YAb_B=12*(2*XAb-1)+3
     YAb_B[HighXAb]=3
     Tb=((78.44 +YAb_B - 33.6*XNa_M4 - (66.8 -2.92*P)*XAl_M2 +78.5*XAl_T1 +9.4*XNa_A )/
-        (0.0721-0.0083144*np.log(Ked_trB)))
+        (0.0721-0.0083144*np.log(Ked_trB.astype(float))))
 
     if equationT=="T_HB1994_A":
         return Ta

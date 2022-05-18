@@ -157,3 +157,18 @@ Demonstrates two feldspar thermometry, along with discussion of how to apply var
 
     <iframe width="560" height="315" src="https://www.youtube.com/embed/uTYdh4Y1S0Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 ---------
+
+
+Integration with VESIcal
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Demonstrates how to combine Thermobar and VESIcal to calculate temperatures at which to calculate saturation pressures.
+
+**Useful files:
+
+    * Download :download:`Python Notebook (Integration_with_VESIcal.ipynb) <Examples/Integration_with_VESIcal/Combining_VESIcal_Thermobar_SatPs.ipynb>`
+    * Download :download:`Excel Workbook (Ol_hosted_melt_inclusions.xlsx) <Examples/Integration_with_VESIcal/Ol_hosted_melt_inclusions.xlsx>`
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/FRpsDbouuec" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+---------

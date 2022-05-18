@@ -1,0 +1,51 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww14200\viewh15340\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \
+This is the Higgins et al (2021) amphibole thermobarometer and chemometer. This code is designed as a simple interface for those who want to attain rapid estimates of pre-eruptive storage conditions with minimal coding knowledge. Users must install R (https://www.r-project.org/) and R studio (https://www.rstudio.com/products/rstudio/) both of which are free and widely compatible. Users must have access to a version of Excel that can open xlsx files.\
+\
+The procedure for running the thermobarometer and chemometer is as follows\
+\
+1) Copy the folder Amphibole (PTX) into any directory (folder). The script is designed to detect the directory. Do not move or delete any items within the Amphibole (PTX) folder.\
+\
+2) Enter your data into the Input.xlsx spreadsheet. Test points may be deleted. All columns denoting amphibole followed by an oxide MUST be filled (or zeros added if not measured). Columns can be added in this sheet (e.g. sample, locality, textural info) using sensible naming convention (no special characters) but amphibole_\'94oxide\'94 columns MUST NOT be deleted or names changed.\
+\
+3) Open the model_amph.R script, highlight all the code (cmd+a for mac; ctr+a for windows) and run. Packages will automatically be installed if not loaded. Clearing environment and re-running can often solve problems during the first run and package install. If problems are encountered regarding the Java version or package availability check your versions or contact oliver.higgins@unige.ch\
+\
+4) If run correctly the model will run and create an Output.xlsx file that can be plotted in R or excel. This will simply create an identical copy of your Input.xlsx spreadsheet with the following appended columns:\
+\
+P_A: pressure predicted by the model (kbar)\
+P_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+T_A: temperature predicted by the model (degrees centigrade)\
+T_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+SiO2_pred: SiO2 of the equilibrium melt predicted by the model (wt%)\
+SiO2_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+Al2O3_pred: Al2O3 of the equilibrium melt predicted by the model (wt%)\
+Al2O3_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+CaO_pred: CaO of the equilibrium melt predicted by the model (wt%)\
+CaO_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+Na2O_pred: Na2O of the equilibrium melt predicted by the model (wt%)\
+Na2O_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+K2O_pred: K2O of the equilibrium melt predicted by the model (wt%)\
+K2O_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+MgO_pred: MgO of the equilibrium melt predicted by the model (wt%)\
+MgO_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+FeO_pred: FeO of the equilibrium melt predicted by the model (wt%)\
+FeO_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+TiO2_pred: TiO2 of the equilibrium melt predicted by the model (wt%)\
+TiO2_uncer: half the the interquartile range of the voting distribution from the forest of decision trees. This can be treated as a pseudo uncertainty as well as a post processing to remove highly uncertain estimates\
+\
+}

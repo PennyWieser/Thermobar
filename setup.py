@@ -16,7 +16,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
     name="Thermobar",
     version=__version__,
-    author="Penny, Maurizio, Jordan, Eric",
+    author="Penny, Maurizio, Jordan, Eric, Sinan",
     author_email="penny.wieser@gmail.com",
     description="Thermobar",
     long_description=long_description,
@@ -32,12 +32,19 @@ setup(
     install_requires=[
             'pandas',
             'numpy',
+            'python-ternary',
             'matplotlib',
             'scikit-learn',
             'scipy',
             'statsmodels',
             'openpyxl',
+            'skl2onnx',
+            'onnxruntime'
             ],
+            # PyPI doesnt allow this :(
+    # extras_require={
+    #     'onnx': ["Thermobar_onnx @ https://github.com/PennyWieser/Thermobar_onnx/archive/refs/tags/0.0.1dev.zip"]
+    # },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",

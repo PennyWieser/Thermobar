@@ -5,10 +5,26 @@ from functools import partial
 import inspect
 import warnings as w
 import numbers
-from Thermobar.import_export import *
 from pathlib import Path
 Thermobar_dir=Path(__file__).parent
+from Thermobar.import_export import *
 from Thermobar.core import *
+
+def convert_F2O_to_F_ppm(F2O_wt=None):
+    """ Converts from F2O in wt% to F in ppm"""
+    F2O_mass=53.99621
+    F_mass=18.998403
+    F_calc=2*F_mass*(F2O_wt/F2O_mass)
+    return F_calc*10000
+
+def convert_F_to_F2O(F_ppm=None):
+    """ Converts from F in ppm to F2O in wt%"""
+    F=F_ppm/10000
+    F2O_mass=53.99621
+    F_mass=18.998403
+    F2O_calc=(F/F_mass)*0.5*F2O_mass
+    return F2O_calc
+
 
 def normalize_anhydrous_to_100_incF_mol_prop(liq_comps, F2O_content=0):
     '''
