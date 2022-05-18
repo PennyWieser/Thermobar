@@ -161,7 +161,7 @@ def P_Ryan1996(gt_comps, T_K):
             else:
 
                 if P > 0:
-                    P_cr[i] = P / 10.0
+                    P_cr[i] = P
                     break
                 else:
                     P_cr[i] = -1
@@ -265,6 +265,6 @@ def calculate_gt_press(*, gt_comps=None, equationP=None, T=None):
         raise ValueError(f'{equationP} requires you to enter gt_comps and T [K]')
 
 
-    P_kbar_series= 10*pd.Series(P)
+    P_kbar_series = pd.Series(P)
 
     return P_kbar_series

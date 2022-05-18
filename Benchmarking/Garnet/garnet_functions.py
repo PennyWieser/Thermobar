@@ -13,7 +13,7 @@ from Thermobar.geotherm import *
 from Thermobar.garnet_plot import *
 
 #Now load the data from Ozaydin et al. (2021)
-file = "../Examples/Garnet/Group1_Kimberley.xlsx" #Wherever that /Examples/Garnet is
+file = "Group1_Kimberley.xlsx" #Wherever that /Examples/Garnet is
 data = import_excel(file, sheet_name = "Sheet1")
 my_input_gt = data['my_input']
 
@@ -31,7 +31,7 @@ ax2 = plt.subplot(122)
 ax1.plot(x,y,color = 'r',linewidth = 1)
 
 #Loading external file including the solution from Ozaydin et al. (2021)
-file_ext = "../Benchmarking/garnet/Group_1_PT_solution.xlsx"
+file_ext = "../garnet/Group_1_PT_solution.xlsx"
 data_ext = import_excel(file_ext, sheet_name = "Group_1_PT_solution")
 input_gt_ext = data_ext['my_input']
 p_ext = np.array(input_gt_ext['P_Kb'])
@@ -75,7 +75,7 @@ plt.show()
 
 #Loading data from Sudholz et al. (2021) for benchmarking tests of
 #Sudholz2021 and Canil1999. This file consists both the solution and composition data
-file_sudholz = "../Benchmarking/garnet/PT_Sudholz.xlsx"
+file_sudholz = "../garnet/PT_Sudholz.xlsx"
 data_sudholz = import_excel(file_sudholz, sheet_name = "PT_Sudholz")
 input_sudholz_ext = data_sudholz['my_input']
 
