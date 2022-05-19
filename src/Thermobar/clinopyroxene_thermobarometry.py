@@ -12,9 +12,10 @@ from pathlib import Path
 import joblib
 # Things for machine learning onnx
 from sklearn.preprocessing import StandardScaler
-from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
-import onnxruntime as rt
+#from skl2onnx import convert_sklearn
+#from skl2onnx.common.data_types import FloatTensorType
+
+
 
 
 from Thermobar.core import *
@@ -449,6 +450,7 @@ liq_comps=None, meltmatch=None):
         import Thermobar_onnx
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    import onnxruntime as rt
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Press.onnx"))
     input_name = sess.get_inputs()[0].name
@@ -519,6 +521,7 @@ def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltm
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
+    import onnxruntime as rt
     sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Press.onnx"))
 
 
@@ -947,6 +950,7 @@ def T_Jorgenson2022_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, melt
         import Thermobar_onnx
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    import onnxruntime as rt
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Temp.onnx"))
 
@@ -1011,9 +1015,13 @@ def T_Petrelli2020_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, meltm
 
     x_test=Cpx_Liq_ML_in.values
 
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
 
-    # using Onnx #Thermobar_dir/
-    #str(load_dir / "model.onnx")
+
+    import onnxruntime as rt
     sess = rt.InferenceSession(str(Thermobar_dir/"Petrelli2020_Cpx_Liq_Temp.onnx"))
     #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
     input_name = sess.get_inputs()[0].name
@@ -1171,6 +1179,7 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
+    import onnxruntime as rt
     sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Press.onnx"))
 
 
@@ -1295,6 +1304,7 @@ def P_Jorgenson2022_Cpx_only_onnx(T=None, *, cpx_comps):
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
+    import onnxruntime as rt
     sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Press.onnx"))
 
     input_name = sess.get_inputs()[0].name
@@ -1652,6 +1662,7 @@ def T_Jorgenson2022_Cpx_only_onnx(P=None, *, cpx_comps):
         import Thermobar_onnx
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    import onnxruntime as rt
     path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Temp.onnx"))
 
@@ -1688,6 +1699,12 @@ def T_Petrelli2020_Cpx_only_onnx(P=None, *, cpx_comps):
     })
 
     x_test=Cpx_test_noID_noT.values
+
+    try:
+        import Thermobar_onnx
+    except ImportError:
+        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+    import onnxruntime as rt
 
     sess = rt.InferenceSession(str(Thermobar_dir/"Petrelli2020_Cpx_only_Temp.onnx"))
     #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
