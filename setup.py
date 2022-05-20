@@ -38,8 +38,6 @@ setup(
             'scipy',
             'statsmodels',
             'openpyxl',
-            'skl2onnx',
-            'onnxruntime'
             ],
             # PyPI doesnt allow this :(
     # extras_require={
