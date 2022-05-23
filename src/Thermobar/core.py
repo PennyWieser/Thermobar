@@ -1081,16 +1081,16 @@ def calculate_garnet_components(gt_comps):
     gt_calc['Na_Gt_Cat'] = (no_oxygen * gt_calc['Na2O_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
     gt_calc['K_Gt_Cat'] = (no_oxygen * gt_calc['K2O_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
 
-    gt_calc['Mg_MgFeCa'] = gt_calc['Mg_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
+    gt_calc['Mg_MgFeCa_Gt'] = gt_calc['Mg_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
      gt_calc['Fe_Gt_Cat'] + gt_calc['Ca_Gt_Cat'])
-    gt_calc['Fe_MgFeCa'] = gt_calc['Fe_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
+    gt_calc['Fe_MgFeCa_Gt'] = gt_calc['Fe_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
      gt_calc['Fe_Gt_Cat'] + gt_calc['Ca_Gt_Cat'])
-    gt_calc['Ca_MgFeCa'] = gt_calc['Ca_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
+    gt_calc['Ca_MgFeCa_Gt'] = gt_calc['Ca_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
      gt_calc['Fe_Gt_Cat'] + gt_calc['Ca_Gt_Cat'])
 
-    gt_calc['Al_AlCr'] = gt_calc['Al_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
+    gt_calc['Al_AlCr_Gt'] = gt_calc['Al_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
      gt_calc['Cr_Gt_Cat'])
-    gt_calc['Cr_AlCr'] = gt_calc['Cr_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
+    gt_calc['Cr_AlCr_Gt'] = gt_calc['Cr_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
      gt_calc['Cr_Gt_Cat'])
 
     return gt_calc
