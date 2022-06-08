@@ -425,6 +425,8 @@ def mantle_geotherm_plot(T, P, Depth, plot_style, Temp_unit, T_Sample, P_Sample,
 
     max_depth: Maximum depth to show the plot.
 
+    leg: Boolean parameter to set existence of a legend.
+
     plot_type: 'show' or 'save' the figure.
 
     moho: moho depth in km.
@@ -440,6 +442,7 @@ def mantle_geotherm_plot(T, P, Depth, plot_style, Temp_unit, T_Sample, P_Sample,
     lab = kwargs.pop('lab', None)
     Depth_Sample = kwargs.pop('Depth_Sample', None)
     filename_save = kwargs.pop('filename_save', 'Geotherm_Plot.png')
+    leg = kwargs.pop('leg', True)
 
     Depth = Depth/1e3
 
@@ -510,30 +513,33 @@ def mantle_geotherm_plot(T, P, Depth, plot_style, Temp_unit, T_Sample, P_Sample,
     if moho != None:
 
         if plot_style == 'Depth':
-            ax1.axhline(moho, linestyle = '--', color = 'k')
+            ax1.axhline(moho, linestyle = '--', color = 'k', label = 'MOHO')
             crust_obj = patches.Rectangle((0,0) ,100000.0, moho, color = '#6cc1c7', alpha = 0.6)
             ax1.add_patch(crust_obj)
 
         elif plot_style == 'Pressure':
             pressure_equivalent_moho = P[(np.abs((Depth / 1e3)-moho)).argmin()]
-            ax1.axhline(pressure_equivalent_moho, linestyle = '--', color = 'k')
+            ax1.axhline(pressure_equivalent_moho, linestyle = '--', color = 'k', label = 'MOHO')
             crust_obj = patches.Rectangle((0,0) ,100000.0, pressure_equivalent_moho, color = '#6cc1c7', alpha = 0.6)
             ax1.add_patch(crust_obj)
 
     if lab != None:
 
         if plot_style == 'Depth':
-            ax1.axhline(lab, linestyle = '--', color = 'k')
+            ax1.axhline(lab, linestyle = '--', color = '#9d1414', label = 'LAB')
             mantle_obj = patches.Rectangle((0,lab) ,100000.0, 1e5, color = '#c76c75', alpha = 0.6)
             ax1.add_patch(mantle_obj)
 
         elif plot_style == 'Pressure':
             pressure_equivalent_lab = P[(np.abs((Depth / 1e3)-lab)).argmin()]
-            ax1.axhline(pressure_equivalent_lab, linestyle = '--', color = 'k')
+            ax1.axhline(pressure_equivalent_lab, linestyle = '--', color = '#9d1414', label = 'LAB')
             mantle_obj = patches.Rectangle((0,pressure_equivalent_lab) ,100000.0, 1e5, color = '#c76c75', alpha = 0.6)
             ax1.add_patch(mantle_obj)
 
     ax1.grid()
+
+    if leg == True:
+        ax1.legend()
 
     if plot_type == 'show':
         plt.show()

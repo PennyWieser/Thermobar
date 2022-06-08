@@ -1010,14 +1010,14 @@ def calculate_cat_fractions_olivine(ol_comps):
 def calculate_mol_proportions_garnet(gt_comps):
 
     #Exchanging oxide measurements with element one if it exists.
-
+    pd.options.mode.chained_assignment = None
     for i in range(0,len(gt_comps['SiO2_Gt'])):
 
         try:
             gt_comps['TiO2_Gt'][i] = (gt_comps['Ti_Gt'][i] * 1.6685) / 1e4
         except KeyError:
             pass
-
+    pd.options.mode.chained_assignment = 'warn'
     # This makes the input match the columns in the oxide mass dataframe
     gt_wt = gt_comps.reindex(oxide_mass_gt_df.columns, axis=1).fillna(0)
     gt_wt_combo = pd.concat([oxide_mass_gt_df, gt_wt],)
@@ -1060,7 +1060,6 @@ def calculate_moles_garnet(gt_comps):
 def calculate_garnet_components(gt_comps):
 
     no_oxygen = 12.0
-    
     oxy_prop = calculate_oxygens_garnet(gt_comps = gt_comps)
     cat_prop = calculate_moles_garnet(gt_comps = gt_comps)
 
@@ -1082,16 +1081,16 @@ def calculate_garnet_components(gt_comps):
     gt_calc['Na_Gt_Cat'] = (no_oxygen * gt_calc['Na2O_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
     gt_calc['K_Gt_Cat'] = (no_oxygen * gt_calc['K2O_Gt_Mole']) / gt_calc['Oxygen_Sum_Gt']
 
-    gt_calc['Mg_MgFeCa'] = gt_calc['Mg_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
+    gt_calc['Mg_MgFeCa_Gt'] = gt_calc['Mg_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
      gt_calc['Fe_Gt_Cat'] + gt_calc['Ca_Gt_Cat'])
-    gt_calc['Fe_MgFeCa'] = gt_calc['Fe_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
+    gt_calc['Fe_MgFeCa_Gt'] = gt_calc['Fe_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
      gt_calc['Fe_Gt_Cat'] + gt_calc['Ca_Gt_Cat'])
-    gt_calc['Ca_MgFeCa'] = gt_calc['Ca_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
+    gt_calc['Ca_MgFeCa_Gt'] = gt_calc['Ca_Gt_Cat'] / (gt_calc['Mg_Gt_Cat'] +\
      gt_calc['Fe_Gt_Cat'] + gt_calc['Ca_Gt_Cat'])
 
-    gt_calc['Al_AlCr'] = gt_calc['Al_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
+    gt_calc['Al_AlCr_Gt'] = gt_calc['Al_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
      gt_calc['Cr_Gt_Cat'])
-    gt_calc['Cr_AlCr'] = gt_calc['Cr_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
+    gt_calc['Cr_AlCr_Gt'] = gt_calc['Cr_Gt_Cat'] / (gt_calc['Al_Gt_Cat'] +\
      gt_calc['Cr_Gt_Cat'])
 
     return gt_calc

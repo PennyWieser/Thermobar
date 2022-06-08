@@ -19,6 +19,21 @@ def garnet_CARP_class_Griffin2002(gt_comps):
     gt_comps: garnet composition dataframe imported from core function
     '''
 
+    idx_critical_missing = []
+    for i in range(0,len(gt_comps)):
+
+        if (pd.isna(gt_comps['CaO_Gt'][i]) == True) or (pd.isna(gt_comps['Cr2O3_Gt'][i]) == True) or\
+         (pd.isna(gt_comps['MgO_Gt'][i]) == True) or (pd.isna(gt_comps['FeOt_Gt'][i]) == True) or\
+         (pd.isna(gt_comps['TiO2_Gt'][i]) == True) or  (pd.isna(gt_comps['Zr_Gt'][i]) == True) or\
+         (pd.isna(gt_comps['Y_Gt'][i]) == True):
+
+            idx_critical_missing.append(i)
+
+    if len(idx_critical_missing) > 0:
+        print('WARNING')
+        print('There are critical components missing in some of the samples for CARP analysis and might lead to wrong analysis. idx list: ')
+        print(idx_critical_missing)
+
     h1 = []
     h2 = []
     h3 = []
@@ -218,6 +233,29 @@ def garnet_class_Grutter2003(gt_comps):
     gt_comps: garnet composition dataframe imported from core function
     '''
 
+    idx_critical_missing = []
+    idx_na_missing = []
+    for i in range(0,len(gt_comps)):
+        if (pd.isna(gt_comps['CaO_Gt'][i]) == True) or (pd.isna(gt_comps['Cr2O3_Gt'][i]) == True) or\
+         (pd.isna(gt_comps['MgO_Gt'][i]) == True) or (pd.isna(gt_comps['FeOt_Gt'][i]) == True) or\
+         (pd.isna(gt_comps['MnO_Gt'][i]) == True) or  (pd.isna(gt_comps['TiO2_Gt'][i]) == True):
+
+            idx_critical_missing.append(i)
+
+        if (pd.isna(gt_comps['Na2O_Gt'][i]) == True):
+
+            idx_na_missing.append(i)
+
+    if len(idx_critical_missing) > 0:
+        print('WARNING')
+        print('There are critical components missing in some of the samples for Grutter2003 analysis. For these samples analyses might be wrong. idx list: ')
+        print(idx_critical_missing)
+
+    if len(idx_na_missing) > 0:
+        print('WARNING')
+        print('Na2O component is missing in some of the samples, diamondiferious classificatons might be wrong, defaulting to non-indicator classification. idx list: ')
+        print(idx_na_missing)
+
     ca_int = []
     mg_num_g = []
     g10 = []
@@ -374,6 +412,15 @@ def garnet_ca_cr_class_Griffin2002(gt_comps):
     ###Parameters###
     gt_comps: garnet composition dataframe imported from core function
     '''
+
+    #Checking if any CaO or Cr2O3 is missing
+
+    for i in range(0,len(gt_comps)):
+
+        if (pd.isna(gt_comps['CaO_Gt'][i]) == True) or (pd.isna(gt_comps['Cr2O3_Gt'][i]) == True):
+
+            print('WARNING')
+            print('There is CaO or Cr2O3 missing in one of the samples. idx = ' + str(i))
 
     low_cr_ca = [0,9,9,0]
     low_cr_cr = [0,0,1.52,1.52]

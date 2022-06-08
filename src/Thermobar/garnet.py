@@ -62,16 +62,15 @@ def P_Ryan1996(gt_comps, T_K):
     '''
     Cr-pyrope garnet barometer of Ryan et al. (1996)
     :cite:`ryan1996`
-    SEE=+-50C
     '''
 
     gt_calc = calculate_garnet_components(gt_comps = gt_comps)
 
-    xMg = np.array(gt_calc['Mg_MgFeCa'])
-    xCa = np.array(gt_calc['Ca_MgFeCa'])
-    xFe = np.array(gt_calc['Fe_MgFeCa'])
-    xAl = np.array(gt_calc['Al_AlCr'])
-    xCr = np.array(gt_calc['Cr_AlCr'])
+    xMg = np.array(gt_calc['Mg_MgFeCa_Gt'])
+    xCa = np.array(gt_calc['Ca_MgFeCa_Gt'])
+    xFe = np.array(gt_calc['Fe_MgFeCa_Gt'])
+    xAl = np.array(gt_calc['Al_AlCr_Gt'])
+    xCr = np.array(gt_calc['Cr_AlCr_Gt'])
 
     P_cr = np.zeros(len(T_K))
 
@@ -162,7 +161,7 @@ def P_Ryan1996(gt_comps, T_K):
             else:
 
                 if P > 0:
-                    P_cr[i] = P / 10.0
+                    P_cr[i] = P
                     break
                 else:
                     P_cr[i] = -1
@@ -192,6 +191,11 @@ def calculate_gt_temp(*, gt_comps=None, equationT=None):
         |  T_Canil1999
         |  T_Sudholz2021
 
+    out_format: str
+        Choose from:
+
+        |  'Array' - A numpy array output
+        |  'DataFrame' - Pandas dataframe output
 
     Returns
     -----------
@@ -213,13 +217,8 @@ def calculate_gt_temp(*, gt_comps=None, equationT=None):
         raise ValueError(f'{equationT} requires you to enter gt_comps that involves Ni_Gt [ppm]')
 
     T_K_series= pd.Series(T_K)
-    return T_K_series
 
-    # if out_format == 'DataFrame':
-    #
-    #     T_K = pd.DataFrame(T_K, columns = ['Temperature_K'])
-    #
-    # return T_K
+    return T_K_series
 
 #--------------------Function for solving for pressure for garnets-----------------------------------------------------#
 Gt_P_funcs = {P_Ryan1996} # put on outside
@@ -241,7 +240,7 @@ def calculate_gt_press(*, gt_comps=None, equationP=None, T=None):
 
         |  P_Ryan1996
 
-    T: pd.Series
+    T: Array
         Estimated temperature of garnet the sample
 
 
@@ -266,6 +265,6 @@ def calculate_gt_press(*, gt_comps=None, equationP=None, T=None):
         raise ValueError(f'{equationP} requires you to enter gt_comps and T [K]')
 
 
-    P_kbar_series= 10*pd.Series(P)
+    P_kbar_series = pd.Series(P)
 
     return P_kbar_series

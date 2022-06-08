@@ -32,6 +32,8 @@ from Thermobar.clinopyroxene_thermobarometry import *
 from Thermobar.Nimis_1999 import *
 # This has functions for two-pyroxene thermobarometry
 from Thermobar.two_pyroxene import *
+# This has functions for pyroxenes-garnet thermobarometry
+from Thermobar.pyroxenes_garnet import *
 # Feldspar functions
 from Thermobar.feldspar import *
 # Amphibole functions
@@ -52,6 +54,3 @@ from Thermobar.geotherm import *
 
 # version
 from ._version import __version__
-
-
-

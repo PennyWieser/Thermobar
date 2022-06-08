@@ -11,7 +11,7 @@ from Thermobar.geotherm import *
 from Thermobar.garnet import *
 from Thermobar.garnet_class import *
 
-def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', filename_save = None):
+def plot_garnet_geotherm(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_chosen = None, temp_unit = 'Celsius', plot_type = 'show', filename_save = None):
 
 	'''
 	A function to plot the CaO CR2O3 based garnet xenocryst classifications
@@ -25,7 +25,7 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 	T_Ni: Temperature output taken from one of the garnet thermometry methods in
 	Kelvin.
 
-	P_Cr: Cr2O3 based pressure estimate of the garnet xenocrysts in GPa
+	P_Cr: Cr2O3 based pressure estimate of the garnet xenocrysts in KBar
 
 	SHF_low: Surface heat flow value for the lower end of the geotherms to be plotted in mW/m^2
 
@@ -49,7 +49,7 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 
 	for i in range(SHF_low, SHF_high):
 
-		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T+273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True, adiabat = False)
+		T, depth, p, depth_intercepts = calculate_hasterok2011_geotherm(SHF = i, BDL_T = BDL_T + 273, T_0 = 0, max_depth = max_depth, moho = 38, kinked = True, adiabat = False)
 		if temp_unit == 'Celsius':
 			geotherms.append(T-273.0)
 		pressures.append(p)
@@ -57,6 +57,8 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 
 	geotherms = np.array(geotherms)
 	pressures = np.array(pressures)
+
+	P_Cr = P_Cr / 10.0
 
 	d_g_p = [35,37.5,40,42.5,45,47.5,50,52.5,55,57.5,60]
 
@@ -66,6 +68,22 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 	else:
 		d_g_t = np.array([600,700,800,900,1000,1100,1200,1300,1400,1500,1600]) + 273
 
+	#Checking if Y_Gt exist at all
+
+	try:
+		gt_comps['Y_Gt']
+		trace_exist = True
+	except KeyError:
+		trace_exist = False
+
+	if trace_exist == True:
+
+		for i in range(0,len(gt_comps)):
+
+			if pd.isna(gt_comps['Y_Gt'][i]) == True:
+
+				print('WARNING')
+				print('There is Y_Gt missing in one of the samples. idx = ' + str(i))
 
 	ca_cr_class = garnet_ca_cr_class_Griffin2002(gt_comps)
 
@@ -103,8 +121,10 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 			unclass_t.append(T_Ni[i])
 
 	fig3 = plt.figure(figsize = (5,7))
-	ax1 = plt.subplot(211)
-
+	if trace_exist == True:
+		ax1 = plt.subplot(211)
+	elif trace_exist == False:
+		ax1 = plt.subplot(111)
 
 	ax1.plot(d_g_t,np.array(d_g_p)/10.0,'-',color = '#a832a4')
 
@@ -136,63 +156,65 @@ def plot_CA_CR(gt_comps, T_Ni, P_Cr, BDL_T, SHF_low, SHF_high, max_depth, SHF_ch
 	ax1.legend(fontsize = 7,framealpha = 1)
 	ax1.set_ylabel('P (GPa)')
 
-	ax2 = plt.subplot(212)
+	if trace_exist == True:
+		ax2 = plt.subplot(212)
 
-	lherz_t = []
-	lherz_y = []
-	lowcaharz_t = []
-	lowcaharz_y = []
-	harz_t = []
-	harz_y = []
-	low_cr_gt_t = []
-	low_cr_gt_y = []
-	wehrlite_t = []
-	wehrlite_y = []
-	unclass_t = []
-	unclass_y = []
+	if trace_exist == True:
+		lherz_t = []
+		lherz_y = []
+		lowcaharz_t = []
+		lowcaharz_y = []
+		harz_t = []
+		harz_y = []
+		low_cr_gt_t = []
+		low_cr_gt_y = []
+		wehrlite_t = []
+		wehrlite_y = []
+		unclass_t = []
+		unclass_y = []
 
-	for i in range(0,len(T_Ni)):
-		if ca_cr_class[i] == 'Lherzolite':
-			lherz_t.append(float(T_Ni[i]))
-			lherz_y.append(gt_comps['Y_Gt'][i])
-		elif ca_cr_class[i] == 'Low-Ca Harzburgite':
-			lowcaharz_t.append(float(T_Ni[i]))
-			lowcaharz_y.append(gt_comps['Y_Gt'][i])
-		elif ca_cr_class[i] == 'Ca-Harzburgite':
-			harz_t.append(float(T_Ni[i]))
-			harz_y.append(gt_comps['Y_Gt'][i])
-		elif ca_cr_class[i] == 'Low-Cr Peridotite':
-			low_cr_gt_t.append(float(T_Ni[i]))
-			low_cr_gt_y.append(gt_comps['Y_Gt'][i])
-		elif ca_cr_class[i] == 'Wehrlite':
-			wehrlite_t.append(float(T_Ni[i]))
-			wehrlite_y.append(gt_comps['Y_Gt'][i])
+		for i in range(0,len(T_Ni)):
+			if ca_cr_class[i] == 'Lherzolite':
+				lherz_t.append(float(T_Ni[i]))
+				lherz_y.append(gt_comps['Y_Gt'][i])
+			elif ca_cr_class[i] == 'Low-Ca Harzburgite':
+				lowcaharz_t.append(float(T_Ni[i]))
+				lowcaharz_y.append(gt_comps['Y_Gt'][i])
+			elif ca_cr_class[i] == 'Ca-Harzburgite':
+				harz_t.append(float(T_Ni[i]))
+				harz_y.append(gt_comps['Y_Gt'][i])
+			elif ca_cr_class[i] == 'Low-Cr Peridotite':
+				low_cr_gt_t.append(float(T_Ni[i]))
+				low_cr_gt_y.append(gt_comps['Y_Gt'][i])
+			elif ca_cr_class[i] == 'Wehrlite':
+				wehrlite_t.append(float(T_Ni[i]))
+				wehrlite_y.append(gt_comps['Y_Gt'][i])
+			else:
+				unclass_t.append(float(T_Ni[i]))
+				unclass_y.append(gt_comps['Y_Gt'][i])
+
+		if len(lherz_t) != 0:
+			ax2.plot(lherz_t,lherz_y,'*',color = '#339e51', label = 'Lherzolite',markersize = 3)
+		if len(lowcaharz_t) != 0:
+			ax2.plot(lowcaharz_t,lowcaharz_y,'s',color = '#8b1f8f', label = 'Low-Ca Harzburgite',markersize = 3)
+		if len(harz_t) != 0:
+			ax2.plot(harz_t,harz_y,'s',color = '#ef2fa1', label = 'Harzburgite',markersize = 3)
+		if len(low_cr_gt_t) != 0:
+			ax2.plot(low_cr_gt_t,low_cr_gt_y,'s',color = '#d9c1cb', label = 'Low-Cr Peridotite',markersize = 3)
+		if len(wehrlite_t) != 0:
+			ax2.plot(wehrlite_t,wehrlite_y,'^',color = '#b06f90', label = 'Wehrlite',markersize = 3)
+		if len(unclass_t) != 0:
+			ax2.plot(unclass_t,unclass_y,'x',color = 'k',alpha = 0.25, label = 'Unclassified',markersize = 3)
+
+		ax2.set_ylim(1e-1,1e2)
+		ax2.set_xlim(600,1800)
+		if temp_unit == 'Celsius':
+			ax2.set_xlabel(r'$T_{Ni} \, C^{\circ}$')
 		else:
-			unclass_t.append(float(T_Ni[i]))
-			unclass_y.append(gt_comps['Y_Gt'][i])
-
-	if len(lherz_t) != 0:
-		ax2.plot(lherz_t,lherz_y,'*',color = '#339e51', label = 'Lherzolite',markersize = 3)
-	if len(lowcaharz_t) != 0:
-		ax2.plot(lowcaharz_t,lowcaharz_y,'s',color = '#8b1f8f', label = 'Low-Ca Harzburgite',markersize = 3)
-	if len(harz_t) != 0:
-		ax2.plot(harz_t,harz_y,'s',color = '#ef2fa1', label = 'Harzburgite',markersize = 3)
-	if len(low_cr_gt_t) != 0:
-		ax2.plot(low_cr_gt_t,low_cr_gt_y,'s',color = '#d9c1cb', label = 'Low-Cr Peridotite',markersize = 3)
-	if len(wehrlite_t) != 0:
-		ax2.plot(wehrlite_t,wehrlite_y,'^',color = '#b06f90', label = 'Wehrlite',markersize = 3)
-	if len(unclass_t) != 0:
-		ax2.plot(unclass_t,unclass_y,'x',color = 'k',alpha = 0.25, label = 'Unclassified',markersize = 3)
-
-	ax2.set_ylim(1e-1,1e2)
-	ax2.set_xlim(600,1800)
-	if temp_unit == 'Celsius':
-		ax2.set_xlabel(r'$T_{Ni} \, C^{\circ}$')
-	else:
-		ax2.set_xlabel(r'$T_{Ni} \, K^{\circ}$')
-	ax2.set_ylabel('Y (wt ppm)')
-	ax2.set_yscale('log')
-	ax2.axvline(BDL_T,linestyle = '--',color = 'k',linewidth = 2)
+			ax2.set_xlabel(r'$T_{Ni} \, K^{\circ}$')
+		ax2.set_ylabel('Y (wt ppm)')
+		ax2.set_yscale('log')
+		ax2.axvline(BDL_T,linestyle = '--',color = 'k',linewidth = 2)
 
 	if plot_type == 'show':
 		plt.show()
@@ -223,7 +245,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 	T_Ni: Temperature output taken from one of the garnet thermometry methods in
 	Kelvin.
 
-	P_Cr: Cr2O3 based pressure estimate of the garnet xenocrysts in GPa
+	P_Cr: Cr2O3 based pressure estimate of the garnet xenocrysts in KBar
 
 	BDL_T: is Temperature at the base of the depleted lithosphere in Celsius
 
@@ -244,6 +266,7 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 
 	'''
 
+	P_Cr = P_Cr / 10.0
 
 	#Calculating range of geotherms to be plotted
 	geotherms = []
