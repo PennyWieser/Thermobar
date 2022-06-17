@@ -111,8 +111,38 @@ filter_q=None, append=False):
         from the import_excel function, or any dataframe with the
         headings _Liq for liquids, _Cpx for clinopyroxenes etc.
 
-    phase_err_type: "Abs" (default) or "Perc"
-        Determins if specified errors are absolute (Abs) or percentage errors.
+    Options for adding different types of error:
+
+    1) If you want to specifying an error for >1 variable:
+
+        phase_err: pandas dataframe
+            Pandas dataframe with headings for the error of the oxide in each
+            phase (e.g., SiO2_Liq_Err, or SiO2_Cpx_Err).
+            This dataframe can be generated from a user-inputted spreadsheet
+            with these column headings using the function import_excel_errors.
+            Errors can be absolute, or percentage errors.
+            the default is absolute errors (in wt%), but users can overwrite
+            this using phase_err_Type="Perc".
+
+
+        phase_err_type: "Abs" (default) or "Perc"
+            Determins if specified errors are absolute (Abs) or percentage errors.
+
+    2) If you want to specify error for a single variable:
+
+        variable: str
+            Name of column you wish to add error to (e.g. Na2O_Liq)
+
+        variable_err: flt, int
+            Specifies how much error to add
+
+    3) If you want to add a fixed percent of noise to all variables.
+
+        noise_percent: flt, int
+            Adds a fixed noise percent to all input variables.
+
+
+
 
     duplicates: flt, int (Default: 10)
         Number of new synthetic samples generated per sample in the original
@@ -139,32 +169,7 @@ filter_q=None, append=False):
         If True, appends user-entered dataframe onto the synthetic dataframe
         once noise has been added.
 
-    Options for adding different types of error:
 
-    1) If you want to specifying an error for >1 variable:
-
-        phase_err: pandas dataframe
-            Pandas dataframe with headings for the error of the oxide in each
-            phase (e.g., SiO2_Liq_Err, or SiO2_Cpx_Err).
-            This dataframe can be generated from a user-inputted spreadsheet
-            with these column headings using the function import_excel_errors.
-            Errors can be absolute, or percentage errors.
-            the default is absolute errors (in wt%), but users can overwrite
-            this using phase_err_Type="Perc".
-
-
-    2) If you want to specify error for a single variable:
-
-        variable: str
-            Name of column you wish to add error to (e.g. Na2O_Liq)
-
-        variable_err: flt, int
-            Specifies how much error to add
-
-    3) If you want to add a fixed percent of noise to all variables.
-
-        noise_percent: flt, int
-            Adds a fixed noise percent to all input variables.
 
     Returns
     -------
@@ -178,6 +183,10 @@ filter_q=None, append=False):
     an index 1. etc.
 
     '''
+
+    if variable_err is not None:
+        if (type(variable_err) is not float) and (type(variable_err) is not int) and (type(variable_err) is not np.ndarray):
+            raise Exception('variable error must be a float, integer, or np.ndarray. If youve entered a pandas series, do series.values')
 
     if variable is not None and noise_percent is not None:
         raise Exception('noise_percent is an arguement on its own '

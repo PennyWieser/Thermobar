@@ -1,4 +1,4 @@
-__author__ = 'Penny Wieser, Maurizio Petrelli, Jordan Lubbers, Eric Wieser'
+__author__ = 'Penny Wieser, Maurizio Petrelli, Jordan Lubbers, Sinan, Eric Wieser'
 
 
 import numpy as np
