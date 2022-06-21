@@ -50,6 +50,7 @@ Welcome to Thermobar's documentation!
    :caption:  Cpx & Cpx-Liq
 
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liq_Thermobarometry
+   Examples/Cpx_Cpx_Liq_Thermobarometry/MachineLearning_Cpx_Liq_Thermobarometry
    Examples/Cpx_Cpx_Liq_Thermobarometry/Pyroxene_Ternary_Cpx_Example
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liquid_melt_matching/Cpx_MeltMatch1_Gleeson2020
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liquid_melt_matching/Cpx_MeltMatch2_ScruggsPutirka2018
