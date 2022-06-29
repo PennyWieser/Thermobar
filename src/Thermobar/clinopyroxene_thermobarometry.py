@@ -15,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 #from skl2onnx import convert_sklearn
 #from skl2onnx.common.data_types import FloatTensorType
 
-
+np.seterr(invalid="ignore")
 
 
 from Thermobar.core import *

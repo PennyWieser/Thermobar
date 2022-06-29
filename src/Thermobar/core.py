@@ -11,6 +11,8 @@ import pickle
 from pathlib import Path
 Thermobar_dir=Path(__file__).parent
 
+np.seterr(invalid="ignore")
+
 
 ## This specifies the default order for each dataframe type used in calculations
 df_ideal_liq = pd.DataFrame(columns=['SiO2_Liq', 'TiO2_Liq', 'Al2O3_Liq',

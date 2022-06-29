@@ -50,6 +50,8 @@ from Thermobar.garnet_plot import*
 from Thermobar.garnet_class import*
 # Geotherm
 from Thermobar.geotherm import *
+# Density profiles
+from Thermobar.density_profiles import *
 
 
 # version
