@@ -4164,6 +4164,65 @@ def calculate_hydrous_mol_fractions_liquid_redox(liq_comps):
     return mol_frac_hyd
 
 
+def convert_fo2_to_buffer(fo2=None, T_K=None, P_kbar=None):
+
+    """ Converts fo2 in bars to deltaNNO and delta QFM using Frost 1991
+    based on user-entered T in Kelvin and P in kbar
+    """
+    logfo2=np.log10(fo2)
+# NNO Buffer position from frost (1991)
+    logfo2_NNO=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
+
+    fo2_NNO=10**logfo2
+    DeltaNNO=logfo2-logfo2_NNO
+
+
+
+#  QFM Buffer position from frost (1991)
+
+    # Calculates cut off T for alpha-beta qtz transition that determins QFM
+    Cut_off_T=573+273.15+0.025*(P_kbar*1000)
+
+    logfo2_QFM_highT=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K
+    T_Choice='HighT Beta Qtz'
+
+    logfo2_QFM_lowT=(-26455.3/T_K) +10.344 + 0.092 * ((P_kbar*1000)-1)/T_K
+    T_Choice='Low T alpha Qtz'
+
+
+    fo2_QFM_highT=10**logfo2_QFM_highT
+    fo2_QFM_lowT=10**logfo2_QFM_lowT
+
+    Delta_QFM_highT=logfo2-logfo2_QFM_highT
+    Delta_QFM_lowT=logfo2-logfo2_QFM_highT
+    if isinstance(fo2, float) or isinstance(fo2, int):
+        if T_K<Cut_off_T:
+            DeltaQFM=Delta_QFM_lowT
+        if T_K>=Cut_off_T:
+            DeltaQFM=Delta_QFM_highT
+        out=pd.DataFrame(data={'deltaNNO_Frost1991':  DeltaNNO,
+                               'deltaQFM_Frost1991':  DeltaQFM,
+                               'QFM_equation_Choice': 'High T',
+                               'T_K': T_K,
+                               'P_kbar': P_kbar,
+                               'fo2': fo2}, index=[0])
+    else:
+        print('using low temp')
+        out=pd.DataFrame(data={'deltaNNO_Frost1991':  DeltaNNO,
+                               'deltaQFM_Frost1991': Delta_QFM_highT,
+                               'QFM_equation_Choice': 'High T',
+                               'T_K': T_K,
+                               'P_kbar': P_kbar,
+                               'fo2': fo2})
+        out.loc[(T_K<Cut_off_T), 'deltaQFM_Frost1991']=Delta_QFM_lowT
+        out.loc[(T_K<Cut_off_T), 'QFM_equation_Choice']='Low T'
+
+    out['Cut off T (K)']=Cut_off_T
+
+    return out
+
+
+
 
 def convert_fe_partition_to_fo2(*, liq_comps, T_K, P_kbar,  model="Kress1991", renorm=False):
     '''
