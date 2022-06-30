@@ -30,8 +30,8 @@ def T_Sudholz2021(gt_comps):
 
     gt_calc = calculate_garnet_components(gt_comps = gt_comps)
 
-    xCa = np.array(gt_calc['Ca_MgFeCa'])
-    xCr = np.array(gt_calc['Cr_AlCr'])
+    xCa = np.array(gt_calc['Ca_MgFeCa_Gt'])
+    xCr = np.array(gt_calc['Cr_AlCr_Gt'])
 
     ni_ol = 3e3
 
