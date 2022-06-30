@@ -671,7 +671,7 @@ H2O_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd):
     :cite:`putirka2016amphibole`
 
     '''
-    print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H"O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
+    # print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H"O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
     return (10 * (-3.093 - 4.274 * np.log(Al_Amp_cat_23ox.astype(float) / Al2O3_Liq_mol_frac_hyd.astype(float))
     - 4.216 * np.log(Al2O3_Liq_mol_frac_hyd.astype(float)) + 63.3 * P2O5_Liq_mol_frac_hyd +
     1.264 * H2O_Liq_mol_frac_hyd + 2.457 * Al_Amp_cat_23ox + 1.86 * K_Amp_cat_23ox
@@ -1011,6 +1011,9 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
         raise ValueError(f'{equationP} is not a valid equation') from None
     sig=inspect.signature(func)
 
+    if equationP == "P_Put2016_eq7a":
+        print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H"O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
+
     if sig.parameters['T'].default is not None:
         if T is None:
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
@@ -1281,7 +1284,7 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
 
 
 def calculate_amp_liq_press_temp_matching(*, liq_comps, amp_comps, equationT=None,
-equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
+equationP=None, P=None, T=None,  H2O_Liq=None,
  Kd_Match=0.28, Kd_Err=0.11, return_all_pairs=False):
 
     '''
