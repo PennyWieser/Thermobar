@@ -57,7 +57,7 @@ def prezzi(P_kbar):
 Profile_funcs={ryan_lerner, mavko_debari, hill_zucca, prezzi, rasmussen}
 Profile_funcs_by_name= {p.__name__: p for p in Profile_funcs}
 
-def convert_pressure_to_depth(P_kbar=None, model=None, crust_dens_kgm3=None):
+def convert_pressure_to_depth(P_kbar=None, model=None, crust_dens_kgm3=None, g=9.81):
     """ Converts pressure in kbar to depth in km using a variety of crustal density profiles
 
 
@@ -66,6 +66,9 @@ def convert_pressure_to_depth(P_kbar=None, model=None, crust_dens_kgm3=None):
 
     P_kbar: int, float, pd.Series, np.ndarray
         Pressure in kbar
+
+    g: float
+        gravitational constant, in m/s2
 
     model: str or float:
     If you want an existing model, choose from
@@ -126,4 +129,9 @@ def convert_pressure_to_depth(P_kbar=None, model=None, crust_dens_kgm3=None):
         D=10**5*P_kbar/(9.8*crust_dens_kgm3)
 
     D_series=pd.Series(D)
+
+    if g != 9.81:
+        print('You specified a g that wasnt 9.81, ive adjusted the profiles accordingly')
+        D_series=D_series*(9.81/g)
+
     return D_series
