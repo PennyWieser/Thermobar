@@ -184,10 +184,10 @@ filter_q=None, append=False):
 
     '''
 
-    if variable_err is not None:
-        if (type(variable_err) is not float) and (type(variable_err) is not int) and (type(variable_err) is not np.ndarray):
-            raise Exception('variable error must be a float, integer, or np.ndarray. If youve entered a pandas series, do series.values')
-
+    # if variable_err is not None:
+    #     if (type(variable_err) is not float) and (type(variable_err) is not int) and (type(variable_err) is not np.ndarray):
+    #         raise Exception('variable error must be a float, integer, or np.ndarray. If youve entered a pandas series, do series.values')
+    #
     if variable is not None and noise_percent is not None:
         raise Exception('noise_percent is an arguement on its own '
         'it adds noise to all variables. Either specify variable or '
