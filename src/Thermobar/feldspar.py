@@ -333,7 +333,7 @@ def calculate_fspar_liq_press(*, plag_comps=None, kspar_comps=None, liq_comps=No
 
 def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_comps=None,
                                 meltmatch=None, equationP=None, equationT=None, iterations=30, T_K_guess=1300,
-                                H2O_Liq=None):
+                                H2O_Liq=None, eq_tests=False):
     '''
     Solves simultaneous equations for temperature and pressure using
     feldspar-liquid thermometers and barometers. Currently no Kspar barometers exist.
@@ -366,6 +366,9 @@ def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_com
 
     T_K_guess: int or float (Default = 1300K)
          Initial guess of temperature.
+
+    eq_tests: bool
+
 
     Returns
     ---------
@@ -417,8 +420,22 @@ def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_com
 
     # calculates Kd Fe-Mg if eq_tests="True"
 
-    PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
-    return PT_out
+
+
+    if eq_tests is True:
+
+        eq_tests=calculate_plag_liq_eq_tests(liq_comps=liq_comps,
+        plag_comps=plag_comps, P=P_guess, T=T_K_guess)
+        eq_tests.insert(1, "P_kbar_calc", P_guess)
+        eq_tests.insert(2, "T_K_calc", T_K_guess)
+        return eq_tests
+
+    else:
+         PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+         return PT_out
+
+
+
 
 ## Equations: Plag-Liquid hygrometry
 
@@ -470,6 +487,7 @@ def H_Waters2015(T, *, liq_comps=None, plag_comps=None,
     SEE=+-0.35 wt%
 
     '''
+    T=T+0.000000000001 # This stops it being an integer
     # 1st bit calculates mole fractions in the same way as Waters and Lange.
     # Note, to match excel, all Fe is considered as FeOT.
     mol_prop = calculate_anhydrous_mol_proportions_liquid(liq_comps=liq_comps)
@@ -886,17 +904,35 @@ def calculate_fspar_liq_temp_hygr(*, liq_comps, plag_comps, equationT, equationH
 
     # Calculating a dataframe showing the evolution of temperature and H2O vs. number of iterations
     Iter=It_sample
-    for i in range(0, len(liq_comps)):
-        if i==0:
-            T_evol=pd.DataFrame(data={'Iteration': Iter, 'Sample_0_T_calc': T_sample[0, :]})
-            T_evol.insert(i+1, 'Sample_0_H_calc', H2O_sample[0, :])
-        else:
-            new_col_name_T=('Sample_'+str(i)+ "_T_calc")
-            new_col_name_H=('Sample_'+str(i)+ "_H_calc")
-            T_evol.insert(2*i, new_col_name_T, T_sample[i, :])
-            T_evol.insert(2*i+1, new_col_name_H, H2O_sample[i, :])
 
-    return {'T_H_calc': Combined_output, 'T_H_Evolution':  T_evol}
+    df_t=pd.DataFrame(T_sample.T)
+    df_Temp=df_t.add_prefix('Sample_')
+    df_Temp2=df_Temp.add_suffix('_T_calc')
+    df_Temp2
+
+    print(len(df_Temp2))
+
+    df_h=pd.DataFrame(H2O_sample.T)
+    df_H2O=df_h.add_prefix('Sample_')
+    df_H2O2=df_H2O.add_suffix('_T_calc')
+    df_H2O2
+
+    T_evol=pd.concat([df_Temp2, df_H2O2], axis=1)
+    T_evol['Iteration']=Iter
+
+    # for i in range(0, len(liq_comps)):
+    #     if i==0:
+    #         T_evol=pd.DataFrame(data={'Iteration': Iter, 'Sample_0_T_calc': T_sample[0, :]})
+    #         T_evol.insert(i+1, 'Sample_0_H_calc', H2O_sample[0, :])
+    #     else:
+    #         new_col_name_T=('Sample_'+str(i)+ "_T_calc")
+    #         new_col_name_H=('Sample_'+str(i)+ "_H_calc")
+    #         T_evol.insert(2*i, new_col_name_T, T_sample[i, :])
+    #         T_evol.insert(2*i+1, new_col_name_H, H2O_sample[i, :])
+    #
+
+
+    return {'T_H_calc': Combined_output, 'T_H_Evolution':  T_evol, 'T_sample': T_sample, 'H2O_sample': H2O_sample}
 
 
 

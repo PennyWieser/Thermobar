@@ -165,12 +165,75 @@ def P_Schmidt1992(T=None, *, Al_Amp_cat_23ox):
     return (-3.01 + 4.76 * Al_Amp_cat_23ox)
 
 
+def P_Medard2022_RidolfiSites(T=None,*,  amp_comps):
+    """ Regression strategy of Medard 2022 linking AlVI to pressure,
+    using site allocation strategy used by Ridolfi 2022 for consistency
+
+    Statistics on calibration dataset:
+
+    R2=0.93
+    RMSE=93.48
+    Int of reg=37.7
+    Grad of reg=0.92
+
+
+    """
+
+    Sites_R=calculate_sites_ridolfi(amp_comps)
+    P_Calc=817.22283194*Sites_R['Al_VI_C']+176.24032229
+    return P_Calc/100
+
+
+
+def P_Medard2022_LeakeSites(T=None, *,amp_comps):
+    """ Regression strategy of Medard 2022 linking AlVI to pressure,
+    using site allocation strategy used by Leake (implemented in Putirka) for consistency
+
+    Statistics on calibration dataset:
+
+    R2=0.94
+    RMSE=87
+    Int of reg=32
+    Grad of reg=0.94
+
+
+    """
+    ox23=calculate_23oxygens_amphibole(amp_comps)
+    Leake=get_amp_sites_leake(ox23)
+
+    P_Calc=874.64558583*Leake['Al_C']+43.72682101
+    return P_Calc/100
+
+
+def P_Medard2022_MutchSites(T=None,*, amp_comps):
+    """ Regression strategy of Medard 2022 linking AlVI to pressure,
+    using site allocation strategy used by Mutch 2016 for consistency
+
+    Statistics on calibration dataset:
+
+    R2=0.93
+    RMSE=93.9
+    Int of reg=38.19
+    Grad of reg=0.93
+
+
+    """
+
+    ox23=calculate_23oxygens_amphibole(amp_comps)
+    Amp_sites_initial=get_amp_sites_mutch(ox23)
+    norm_cat = amp_components_ferric_ferrous_mutch(Amp_sites_initial, ox23)
+    Sites_M = get_amp_sites_ferric_ferrous_mutch(norm_cat)
+
+    P_Calc=835.07125833*Sites_M['Al_C']+107.37542222
+    return P_Calc/100
+
 
 ## Function: Amphibole-only barometry
 
 Amp_only_P_funcs = { P_Ridolfi2012_1a, P_Ridolfi2012_1b, P_Ridolfi2012_1c, P_Ridolfi2012_1d,
 P_Ridolfi2012_1e, P_Ridolfi2010, P_Hammarstrom1986_eq1, P_Hammarstrom1986_eq2, P_Hammarstrom1986_eq3, P_Hollister1987,
-P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995, P_Kraw2012} # put on outside
+P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995, P_Kraw2012, P_Medard2022_RidolfiSites,
+P_Medard2022_LeakeSites, P_Medard2022_MutchSites} # put on outside
 
 Amp_only_P_funcs_by_name= {p.__name__: p for p in Amp_only_P_funcs}
 
@@ -371,6 +434,17 @@ classification=False, Ridolfi_Filter=True):
        name = calculate_sites_ridolfi(amp_comps).classification
 
 
+    if equationP=="P_Medard2022_RidolfiSites":
+        df_out=P_Medard2022_RidolfiSites(amp_comps=amp_comps)
+        return df_out
+
+    if equationP=="P_Medard2022_MutchSites":
+        df_out=P_Medard2022_MutchSites(amp_comps=amp_comps)
+        return df_out
+
+    if equationP=="P_Medard2022_LeakeSites":
+        df_out=P_Medard2022_LeakeSites(amp_comps=amp_comps)
+        return df_out
 
 
     if equationP == "P_Kraw2012":
@@ -530,7 +604,7 @@ classification=False, Ridolfi_Filter=True):
 
 
 
-    if equationP != "Mutch2016" and 'Ridolfi2012' not in equationP and equationP != "P_Ridolfi2021":
+    if equationP != "Mutch2016" and 'Ridolfi2012' not in equationP and  equationP != "P_Ridolfi2021":
         ox23_amp = calculate_23oxygens_amphibole(amp_comps=amp_comps)
 
     kwargs = {name: ox23_amp[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}

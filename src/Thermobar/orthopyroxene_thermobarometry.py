@@ -91,6 +91,7 @@ def P_Put2008_eq29c(T, *, Al_Opx_cat_6ox,
 
     '''
     logCr2O3 = np.log(Cr_Opx_cat_6ox.astype(float))
+    #print(logCr2O3)
 
 
     return (2064 + 0.321 * (T - 273.15) - 343.4 * np.log((T - 273.15)) + 31.52 * Al_Opx_cat_6ox - 12.28 * Ca_Opx_cat_6ox
@@ -195,9 +196,9 @@ def calculate_opx_only_press(*, opx_comps, equationP, T=None):
     if sig.parameters['T'].default is not None:
         if T is None:
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
-    else:
-        if T is not None:
-            print('Youve selected a T-independent function')
+    # else:
+    #     if T is not None:
+    #         print('Youve selected a T-independent function')
 
     opx_comps = calculate_orthopyroxene_components(opx_comps=opx_comps)
     if equationP != "P_Put2008_eq29c":
@@ -232,7 +233,7 @@ def calculate_opx_only_press(*, opx_comps, equationP, T=None):
 
 ## Orthopyroxene-Liquid pressure
 
-Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Felsic_Opx} # put on outside
+Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Felsic_Opx, P_Put2008_eq29c} # put on outside
 
 Opx_Liq_P_funcs_by_name = {p.__name__: p for p in Opx_Liq_P_funcs}
 
@@ -297,9 +298,9 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
     if sig.parameters['T'].default is not None:
         if T is None:
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
-    else:
-        if T is not None:
-            print('Youve selected a T-independent function')
+    # else:
+    #     if T is not None:
+    #         print('Youve selected a T-independent function')
 
     if isinstance(T, pd.Series):
         if liq_comps is not None:
@@ -333,9 +334,9 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
     if sig.parameters['T'].default is not None:
         if T is None:
             raise ValueError(f'{equationP} requires you to enter T')
-    else:
-        if T is not None:
-            print('Youve selected a T-independent function')
+    # else:
+    #     if T is not None:
+    #         print('Youve selected a T-independent function')
 
 
     kwargs = {name: Combo_liq_opxs[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}

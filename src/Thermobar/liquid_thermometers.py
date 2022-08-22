@@ -373,7 +373,7 @@ T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq
 Liquid_only_funcs_by_name = {p.__name__: p for p in Liquid_only_funcs}
 
 
-def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
+def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None, print=False):
 
     '''
     Liquid-only thermometery. Returns a temperature in Kelvin.
@@ -466,7 +466,8 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None):
 
     if H2O_Liq is not None:
         liq_comps_c['H2O_Liq']=H2O_Liq
-        print('Water content replaced with that from H2O_Liq')
+        if print is True:
+            print('Water content replaced with that from H2O_Liq')
 
 # Keiths Liq-only spreadsheet doesn't use Cr2O3 and P2O5 to calc cat. frac. So have set this to zero.
     if equationT != "T_Put2008_eq26_plag_sat" and equationT != "T_Put2008_eq24c_kspar_sat" \

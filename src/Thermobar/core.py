@@ -10,6 +10,7 @@ from pickle import load
 import pickle
 from pathlib import Path
 Thermobar_dir=Path(__file__).parent
+np.seterr(divide='ignore', invalid='ignore')
 
 np.seterr(invalid="ignore")
 
