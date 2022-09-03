@@ -386,6 +386,8 @@ classification=False, Ridolfi_Filter=True):
         | P_Ridolfi2012_1e (T-independent)
         | P_Ridolfi2021 - (T-independent)- Uses new algorithm in 2021 paper to
         select pressures from equations 1a-e.
+        | P_Medard2022. Choose how you want the sites calculated:
+            P_Medard2022_RidolfiSites, LeakeSites, MutchSites
 
         | P_Ridolfi2010  (T-independent)
         | P_Hammarstrom1986_eq1  (T-independent)
@@ -1085,8 +1087,8 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
         raise ValueError(f'{equationP} is not a valid equation') from None
     sig=inspect.signature(func)
 
-    if equationP == "P_Put2016_eq7a":
-        print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H"O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
+    if equationP == "P_Put2016_eq7a" and meltmatch is None:
+        print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H2O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
 
     if sig.parameters['T'].default is not None:
         if T is None:
@@ -1427,6 +1429,8 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
     if equationT is not None and T is not None:
         raise ValueError('You have entered an equation for T and specified a temperature. '
         'The code doesnt know what you want it to do. Either enter an equation, or choose a temperature.  ')
+    if equationP == "P_Put2016_eq7a":
+        print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H2O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
 
     # This over-writes inputted Fe3Fet_Liq and H2O_Liq inputs.
     liq_comps_c = liq_comps.copy()
@@ -1454,6 +1458,8 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
     Combo_liqs_hyd_anhyd = pd.concat([liq_comps_hy, liq_comps_an], axis=1)
 
 
+
+
     # This duplicates AMPs, repeats amp1-amp1*N, amp2-amp2*N etc.
     DupAMPs = pd.DataFrame(
         np.repeat(amp_comps_23.values, np.shape(Combo_liqs_hyd_anhyd)[0], axis=0))
@@ -1465,6 +1471,13 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
                         np.shape(amp_comps_23)[0]).reset_index(drop=True)
     # Combines these merged liquids and amp dataframes
     Combo_liq_amps = pd.concat([DupLiqs, DupAMPs], axis=1)
+
+    LenAmp=len(amp_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenAmp) + " Amp & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(len(Combo_liq_amps)) +
+          " Amp-Liq pairs, be patient if this is >>1 million!")
+
+
 
     # calculate Kd for this merged dataframe
     Combo_liq_amps['Kd']=((Combo_liq_amps['FeOt_Amp_mol_prop']/Combo_liq_amps['MgO_Amp_mol_prop'])/
@@ -1550,7 +1563,7 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
 
 
 
-    print('Done!')
+    print('Done!!! I found a total of N='+str(len(Combo_liq_amp_fur_filt)) + ' Amp-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Amp out of the N='+str(LenAmp)+' Amp that you input matched to 1 or more liquids')
     return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_amp_fur_filt}
 
 

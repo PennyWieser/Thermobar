@@ -1150,8 +1150,12 @@ def calculate_plag_kspar_temp_matching(*, kspar_comps, plag_comps, equationT=Non
     Combo_plags_kspars_1['K_Barth'] = Combo_plags_kspars_1['Ab_Kspar'] / \
         Combo_plags_kspars_1['Ab_Plag']
     LenCombo = str(np.shape(Combo_plags_kspars)[0])
-    print("Considering " + LenCombo +
-          " Kspar-Plag pairs, be patient if this is >>1 million!")
+    LenPlag=len(plag_comps)
+    LenKspar=len(kspar_comps)
+    print("Considering N=" + str(LenPlag) + " Plag & N=" + str(LenKspar) +" Kspar, which is a total of N="+ str(LenCombo) +
+          " Plag-Kspar pairs, be patient if this is >>1 million!")
+
+
 
     T_K_calc=calculate_plag_kspar_temp(Two_Fspar_Match=Combo_plags_kspars_1.astype(float),
     equationT=equationT, P=P)
@@ -1169,7 +1173,7 @@ def calculate_plag_kspar_temp_matching(*, kspar_comps, plag_comps, equationT=Non
 
 ## Matching functions for fspar-Liq
 def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equationH, iterations=20,
-                                P=None, kspar_comps=None, eq_tests=True):
+                                P=None, kspar_comps=None, Ab_An_P2008=True ):
 
     '''
     Evaluates all possible Plag-liq pairs, iterates T and H2O
@@ -1204,11 +1208,14 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
         T in K for all posible plag-liq matches, along with equilibrium
         tests, components and input mineral compositions
     '''
+
+
     if kspar_comps is not None:
         raise Exception('This function isnt able to use KSpar yet as no hygrometers exist')
 
-    if eq_tests is False:
-        print('Too bad, we output the equilibrium tests results anyway, as you really need to look at them!')
+    plag_comps_c=plag_comps.copy()
+    liq_comps_c=liq_comps.copy()
+
     #Check valid equation for T
     try:
         func = plag_liq_T_funcs_by_name[equationT]
@@ -1230,16 +1237,24 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
     # computation time
     liq_comps_c=liq_comps.copy()
 
+    plag_comps_c['ID_Fspar'] = plag_comps_c.index
+    liq_comps_c['ID_liq'] = liq_comps_c.index.astype('float64')
+
+    if "Sample_ID_Plag" not in plag_comps:
+        plag_comps_c['Sample_ID_Plag'] = plag_comps.index.astype('float64')
+    if "Sample_ID_liq" not in liq_comps:
+        liq_comps_c['Sample_ID_liq'] = liq_comps.index.astype('float64')
+
 
 
     # This duplicates Plags, repeats liq1-liq1*N, liq2-liq2*N etc.
-    DupFspars = pd.DataFrame(np.repeat(plag_comps.values, np.shape(
+    DupFspars = pd.DataFrame(np.repeat(plag_comps_c.values, np.shape(
         liq_comps_c)[0], axis=0))  # .astype('float64')
-    DupFspars.columns = plag_comps.columns
+    DupFspars.columns = plag_comps_c.columns
 
     # This duplicates liquids like liq1-liq2-liq3 for liq1, liq1-liq2-liq3 for
     # liq2 etc.
-    Dupliqs = pd.concat([liq_comps_c] * np.shape(plag_comps)[0]).reset_index(drop=True)
+    Dupliqs = pd.concat([liq_comps_c] * np.shape(plag_comps_c)[0]).reset_index(drop=True)
     # Combines these merged liquids and liq dataframes
     Combo_fspar_liqs = pd.concat([Dupliqs, DupFspars], axis=1)
 
@@ -1282,32 +1297,91 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
     Combined_output.insert(2, 'Delta T (last 2 iters)', DeltaT)
     Combined_output.insert(4, 'Delta H (last 2 iters)', DeltaH)
 
-    # Calculating a dataframe showing the evolution of temperature and H2O vs. number of iterations
     Iter=It_sample
-    for i in range(0, len(Dupliqs)):
-        if i==0:
-            T_evol=pd.DataFrame(data={'Iteration': Iter, 'Sample_0_T_calc': T_sample[0, :]})
-            T_evol.insert(i+1, 'Sample_0_H_calc', H2O_sample[0, :])
-        else:
-            new_col_name_T=('Sample_'+str(i)+ "_T_calc")
-            new_col_name_H=('Sample_'+str(i)+ "_H_calc")
-            T_evol.insert(2*i, new_col_name_T, T_sample[i, :])
-            T_evol.insert(2*i+1, new_col_name_H, H2O_sample[i, :])
+
+    df_t=pd.DataFrame(T_sample.T)
+    df_Temp=df_t.add_prefix('Sample_')
+    df_Temp2=df_Temp.add_suffix('_T_calc')
+    df_Temp2
+
+    print(len(df_Temp2))
+
+    df_h=pd.DataFrame(H2O_sample.T)
+    df_H2O=df_h.add_prefix('Sample_')
+    df_H2O2=df_H2O.add_suffix('_T_calc')
+    df_H2O2
+
+    T_evol=pd.concat([df_Temp2, df_H2O2], axis=1)
+    T_evol['Iteration']=Iter
+    # Calculating a dataframe showing the evolution of temperature and H2O vs. number of iterations
+    # Iter=It_sample
+    # for i in range(0, len(Dupliqs)):
+    #     if i==0:
+    #         T_evol=pd.DataFrame(data={'Iteration': Iter, 'Sample_0_T_calc': T_sample[0, :]})
+    #         T_evol.insert(i+1, 'Sample_0_H_calc', H2O_sample[0, :])
+    #     else:
+    #         new_col_name_T=('Sample_'+str(i)+ "_T_calc")
+    #         new_col_name_H=('Sample_'+str(i)+ "_H_calc")
+    #         T_evol.insert(2*i, new_col_name_T, T_sample[i, :])
+    #         T_evol.insert(2*i+1, new_col_name_H, H2O_sample[i, :])
+    #
+    #
+    #
+    #
+    if Ab_An_P2008 is True:
+        Combo_fspar_liqs2=Combined_output.loc[Combined_output['Pass An-Ab Eq Test Put2008?'].str.contains('Yes')].reset_index(drop=True)
+
+    if Ab_An_P2008 is False:
+        print('We are returning all pairs, if you want to use the Ab-An equilibrium test of Putirka (2008), enter Ab_An_P2008=True')
+        Combo_fspar_liqs2=Combined_output
 
 
-    print('Done!!! We have returned all pairs. You could now filter based on those passing the'+
-    'An-Ab equilibrium test, or other equilibrium tests you want to try')
+    Combo_fspar_liqs2=Combined_output
+    FsparNumbers = Combo_fspar_liqs2['ID_Fspar'].unique()
+
+    Combo_fspar_liqs3=Combo_fspar_liqs2.drop(['Pass An-Ab Eq Test Put2008?', 'T_K_calc'], axis=1)
+    Combo_fspar_liqs3['T_K_calc']=Combo_fspar_liqs2['T_K_calc'].astype(float)
+    if len(FsparNumbers) > 0:
+        if plag_comps is not None:
+            df1_Mean_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Plag'], as_index=False).mean()
+            df1_Std_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Plag'], as_index=False).std()
+            count=Combo_fspar_liqs2.groupby('ID_Fspar',as_index=False).count().iloc[:, 1]
+            df1_Mean_nopref['# of Liqs Averaged']=count
+
+            Sample_ID_Fspar_Mean=df1_Mean_nopref['Sample_ID_Plag']
+            Sample_ID_Fspar_Std=df1_Std_nopref['Sample_ID_Plag']
+            df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+            df1_Std=df1_Std_nopref.add_prefix('Std_')
+
+            df1_Mean.rename(columns={"Mean_ID_Fspar": "ID_Fspar"}, inplace=True)
+            df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
+            df1_Std.rename(columns={"Std_ID_Fspar": "ID_Fspar"}, inplace=True)
 
 
 
-    return {'T_H_calc': Combined_output, 'T_H_Evolution':  T_evol}
+            df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_Fspar'])
+            df1_M['Sample_ID_Plag']=Sample_ID_Fspar_Mean
+
+    else:
+        raise Exception(
+            'No Matches - to set less strict filters, change our Kd filter')
+
+
+    print('Done!!! I found a total of N='+str(len(Combo_fspar_liqs3)) + ' Fspar-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Fspar out of the N='+str(LenFspar)+' Fspar that you input matched to 1 or more liquids')
+
+    return {'Av_HTs': df1_M, 'All_HTs': Combo_fspar_liqs2, 'T_H_Evolution':  T_evol}
+    # Now we do the averaging step for each feldspar crystal
+
+
+
+
 
 
 
 
 def calculate_fspar_liq_temp_matching(*, liq_comps, plag_comps=None,
 kspar_comps=None, H2O_Liq=None, equationT=None,
-P=None, eq_tests=False):
+P=None, Ab_An_P2008=False):
     '''
     Evaluates all possible Plag-liq or kspar-liq pairs,
     returns T (K) and equilibrium test values. Users must investigate correct values for eq tests.
@@ -1391,7 +1465,7 @@ P=None, eq_tests=False):
 
 
     # Adding an ID label to help with melt-liq rematching later
-    cat_fspar['ID_Plag'] = cat_fspar.index
+    cat_fspar['ID_Fspar'] = cat_fspar.index
     cat_liqs['ID_liq'] = cat_liqs.index.astype('float64')
     if "Sample_ID_Plag" not in cat_fspar:
         cat_fspar['Sample_ID_Plag'] = cat_fspar.index.astype('float64')
@@ -1432,21 +1506,97 @@ P=None, eq_tests=False):
         equationT=equationT, P=P)
         Combo_fspar_liqs_1.insert(0, "T_K_calc", T_K_calc)
 
-    if eq_tests is False:
-        return Combo_fspar_liqs_1
-    if eq_tests is True:
-        if kspar_comps is not None:
-            print('Sorry, no equilibrium tests implemented for Kspar-Liquid. Weve just returned the major elements')
-            Combo_fspar_liqs.insert(0, "T_K_calc", T_K_calc)
-            return Combo_fspar_liqs
 
+    if kspar_comps is not None:
+        print('Sorry, no equilibrium tests implemented for Kspar-Liquid. Weve returned all possible pairs, you will have to filter them yourselves')
+        Combo_fspar_liqs.insert(0, "T_K_calc", T_K_calc)
+        Combo_fspar_liqs2=Combo_fspar_liqs
+
+
+
+    if plag_comps is not None:
+        eq_tests=calculate_plag_liq_eq_tests(meltmatch=Combo_fspar_liqs_1,
+        P=P, T=T_K_calc)
+
+
+        cols_to_move = ['T_K_calc']
+        eq_testsN = eq_tests[cols_to_move + [
+            col for col in eq_tests.columns if col not in cols_to_move]]
+        if Ab_An_P2008 is True:
+            Combo_fspar_liqs2=eq_testsN.loc[eq_testsN['Pass An-Ab Eq Test Put2008?'].str.contains('Yes')].reset_index(drop=True)
+
+        if Ab_An_P2008 is False:
+            print('We are returning all pairs, if you want to use the Ab-An equilibrium test of Putirka (2008), enter Ab_An_P2008=True')
+            Combo_fspar_liqs2=eq_testsN
+
+
+
+    FsparNumbers = Combo_fspar_liqs2['ID_Fspar'].unique()
+
+    Combo_fspar_liqs3=Combo_fspar_liqs2.drop(['Pass An-Ab Eq Test Put2008?', 'T_K_calc'], axis=1)
+    Combo_fspar_liqs3['T_K_calc']=Combo_fspar_liqs2['T_K_calc'].astype(float)
+    if len(FsparNumbers) > 0:
         if plag_comps is not None:
-            eq_tests=calculate_plag_liq_eq_tests(meltmatch=Combo_fspar_liqs_1,
-            P=P, T=T_K_calc)
+            df1_Mean_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Plag'], as_index=False).mean()
+            df1_Std_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Plag'], as_index=False).std()
+            count=Combo_fspar_liqs2.groupby('ID_Fspar',as_index=False).count().iloc[:, 1]
+            df1_Mean_nopref['# of Liqs Averaged']=count
 
-            cols_to_move = ['T_K_calc']
-            eq_tests = eq_tests[cols_to_move + [
-                col for col in eq_tests.columns if col not in cols_to_move]]
-        return eq_tests
+            Sample_ID_Fspar_Mean=df1_Mean_nopref['Sample_ID_Plag']
+            Sample_ID_Fspar_Std=df1_Std_nopref['Sample_ID_Plag']
+            df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+            df1_Std=df1_Std_nopref.add_prefix('Std_')
+
+            df1_Mean.rename(columns={"Mean_ID_Fspar": "ID_Fspar"}, inplace=True)
+            df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
+            df1_Std.rename(columns={"Std_ID_Fspar": "ID_Fspar"}, inplace=True)
+
+
+
+            df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_Fspar'])
+            df1_M['Sample_ID_Plag']=Sample_ID_Fspar_Mean
+
+
+
+            # cols_to_move = ['Sample_ID_Plag',
+            #                 'Mean_T_K_calc', 'Std_T_K_calc']
+            #
+            # df1_M = df1_M[cols_to_move +
+            #             [col for col in df1_M.columns if col not in cols_to_move]]
+
+
+
+        if kspar_comps is not None:
+            df1_Mean_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Kspar'], as_index=False).mean()
+            df1_Std_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Kspar'], as_index=False).std()
+            count=Combo_fspar_liqs2.groupby('ID_Fspar',as_index=False).count().iloc[:, 1]
+            df1_Mean_nopref['# of Liqs Averaged']=count
+
+            Sample_ID_Fspar_Mean=df1_Mean_nopref['Sample_ID_Kspar']
+            Sample_ID_Fspar_Std=df1_Std_nopref['Sample_ID_Kspar']
+            df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+            df1_Std=df1_Std_nopref.add_prefix('Std_')
+
+            df1_Mean.rename(columns={"Mean_ID_Fspar": "ID_Fspar"}, inplace=True)
+            df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
+            df1_Std.rename(columns={"Std_ID_Fspar": "ID_Fspar"}, inplace=True)
+
+
+
+            df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_Fspar'])
+            df1_M['Sample_ID_Kspar']=Sample_ID_Fspar_Mean
+
+
+    else:
+        raise Exception(
+            'No Matches - to set less strict filters, change our Kd filter')
+
+
+    print('Done!!! I found a total of N='+str(len(Combo_fspar_liqs3)) + ' Fspar-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Fspar out of the N='+str(LenFspar)+' Fspar that you input matched to 1 or more liquids')
+
+    return {'Av_PTs': df1_M, 'All_PTs': Combo_fspar_liqs2}
+    # Now we do the averaging step for each feldspar crystal
+
+
 
 
