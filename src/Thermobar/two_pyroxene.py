@@ -700,8 +700,8 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.copy()
         print('No Kd selected, all matches are shown')
 
-    if return_all_pairs is False:
-        raise Exception('You havent specified what Kd filter you want. Either enter Subsolidus, HighTemp, Kd_Match and Kd_Err or return_all_pairs=True')
+    if return_all_pairs is False and Kd_Match is None:
+        raise Exception('You havent specified what Kd filter you want. Either enter Kd_Match= "Subsolidus", "HighTemp", or Kd_Match=value and Kd_Err=val, or  return_all_pairs=True')
 
 
     if len(Combo_opxs_cpxs_1) == 0:
