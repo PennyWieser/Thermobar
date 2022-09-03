@@ -8,8 +8,7 @@ import pandas as pd
 from pickle import load
 import pickle
 from pathlib import Path
-from time import sleep
-from tqdm import tqdm
+
 #Thermobar_dir=Path(__file__).parent
 import joblib
 # Things for machine learning onnx
