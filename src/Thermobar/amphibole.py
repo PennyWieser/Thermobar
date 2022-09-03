@@ -828,7 +828,7 @@ K_Amp_cat_23ox, Ca_Amp_cat_23ox, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd):
             NaM4[i]=NaM4_1[i]
 
     HelzA=Na_Amp_cat_23ox-NaM4
-    ln_KD_Na_K=np.log((K_Amp_cat_23ox.astype(float)/HelzA)*(Na2O_Liq_mol_frac_hyd.astype(float)/K2O_Liq_mol_frac_hyd.astype(float)))
+    ln_KD_Na_K=np.log((K_Amp_cat_23ox.astype(float)/HelzA.astype(float))*(Na2O_Liq_mol_frac_hyd.astype(float)/K2O_Liq_mol_frac_hyd.astype(float)))
 
     return (273.15+(10073.5/(9.75+0.934*Si_Amp_cat_23ox-1.454*Ti_Amp_cat_23ox
     -0.882*Mg_Amp_cat_23ox-1.123*Na_Amp_cat_23ox-0.322*np.log(FeOt_Liq_mol_frac_hyd.astype(float))

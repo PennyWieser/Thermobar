@@ -1204,9 +1204,11 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
         T in K for all posible plag-liq matches, along with equilibrium
         tests, components and input mineral compositions
     '''
+    if kspar_comps is not None:
+        raise Exception('This function isnt able to use KSpar yet as no hygrometers exist')
 
     if eq_tests is False:
-        print('Too bad, we return the equilibrium tests anyway, as you really need to look at them!')
+        print('Too bad, we output the equilibrium tests results anyway, as you really need to look at them!')
     #Check valid equation for T
     try:
         func = plag_liq_T_funcs_by_name[equationT]
@@ -1245,8 +1247,13 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
     # Combo_plags_liqs_1['K_Barth'] = Combo_plags_liqs_1['Ab_liq'] / \
     #     Combo_plags_liqs_1['Ab_Plag']
     LenCombo = str(np.shape(Combo_fspar_liqs)[0])
-    print("Considering " + LenCombo +
-          " liq-spar pairs, be patient if this is >>1 million!")
+
+    LenFspar=len(plag_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenFspar) + " Fspar & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCombo) +
+          " Liq- Fspar pairs, be patient if this is >>1 million!")
+
+
 
     H2O_iter=np.empty(len(Dupliqs), dtype=float)
     T_iter_23_W2015=calculate_fspar_liq_temp(liq_comps=Dupliqs, plag_comps=DupFspars, equationT=equationT,
@@ -1287,6 +1294,9 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
             T_evol.insert(2*i, new_col_name_T, T_sample[i, :])
             T_evol.insert(2*i+1, new_col_name_H, H2O_sample[i, :])
 
+
+    print('Done!!! We have returned all pairs. You could now filter based on those passing the'+
+    'An-Ab equilibrium test, or other equilibrium tests you want to try')
 
 
 
@@ -1405,8 +1415,12 @@ P=None, eq_tests=False):
     # Combo_plags_liqs_1['K_Barth'] = Combo_plags_liqs_1['Ab_liq'] / \
     #     Combo_plags_liqs_1['Ab_Plag']
     LenCombo = str(np.shape(Combo_fspar_liqs)[0])
-    print("Considering " + LenCombo +
-          " liq-spar pairs, be patient if this is >>1 million!")
+
+    LenFspar=len(cat_fspar)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenFspar) + " Fspar & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCombo) +
+          " Liq-Fspar pairs, be patient if this is >>1 million!")
+
 
     if plag_comps is not None:
         T_K_calc=calculate_fspar_liq_temp(meltmatch_plag=Combo_fspar_liqs_1,

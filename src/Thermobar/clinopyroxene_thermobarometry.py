@@ -8,6 +8,8 @@ import pandas as pd
 from pickle import load
 import pickle
 from pathlib import Path
+from time import sleep
+from tqdm import tqdm
 #Thermobar_dir=Path(__file__).parent
 import joblib
 # Things for machine learning onnx
@@ -2673,7 +2675,9 @@ H2O_Liq=None, return_all_pairs=False):
     LenCombo = str(np.shape(Combo_liq_cpxs)[0])
 
     # Status update for user
-    print("Considering " + LenCombo +
+    LenCpx=len(cpx_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenCpx) + " Cpx & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCombo) +
           " Liq-Cpx pairs, be patient if this is >>1 million!")
 
     # calculate clinopyroxene-liquid components for this merged dataframe
@@ -2908,7 +2912,9 @@ H2O_Liq=None, return_all_pairs=False):
 
 
 
-    print('Done!')
+
+    print('Done!!! I found a total of N='+str(len(combo_liq_cpx_fur_filt)) + ' Cpx-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Cpx out of the N='+str(LenCpx)+' Cpx that you input matched to 1 or more liquids')
+
     return {'Av_PTs': df1_M, 'All_PTs': combo_liq_cpx_fur_filt}
 
 

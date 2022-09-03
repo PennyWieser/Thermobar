@@ -751,8 +751,12 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
 
     #Combo_liq_opxs = Combo_liq_opxs.convert_objects(convert_numeric=True)
     LenCombo = str(np.shape(Combo_liq_opxs)[0])
-    print("Considering " + LenCombo +
+
+    LenOpx=len(opx_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenOpx) + " Opx & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCombo) +
           " Liq-Opx pairs, be patient if this is >>1 million!")
+
 
     if return_all_pairs is False:
 
@@ -876,7 +880,11 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     # Returns all opxs-liquids that went through 1st Kd filter with
     # equilibrium parameters, averaged matches, and all matches (not averaged)
 
-    print('Finished!')
+
+    print('Done!!! I found a total of N='+str(len(Combo_liq_opx_fur_filt)) +
+    ' Opx-Liq matches using the specified filter. N=' + str(len(df1_M)) +
+     ' Opx out of the N='+str(LenOpx)
+     +' Opx that you input matched to 1 or more liquids')
 
 
     cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq']

@@ -359,6 +359,21 @@ def T_Put2008_eq24c_kspar_sat(P, *, Al_Liq_cat_frac, Na_Liq_cat_frac,
     - 2313 * Ca_Liq_cat_frac *Al_Liq_cat_frac + 395 * K_Liq_cat_frac * Al_Liq_cat_frac
     - 151 * K_Liq_cat_frac * Si_Liq_cat_frac + 15037 * Ca_Liq_cat_frac**2))
 
+
+def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac, Mn_Liq_cat_frac,
+                            Fet_Liq_cat_frac, Fet_Opx_cat_6ox, Al_Liq_cat_frac, Ti_Liq_cat_frac, Mg_Number_Liq_NoFe3):
+    '''
+    Equation 28b of Putirka et al. (2008). Orthopyroxene-liquid thermometer- temperature at which a liquid is saturated in orhopyroxene (for a given P).
+    :cite:`putirka2008thermometers`
+    '''
+    Cl_NM = Mg_Liq_cat_frac + Fet_Liq_cat_frac + \
+        Ca_Liq_cat_frac + Mn_Liq_cat_frac
+    NF = (7 / 2) * np.log(1 - Al_Liq_cat_frac.astype(float)) + \
+        7 * np.log(1 - Ti_Liq_cat_frac.astype(float))
+    return (273.15 + (5573.8 + 587.9 * (P / 10) - 61 * (P / 10)**2) / (5.3 - 0.633 * np.log(Mg_Number_Liq_NoFe3.astype(float)) - 3.97 * Cl_NM +
+            0.06 * NF + 24.7 * Ca_Liq_cat_frac**2 + 0.081 * H2O_Liq + 0.156 * (P / 10)))
+
+
 ## Listing them all to check for invalid inputs- add new ones into this list so they become recognised.
 
 Liquid_only_funcs = {T_Put2008_eq13, T_Put2008_eq14, T_Put2008_eq15, T_Put2008_eq16,
@@ -367,7 +382,7 @@ T_Beatt93_BeattDMg_HerzCorr, T_Sug2000_eq1, T_Sug2000_eq3_ol, T_Sug2000_eq3_opx,
 T_Sug2000_eq3_cpx, T_Sug2000_eq3_pig,
 T_Sug2000_eq6a, T_Sug2000_eq6a_H7a, T_Sug2000_eq6b, T_Sug2000_eq6b_H7b, T_Put2008_eq19_BeattDMg, T_Put2008_eq21_BeattDMg,
 T_Put2008_eq22_BeattDMg, T_Molina2015_amp_sat, T_Put2016_eq3_amp_sat,
-T_Put2008_eq34_cpx_sat,
+T_Put2008_eq34_cpx_sat, T_Put2008_eq28b_opx_sat,
 T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq24c_kspar_sat, T_Beatt1993_opx} # put on outside
 
 Liquid_only_funcs_by_name = {p.__name__: p for p in Liquid_only_funcs}
@@ -509,9 +524,15 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None, print
     if sig.parameters['P'].default is not None:
         if P is None:
             raise ValueError(f'{equationT} requires you to enter P, or specify P="Solve"')
-    else:
-        if P is not None:
-            print('Youve selected a P-independent function')
+
+    #else:
+        # print('gothere2')
+        # if P is not None:
+        #     print('gothere3')
+        #     print('Youve selected a P-independent function')
+        #     P=None
+        #     print('got here')
+
 
 
     kwargs = {name: anhyd_cat_frac[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}

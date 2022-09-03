@@ -12,7 +12,6 @@ from pathlib import Path
 Thermobar_dir=Path(__file__).parent
 np.seterr(divide='ignore', invalid='ignore')
 
-np.seterr(invalid="ignore")
 
 
 ## This specifies the default order for each dataframe type used in calculations
@@ -1321,8 +1320,7 @@ def calculate_orthopyroxene_liquid_components(
 
     combo_liq_opxs['ln_FmAl2SiO6_liq'] = (np.log(combo_liq_opxs['FmAl2SiO6'].astype('float64') /
     (combo_liq_opxs['Si_Liq_cat_frac'] * combo_liq_opxs['Al_Liq_cat_frac']**2 *
-    (combo_liq_opxs['Fet_Liq_cat_frac']
-                                                                                                                                   + combo_liq_opxs['Mn_Liq_cat_frac'] + combo_liq_opxs['Mg_Liq_cat_frac']))))
+    (combo_liq_opxs['Fet_Liq_cat_frac']+ combo_liq_opxs['Mn_Liq_cat_frac'] + combo_liq_opxs['Mg_Liq_cat_frac']))))
     combo_liq_opxs['Kd_Fe_Mg_Fet'] = ((combo_liq_opxs['FeOt_Opx'] / 71.844) /
     (combo_liq_opxs['MgO_Opx'] / 40.3044)) / (
         (combo_liq_opxs['FeOt_Liq'] / 71.844) / (combo_liq_opxs['MgO_Liq'] / 40.3044))
