@@ -414,13 +414,24 @@ def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_com
 
         # Gives users flexibility to add a different guess temperature
 
-            for _ in range(iterations):
-                P_guess = P_func(T_K_guess)
-                T_K_guess = T_func(P_guess)
+        count=0
+        for _ in range(iterations):
+            P_guess = P_func(T_K_guess)
+            T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
 
     # calculates Kd Fe-Mg if eq_tests="True"
 
-
+    else:
+        DeltaP=0
+        DeltaT=0
 
     if eq_tests is True:
 
@@ -428,10 +439,15 @@ def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_com
         plag_comps=plag_comps, P=P_guess, T=T_K_guess)
         eq_tests.insert(1, "P_kbar_calc", P_guess)
         eq_tests.insert(2, "T_K_calc", T_K_guess)
+        eq_tests.insert(3, "Delta_P_kbar_Iter", DeltaP)
+        eq_tests.insert(4, 'Delta_T_K_Iter',DeltaT)
         return eq_tests
 
     else:
-         PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+         PT_out = PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
          return PT_out
 
 
@@ -883,6 +899,7 @@ def calculate_fspar_liq_temp_hygr(*, liq_comps, plag_comps, equationT, equationH
     It_sample=np.empty( iterations)
 
     for i in range (0, iterations):
+
         H2O_iter_23_W2015=calculate_fspar_liq_hygr(liq_comps=liq_comps, plag_comps=plag_comps,
                                             equationH=equationH,
                                                P=P, T=T_iter_23_W2015)
@@ -892,6 +909,8 @@ def calculate_fspar_liq_temp_hygr(*, liq_comps, plag_comps, equationT, equationH
                                P=P, H2O_Liq=H2O_iter_23_W2015['H2O_calc'])
         T_sample[:, i]=T_iter_23_W2015
         It_sample[i]=i
+
+
     Combined_output=H2O_iter_23_W2015.copy()
     Combined_output.insert(0, '# of iterations', iterations)
     Combined_output.insert(1, 'T_K_calc', T_iter_23_W2015)

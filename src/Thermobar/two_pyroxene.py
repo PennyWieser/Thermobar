@@ -529,19 +529,40 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     if isinstance(P_func, partial) and isinstance(T_func, partial):
 
         # Gives users flexibility to add a different guess temperature
-
+        count=0
         for _ in range(iterations):
+
+
+
+
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
 
-        T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
-        T_K_guess[T_K_guess_is_bad] = np.nan
-        P_guess[T_K_guess_is_bad] = np.nan
+            count=count+1
+
+
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
+
+    else:
+        DeltaP=0
+        DeltaT=0
+
+    T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
+    T_K_guess[T_K_guess_is_bad] = np.nan
+    P_guess[T_K_guess_is_bad] = np.nan
 
 
     if eq_tests is False:
         PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
-                                    'T_K_calc': T_K_guess})
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
 
         return PT_out
     if eq_tests is True:

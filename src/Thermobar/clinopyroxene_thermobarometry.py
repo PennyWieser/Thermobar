@@ -2286,10 +2286,22 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         P_guess = P_func
 
     if isinstance(P_func, partial) and isinstance(T_func, partial):
-
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
+    else:
+        DeltaP=0
+        DeltaT=0
+
 
     #if equationT != "T_Petrelli2020_Cpx_Liq":
     T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
@@ -2300,14 +2312,16 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
 
     # calculates equilibrium tests of Neave and Putirka if eq_tests="True"
     if eq_tests is False:
-        PT_out = pd.DataFrame(
-            data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+        PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
 
         if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
 
-            PT_out.insert(2, "Median_Trees_P", Median_P)
-            PT_out.insert(3, "Std_Trees_P", Std_P)
-            PT_out.insert(4, "IQR_Trees_P", Std_P)
+            PT_out.insert(5, "Median_Trees_P", Median_P)
+            PT_out.insert(6, "Std_Trees_P", Std_P)
+            PT_out.insert(7, "IQR_Trees_P", Std_P)
 
         if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
             PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
@@ -2322,18 +2336,20 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps, P=P_guess, T=T_K_guess)
         if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
-            eq_tests.insert(2, "Median_Trees_P", Median_P)
-            eq_tests.insert(3, "Std_Trees_P", Std_P)
-            eq_tests.insert(4, "IQR_Trees_P", Std_P)
+            eq_tests.insert(5, "Median_Trees_P", Median_P)
+            eq_tests.insert(6, "Std_Trees_P", Std_P)
+            eq_tests.insert(7, "IQR_Trees_P", Std_P)
         if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
             if "Petrelli" in equationP or "Jorgenson" in equationP:
-                a=4
+                a=7
             else:
-                a=0
+                a=4
             eq_tests.insert(a+1, "Median_Trees_T", Median_T)
             eq_tests.insert(a+2, "Std_Trees_T", Std_T)
             eq_tests.insert(a+3, "IQR_Trees_T", Std_T)
 
+        eq_tests.insert(3,'Delta_P_kbar_Iter',DeltaP )
+        eq_tests.insert(4,'Delta_T_K_Iter',DeltaT)
         return eq_tests
 ## All popular option for Cpx-Liq thermobarometry
 
@@ -3354,16 +3370,28 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
         P_guess = P_func
 
     if isinstance(P_func, partial) and isinstance(T_func, partial):
-
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
+
+    else:
+        DeltaP=0
+        DeltaT=0
 
 
-
-
-    PT_out = pd.DataFrame(
-            data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+    PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
     PT_out.replace([np.inf, -np.inf], np.nan, inplace=True)
 
     if return_input is False:

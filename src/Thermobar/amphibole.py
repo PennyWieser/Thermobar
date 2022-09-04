@@ -927,7 +927,7 @@ def calculate_amp_only_temp(amp_comps, equationT, P=None):
 ## Function: PT Iterate Amphibole - only
 
 def calculate_amp_only_press_temp(amp_comps, equationT, equationP, iterations=30,
-T_K_guess=1300, Ridolfi_Filter=True, return_amps=True):
+T_K_guess=1300, Ridolfi_Filter=True, return_amps=True, deltaNNO=None):
     '''
     Solves simultaneous equations for temperature and pressure using
     amphibole only thermometers and barometers.
@@ -984,12 +984,15 @@ T_K_guess=1300, Ridolfi_Filter=True, return_amps=True):
     pandas.DataFrame: Pressure in Kbar, Temperature in K
     '''
     T_func = calculate_amp_only_temp(amp_comps=amp_comps, equationT=equationT, P="Solve")
-    if equationP !="P_Ridolfi2021" and equationP != "P_Mutch2016":
+    if equationP !="P_Ridolfi2021" and equationP != "P_Mutch2016" and equationP!= "P_Kraw2012":
         P_func = calculate_amp_only_press(amp_comps=amp_comps, equationP=equationP, T="Solve")
 
     # If mutch, need to extract P from dataframe.
     if equationP == "P_Mutch2016":
         P_func = calculate_amp_only_press(amp_comps=amp_comps, equationP=equationP, T="Solve").P_kbar_calc
+
+    if equationP == "P_Kraw2012":
+        P_func = calculate_amp_only_press(amp_comps=amp_comps, equationP=equationP, T="Solve", deltaNNO=deltaNNO).PH2O_kbar_calc
 
     # If Ridolfi, need to extract Pkbar, as well as warning messages.
     if equationP == "P_Ridolfi2021":
@@ -1013,9 +1016,24 @@ T_K_guess=1300, Ridolfi_Filter=True, return_amps=True):
 
     if isinstance(P_func, partial) and isinstance(T_func, partial):
 
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
+
+
+    else:
+        DeltaP=0
+        DeltaT=0
+
 
     if equationP=="P_Ridolfi2021":
         PT_out=pd.DataFrame(data={'P_kbar_calc': P_guess,
@@ -1028,8 +1046,10 @@ T_K_guess=1300, Ridolfi_Filter=True, return_amps=True):
          })
 
     else:
-        PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
-
+        PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
     if return_amps is True:
         PT_out2=pd.concat([PT_out, amp_comps], axis=1)
         return PT_out2
@@ -1328,12 +1348,28 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
 
     if isinstance(P_func, partial) and isinstance(T_func, partial):
 
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
 
 
-    PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+    else:
+        DeltaP=0
+        DeltaT=0
+
+    PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                'T_K_calc': T_K_guess,
+                                'Delta_P_kbar_Iter': DeltaP,
+                                'Delta_T_K_Iter': DeltaT})
 
     if eq_tests is False:
         return PT_out

@@ -585,21 +585,39 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
     if isinstance(T_func, pd.Series) and isinstance(P_func, pd.Series):
         T_K_guess = T_func
         P_gues = P_func
-    if isinstance(P_func, partial) and isinstance(T_func, partial):
 
+
+    if isinstance(P_func, partial) and isinstance(T_func, partial):
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
+
+
+    else:
+        DeltaP=0
+        DeltaT=0
 
 # This gets rid of any stray Nans, 0s, 0C etc.
     T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
     T_K_guess[T_K_guess_is_bad] = np.nan
     P_guess[T_K_guess_is_bad] = np.nan
 
+
     # calculates Kd Fe-Mg if eq_tests="True"
     if eq_tests is False:
-        PT_out = pd.DataFrame(
-            data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+        PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
 
         return PT_out
     if eq_tests is True and meltmatch is None:
@@ -607,17 +625,21 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
             opx_comps=opx_comps, liq_comps=liq_comps_c)
         Combo_liq_opxs.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_opxs.insert(1, "T_K_calc", T_K_guess)
-        Combo_liq_opxs.insert(3, "eq_tests_Kd_Fe_Mg_Fet",
+        Combo_liq_opxs.insert(2, 'Delta_P_kbar_Iter', DeltaP)
+        Combo_liq_opxs.insert(3, 'Delta_T_K_Iter',  DeltaT)
+        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fet",
                               Combo_liq_opxs['Kd_Fe_Mg_Fet'])
-        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fe2",
+        Combo_liq_opxs.insert(5, "eq_tests_Kd_Fe_Mg_Fe2",
                               Combo_liq_opxs['Kd_Fe_Mg_Fe2'])
     if eq_tests is True and meltmatch is not None:
         Combo_liq_opxs = meltmatch.copy()
         Combo_liq_opxs.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_opxs.insert(1, "T_K_calc", T_K_guess)
-        Combo_liq_opxs.insert(3, "eq_tests_Kd_Fe_Mg_Fet",
+        Combo_liq_opxs.insert(2, 'Delta_P_kbar_Iter', DeltaP)
+        Combo_liq_opxs.insert(3, 'Delta_T_K_Iter',  DeltaT)
+        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fet",
                               meltmatch['Kd_Fe_Mg_Fet'])
-        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fe2",
+        Combo_liq_opxs.insert(5, "eq_tests_Kd_Fe_Mg_Fe2",
                               meltmatch['Kd_Fe_Mg_Fe2'])
 
     return Combo_liq_opxs
