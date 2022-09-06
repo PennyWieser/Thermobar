@@ -1223,9 +1223,12 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
 
     Returns
     -------
-    pandas.DataFrame
-        T in K for all posible plag-liq matches, along with equilibrium
-        tests, components and input mineral compositions
+    dict
+        'Av_HTs': df of averaged T and H for each Plag, and all the liquids it matches (+eq tests etc)
+        'All_HTs: df of all T and H for all possible Plag-Liq combinations (+eq tests etc)
+        'T_H_Evolution': dataframe of T-H evolution against number of iterations.
+
+
     '''
 
 
@@ -1428,11 +1431,15 @@ P=None, Ab_An_P2008=False):
     P: float, int, pandas.Series
         Pressure in kbar to perform calculations at.
 
+
     Returns
     -------
-    pandas.DataFrame
-        T in K for all posible plag-liq matches, along with equilibrium
-        tests, components and input mineral compositions
+    dict
+        'Av_PTs': df of averaged T for each Plag, and all the liquids it matches (+eq tests etc)
+        'All_PTs: df of all T for all possible Plag-Liq combinations (+eq tests etc)
+
+
+
     '''
 
 

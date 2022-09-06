@@ -237,6 +237,11 @@ P_Medard2022_LeakeSites, P_Medard2022_MutchSites} # put on outside
 
 Amp_only_P_funcs_by_name= {p.__name__: p for p in Amp_only_P_funcs}
 
+def calculate_amp_only_hygr(amp_comps=None, T=None):
+    ''' Exists just to tell users to use a different function
+    '''
+    raise Exception('Please use calculate_amp_only_melt_comps, which will calculate H2O along with other melt composition parameters ')
+
 def calculate_amp_only_melt_comps(amp_comps=None, T=None):
     '''
     Calculates melt compositions from Amphibole compositions using Zhang et al. (2017),
@@ -1397,7 +1402,7 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
 
 def calculate_amp_liq_press_temp_matching(*, liq_comps, amp_comps, equationT=None,
 equationP=None, P=None, T=None,  H2O_Liq=None,
- Kd_Match=0.28, Kd_Err=0.11, return_all_pairs=False):
+ Kd_Match=0.28, Kd_Err=0.11, return_all_pairs=False, iterations=30):
 
     '''
     Evaluates all possible Amp-Liq pairs from  N Liquids, M amp compositions
@@ -1533,24 +1538,33 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
     if equationP is not None and equationT is not None:
 
         PT_out = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
-         equationP=equationP, equationT=equationT)
+         equationP=equationP, equationT=equationT, iterations=iterations)
         P_guess = PT_out['P_kbar_calc'].astype('float64')
         T_K_guess = PT_out['T_K_calc'].astype('float64')
+        Delta_T_K_Iter=PT_out['Delta_T_K_Iter'].astype(float)
+        Delta_P_kbar_Iter=PT_out['Delta_P_kbar_Iter'].astype(float)
+
 
     if equationP is not None and equationT is None:
         P_guess = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
         equationP=equationP, T=T)
         T_K_guess = T
+        Delta_T_K_Iter=0
+        Delta_P_kbar_Iter=0
     # Same if user doesnt specify an equation for P, but a real P
     if equationT is not None and equationP is None:
         T_guess = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
         equationT=equationT, P=P)
         P_guess = P
-
+        Delta_T_K_Iter=0
+        Delta_P_kbar_Iter=0
 
     Combo_liq_amp_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
     Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
-    Combo_liq_amp_fur_filt.insert(2, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
+    Combo_liq_amp_fur_filt.insert(2, "Delta_P_kbar_Iter", Delta_P_kbar_Iter)
+    Combo_liq_amp_fur_filt.insert(3, "Delta_T_K_Iter", Delta_T_K_Iter)
+
+    Combo_liq_amp_fur_filt.insert(4, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
 
     # Final step, calcuate a 3rd output which is the average and standard
     # deviation for each Amp (e.g., Amp1-Melt1, Amp1-melt3 etc. )

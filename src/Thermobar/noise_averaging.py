@@ -27,6 +27,7 @@ def av_noise_samples_series(calc, sampleID):
 
     '''
 
+
     if isinstance(calc, pd.Series):
         N = sampleID.unique()
         Av_mean = np.empty(len(N), dtype=float)
@@ -34,14 +35,18 @@ def av_noise_samples_series(calc, sampleID):
         Max = np.empty(len(N), dtype=float)
         Min = np.empty(len(N), dtype=float)
         Std = np.empty(len(N), dtype=float)
-        for i in range(0, len(N)):
-            Av_mean[i] = np.nanmean(calc[sampleID == i])
-            Av_median[i] = np.nanmedian(calc[sampleID == i])
-            Std[i] = np.nanstd(calc[sampleID == i])
-            Min[i] = np.nanmin(calc[sampleID == i])
-            Max[i] = np.nanmax(calc[sampleID == i])
+        i=0
+        for ID in sampleID.unique():
+            sam=ID
+            Av_mean[i] = np.nanmean(calc[sampleID == sam])
+            Av_median[i] = np.nanmedian(calc[sampleID == sam])
+            Std[i] = np.nanstd(calc[sampleID == sam])
+            Min[i] = np.nanmin(calc[sampleID == sam])
+            Max[i] = np.nanmax(calc[sampleID == sam])
 
-    Err_out = pd.DataFrame(data={'Sample': N, 'Mean_calc': Av_mean,
+            i=i+1
+    len1=len(calc[sampleID == sam])
+    Err_out = pd.DataFrame(data={'Sample': N, '# averaged': len1, 'Mean_calc': Av_mean,
     'Median_calc': Av_median, 'St_dev_calc': Std,
     'Max_calc': Max, 'Min_calc': Min})
 
@@ -70,8 +75,8 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
     "St_dev_calc", "Max_calc", "Min_calc"
 
     '''
-    calc=dataframe['calc_heading']
-    sampleID=dataframe['ID_heading']
+    calc=dataframe[calc_heading]
+    sampleID=dataframe[ID_heading]
     if isinstance(calc, pd.Series):
         N = sampleID.unique()
         Av_mean = np.empty(len(N), dtype=float)
@@ -222,6 +227,14 @@ filter_q=None, append=False):
         elx = 'Liq'
     if any(Sample_c.columns.str.contains("_Ol")):
         elx = 'Ol'
+
+    if len(Sample_c['Sample_ID_{}'.format(elx)].unique() ) !=  len(Sample_c):
+        w.warn('Non unique sample names. We have appended the index onto all sample names to save issues with averaging later')
+        TEST=Sample_c.index.values
+        for i in range(0, len(Sample_c)):
+            Sample_c.loc[i, 'Sample_ID_Liq']=Sample_c['Sample_ID_Liq'].iloc[i]+'_'+str(TEST[i])
+
+
     if phase_err is None or (phase_err is not None and err_dist == "uniform"):
 
         Sample_c['Sample_ID_{}_Num'.format(elx)] = Sample_c.index
@@ -234,7 +247,9 @@ filter_q=None, append=False):
 
         # Dropping sample name so it doesnt get averaged.
         Sample_name_num = Dup_Sample['Sample_ID_{}_Num'.format(elx)]
+        Sample_name_str=Dup_Sample['Sample_ID_{}'.format(elx)]
         Dup_Sample.drop('Sample_ID_{}_Num'.format(elx), axis=1, inplace=True)
+        Dup_Sample.drop('Sample_ID_{}'.format(elx), axis=1, inplace=True)
 
         if variable is not None:
 
@@ -308,6 +323,9 @@ filter_q=None, append=False):
         # sigma errors
         Data = phase_comp
 
+
+
+
         SiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
         TiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
         Al2O3_Err = np.empty((duplicates * len(Data)), dtype=float)
@@ -326,6 +344,7 @@ filter_q=None, append=False):
         F_Err = np.empty((duplicates * len(Data)), dtype=float)
         Cl_Err = np.empty((duplicates * len(Data)), dtype=float)
         Sample_name_num = np.empty((duplicates * len(Data)), dtype=float)
+        Sample_name_str = np.empty((duplicates * len(Data)), dtype=object)
 
         if phase_err_type == "Abs":
             Err = phase_err
@@ -340,6 +359,7 @@ filter_q=None, append=False):
         for i in range(0, len(Data)):
 
             Sample_name_num[i * duplicates:(i * duplicates + duplicates)] = i
+            Sample_name_str[i * duplicates:(i * duplicates + duplicates)] = Data['Sample_ID_{}'.format(elx)].iloc[i]
 
             SiO2_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['SiO2_{}'.format(
                 elx)].iloc[i], scale=Err['SiO2_{}_Err'.format(elx)].iloc[i], size=duplicates)
@@ -435,6 +455,8 @@ filter_q=None, append=False):
             mynoisedDataframe['T_K'] = T_K_Err
 
     mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
+
+    mynoisedDataframe['Sample_ID_{}'.format(elx)] = Sample_name_str
 
     if positive is True:
         num = mynoisedDataframe._get_numeric_data()

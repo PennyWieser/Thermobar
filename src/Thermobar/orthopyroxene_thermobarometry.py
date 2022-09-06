@@ -648,7 +648,7 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
 
 def calculate_opx_liq_press_temp_matching(*, liq_comps, opx_comps, equationT=None,
 equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
- Kd_Match=None, Kd_Err=None, Opx_Quality=False, return_all_pairs=False):
+ Kd_Match=None, Kd_Err=None, Opx_Quality=False, return_all_pairs=False, iterations=30):
 
     '''
     Evaluates all possible Opx-Liq pairs from  N Liquids, M opx compositions
@@ -827,12 +827,15 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         # If users want to melt match specifying an equation for both T and P
     if equationP is not None and equationT is not None:
 
-        PT_out = calculate_opx_liq_press_temp(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
+        PT_out = calculate_opx_liq_press_temp(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT, iterations=iterations)
         #print(PT_out)
         P_guess = PT_out['P_kbar_calc'].astype('float64')
         T_K_guess = PT_out['T_K_calc'].astype('float64')
+        Delta_T_K_Iter=PT_out['Delta_T_K_Iter'].astype(float)
+        Delta_P_kbar_Iter=PT_out['Delta_P_kbar_Iter'].astype(float)
         Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
         Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+
 
     # Users may already know their pressure, rather than choosing an equation.
     if equationT is not None and equationP is None:
@@ -840,17 +843,21 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         T_K_guess = calculate_opx_liq_temp(meltmatch=Combo_liq_opx_fur_filt, equationT=equationT, P=P_guess)
         Combo_liq_opx_fur_filt.insert(0, "P_kbar_input", P_guess)
         Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
-
+        Delta_T_K_Iter=0
+        Delta_P_kbar_Iter=0
 # Users may already know their temperature, rather than using an equation
     if equationP is not None and equationT is None:
         T_K_guess = T
         P_guess = calculate_opx_liq_press(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, T=T_K_guess)
         Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
         Combo_liq_opx_fur_filt.insert(1, "T_K_input", T_K_guess)
-
+        Delta_T_K_Iter=0
+        Delta_P_kbar_Iter=0
 
 
     print('Finished calculating Ps and Ts, now just averaging the results. Almost there!')
+    Combo_liq_opx_fur_filt.insert(2, "Delta_T_K_Iter", Delta_P_kbar_Iter)
+    Combo_liq_opx_fur_filt.insert(3, "Delta_P_kbar_Iter",  Delta_T_K_Iter)
 
 
 

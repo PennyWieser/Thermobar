@@ -2518,7 +2518,7 @@ def arrange_all_cpx_liq_pairs(liq_comps, cpx_comps, H2O_Liq=None, Fe3Fet_Liq=Non
 def calculate_cpx_liq_press_temp_matching(*, liq_comps, cpx_comps, equationT=None,
 equationP=None, P=None, T=None, PMax=30,
 Fe3Fet_Liq=None, Kd_Match="Putirka", Kd_Err=0.03, DiHd_Err=0.06, EnFs_Err=0.05, CaTs_Err=0.03, Cpx_Quality=False,
-H2O_Liq=None, return_all_pairs=False):
+H2O_Liq=None, return_all_pairs=False, iterations=30):
 
     '''
     Evaluates all possible Opx-Liq pairs from  N Liquids, M Cpx compositions
@@ -2794,20 +2794,27 @@ H2O_Liq=None, return_all_pairs=False):
             # P and T iteratively
 
             PT_out = calculate_cpx_liq_press_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
-            equationP=equationP, equationT=equationT)
+            equationP=equationP, equationT=equationT, iterations=iterations)
             P_guess = PT_out['P_kbar_calc']
             T_K_guess = PT_out['T_K_calc']
+            Delta_T_K_Iter=PT_out['Delta_T_K_Iter']
+            Delta_P_kbar_Iter=PT_out['Delta_P_kbar_Iter']
+
 
         # This performs calculations if user specifies equation for P, but a real temp:
         if equationP is not None and equationT is None:
             P_guess = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs_FeMgMatch,
             equationP=equationP, T=T)
             T_K_guess = T
+            Delta_T_K_Iter=0
+            Delta_P_kbar_Iter=0
         # Same if user doesnt specify an equation for P, but a real P
         if equationT is not None and equationP is None:
             T_guess = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
             equationT=equationT, P=P)
             P_guess = P
+            Delta_T_K_Iter=0
+            Delta_P_kbar_Iter=0
 
         # Now, we use calculated pressures and temperatures, regardless of
         # whether we iterated or not, to calculate the other CPX components
@@ -2843,25 +2850,35 @@ H2O_Liq=None, return_all_pairs=False):
 
 
             PT_out = calculate_cpx_liq_press_temp(meltmatch=Combo_liq_cpxs_2,
-            equationP=equationP, equationT=equationT)
+            equationP=equationP, equationT=equationT, iterations=iterations)
             P_guess = PT_out['P_kbar_calc']
             T_K_guess = PT_out['T_K_calc']
+            Delta_T_K_Iter=PT_out['Delta_T_K_Iter'].astype(float)
+            Delta_P_kbar_Iter=PT_out['Delta_P_kbar_Iter'].astype(float)
+
 
         # This performs calculations if user specifies equation for P, but a real temp:
         if equationP is not None and equationT is None:
             P_guess = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs_2,
             equationP=equationP, T=T)
             T_K_guess = T
+            Delta_T_K_Iter=0
+            Delta_P_kbar_Iter=0
         # Same if user doesnt specify an equation for P, but a real P
         if equationT is not None and equationP is None:
             T_guess = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_2,
             equationT=equationT, P=P)
             P_guess = P
+            Delta_T_K_Iter=0
+            Delta_P_kbar_Iter=0
 
         combo_liq_cpx_fur_filt = calculate_cpx_liq_eq_tests(
             meltmatch=Combo_liq_cpxs_2, P=P_guess, T=T_K_guess)
 
 
+
+    combo_liq_cpx_fur_filt.insert(2, 'Delta_T_K_Iter', Delta_T_K_Iter)
+    combo_liq_cpx_fur_filt.insert(3, 'Delta_P_kbar_Iter', Delta_P_kbar_Iter)
 
 
 
