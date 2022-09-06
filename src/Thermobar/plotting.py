@@ -69,7 +69,7 @@ def Tukey_calc(x,y): #, name):
     plt.annotate(print(tukey), xy=(1, 1.5), xycoords="axes fraction", fontsize=9)
 
 
-def calculate_R2(x, y, xy=True):
+def calculate_R2(x, y, xy=True, df=False):
     """ Calculates statistics
     if xy= False doesnt return y and x pred
     """
@@ -99,10 +99,21 @@ def calculate_R2(x, y, xy=True):
         'Int': Int, 'Grad':Grad[0],
     'x_pred': regx, 'y_pred': Y_pred}
 
-    else:
+    if xy is False and df is False:
         return {'R2': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp,
         'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
         'Int': Int, 'Grad':Grad[0]}
+
+    if xy is False and df is True:
+        df=pd.DataFrame(data={'R2': R,
+                                'RMSE': RMSEp,
+                                'P_val': p_value,
+                                'Median': Medianp,
+                                'Mean': Meanp,
+                                'Int': Int,
+                                'Grad': Grad[0]
+        })
+        return df
 
 
 def calculate_R2_Tukey(x, y):
