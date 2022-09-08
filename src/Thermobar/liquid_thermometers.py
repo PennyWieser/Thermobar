@@ -20,6 +20,18 @@ def T_Put2008_eq13(P=None, *, MgO_Liq):
     return (26.3 * MgO_Liq + 994.4 + 273.15)
 
 
+def T_Shi_Test(P, *, MgO_Liq, SiO2_Liq, H2O_Liq):
+    '''
+    Testing the thermometer of Shi et al. (in prep)
+    '''
+    return (
+    845.54899873 + (25.85511871*MgO_Liq)
++ (3.08839706*SiO2_Liq)
+- (61.64200793*(np.log(1+H2O_Liq)))
++ (61.13449845*P/10)
+)
+
+
 def T_Put2008_eq14(P=None, *, Mg_Number_Liq_NoFe3, MgO_Liq,
                    FeOt_Liq, Na2O_Liq, K2O_Liq, H2O_Liq):
     '''
@@ -383,7 +395,7 @@ T_Sug2000_eq3_cpx, T_Sug2000_eq3_pig,
 T_Sug2000_eq6a, T_Sug2000_eq6a_H7a, T_Sug2000_eq6b, T_Sug2000_eq6b_H7b, T_Put2008_eq19_BeattDMg, T_Put2008_eq21_BeattDMg,
 T_Put2008_eq22_BeattDMg, T_Molina2015_amp_sat, T_Put2016_eq3_amp_sat,
 T_Put2008_eq34_cpx_sat, T_Put2008_eq28b_opx_sat,
-T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq24c_kspar_sat, T_Beatt1993_opx} # put on outside
+T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq24c_kspar_sat, T_Beatt1993_opx, T_Shi_Test} # put on outside
 
 Liquid_only_funcs_by_name = {p.__name__: p for p in Liquid_only_funcs}
 

@@ -661,11 +661,11 @@ def calculate_ol_liq_temp(*, equationT, liq_comps=None, ol_comps=None, meltmatch
                           'Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], P=P, H2O=Liq_Ols['H2O_Liq'], T=T_K)
         Kd_Toplis_calc = Kd_func(ol_fo)
 
-        DeltaKd_Toplis = abs(KdFeMg_Meas - Kd_Toplis_calc)
-        DeltaKd_Roeder = abs(KdFeMg_Meas - 0.3)
-        DeltaKd_Matzen = abs(KdFeMg_Meas - 0.34)
+        DeltaKd_Toplis = KdFeMg_Meas - Kd_Toplis_calc
+        DeltaKd_Roeder = KdFeMg_Meas - 0.3
+        DeltaKd_Matzen = KdFeMg_Meas - 0.34
         df = pd.DataFrame(data={'T_K_calc': T_K, 'Kd Meas': KdFeMg_Meas, 'Kd calc (Toplis)': Kd_Toplis_calc,
-                                'ΔKd, Toplis': DeltaKd_Toplis, 'ΔKd, Roeder': DeltaKd_Roeder, 'ΔKd, Matzen': DeltaKd_Matzen})
+                                'ΔKd, Toplis (M-P)': DeltaKd_Toplis, 'ΔKd, Roeder (M-P)': DeltaKd_Roeder, 'ΔKd, Matzen (M-P)': DeltaKd_Matzen})
         df_out = pd.concat([df, Liq_Ols], axis=1)
 
         return df_out

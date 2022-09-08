@@ -97,6 +97,13 @@ Welcome to Thermobar's documentation!
    Examples/Feldspar_Thermobarometry/Fspar_Liq_Matching
    Examples/Feldspar_Thermobarometry/Fspar_Ternary_Plot
 
+   %
+.. toctree::
+   :maxdepth: 2
+   :caption:  Garnet and geotherms
+
+   Examples/Garnet_Geotherms/Garnet_Functions
+   Examples/Garnet_Geotherms/Geotherm_functions
 
 
 
@@ -118,12 +125,6 @@ Welcome to Thermobar's documentation!
    Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg_Fe_Eq_SingleSamples
    Examples/Integration_with_VESIcal/Combining_VESIcal_Thermobar_SatPs
 
-   %
-.. toctree::
-   :maxdepth: 2
-   :caption:  Garnet and geotherms
-   Examples/Garnet_Geotherms/Garnet_Functions
-   Examples/Garnet_Geotherms/Geotherm_functions
 
    %
 .. toctree::
@@ -137,6 +138,7 @@ Welcome to Thermobar's documentation!
    Examples/Other_features/oxide_to_wtperc
    Examples/Other_features/fo2_to_Fe3FeT
    Examples/Other_features/fo2_to_BufferPosition
+   Examples/Other_features/Calculating_Viscosity
    Examples/Other_features/Density_to_depth
 
 

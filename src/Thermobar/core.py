@@ -4254,7 +4254,7 @@ def convert_fe_partition_to_fo2(*, liq_comps, T_K, P_kbar,  model="Kress1991", r
     Returns
     -------
 
-    liquid compositions with calculated Fe3Fet_Liq, FeO_Liq, Fe2O3_Liq, and XFe3Fe2.
+    liquid compositions with calculated Fe3FeT_Liq, FeO_Liq, Fe2O3_Liq, and XFe3Fe2.
 
     '''
 

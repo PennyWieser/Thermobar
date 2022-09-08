@@ -113,6 +113,7 @@ def calculate_R2(x, y, xy=True, df=False):
                                 'Int': Int,
                                 'Grad': Grad[0]
         })
+        df=df.round(decimals=2)
         return df
 
 

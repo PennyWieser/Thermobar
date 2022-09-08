@@ -586,7 +586,7 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
 
 def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=None, equationP=None,
                                   Kd_Match=None, Kd_Err=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None,
-                                  return_all_pairs=False, iterations=30):
+                                  return_all_pairs=True, iterations=30):
     '''
     Evaluates all possible Cpx-Opx pairs for user supplied dataframes of opx and cpx
     comps (can be different lengths). Returns P (kbar) and T (K) for those in Kd Fe-Mg equilibrium.
