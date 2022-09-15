@@ -782,6 +782,8 @@ def T_Jorgenson2022_Cpx_Liq_Norm(P=None, *, cpx_comps=None, liq_comps=None, melt
     if meltmatch is None:
         cpx_test=cpx_comps.copy()
         liq_test=liq_comps.copy()
+
+
         cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
 
     if meltmatch is not None:
@@ -2319,9 +2321,9 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
 
         if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
 
-            PT_out.insert(5, "Median_Trees_P", Median_P)
-            PT_out.insert(6, "Std_Trees_P", Std_P)
-            PT_out.insert(7, "IQR_Trees_P", Std_P)
+            PT_out.insert(4, "Median_Trees_P", Median_P)
+            PT_out.insert(5, "Std_Trees_P", Std_P)
+            PT_out.insert(6, "IQR_Trees_P", Std_P)
 
         if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
             PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
@@ -2412,6 +2414,9 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
         Pet2020=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
         liq_comps=liq_comps_c, equationT="T_Petrelli2020_Cpx_Liq", equationP="P_Petrelli2020_Cpx_Liq")
 
+        Jorg2020=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Jorgenson2022_Cpx_Liq", equationP="P_Jorgenson2022_Cpx_Liq")
+
         Teq34_NP17=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
         liq_comps=liq_comps_c, equationT="T_Put2008_eq34_cpx_sat", equationP="P_Neave2017")
 
@@ -2452,9 +2457,12 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
                                     'P_kbar: (P2003 P&T)': Put2003.P_kbar_calc,
                                     'T_K: (P2003 P&T)': Put2003.T_K_calc,
 
-                                    'P_kbar: (Petrelli, 2020)': Pet2020.P_kbar_calc,
+
                                     'P_kbar: (Petrelli, 2020)': Pet2020.P_kbar_calc,
                                     'T_K: (Petrelli, 2020)': Pet2020.T_K_calc,
+
+                                    'P_kbar: (Jorgeson, 2022)': Jorg2020.P_kbar_calc,
+                                    'T_K: (Jorgeson, 2022)': Jorg2020.T_K_calc,
 
                                     'T_K: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.T_K_calc,
                                     'P_kbar: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.P_kbar_calc,
@@ -3115,8 +3123,11 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
 
         cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq2", H2O_Liq=H2O_Liq)
 
-        cpx_comps_c['T_Petrelli21']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
+        cpx_comps_c['T_Petrelli20']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
         equationT="T_Petrelli2020_Cpx_only").T_K_calc
+
+        cpx_comps_c['T_Jorgenson22']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
+        equationT="T_Jorgenson2022_Cpx_only").T_K_calc
 
         cpx_comps_c['T_Petrelli21_H2O']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
         equationT="T_Petrelli2020_Cpx_only_withH2O").T_K_calc
@@ -3129,8 +3140,22 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
         cpx_comps_c['T_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).T_K_calc
 
-        cpx_comps_c['P_Petrelli21']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
+        cpx_comps_c['T_Put_Teq32d_subsol_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
+        equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d_subsol").T_K_calc
+        cpx_comps_c['T_Put_Teq32d_subsol_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
+        equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d_subsol", H2O_Liq=H2O_Liq).T_K_calc
+
+        cpx_comps_c['P_Put_Teq32d_subsol_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
+        equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d_subsol").P_kbar_calc
+        cpx_comps_c['P_Put_Teq32d_subsol_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
+        equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d_subsol", H2O_Liq=H2O_Liq).P_kbar_calc
+
+
+        cpx_comps_c['P_Petrelli20']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
         equationP="P_Petrelli2020_Cpx_only").P_kbar_calc
+
+        cpx_comps_c['P_Jorgenson22']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
+        equationP="P_Jorgenson2022_Cpx_only").P_kbar_calc
 
         cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
@@ -3140,7 +3165,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
 
 
         X_Wangeq1_Sorted=np.sort(cpx_comps_c['P_Wang21_eq1'])
-        X_Pet_Sorted=np.sort(cpx_comps_c['P_Petrelli21'])
+        X_Pet_Sorted=np.sort(cpx_comps_c['P_Petrelli20'])
         X_Put_32d32a=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32a'])
         X_Put_32d32b=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32b'])
         if plot==True:
@@ -3165,8 +3190,8 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
             plt.xlabel('P_kbar')
             plt.xlim([-3, 16])
 
-    cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Petrelli21', 'T_Petrelli21_H2O',
-    'P_Petrelli21_H2O', 'T_Put_Teq32d_Peq32a', 'T_Put_Teq32d_Peq32b', 'P_Petrelli21',
+    cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Petrelli20', 'T_Petrelli21_H2O',
+    'P_Petrelli21_H2O', 'T_Put_Teq32d_Peq32a', 'T_Put_Teq32d_Peq32b', 'P_Petrelli20',
     'P_Put_Teq32d_Peq32a', 'P_Put_Teq32d_Peq32b']
     cpx_comps_c_move = cpx_comps_c[cols_to_move + [
         col for col in cpx_comps_c.columns if col not in cols_to_move]]
