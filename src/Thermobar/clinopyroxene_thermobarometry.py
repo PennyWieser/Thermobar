@@ -3395,11 +3395,19 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
             cpx_comps=cpx_comps_c, equationP=equationP, H2O_Liq=H2O_Liq, T="Solve")
 
     if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
-        P_func=P_func.P_kbar_calc
+        P_func2=P_func.copy()
+        P_func = P_func2.P_kbar_calc
+        Median_P=P_func2.Median_Trees
+        Std_P=P_func2.Std_Trees
+        IQR_P=P_func2.IQR_Trees
 
 
     if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
-         T_func=T_func.T_K_calc
+        T_func2=T_func.copy()
+        T_func=T_func2.T_K_calc
+        Median_T=T_func2.Median_Trees
+        Std_T=T_func2.Std_Trees
+        IQR_T=T_func2.IQR_Trees
 
     if isinstance(P_func, pd.Series) and isinstance(T_func, partial):
         P_guess = P_func
@@ -3429,12 +3437,26 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
         DeltaP=0
         DeltaT=0
 
-
     PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
                                     'T_K_calc': T_K_guess,
                                     'Delta_P_kbar_Iter': DeltaP,
                                     'Delta_T_K_Iter': DeltaT})
     PT_out.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+    if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
+
+        PT_out.insert(4, "Median_Trees_P", Median_P)
+        PT_out.insert(5, "Std_Trees_P", Std_P)
+        PT_out.insert(6, "IQR_Trees_P", Std_P)
+
+    if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
+        PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
+        PT_out.insert(len(PT_out.columns), "Std_Trees_T", Std_T)
+        PT_out.insert(len(PT_out.columns), "IQR_Trees_T", Std_T)
+
+
+
+
 
     if return_input is False:
         return PT_out
