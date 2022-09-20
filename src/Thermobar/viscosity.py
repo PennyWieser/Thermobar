@@ -151,7 +151,7 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_conte
 
     df_params = pd.concat([df_B, df_C],axis = 'columns')
 
-    print(df_params)
+
 
 
 
@@ -172,6 +172,7 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_conte
         liq_comps_c.insert(0, 'T_K', T)
         liq_comps_c.insert(0, 'logn_melt', logn_melt.values)
         liq_comps_c.insert(0, 'n_melt', n_melt.values)
+    combo=pd.concat([liq_comps_c, df_params], axis=1)
 
-    return liq_comps_c, df_params
+    return combo
 
