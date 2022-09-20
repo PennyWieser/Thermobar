@@ -165,14 +165,82 @@ def P_Schmidt1992(T=None, *, Al_Amp_cat_23ox):
     return (-3.01 + 4.76 * Al_Amp_cat_23ox)
 
 
+def P_Medard2022_RidolfiSites(T=None,*,  amp_comps):
+    """ Regression strategy of Medard 2022 linking AlVI to pressure,
+    using site allocation strategy used by Ridolfi 2022 for consistency
+
+    Statistics on calibration dataset:
+
+    R2=0.93
+    RMSE=93.48
+    Int of reg=37.7
+    Grad of reg=0.92
+
+
+    """
+
+    Sites_R=calculate_sites_ridolfi(amp_comps)
+    P_Calc=817.22283194*Sites_R['Al_VI_C']+176.24032229
+    return P_Calc/100
+
+
+
+def P_Medard2022_LeakeSites(T=None, *,amp_comps):
+    """ Regression strategy of Medard 2022 linking AlVI to pressure,
+    using site allocation strategy used by Leake (implemented in Putirka) for consistency
+
+    Statistics on calibration dataset:
+
+    R2=0.94
+    RMSE=87
+    Int of reg=32
+    Grad of reg=0.94
+
+
+    """
+    ox23=calculate_23oxygens_amphibole(amp_comps)
+    Leake=get_amp_sites_leake(ox23)
+
+    P_Calc=874.64558583*Leake['Al_C']+43.72682101
+    return P_Calc/100
+
+
+def P_Medard2022_MutchSites(T=None,*, amp_comps):
+    """ Regression strategy of Medard 2022 linking AlVI to pressure,
+    using site allocation strategy used by Mutch 2016 for consistency
+
+    Statistics on calibration dataset:
+
+    R2=0.93
+    RMSE=93.9
+    Int of reg=38.19
+    Grad of reg=0.93
+
+
+    """
+
+    ox23=calculate_23oxygens_amphibole(amp_comps)
+    Amp_sites_initial=get_amp_sites_mutch(ox23)
+    norm_cat = amp_components_ferric_ferrous_mutch(Amp_sites_initial, ox23)
+    Sites_M = get_amp_sites_ferric_ferrous_mutch(norm_cat)
+
+    P_Calc=835.07125833*Sites_M['Al_C']+107.37542222
+    return P_Calc/100
+
 
 ## Function: Amphibole-only barometry
 
 Amp_only_P_funcs = { P_Ridolfi2012_1a, P_Ridolfi2012_1b, P_Ridolfi2012_1c, P_Ridolfi2012_1d,
 P_Ridolfi2012_1e, P_Ridolfi2010, P_Hammarstrom1986_eq1, P_Hammarstrom1986_eq2, P_Hammarstrom1986_eq3, P_Hollister1987,
-P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995, P_Kraw2012} # put on outside
+P_Johnson1989, P_Blundy1990, P_Schmidt1992, P_Anderson1995, P_Kraw2012, P_Medard2022_RidolfiSites,
+P_Medard2022_LeakeSites, P_Medard2022_MutchSites} # put on outside
 
 Amp_only_P_funcs_by_name= {p.__name__: p for p in Amp_only_P_funcs}
+
+def calculate_amp_only_hygr(amp_comps=None, T=None):
+    ''' Exists just to tell users to use a different function
+    '''
+    raise Exception('Please use calculate_amp_only_melt_comps, which will calculate H2O along with other melt composition parameters ')
 
 def calculate_amp_only_melt_comps(amp_comps=None, T=None):
     '''
@@ -323,6 +391,8 @@ classification=False, Ridolfi_Filter=True):
         | P_Ridolfi2012_1e (T-independent)
         | P_Ridolfi2021 - (T-independent)- Uses new algorithm in 2021 paper to
         select pressures from equations 1a-e.
+        | P_Medard2022. Choose how you want the sites calculated:
+            P_Medard2022_RidolfiSites, LeakeSites, MutchSites
 
         | P_Ridolfi2010  (T-independent)
         | P_Hammarstrom1986_eq1  (T-independent)
@@ -371,6 +441,17 @@ classification=False, Ridolfi_Filter=True):
        name = calculate_sites_ridolfi(amp_comps).classification
 
 
+    if equationP=="P_Medard2022_RidolfiSites":
+        df_out=P_Medard2022_RidolfiSites(amp_comps=amp_comps)
+        return df_out
+
+    if equationP=="P_Medard2022_MutchSites":
+        df_out=P_Medard2022_MutchSites(amp_comps=amp_comps)
+        return df_out
+
+    if equationP=="P_Medard2022_LeakeSites":
+        df_out=P_Medard2022_LeakeSites(amp_comps=amp_comps)
+        return df_out
 
 
     if equationP == "P_Kraw2012":
@@ -530,7 +611,7 @@ classification=False, Ridolfi_Filter=True):
 
 
 
-    if equationP != "Mutch2016" and 'Ridolfi2012' not in equationP and equationP != "P_Ridolfi2021":
+    if equationP != "Mutch2016" and 'Ridolfi2012' not in equationP and  equationP != "P_Ridolfi2021":
         ox23_amp = calculate_23oxygens_amphibole(amp_comps=amp_comps)
 
     kwargs = {name: ox23_amp[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -671,6 +752,7 @@ H2O_Liq_mol_frac_hyd, P2O5_Liq_mol_frac_hyd):
     :cite:`putirka2016amphibole`
 
     '''
+    # print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H"O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
     return (10 * (-3.093 - 4.274 * np.log(Al_Amp_cat_23ox.astype(float) / Al2O3_Liq_mol_frac_hyd.astype(float))
     - 4.216 * np.log(Al2O3_Liq_mol_frac_hyd.astype(float)) + 63.3 * P2O5_Liq_mol_frac_hyd +
     1.264 * H2O_Liq_mol_frac_hyd + 2.457 * Al_Amp_cat_23ox + 1.86 * K_Amp_cat_23ox
@@ -753,7 +835,7 @@ K_Amp_cat_23ox, Ca_Amp_cat_23ox, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd):
             NaM4[i]=NaM4_1[i]
 
     HelzA=Na_Amp_cat_23ox-NaM4
-    ln_KD_Na_K=np.log((K_Amp_cat_23ox.astype(float)/HelzA)*(Na2O_Liq_mol_frac_hyd.astype(float)/K2O_Liq_mol_frac_hyd.astype(float)))
+    ln_KD_Na_K=np.log((K_Amp_cat_23ox.astype(float)/HelzA.astype(float))*(Na2O_Liq_mol_frac_hyd.astype(float)/K2O_Liq_mol_frac_hyd.astype(float)))
 
     return (273.15+(10073.5/(9.75+0.934*Si_Amp_cat_23ox-1.454*Ti_Amp_cat_23ox
     -0.882*Mg_Amp_cat_23ox-1.123*Na_Amp_cat_23ox-0.322*np.log(FeOt_Liq_mol_frac_hyd.astype(float))
@@ -850,7 +932,7 @@ def calculate_amp_only_temp(amp_comps, equationT, P=None):
 ## Function: PT Iterate Amphibole - only
 
 def calculate_amp_only_press_temp(amp_comps, equationT, equationP, iterations=30,
-T_K_guess=1300, Ridolfi_Filter=True, return_amps=True):
+T_K_guess=1300, Ridolfi_Filter=True, return_amps=True, deltaNNO=None):
     '''
     Solves simultaneous equations for temperature and pressure using
     amphibole only thermometers and barometers.
@@ -907,12 +989,15 @@ T_K_guess=1300, Ridolfi_Filter=True, return_amps=True):
     pandas.DataFrame: Pressure in Kbar, Temperature in K
     '''
     T_func = calculate_amp_only_temp(amp_comps=amp_comps, equationT=equationT, P="Solve")
-    if equationP !="P_Ridolfi2021" and equationP != "P_Mutch2016":
+    if equationP !="P_Ridolfi2021" and equationP != "P_Mutch2016" and equationP!= "P_Kraw2012":
         P_func = calculate_amp_only_press(amp_comps=amp_comps, equationP=equationP, T="Solve")
 
     # If mutch, need to extract P from dataframe.
     if equationP == "P_Mutch2016":
         P_func = calculate_amp_only_press(amp_comps=amp_comps, equationP=equationP, T="Solve").P_kbar_calc
+
+    if equationP == "P_Kraw2012":
+        P_func = calculate_amp_only_press(amp_comps=amp_comps, equationP=equationP, T="Solve", deltaNNO=deltaNNO).PH2O_kbar_calc
 
     # If Ridolfi, need to extract Pkbar, as well as warning messages.
     if equationP == "P_Ridolfi2021":
@@ -936,9 +1021,24 @@ T_K_guess=1300, Ridolfi_Filter=True, return_amps=True):
 
     if isinstance(P_func, partial) and isinstance(T_func, partial):
 
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
+
+
+    else:
+        DeltaP=0
+        DeltaT=0
+
 
     if equationP=="P_Ridolfi2021":
         PT_out=pd.DataFrame(data={'P_kbar_calc': P_guess,
@@ -951,8 +1051,10 @@ T_K_guess=1300, Ridolfi_Filter=True, return_amps=True):
          })
 
     else:
-        PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
-
+        PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
     if return_amps is True:
         PT_out2=pd.concat([PT_out, amp_comps], axis=1)
         return PT_out2
@@ -1009,6 +1111,9 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
     except KeyError:
         raise ValueError(f'{equationP} is not a valid equation') from None
     sig=inspect.signature(func)
+
+    if equationP == "P_Put2016_eq7a" and meltmatch is None:
+        print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H2O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
 
     if sig.parameters['T'].default is not None:
         if T is None:
@@ -1248,12 +1353,28 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
 
     if isinstance(P_func, partial) and isinstance(T_func, partial):
 
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
 
 
-    PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+    else:
+        DeltaP=0
+        DeltaT=0
+
+    PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                'T_K_calc': T_K_guess,
+                                'Delta_P_kbar_Iter': DeltaP,
+                                'Delta_T_K_Iter': DeltaT})
 
     if eq_tests is False:
         return PT_out
@@ -1280,8 +1401,8 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
 
 
 def calculate_amp_liq_press_temp_matching(*, liq_comps, amp_comps, equationT=None,
-equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
- Kd_Match=0.28, Kd_Err=0.11, return_all_pairs=False):
+equationP=None, P=None, T=None,  H2O_Liq=None,
+ Kd_Match=0.28, Kd_Err=0.11, return_all_pairs=False, iterations=30):
 
     '''
     Evaluates all possible Amp-Liq pairs from  N Liquids, M amp compositions
@@ -1349,6 +1470,8 @@ equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
     if equationT is not None and T is not None:
         raise ValueError('You have entered an equation for T and specified a temperature. '
         'The code doesnt know what you want it to do. Either enter an equation, or choose a temperature.  ')
+    if equationP == "P_Put2016_eq7a":
+        print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H2O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
 
     # This over-writes inputted Fe3Fet_Liq and H2O_Liq inputs.
     liq_comps_c = liq_comps.copy()
@@ -1376,6 +1499,8 @@ equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
     Combo_liqs_hyd_anhyd = pd.concat([liq_comps_hy, liq_comps_an], axis=1)
 
 
+
+
     # This duplicates AMPs, repeats amp1-amp1*N, amp2-amp2*N etc.
     DupAMPs = pd.DataFrame(
         np.repeat(amp_comps_23.values, np.shape(Combo_liqs_hyd_anhyd)[0], axis=0))
@@ -1387,6 +1512,13 @@ equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
                         np.shape(amp_comps_23)[0]).reset_index(drop=True)
     # Combines these merged liquids and amp dataframes
     Combo_liq_amps = pd.concat([DupLiqs, DupAMPs], axis=1)
+
+    LenAmp=len(amp_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenAmp) + " Amp & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(len(Combo_liq_amps)) +
+          " Amp-Liq pairs, be patient if this is >>1 million!")
+
+
 
     # calculate Kd for this merged dataframe
     Combo_liq_amps['Kd']=((Combo_liq_amps['FeOt_Amp_mol_prop']/Combo_liq_amps['MgO_Amp_mol_prop'])/
@@ -1406,24 +1538,33 @@ equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
     if equationP is not None and equationT is not None:
 
         PT_out = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
-         equationP=equationP, equationT=equationT)
+         equationP=equationP, equationT=equationT, iterations=iterations)
         P_guess = PT_out['P_kbar_calc'].astype('float64')
         T_K_guess = PT_out['T_K_calc'].astype('float64')
+        Delta_T_K_Iter=PT_out['Delta_T_K_Iter'].astype(float)
+        Delta_P_kbar_Iter=PT_out['Delta_P_kbar_Iter'].astype(float)
+
 
     if equationP is not None and equationT is None:
         P_guess = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
         equationP=equationP, T=T)
         T_K_guess = T
+        Delta_T_K_Iter=0
+        Delta_P_kbar_Iter=0
     # Same if user doesnt specify an equation for P, but a real P
     if equationT is not None and equationP is None:
         T_guess = calculate_amp_liq_press_temp(meltmatch=Combo_liq_amp_fur_filt,
         equationT=equationT, P=P)
         P_guess = P
-
+        Delta_T_K_Iter=0
+        Delta_P_kbar_Iter=0
 
     Combo_liq_amp_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
     Combo_liq_amp_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
-    Combo_liq_amp_fur_filt.insert(2, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
+    Combo_liq_amp_fur_filt.insert(2, "Delta_P_kbar_Iter", Delta_P_kbar_Iter)
+    Combo_liq_amp_fur_filt.insert(3, "Delta_T_K_Iter", Delta_T_K_Iter)
+
+    Combo_liq_amp_fur_filt.insert(4, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
 
     # Final step, calcuate a 3rd output which is the average and standard
     # deviation for each Amp (e.g., Amp1-Melt1, Amp1-melt3 etc. )
@@ -1472,7 +1613,7 @@ equationP=None, P=None, T=None, eq_crit=False,  H2O_Liq=None,
 
 
 
-    print('Done!')
+    print('Done!!! I found a total of N='+str(len(Combo_liq_amp_fur_filt)) + ' Amp-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Amp out of the N='+str(LenAmp)+' Amp that you input matched to 1 or more liquids')
     return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_amp_fur_filt}
 
 

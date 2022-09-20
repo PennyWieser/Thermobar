@@ -91,6 +91,7 @@ def P_Put2008_eq29c(T, *, Al_Opx_cat_6ox,
 
     '''
     logCr2O3 = np.log(Cr_Opx_cat_6ox.astype(float))
+    #print(logCr2O3)
 
 
     return (2064 + 0.321 * (T - 273.15) - 343.4 * np.log((T - 273.15)) + 31.52 * Al_Opx_cat_6ox - 12.28 * Ca_Opx_cat_6ox
@@ -195,9 +196,9 @@ def calculate_opx_only_press(*, opx_comps, equationP, T=None):
     if sig.parameters['T'].default is not None:
         if T is None:
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
-    else:
-        if T is not None:
-            print('Youve selected a T-independent function')
+    # else:
+    #     if T is not None:
+    #         print('Youve selected a T-independent function')
 
     opx_comps = calculate_orthopyroxene_components(opx_comps=opx_comps)
     if equationP != "P_Put2008_eq29c":
@@ -232,7 +233,7 @@ def calculate_opx_only_press(*, opx_comps, equationP, T=None):
 
 ## Orthopyroxene-Liquid pressure
 
-Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Felsic_Opx} # put on outside
+Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Felsic_Opx, P_Put2008_eq29c} # put on outside
 
 Opx_Liq_P_funcs_by_name = {p.__name__: p for p in Opx_Liq_P_funcs}
 
@@ -297,9 +298,9 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
     if sig.parameters['T'].default is not None:
         if T is None:
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
-    else:
-        if T is not None:
-            print('Youve selected a T-independent function')
+    # else:
+    #     if T is not None:
+    #         print('Youve selected a T-independent function')
 
     if isinstance(T, pd.Series):
         if liq_comps is not None:
@@ -333,9 +334,9 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
     if sig.parameters['T'].default is not None:
         if T is None:
             raise ValueError(f'{equationP} requires you to enter T')
-    else:
-        if T is not None:
-            print('Youve selected a T-independent function')
+    # else:
+    #     if T is not None:
+    #         print('Youve selected a T-independent function')
 
 
     kwargs = {name: Combo_liq_opxs[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
@@ -584,21 +585,39 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
     if isinstance(T_func, pd.Series) and isinstance(P_func, pd.Series):
         T_K_guess = T_func
         P_gues = P_func
-    if isinstance(P_func, partial) and isinstance(T_func, partial):
 
+
+    if isinstance(P_func, partial) and isinstance(T_func, partial):
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
+
+
+    else:
+        DeltaP=0
+        DeltaT=0
 
 # This gets rid of any stray Nans, 0s, 0C etc.
     T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
     T_K_guess[T_K_guess_is_bad] = np.nan
     P_guess[T_K_guess_is_bad] = np.nan
 
+
     # calculates Kd Fe-Mg if eq_tests="True"
     if eq_tests is False:
-        PT_out = pd.DataFrame(
-            data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+        PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
 
         return PT_out
     if eq_tests is True and meltmatch is None:
@@ -606,17 +625,21 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
             opx_comps=opx_comps, liq_comps=liq_comps_c)
         Combo_liq_opxs.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_opxs.insert(1, "T_K_calc", T_K_guess)
-        Combo_liq_opxs.insert(3, "eq_tests_Kd_Fe_Mg_Fet",
+        Combo_liq_opxs.insert(2, 'Delta_P_kbar_Iter', DeltaP)
+        Combo_liq_opxs.insert(3, 'Delta_T_K_Iter',  DeltaT)
+        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fet",
                               Combo_liq_opxs['Kd_Fe_Mg_Fet'])
-        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fe2",
+        Combo_liq_opxs.insert(5, "eq_tests_Kd_Fe_Mg_Fe2",
                               Combo_liq_opxs['Kd_Fe_Mg_Fe2'])
     if eq_tests is True and meltmatch is not None:
         Combo_liq_opxs = meltmatch.copy()
         Combo_liq_opxs.insert(0, "P_kbar_calc", P_guess)
         Combo_liq_opxs.insert(1, "T_K_calc", T_K_guess)
-        Combo_liq_opxs.insert(3, "eq_tests_Kd_Fe_Mg_Fet",
+        Combo_liq_opxs.insert(2, 'Delta_P_kbar_Iter', DeltaP)
+        Combo_liq_opxs.insert(3, 'Delta_T_K_Iter',  DeltaT)
+        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fet",
                               meltmatch['Kd_Fe_Mg_Fet'])
-        Combo_liq_opxs.insert(4, "eq_tests_Kd_Fe_Mg_Fe2",
+        Combo_liq_opxs.insert(5, "eq_tests_Kd_Fe_Mg_Fe2",
                               meltmatch['Kd_Fe_Mg_Fe2'])
 
     return Combo_liq_opxs
@@ -625,7 +648,7 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
 
 def calculate_opx_liq_press_temp_matching(*, liq_comps, opx_comps, equationT=None,
 equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
- Kd_Match=None, Kd_Err=None, Opx_Quality=False, return_all_pairs=False):
+ Kd_Match=None, Kd_Err=None, Opx_Quality=False, return_all_pairs=False, iterations=30):
 
     '''
     Evaluates all possible Opx-Liq pairs from  N Liquids, M opx compositions
@@ -750,8 +773,12 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
 
     #Combo_liq_opxs = Combo_liq_opxs.convert_objects(convert_numeric=True)
     LenCombo = str(np.shape(Combo_liq_opxs)[0])
-    print("Considering " + LenCombo +
+
+    LenOpx=len(opx_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenOpx) + " Opx & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCombo) +
           " Liq-Opx pairs, be patient if this is >>1 million!")
+
 
     if return_all_pairs is False:
 
@@ -800,12 +827,15 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         # If users want to melt match specifying an equation for both T and P
     if equationP is not None and equationT is not None:
 
-        PT_out = calculate_opx_liq_press_temp(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT)
+        PT_out = calculate_opx_liq_press_temp(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, equationT=equationT, iterations=iterations)
         #print(PT_out)
         P_guess = PT_out['P_kbar_calc'].astype('float64')
         T_K_guess = PT_out['T_K_calc'].astype('float64')
+        Delta_T_K_Iter=PT_out['Delta_T_K_Iter'].astype(float)
+        Delta_P_kbar_Iter=PT_out['Delta_P_kbar_Iter'].astype(float)
         Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
         Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
+
 
     # Users may already know their pressure, rather than choosing an equation.
     if equationT is not None and equationP is None:
@@ -813,17 +843,21 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
         T_K_guess = calculate_opx_liq_temp(meltmatch=Combo_liq_opx_fur_filt, equationT=equationT, P=P_guess)
         Combo_liq_opx_fur_filt.insert(0, "P_kbar_input", P_guess)
         Combo_liq_opx_fur_filt.insert(1, "T_K_calc", T_K_guess.astype(float))
-
+        Delta_T_K_Iter=0
+        Delta_P_kbar_Iter=0
 # Users may already know their temperature, rather than using an equation
     if equationP is not None and equationT is None:
         T_K_guess = T
         P_guess = calculate_opx_liq_press(meltmatch=Combo_liq_opx_fur_filt, equationP=equationP, T=T_K_guess)
         Combo_liq_opx_fur_filt.insert(0, "P_kbar_calc", P_guess.astype(float))
         Combo_liq_opx_fur_filt.insert(1, "T_K_input", T_K_guess)
-
+        Delta_T_K_Iter=0
+        Delta_P_kbar_Iter=0
 
 
     print('Finished calculating Ps and Ts, now just averaging the results. Almost there!')
+    Combo_liq_opx_fur_filt.insert(2, "Delta_T_K_Iter", Delta_P_kbar_Iter)
+    Combo_liq_opx_fur_filt.insert(3, "Delta_P_kbar_Iter",  Delta_T_K_Iter)
 
 
 
@@ -875,7 +909,11 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     # Returns all opxs-liquids that went through 1st Kd filter with
     # equilibrium parameters, averaged matches, and all matches (not averaged)
 
-    print('Finished!')
+
+    print('Done!!! I found a total of N='+str(len(Combo_liq_opx_fur_filt)) +
+    ' Opx-Liq matches using the specified filter. N=' + str(len(df1_M)) +
+     ' Opx out of the N='+str(LenOpx)
+     +' Opx that you input matched to 1 or more liquids')
 
 
     cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq']

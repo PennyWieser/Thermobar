@@ -27,6 +27,7 @@ def av_noise_samples_series(calc, sampleID):
 
     '''
 
+
     if isinstance(calc, pd.Series):
         N = sampleID.unique()
         Av_mean = np.empty(len(N), dtype=float)
@@ -34,14 +35,18 @@ def av_noise_samples_series(calc, sampleID):
         Max = np.empty(len(N), dtype=float)
         Min = np.empty(len(N), dtype=float)
         Std = np.empty(len(N), dtype=float)
-        for i in range(0, len(N)):
-            Av_mean[i] = np.nanmean(calc[sampleID == i])
-            Av_median[i] = np.nanmedian(calc[sampleID == i])
-            Std[i] = np.nanstd(calc[sampleID == i])
-            Min[i] = np.nanmin(calc[sampleID == i])
-            Max[i] = np.nanmax(calc[sampleID == i])
+        i=0
+        for ID in sampleID.unique():
+            sam=ID
+            Av_mean[i] = np.nanmean(calc[sampleID == sam])
+            Av_median[i] = np.nanmedian(calc[sampleID == sam])
+            Std[i] = np.nanstd(calc[sampleID == sam])
+            Min[i] = np.nanmin(calc[sampleID == sam])
+            Max[i] = np.nanmax(calc[sampleID == sam])
 
-    Err_out = pd.DataFrame(data={'Sample': N, 'Mean_calc': Av_mean,
+            i=i+1
+    len1=len(calc[sampleID == sam])
+    Err_out = pd.DataFrame(data={'Sample': N, '# averaged': len1, 'Mean_calc': Av_mean,
     'Median_calc': Av_median, 'St_dev_calc': Std,
     'Max_calc': Max, 'Min_calc': Min})
 
@@ -70,8 +75,8 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
     "St_dev_calc", "Max_calc", "Min_calc"
 
     '''
-    calc=dataframe['calc_heading']
-    sampleID=dataframe['ID_heading']
+    calc=dataframe[calc_heading]
+    sampleID=dataframe[ID_heading]
     if isinstance(calc, pd.Series):
         N = sampleID.unique()
         Av_mean = np.empty(len(N), dtype=float)
@@ -95,7 +100,7 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
 
 def add_noise_sample_1phase(phase_comp, phase_err=None,
 phase_err_type="Abs",
-variable=None, variable_err=None, variable_err_type="Abs", duplicates=10,
+variable=None, variable_err=None, variable_err_type=None, duplicates=10,
 noise_percent=None, err_dist="normal", positive=True,
 filter_q=None, append=False):
     '''
@@ -111,8 +116,38 @@ filter_q=None, append=False):
         from the import_excel function, or any dataframe with the
         headings _Liq for liquids, _Cpx for clinopyroxenes etc.
 
-    phase_err_type: "Abs" (default) or "Perc"
-        Determins if specified errors are absolute (Abs) or percentage errors.
+    Options for adding different types of error:
+
+    1) If you want to specifying an error for >1 variable:
+
+        phase_err: pandas dataframe
+            Pandas dataframe with headings for the error of the oxide in each
+            phase (e.g., SiO2_Liq_Err, or SiO2_Cpx_Err).
+            This dataframe can be generated from a user-inputted spreadsheet
+            with these column headings using the function import_excel_errors.
+            Errors can be absolute, or percentage errors.
+            the default is absolute errors (in wt%), but users can overwrite
+            this using phase_err_Type="Perc".
+
+
+        phase_err_type: "Abs" (default) or "Perc"
+            Determins if specified errors are absolute (Abs) or percentage errors.
+
+    2) If you want to specify error for a single variable:
+
+        variable: str
+            Name of column you wish to add error to (e.g. "Na2O" for Na2O in Liq)
+
+        variable_err: flt, int
+            Specifies how much error to add
+
+    3) If you want to add a fixed percent of noise to all variables.
+
+        noise_percent: flt, int
+            Adds a fixed noise percent to all input variables.
+
+
+
 
     duplicates: flt, int (Default: 10)
         Number of new synthetic samples generated per sample in the original
@@ -139,32 +174,7 @@ filter_q=None, append=False):
         If True, appends user-entered dataframe onto the synthetic dataframe
         once noise has been added.
 
-    Options for adding different types of error:
 
-    1) If you want to specifying an error for >1 variable:
-
-        phase_err: pandas dataframe
-            Pandas dataframe with headings for the error of the oxide in each
-            phase (e.g., SiO2_Liq_Err, or SiO2_Cpx_Err).
-            This dataframe can be generated from a user-inputted spreadsheet
-            with these column headings using the function import_excel_errors.
-            Errors can be absolute, or percentage errors.
-            the default is absolute errors (in wt%), but users can overwrite
-            this using phase_err_Type="Perc".
-
-
-    2) If you want to specify error for a single variable:
-
-        variable: str
-            Name of column you wish to add error to (e.g. Na2O_Liq)
-
-        variable_err: flt, int
-            Specifies how much error to add
-
-    3) If you want to add a fixed percent of noise to all variables.
-
-        noise_percent: flt, int
-            Adds a fixed noise percent to all input variables.
 
     Returns
     -------
@@ -179,6 +189,10 @@ filter_q=None, append=False):
 
     '''
 
+    # if variable_err is not None:
+    #     if (type(variable_err) is not float) and (type(variable_err) is not int) and (type(variable_err) is not np.ndarray):
+    #         raise Exception('variable error must be a float, integer, or np.ndarray. If youve entered a pandas series, do series.values')
+    #
     if variable is not None and noise_percent is not None:
         raise Exception('noise_percent is an arguement on its own '
         'it adds noise to all variables. Either specify variable or '
@@ -213,6 +227,14 @@ filter_q=None, append=False):
         elx = 'Liq'
     if any(Sample_c.columns.str.contains("_Ol")):
         elx = 'Ol'
+
+    if len(Sample_c['Sample_ID_{}'.format(elx)].unique() ) !=  len(Sample_c):
+        w.warn('Non unique sample names. We have appended the index onto all sample names to save issues with averaging later')
+        TEST=Sample_c.index.values
+        for i in range(0, len(Sample_c)):
+            Sample_c.loc[i, 'Sample_ID_Liq']=Sample_c['Sample_ID_Liq'].iloc[i]+'_'+str(TEST[i])
+
+
     if phase_err is None or (phase_err is not None and err_dist == "uniform"):
 
         Sample_c['Sample_ID_{}_Num'.format(elx)] = Sample_c.index
@@ -225,7 +247,9 @@ filter_q=None, append=False):
 
         # Dropping sample name so it doesnt get averaged.
         Sample_name_num = Dup_Sample['Sample_ID_{}_Num'.format(elx)]
+        Sample_name_str=Dup_Sample['Sample_ID_{}'.format(elx)]
         Dup_Sample.drop('Sample_ID_{}_Num'.format(elx), axis=1, inplace=True)
+        Dup_Sample.drop('Sample_ID_{}'.format(elx), axis=1, inplace=True)
 
         if variable is not None:
 
@@ -299,6 +323,9 @@ filter_q=None, append=False):
         # sigma errors
         Data = phase_comp
 
+
+
+
         SiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
         TiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
         Al2O3_Err = np.empty((duplicates * len(Data)), dtype=float)
@@ -317,6 +344,7 @@ filter_q=None, append=False):
         F_Err = np.empty((duplicates * len(Data)), dtype=float)
         Cl_Err = np.empty((duplicates * len(Data)), dtype=float)
         Sample_name_num = np.empty((duplicates * len(Data)), dtype=float)
+        Sample_name_str = np.empty((duplicates * len(Data)), dtype=object)
 
         if phase_err_type == "Abs":
             Err = phase_err
@@ -331,6 +359,7 @@ filter_q=None, append=False):
         for i in range(0, len(Data)):
 
             Sample_name_num[i * duplicates:(i * duplicates + duplicates)] = i
+            Sample_name_str[i * duplicates:(i * duplicates + duplicates)] = Data['Sample_ID_{}'.format(elx)].iloc[i]
 
             SiO2_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['SiO2_{}'.format(
                 elx)].iloc[i], scale=Err['SiO2_{}_Err'.format(elx)].iloc[i], size=duplicates)
@@ -427,6 +456,8 @@ filter_q=None, append=False):
 
     mynoisedDataframe['Sample_ID_{}_Num'.format(elx)] = Sample_name_num
 
+    mynoisedDataframe['Sample_ID_{}'.format(elx)] = Sample_name_str
+
     if positive is True:
         num = mynoisedDataframe._get_numeric_data()
         num[num < 0] = 0
@@ -459,7 +490,7 @@ def calculate_bootstrap_mixes(
         If num_samples greater than length of end members, will randomly downsample liquids to N=num_samples.
 
     self_mixing: None, False, True, "Partial"
-        If None or False, will mix 2 end members in various proportions
+        If None or False, will mix 2 end members in various proportions, but no mixing between end members
         If True, will mix between samples from a given end member as well as between the 2 end members.
         If Partial, half of outputted liquids will be generated by mixing within and between end members, and the other half from mixing between end members.
 

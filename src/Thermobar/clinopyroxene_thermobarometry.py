@@ -8,6 +8,7 @@ import pandas as pd
 from pickle import load
 import pickle
 from pathlib import Path
+
 #Thermobar_dir=Path(__file__).parent
 import joblib
 # Things for machine learning onnx
@@ -15,7 +16,7 @@ from sklearn.preprocessing import StandardScaler
 #from skl2onnx import convert_sklearn
 #from skl2onnx.common.data_types import FloatTensorType
 
-
+np.seterr(invalid="ignore")
 
 
 from Thermobar.core import *
@@ -781,6 +782,8 @@ def T_Jorgenson2022_Cpx_Liq_Norm(P=None, *, cpx_comps=None, liq_comps=None, melt
     if meltmatch is None:
         cpx_test=cpx_comps.copy()
         liq_test=liq_comps.copy()
+
+
         cpx_liq_combo=pd.concat([cpx_test, liq_test], axis=1)
 
     if meltmatch is not None:
@@ -2285,10 +2288,22 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         P_guess = P_func
 
     if isinstance(P_func, partial) and isinstance(T_func, partial):
-
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
+    else:
+        DeltaP=0
+        DeltaT=0
+
 
     #if equationT != "T_Petrelli2020_Cpx_Liq":
     T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
@@ -2299,14 +2314,16 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
 
     # calculates equilibrium tests of Neave and Putirka if eq_tests="True"
     if eq_tests is False:
-        PT_out = pd.DataFrame(
-            data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+        PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
 
         if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
 
-            PT_out.insert(2, "Median_Trees_P", Median_P)
-            PT_out.insert(3, "Std_Trees_P", Std_P)
-            PT_out.insert(4, "IQR_Trees_P", Std_P)
+            PT_out.insert(4, "Median_Trees_P", Median_P)
+            PT_out.insert(5, "Std_Trees_P", Std_P)
+            PT_out.insert(6, "IQR_Trees_P", Std_P)
 
         if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
             PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
@@ -2321,18 +2338,20 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps, P=P_guess, T=T_K_guess)
         if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
-            eq_tests.insert(2, "Median_Trees_P", Median_P)
-            eq_tests.insert(3, "Std_Trees_P", Std_P)
-            eq_tests.insert(4, "IQR_Trees_P", Std_P)
+            eq_tests.insert(5, "Median_Trees_P", Median_P)
+            eq_tests.insert(6, "Std_Trees_P", Std_P)
+            eq_tests.insert(7, "IQR_Trees_P", Std_P)
         if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
             if "Petrelli" in equationP or "Jorgenson" in equationP:
-                a=4
+                a=7
             else:
-                a=0
+                a=4
             eq_tests.insert(a+1, "Median_Trees_T", Median_T)
             eq_tests.insert(a+2, "Std_Trees_T", Std_T)
             eq_tests.insert(a+3, "IQR_Trees_T", Std_T)
 
+        eq_tests.insert(3,'Delta_P_kbar_Iter',DeltaP )
+        eq_tests.insert(4,'Delta_T_K_Iter',DeltaT)
         return eq_tests
 ## All popular option for Cpx-Liq thermobarometry
 
@@ -2395,6 +2414,9 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
         Pet2020=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
         liq_comps=liq_comps_c, equationT="T_Petrelli2020_Cpx_Liq", equationP="P_Petrelli2020_Cpx_Liq")
 
+        Jorg2020=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+        liq_comps=liq_comps_c, equationT="T_Jorgenson2022_Cpx_Liq", equationP="P_Jorgenson2022_Cpx_Liq")
+
         Teq34_NP17=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
         liq_comps=liq_comps_c, equationT="T_Put2008_eq34_cpx_sat", equationP="P_Neave2017")
 
@@ -2435,9 +2457,12 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
                                     'P_kbar: (P2003 P&T)': Put2003.P_kbar_calc,
                                     'T_K: (P2003 P&T)': Put2003.T_K_calc,
 
-                                    'P_kbar: (Petrelli, 2020)': Pet2020.P_kbar_calc,
+
                                     'P_kbar: (Petrelli, 2020)': Pet2020.P_kbar_calc,
                                     'T_K: (Petrelli, 2020)': Pet2020.T_K_calc,
+
+                                    'P_kbar: (Jorgeson, 2022)': Jorg2020.P_kbar_calc,
+                                    'T_K: (Jorgeson, 2022)': Jorg2020.T_K_calc,
 
                                     'T_K: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.T_K_calc,
                                     'P_kbar: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.P_kbar_calc,
@@ -2501,7 +2526,7 @@ def arrange_all_cpx_liq_pairs(liq_comps, cpx_comps, H2O_Liq=None, Fe3Fet_Liq=Non
 def calculate_cpx_liq_press_temp_matching(*, liq_comps, cpx_comps, equationT=None,
 equationP=None, P=None, T=None, PMax=30,
 Fe3Fet_Liq=None, Kd_Match="Putirka", Kd_Err=0.03, DiHd_Err=0.06, EnFs_Err=0.05, CaTs_Err=0.03, Cpx_Quality=False,
-H2O_Liq=None, return_all_pairs=False):
+H2O_Liq=None, return_all_pairs=False, iterations=30):
 
     '''
     Evaluates all possible Opx-Liq pairs from  N Liquids, M Cpx compositions
@@ -2673,7 +2698,9 @@ H2O_Liq=None, return_all_pairs=False):
     LenCombo = str(np.shape(Combo_liq_cpxs)[0])
 
     # Status update for user
-    print("Considering " + LenCombo +
+    LenCpx=len(cpx_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenCpx) + " Cpx & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCombo) +
           " Liq-Cpx pairs, be patient if this is >>1 million!")
 
     # calculate clinopyroxene-liquid components for this merged dataframe
@@ -2775,20 +2802,27 @@ H2O_Liq=None, return_all_pairs=False):
             # P and T iteratively
 
             PT_out = calculate_cpx_liq_press_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
-            equationP=equationP, equationT=equationT)
+            equationP=equationP, equationT=equationT, iterations=iterations)
             P_guess = PT_out['P_kbar_calc']
             T_K_guess = PT_out['T_K_calc']
+            Delta_T_K_Iter=PT_out['Delta_T_K_Iter']
+            Delta_P_kbar_Iter=PT_out['Delta_P_kbar_Iter']
+
 
         # This performs calculations if user specifies equation for P, but a real temp:
         if equationP is not None and equationT is None:
             P_guess = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs_FeMgMatch,
             equationP=equationP, T=T)
             T_K_guess = T
+            Delta_T_K_Iter=0
+            Delta_P_kbar_Iter=0
         # Same if user doesnt specify an equation for P, but a real P
         if equationT is not None and equationP is None:
             T_guess = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_FeMgMatch,
             equationT=equationT, P=P)
             P_guess = P
+            Delta_T_K_Iter=0
+            Delta_P_kbar_Iter=0
 
         # Now, we use calculated pressures and temperatures, regardless of
         # whether we iterated or not, to calculate the other CPX components
@@ -2824,25 +2858,35 @@ H2O_Liq=None, return_all_pairs=False):
 
 
             PT_out = calculate_cpx_liq_press_temp(meltmatch=Combo_liq_cpxs_2,
-            equationP=equationP, equationT=equationT)
+            equationP=equationP, equationT=equationT, iterations=iterations)
             P_guess = PT_out['P_kbar_calc']
             T_K_guess = PT_out['T_K_calc']
+            Delta_T_K_Iter=PT_out['Delta_T_K_Iter'].astype(float)
+            Delta_P_kbar_Iter=PT_out['Delta_P_kbar_Iter'].astype(float)
+
 
         # This performs calculations if user specifies equation for P, but a real temp:
         if equationP is not None and equationT is None:
             P_guess = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs_2,
             equationP=equationP, T=T)
             T_K_guess = T
+            Delta_T_K_Iter=0
+            Delta_P_kbar_Iter=0
         # Same if user doesnt specify an equation for P, but a real P
         if equationT is not None and equationP is None:
             T_guess = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs_2,
             equationT=equationT, P=P)
             P_guess = P
+            Delta_T_K_Iter=0
+            Delta_P_kbar_Iter=0
 
         combo_liq_cpx_fur_filt = calculate_cpx_liq_eq_tests(
             meltmatch=Combo_liq_cpxs_2, P=P_guess, T=T_K_guess)
 
 
+
+    combo_liq_cpx_fur_filt.insert(2, 'Delta_T_K_Iter', Delta_T_K_Iter)
+    combo_liq_cpx_fur_filt.insert(3, 'Delta_P_kbar_Iter', Delta_P_kbar_Iter)
 
 
 
@@ -2908,7 +2952,9 @@ H2O_Liq=None, return_all_pairs=False):
 
 
 
-    print('Done!')
+
+    print('Done!!! I found a total of N='+str(len(combo_liq_cpx_fur_filt)) + ' Cpx-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Cpx out of the N='+str(LenCpx)+' Cpx that you input matched to 1 or more liquids')
+
     return {'Av_PTs': df1_M, 'All_PTs': combo_liq_cpx_fur_filt}
 
 
@@ -3077,8 +3123,11 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
 
         cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq2", H2O_Liq=H2O_Liq)
 
-        cpx_comps_c['T_Petrelli21']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
+        cpx_comps_c['T_Petrelli20']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
         equationT="T_Petrelli2020_Cpx_only").T_K_calc
+
+        cpx_comps_c['T_Jorgenson22']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
+        equationT="T_Jorgenson2022_Cpx_only").T_K_calc
 
         cpx_comps_c['T_Petrelli21_H2O']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
         equationT="T_Petrelli2020_Cpx_only_withH2O").T_K_calc
@@ -3091,8 +3140,22 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
         cpx_comps_c['T_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).T_K_calc
 
-        cpx_comps_c['P_Petrelli21']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
+        cpx_comps_c['T_Put_Teq32d_subsol_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
+        equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d_subsol").T_K_calc
+        cpx_comps_c['T_Put_Teq32d_subsol_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
+        equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d_subsol", H2O_Liq=H2O_Liq).T_K_calc
+
+        cpx_comps_c['P_Put_Teq32d_subsol_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
+        equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d_subsol").P_kbar_calc
+        cpx_comps_c['P_Put_Teq32d_subsol_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
+        equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d_subsol", H2O_Liq=H2O_Liq).P_kbar_calc
+
+
+        cpx_comps_c['P_Petrelli20']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
         equationP="P_Petrelli2020_Cpx_only").P_kbar_calc
+
+        cpx_comps_c['P_Jorgenson22']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
+        equationP="P_Jorgenson2022_Cpx_only").P_kbar_calc
 
         cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
@@ -3102,7 +3165,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
 
 
         X_Wangeq1_Sorted=np.sort(cpx_comps_c['P_Wang21_eq1'])
-        X_Pet_Sorted=np.sort(cpx_comps_c['P_Petrelli21'])
+        X_Pet_Sorted=np.sort(cpx_comps_c['P_Petrelli20'])
         X_Put_32d32a=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32a'])
         X_Put_32d32b=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32b'])
         if plot==True:
@@ -3127,8 +3190,8 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
             plt.xlabel('P_kbar')
             plt.xlim([-3, 16])
 
-    cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Petrelli21', 'T_Petrelli21_H2O',
-    'P_Petrelli21_H2O', 'T_Put_Teq32d_Peq32a', 'T_Put_Teq32d_Peq32b', 'P_Petrelli21',
+    cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Petrelli20', 'T_Petrelli21_H2O',
+    'P_Petrelli21_H2O', 'T_Put_Teq32d_Peq32a', 'T_Put_Teq32d_Peq32b', 'P_Petrelli20',
     'P_Put_Teq32d_Peq32a', 'P_Put_Teq32d_Peq32b']
     cpx_comps_c_move = cpx_comps_c[cols_to_move + [
         col for col in cpx_comps_c.columns if col not in cols_to_move]]
@@ -3332,11 +3395,19 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
             cpx_comps=cpx_comps_c, equationP=equationP, H2O_Liq=H2O_Liq, T="Solve")
 
     if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
-        P_func=P_func.P_kbar_calc
+        P_func2=P_func.copy()
+        P_func = P_func2.P_kbar_calc
+        Median_P=P_func2.Median_Trees
+        Std_P=P_func2.Std_Trees
+        IQR_P=P_func2.IQR_Trees
 
 
     if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
-         T_func=T_func.T_K_calc
+        T_func2=T_func.copy()
+        T_func=T_func2.T_K_calc
+        Median_T=T_func2.Median_Trees
+        Std_T=T_func2.Std_Trees
+        IQR_T=T_func2.IQR_Trees
 
     if isinstance(P_func, pd.Series) and isinstance(T_func, partial):
         P_guess = P_func
@@ -3349,17 +3420,43 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
         P_guess = P_func
 
     if isinstance(P_func, partial) and isinstance(T_func, partial):
-
+        count=0
         for _ in range(iterations):
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
+            count=count+1
 
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
 
+    else:
+        DeltaP=0
+        DeltaT=0
 
-
-    PT_out = pd.DataFrame(
-            data={'P_kbar_calc': P_guess, 'T_K_calc': T_K_guess})
+    PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
     PT_out.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+    if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
+
+        PT_out.insert(4, "Median_Trees_P", Median_P)
+        PT_out.insert(5, "Std_Trees_P", Std_P)
+        PT_out.insert(6, "IQR_Trees_P", Std_P)
+
+    if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
+        PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
+        PT_out.insert(len(PT_out.columns), "Std_Trees_T", Std_T)
+        PT_out.insert(len(PT_out.columns), "IQR_Trees_T", Std_T)
+
+
+
+
 
     if return_input is False:
         return PT_out

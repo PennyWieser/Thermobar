@@ -50,6 +50,7 @@ Welcome to Thermobar's documentation!
    :caption:  Cpx & Cpx-Liq
 
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liq_Thermobarometry
+   Examples/Cpx_Cpx_Liq_Thermobarometry/MachineLearning_Cpx_Liq_Thermobarometry
    Examples/Cpx_Cpx_Liq_Thermobarometry/Pyroxene_Ternary_Cpx_Example
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liquid_melt_matching/Cpx_MeltMatch1_Gleeson2020
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liquid_melt_matching/Cpx_MeltMatch2_ScruggsPutirka2018
@@ -80,7 +81,9 @@ Welcome to Thermobar's documentation!
    :caption:  Amp & Amp-Liq
 
    Examples/Amphibole/Amphibole_Thermobarometry_Chemometry
+   Examples/Amphibole/Amp_Liq_Melt_Matching
    Examples/Amphibole/Amphibole_Classification_Diagrams
+
    %
 
 .. toctree::
@@ -90,8 +93,18 @@ Welcome to Thermobar's documentation!
    Examples/Feldspar_Thermobarometry/Feldspar_Liquid_Thermobarometry
    Examples/Feldspar_Thermobarometry/Plag_Liquid_Hygrometry
    Examples/Feldspar_Thermobarometry/Two_Feldspar_Thermobarometry
+   Examples/Feldspar_Thermobarometry/Two_Feldspar_All_Possible_Pairs
    Examples/Feldspar_Thermobarometry/Fspar_Liq_Matching
    Examples/Feldspar_Thermobarometry/Fspar_Ternary_Plot
+
+   %
+.. toctree::
+   :maxdepth: 2
+   :caption:  Garnet and geotherms
+
+   Examples/Garnet_Geotherms/Garnet_Functions
+   Examples/Garnet_Geotherms/Geotherm_functions
+
 
 
    %
@@ -112,6 +125,7 @@ Welcome to Thermobar's documentation!
    Examples/Melt_Inclusion_FeMg_Equilibrium/Ol_Melt_Inclusion_Mg_Fe_Eq_SingleSamples
    Examples/Integration_with_VESIcal/Combining_VESIcal_Thermobar_SatPs
 
+
    %
 .. toctree::
    :maxdepth: 2
@@ -123,6 +137,11 @@ Welcome to Thermobar's documentation!
    Examples/Other_features/Calculating_Viscosity
    Examples/Other_features/oxide_to_wtperc
    Examples/Other_features/fo2_to_Fe3FeT
+   Examples/Other_features/fo2_to_BufferPosition
+   Examples/Other_features/Calculating_Viscosity
+   Examples/Other_features/Density_to_depth
+
+
 
 
 .. toctree::

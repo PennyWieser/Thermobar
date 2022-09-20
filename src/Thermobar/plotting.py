@@ -10,6 +10,7 @@ from sklearn.metrics import r2_score
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy import stats
 
+# Redit says equation for RMSE ignores DoF. so /n instead of /n-k-1
 def std_dev(x, x2):
     N=len(x)
     sum_squares=np.sum((x-x2)**2)
@@ -68,7 +69,10 @@ def Tukey_calc(x,y): #, name):
     plt.annotate(print(tukey), xy=(1, 1.5), xycoords="axes fraction", fontsize=9)
 
 
-def calculate_R2(x, y):
+def calculate_R2(x, y, xy=True, df=False):
+    """ Calculates statistics
+    if xy= False doesnt return y and x pred
+    """
     masknan=(~np.isnan(x) & ~np.isnan(y))
     regx=x[masknan].values.reshape(-1, 1)
     regy=y[masknan].values.reshape(-1, 1)
@@ -88,10 +92,30 @@ def calculate_R2(x, y):
     Mean=np.nanmean(regy-regx)
     Meanp=np.round(Mean, 2)
 
+    if xy is True:
 
-    return {'R2': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp,
-    'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
-'x_pred': regx, 'y_pred': Y_pred, 'Int': Int, 'Grad':Grad[0]}
+        return {'R2': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp,
+        'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
+        'Int': Int, 'Grad':Grad[0],
+    'x_pred': regx, 'y_pred': Y_pred}
+
+    if xy is False and df is False:
+        return {'R2': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp,
+        'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
+        'Int': Int, 'Grad':Grad[0]}
+
+    if xy is False and df is True:
+        df=pd.DataFrame(data={'R2': R,
+                                'RMSE': RMSEp,
+                                'P_val': p_value,
+                                'Median': Medianp,
+                                'Mean': Meanp,
+                                'Int': Int,
+                                'Grad': Grad[0]
+        })
+        df=df.round(decimals=2)
+        return df
+
 
 def calculate_R2_Tukey(x, y):
     masknan=(~np.isnan(x) & ~np.isnan(y))
@@ -120,7 +144,7 @@ def calculate_R2_Tukey(x, y):
     'Median Error':'{0:.2f}'.format(Medianp), 'Mean Error':'{0:.2f}'.format(Meanp), 'p value':'{0:.3f}'.format(p_value),
      }
 
-def calculate_R2_np(x, y):
+def calculate_R2_np(x, y, xy=True):
     if len(x)!=len(y):
         raise TypeError('X and y not same length')
 
@@ -141,7 +165,10 @@ def calculate_R2_np(x, y):
     Intercept=lr.intercept_
     grad=lr.coef_
 
-    return {'R2': R, 'RMSE':RMSEp, 'Median':Medianp, 'Mean':Meanp, 'grad': grad, 'int': Intercept, 'x_pred': regx, 'y_pred': Y_pred}
+    if xy is True:
+        return {'R2': R, 'RMSE':RMSEp, 'Median':Medianp, 'Mean':Meanp, 'Grad': grad, 'Int': Intercept, 'x_pred': regx, 'y_pred': Y_pred}
+    else:
+        return {'R2': R, 'RMSE':RMSEp, 'Median':Medianp, 'Mean':Meanp, 'Grad': grad, 'Int': Intercept}
 
 
 def Tukey_Plot_np(x,y, name, xlower=-1, xupper=13, yupper=17, ylower=-3):

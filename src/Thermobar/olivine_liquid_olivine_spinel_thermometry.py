@@ -40,8 +40,8 @@ Liquid_olivine_hygr_funcs = {H_Gavr2016}
 Liquid_olivine_hygr_funcs_by_name = {p.__name__: p for p in Liquid_olivine_hygr_funcs}
 
 
-def calculate_ol_liq_hygr(*, liq_comps, ol_comps, equationH, eq_tests=False,
-P=None, T=None, equationT=None, Fe3Fet_Liq=None):
+def calculate_ol_liq_hygr(*, liq_comps=None, ol_comps=None, equationH=None, eq_tests=False,
+P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
     '''
     Olivine-liquid hygrometer. Returns the estimated H2O content
     in wt%
@@ -79,11 +79,7 @@ P=None, T=None, equationT=None, Fe3Fet_Liq=None):
         H2O content in wt%.
  '''
 # These are checks that our inputs are okay
-    ol_comps_c=ol_comps.copy()
-    liq_comps_c=liq_comps.copy()
 
-    if Fe3Fet_Liq is not None:
-        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
     try:
         func = Liquid_olivine_hygr_funcs_by_name[equationH]
@@ -91,21 +87,35 @@ P=None, T=None, equationT=None, Fe3Fet_Liq=None):
         raise ValueError(f'{equationH} is not a valid equation') from None
     sig=inspect.signature(func)
 
-    anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
-    ol_cat_frac = calculate_cat_fractions_olivine(ol_comps=ol_comps_c)
-    Liq_Ols = pd.concat([ol_comps_c, anhyd_cat_frac, ol_cat_frac], axis=1)
+    if meltmatch is None:
+
+        ol_comps_c=ol_comps.copy()
+        liq_comps_c=liq_comps.copy()
+
+        if Fe3Fet_Liq is not None:
+            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
+
+        if len(liq_comps) != len(ol_comps):
+            raise ValueError('The panda series entered for olivine isnt the same length as for liquids')
+
+        anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+        ol_cat_frac = calculate_cat_fractions_olivine(ol_comps=ol_comps_c)
+        Liq_Ols = pd.concat([ol_comps_c, anhyd_cat_frac, ol_cat_frac], axis=1)
+
+    if meltmatch is not None:
+        Liq_Ols=meltmatch
 
 
-
-    if len(liq_comps) != len(ol_comps):
-        raise ValueError('The panda series entered for olivine isnt the same length as for liquids')
 
     kwargs = {name: Liq_Ols[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
     H2O_Calc_np=func(**kwargs)
     H2O_Calc=pd.Series(H2O_Calc_np)
 
-    if eq_tests is False and ol_comps is not None:
+    if eq_tests is False and meltmatch is None:
          return H2O_Calc
+
+    if eq_tests is False and meltmatch is not None:
+        Liq_Ols.insert(0, 'H2O_calc', H2O_Calc)
 
     if eq_tests is True:
         if P is None:
@@ -115,29 +125,144 @@ P=None, T=None, equationT=None, Fe3Fet_Liq=None):
         if T is None and equationT is None:
             raise ValueError('Temperature needed to calculate Delta Kd using Toplis.'
              'Either enter T, or specify equationT=""')
+
         if equationT is not None:
-            T=calculate_ol_liq_temp(ol_comps=ol_comps, liq_comps=liq_comps,
-            equationT=equationT, H2O_Liq=H2O_Calc, P=P).T_K_calc
-        ol_fo = (ol_comps_c['MgO_Ol'] / 40.3044) / \
-            ((ol_comps_c['MgO_Ol'] / 40.3044) + ol_comps_c['FeOt_Ol'] / 71.844)
+            # If not melt match, do separatly
+            #if meltmatch is None:
+
+            T=calculate_ol_liq_temp(meltmatch=Liq_Ols,
+            equationT=equationT, H2O_Liq=H2O_Calc, P=P, eq_tests=eq_tests).T_K_calc
+            # If melt match do on combined dataframe
+            # if meltmatch is not None:
+            #     T=calculate_ol_liq_temp(ol_comps=ol_comps, liq_comps=liq_comps,
+            # equationT=equationT, H2O_Liq=H2O_Calc, P=P).T_K_calc
+
+        ol_fo = (Liq_Ols['MgO_Ol'] / 40.3044) / \
+            ((Liq_Ols['MgO_Ol'] / 40.3044) + Liq_Ols['FeOt_Ol'] / 71.844)
         KdFeMg_Meas = (
-            ((ol_comps_c['FeOt_Ol'] / 71.844) / (ol_comps_c['MgO_Ol'] / 40.3044)) /
-            ((liq_comps_c['FeOt_Liq'] * (1 - liq_comps_c['Fe3Fet_Liq']
-                                         ) / 71.844) / (liq_comps_c['MgO_Liq'] / 40.3044))
+            ((Liq_Ols['FeOt_Ol'] / 71.844) / (Liq_Ols['MgO_Ol'] / 40.3044)) /
+            ((Liq_Ols['FeOt_Liq'] * (1 - Liq_Ols['Fe3Fet_Liq']
+                                         ) / 71.844) / (Liq_Ols['MgO_Liq'] / 40.3044))
         )
         Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'],
         Na2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['Na2O_Liq_mol_frac'],
         P=P, H2O=Liq_Ols['H2O_Liq'], T=T)
         Kd_Toplis_calc = Kd_func(ol_fo)
 
-        DeltaKd_Toplis = abs(KdFeMg_Meas - Kd_Toplis_calc)
-        DeltaKd_Roeder = abs(KdFeMg_Meas - 0.3)
-        DeltaKd_Matzen = abs(KdFeMg_Meas - 0.34)
-        df = pd.DataFrame(data={'H2O_calc': H2O_Calc, 'Temp used for calcs': T, 'P used for calcs': P, 'Kd Meas': KdFeMg_Meas, 'Kd calc (Toplis)': Kd_Toplis_calc,
-                                'ΔKd, Toplis': DeltaKd_Toplis, 'ΔKd, Roeder': DeltaKd_Roeder, 'ΔKd, Matzen': DeltaKd_Matzen})
+        DeltaKd_Toplis = KdFeMg_Meas - Kd_Toplis_calc
+        DeltaKd_Roeder = KdFeMg_Meas - 0.3
+        DeltaKd_Matzen = KdFeMg_Meas - 0.34
+        if equationT is None:
+            df = pd.DataFrame(data={'H2O_calc': H2O_Calc, 'Temp used for calcs': T, 'P used for calcs': P, 'Kd Meas': KdFeMg_Meas, 'Kd calc (Toplis)': Kd_Toplis_calc,'ΔKd, Toplis (M-P)': DeltaKd_Toplis, 'ΔKd, Roeder (M-P)': DeltaKd_Roeder, 'ΔKd, Matzen (M-P)': DeltaKd_Matzen})
+        if equationT is not None:
+            df = pd.DataFrame(data={'H2O_calc': H2O_Calc, 'T_K_calc': T, 'P used for calcs': P, 'Kd Meas': KdFeMg_Meas, 'Kd calc (Toplis)': Kd_Toplis_calc,'ΔKd, Toplis (M-P)': DeltaKd_Toplis, 'ΔKd, Roeder (M-P)': DeltaKd_Roeder, 'ΔKd, Matzen (M-P)': DeltaKd_Matzen})
+
+
         df_out = pd.concat([df, Liq_Ols], axis=1)
 
         return df_out
+
+def calculate_ol_liq_hygr_matching(*, liq_comps, ol_comps, equationH, eq_tests=False,
+T=None, equationT=None, P=None,  Fe3Fet_Liq=None, iterations=30):
+
+    '''
+    Evaluates all possible Ol-liq pairs for H2O
+    returns H2O and equilibrium test values.
+
+    Parameters
+    ----------------
+
+    ol_comps: pandas.DataFrame
+        Panda DataFrame of Ol compositions with column headings SiO2_Ol, CaO_Ol etc.
+
+    liq_comps: pandas.DataFrame
+        Panda DataFrame of liq compositions with column headings SiO2_Liq etc.
+
+    EquationH: str
+        Choose from:
+
+            |   H_Gavr2016 (P-independent, T-independent)
+
+
+
+
+    iterations: int
+        number of times to iterate temperature and H2O. Default 30.
+
+    Returns
+    -------
+    pandas.DataFrame
+        H2O (wt%) for all posible ol-liq matches, along with equilibrium
+        tests, components and input mineral compositions
+    '''
+
+    ol_comps_c=ol_comps.copy()
+    liq_comps_c=liq_comps.copy()
+
+    #Check valid equation for T
+    try:
+        func = Liquid_olivine_hygr_funcs_by_name[equationH]
+    except KeyError:
+        raise ValueError(f'{equationH} is not a valid equation for Ol-Liquid Hygrometry') from None
+    sig=inspect.signature(func)
+
+    # This is a duplication step, to pair up all possible mathes. First we give a unique identifier
+
+    ol_comps_c['ID_Ol'] = ol_comps_c.index
+    liq_comps_c['ID_liq'] = liq_comps_c.index.astype('float64')
+
+    if "Sample_ID_Ol" not in ol_comps:
+        ol_comps_c['Sample_ID_Ol'] = ol_comps.index.astype('float64')
+    if "Sample_ID_liq" not in liq_comps:
+        liq_comps_c['Sample_ID_liq'] = liq_comps.index.astype('float64')
+
+
+    anhyd_liq_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+    ol_cat_frac1 = calculate_cat_fractions_olivine(ol_comps=ol_comps_c)
+    ol_cat_frac= pd.concat([ol_comps_c, ol_cat_frac1], axis=1)
+
+
+    # This duplicates Ols, repeats liq1-liq1*N, liq2-liq2*N etc.
+    DupOls = pd.DataFrame(np.repeat(ol_cat_frac.values, np.shape(
+        anhyd_liq_frac)[0], axis=0))  # .astype('float64')
+    DupOls.columns = ol_cat_frac.columns
+
+    # This duplicates liquids like liq1-liq2-liq3 for liq1, liq1-liq2-liq3 for
+    # liq2 etc.
+    Dupliqs = pd.concat([anhyd_liq_frac ] * np.shape(ol_cat_frac)[0]).reset_index(drop=True)
+    # Combines these merged liquids and liq dataframes
+    Combo_Ol_liqs = pd.concat([Dupliqs, DupOls], axis=1)
+
+    Combo_Ol_liqs_1 = Combo_Ol_liqs.copy()
+    # Combo_Ols_liqs_1['K_Barth'] = Combo_Ols_liqs_1['Ab_liq'] / \
+    #     Combo_Ols_liqs_1['Ab_Ol']
+    LenCombo = str(np.shape(Combo_Ol_liqs)[0])
+
+    LenOl=len(ol_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenOl) + " Ol & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCombo) +
+          " Liq- Ol pairs, be patient if this is >>1 million!")
+
+
+
+    if equationT is None:
+        CalcH2O=calculate_ol_liq_hygr(meltmatch=Combo_Ol_liqs,
+    equationH=equationH, T=T, P=P, eq_tests=eq_tests,
+    Fe3Fet_Liq=Fe3Fet_Liq)
+
+    if equationT is not None:
+        CalcH2O=calculate_ol_liq_hygr(meltmatch=Combo_Ol_liqs,
+    equationH=equationH, equationT=equationT, P=P, eq_tests=eq_tests,
+    Fe3Fet_Liq=Fe3Fet_Liq)
+
+
+
+
+    return CalcH2O
+
+
+
+
 
 ## Functions for olivine-Liquid thermometry
 # Defining functions where DMg is measured.
@@ -239,7 +364,113 @@ Liquid_olivine_funcs_by_name = {p.__name__: p for p in Liquid_olivine_funcs}
 
 ## Function for calculating olivine-liquid temperature using various equations.
 
-def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
+def calculate_ol_liq_temp_matching(*, liq_comps, ol_comps, eq_tests=False,
+equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
+
+    '''
+    Evaluates all possible Ol-liq pairs for temperature, and calculates
+    equilibrium tests
+
+    Parameters
+    ----------------
+
+    ol_comps: pandas.DataFrame
+        Panda DataFrame of Ol compositions with column headings SiO2_Ol, CaO_Ol etc.
+
+    liq_comps: pandas.DataFrame
+        Panda DataFrame of liq compositions with column headings SiO2_Liq etc.
+
+    equationT: str
+        T_Beatt93_ol (P-dependent, H2O_independent)
+        T_Beatt93_ol_HerzCorr (P-dependent, H2O_independent)
+        T_Put2008_eq21 (P-dependent, H2O-dependent)
+        T_Put2008_eq22 (P-dependent, H2O-dependent)
+        T_Sisson1992 (P-dependent, H2O_independent)
+        T_Pu2017 (P-independent, H2O_independent)
+        T_Pu2021 (P-dependent, H2O_independent)
+
+    P: float, int, pandas.Series, str  ("Solve")
+        Pressure in kbar
+        Only needed for P-sensitive thermometers.
+        If enter P="Solve", returns a partial function
+        Else, enter an integer, float, or panda series
+
+    H2O_Liq: optional.
+        If None, uses H2O_Liq column from input.
+        If int, float, pandas.Series, uses this instead of H2O_Liq Column
+
+
+    iterations: int
+        number of times to iterate temperature and H2O. Default 30.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Temp (K) for all posible ol-liq matches, along with equilibrium
+        tests, components and input mineral compositions
+    '''
+
+    ol_comps_c=ol_comps.copy()
+    liq_comps_c=liq_comps.copy()
+
+    #Check valid equation for T
+    try:
+        func = Liquid_olivine_funcs_by_name[equationT]
+    except KeyError:
+        raise ValueError(f'{equationT} is not a valid equation for Ol-Liquid Hygrometry') from None
+    sig=inspect.signature(func)
+
+    # This is a duplication step, to pair up all possible mathes. First we give a unique identifier
+
+    ol_comps_c['ID_Ol'] = ol_comps_c.index
+    liq_comps_c['ID_liq'] = liq_comps_c.index.astype('float64')
+
+    if "Sample_ID_Ol" not in ol_comps:
+        ol_comps_c['Sample_ID_Ol'] = ol_comps.index.astype('float64')
+    if "Sample_ID_liq" not in liq_comps:
+        liq_comps_c['Sample_ID_liq'] = liq_comps.index.astype('float64')
+
+
+    anhyd_liq_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+    ol_cat_frac1 = calculate_cat_fractions_olivine(ol_comps=ol_comps_c)
+    ol_cat_frac= pd.concat([ol_comps_c, ol_cat_frac1], axis=1)
+
+
+    # This duplicates Ols, repeats liq1-liq1*N, liq2-liq2*N etc.
+    DupOls = pd.DataFrame(np.repeat(ol_cat_frac.values, np.shape(
+        anhyd_liq_frac)[0], axis=0))  # .astype('float64')
+    DupOls.columns = ol_cat_frac.columns
+
+    # This duplicates liquids like liq1-liq2-liq3 for liq1, liq1-liq2-liq3 for
+    # liq2 etc.
+    Dupliqs = pd.concat([anhyd_liq_frac ] * np.shape(ol_cat_frac)[0]).reset_index(drop=True)
+    # Combines these merged liquids and liq dataframes
+    Combo_Ol_liqs = pd.concat([Dupliqs, DupOls], axis=1)
+
+    Combo_Ol_liqs_1 = Combo_Ol_liqs.copy()
+    # Combo_Ols_liqs_1['K_Barth'] = Combo_Ols_liqs_1['Ab_liq'] / \
+    #     Combo_Ols_liqs_1['Ab_Ol']
+    LenCombo = str(np.shape(Combo_Ol_liqs)[0])
+
+    LenOl=len(ol_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenOl) + " Ol & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCombo) +
+          " Liq-Ol pairs, be patient if this is >>1 million!")
+
+    CalcT=calculate_ol_liq_temp(equationT=equationT, meltmatch=Combo_Ol_liqs, Fe3Fet_Liq=Fe3Fet_Liq,
+                                        H2O_Liq=H2O_Liq, eq_tests=eq_tests, P=P)
+
+
+
+
+
+    return CalcT
+
+
+
+
+
+def calculate_ol_liq_temp(*, equationT, liq_comps=None, ol_comps=None, meltmatch=None, P=None,
                           NiO_Ol_Mol=None, H2O_Liq=None, Fe3Fet_Liq=None, eq_tests=False):
     '''
     Olivine-liquid thermometers. Returns the temperature in Kelvin,
@@ -289,112 +520,123 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
     sig=inspect.signature(func)
 
 
-    if isinstance(P, pd.Series):
-        if len(P) != len(liq_comps):
-            raise ValueError('The panda series entered for pressure isnt the same length '
-             'as the dataframe of liquid compositions')
-        if len(liq_comps) != len(ol_comps):
-            raise ValueError('The panda series entered for olivine isnt the same length as for liquids')
 
 # Replacing H2O and Fe3FeT if relevant
-    liq_comps_c = liq_comps.copy()
-    ol_comps_c=ol_comps.copy()
+    if meltmatch is None:
 
-    if H2O_Liq is not None:
-        liq_comps_c['H2O_Liq'] = H2O_Liq
-    if Fe3Fet_Liq is not None:
-        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
+        if isinstance(P, pd.Series):
+            if len(P) != len(liq_comps):
+                raise ValueError('The panda series entered for pressure isnt the same length '
+                'as the dataframe of liquid compositions')
+            if len(liq_comps) != len(ol_comps):
+                raise ValueError('The panda series entered for olivine isnt the same length as for liquids')
+        liq_comps_c = liq_comps.copy()
+        ol_comps_c=ol_comps.copy()
+
+
+        if H2O_Liq is not None:
+            liq_comps_c['H2O_Liq'] = H2O_Liq
+        if Fe3Fet_Liq is not None:
+            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
 # Allows different calculation scheme for Ni-bearing equations
-    if equationT == "T_Pu2017" or equationT == "T_Pu2021":
-        anhyd_mol_frac_Ni = calculate_anhydrous_mol_fractions_liquid_Ni(
-            liq_comps=liq_comps_c)
-        if NiO_Ol_Mol is None:
-            ol_mol_frac_Ni = calculate_mol_fractions_olivine_ni(
-                ol_comps=ol_comps_c)
-            Liq_Ols_Ni = pd.concat([anhyd_mol_frac_Ni, ol_mol_frac_Ni], axis=1)
-            if eq_tests is True:
-                anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(
-                    liq_comps=liq_comps_c)
-                Liq_Ols = pd.concat([Liq_Ols_Ni, liq_comps_c], axis=1)
-    # This means the equilibrium testwork
-        if NiO_Ol_Mol is not None:
-            if eq_tests is True and ol_comps is None:
-                raise Exception(
-                    'you dont have any ol compositions, so we cant calculate Kd values')
+        if equationT == "T_Pu2017" or equationT == "T_Pu2021":
+            anhyd_mol_frac_Ni = calculate_anhydrous_mol_fractions_liquid_Ni(
+                liq_comps=liq_comps_c)
+            if NiO_Ol_Mol is None:
+                ol_mol_frac_Ni = calculate_mol_fractions_olivine_ni(
+                    ol_comps=ol_comps_c)
+                Liq_Ols_Ni = pd.concat([anhyd_mol_frac_Ni, ol_mol_frac_Ni], axis=1)
+                if eq_tests is True:
+                    anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(
+                        liq_comps=liq_comps_c)
+                    Liq_Ols = pd.concat([Liq_Ols_Ni, liq_comps_c], axis=1)
+        # This means the equilibrium testwork
+            if NiO_Ol_Mol is not None:
+                if eq_tests is True and ol_comps is None:
+                    raise Exception(
+                        'you dont have any ol compositions, so we cant calculate Kd values')
 
-            NiO_Ol_Mol = NiO_Ol_Mol
-            Liq_Ols_Ni = anhyd_mol_frac_Ni.copy()
-            Liq_Ols_Ni['NiO_Ol_mol_frac'] = NiO_Ol_Mol
-        if equationT == "T_Pu2017":
-            func = T_Pu2017
-            kwargs = {name: Liq_Ols_Ni[name] for name, p in inspect.signature(
-                func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
-            T_K=func(**kwargs)
-        if equationT=="T_Pu2021":
-            if P is None:
-                raise ValueError(f'{equationT} requires you to enter P, or set P=Solve')
-            func = T_Pu2021
-            kwargs = {name: Liq_Ols_Ni[name] for name, p in inspect.signature(
-                func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
-            T_K=func(P, **kwargs)
+                NiO_Ol_Mol = NiO_Ol_Mol
+                Liq_Ols_Ni = anhyd_mol_frac_Ni.copy()
+                Liq_Ols_Ni['NiO_Ol_mol_frac'] = NiO_Ol_Mol
+            if equationT == "T_Pu2017":
+                func = T_Pu2017
+                kwargs = {name: Liq_Ols_Ni[name] for name, p in inspect.signature(
+                    func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
+                T_K=func(**kwargs)
+            if equationT=="T_Pu2021":
+                if P is None:
+                    raise ValueError(f'{equationT} requires you to enter P, or set P=Solve')
+                func = T_Pu2021
+                kwargs = {name: Liq_Ols_Ni[name] for name, p in inspect.signature(
+                    func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
+                T_K=func(P, **kwargs)
 
 
-    else:
-    # Keiths spreadsheets dont use Cr2O3 and P2O5. So have set this to zero.
-        liq_comps_c['Cr2O3_Liq']=0
-        liq_comps_c['P2O5_Liq']=0
-        ol_comps_c['Cr2O3_Ol']=0
-        ol_comps_c['P2O5_Ol']=0
+        else:
+        # Keiths spreadsheets dont use Cr2O3 and P2O5. So have set this to zero.
+            liq_comps_c['Cr2O3_Liq']=0
+            liq_comps_c['P2O5_Liq']=0
+            ol_comps_c['Cr2O3_Ol']=0
+            ol_comps_c['P2O5_Ol']=0
     # Now calculate cation fractions
+    if meltmatch is None:
+
         anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
         ol_cat_frac = calculate_cat_fractions_olivine(ol_comps=ol_comps_c)
-        Liq_Ols = pd.concat([anhyd_cat_frac, ol_cat_frac], axis=1)
+        Liq_Ols = pd.concat([anhyd_cat_frac, ol_cat_frac, ol_comps_c], axis=1)
 
-    # This performs extra calculation steps for Beattie equations
-        if equationT == "T_Put2008_eq22" or equationT == "T_Put2008_eq21" or \
-        equationT == "T_Beatt93_ol" or equationT == "T_Beatt93_ol_HerzCorr" or equationT=="T_Put2008_eq19":
+    if meltmatch is not None:
+        if equationT == "T_Pu2017" or equationT == "T_Pu2021":
+            raise Exception('Sorry, we havent yet integrated the Pu equations into this method. We can do this if you need it')
 
-                Liq_Ols['DMg_Meas'] = Liq_Ols['Mg_Ol_cat_frac'] / \
-                    Liq_Ols['Mg_Liq_cat_frac']
-                Liq_Ols['CNML'] = (Liq_Ols['Mg_Liq_cat_frac'] + Liq_Ols['Fet_Liq_cat_frac'] +
-                                   Liq_Ols['Ca_Liq_cat_frac'] + Liq_Ols['Mn_Liq_cat_frac'])
-                Liq_Ols['CSiO2L'] = Liq_Ols['Si_Liq_cat_frac']
-                Liq_Ols['NF'] = (7 / 2) * np.log(1 - Liq_Ols['Al_Liq_cat_frac']
-                                                 ) + 7 * np.log(1 - Liq_Ols['Ti_Liq_cat_frac'])
-                Liq_Ols['Den_Beat93'] = 52.05 / 8.3144 + 2 * np.log(Liq_Ols['DMg_Meas']) + 2 * np.log(
-                    1.5 * Liq_Ols['CNML']) + 2 * np.log(3 * Liq_Ols['CSiO2L']) - Liq_Ols['NF']
+        Liq_Ols=meltmatch
 
-        if equationT == "T_Sisson1992":
-            Liq_Ols['KdMg_TSG1992'] = (Liq_Ols['Mg_Ol_cat_frac'] /
-                (Liq_Ols['Mg_Liq_cat_frac'] *
-                    (Liq_Ols['Si_Liq_cat_frac']**(0.5))))
+# This performs extra calculation steps for Beattie equations
+    if equationT == "T_Put2008_eq22" or equationT == "T_Put2008_eq21" or \
+    equationT == "T_Beatt93_ol" or equationT == "T_Beatt93_ol_HerzCorr" or equationT=="T_Put2008_eq19":
 
+        Liq_Ols['DMg_Meas'] = Liq_Ols['Mg_Ol_cat_frac'].astype(float) /Liq_Ols['Mg_Liq_cat_frac'].astype(float)
+        Liq_Ols['CNML'] = (Liq_Ols['Mg_Liq_cat_frac'] + Liq_Ols['Fet_Liq_cat_frac'] +
+                                Liq_Ols['Ca_Liq_cat_frac'] + Liq_Ols['Mn_Liq_cat_frac'])
+        Liq_Ols['CSiO2L'] = Liq_Ols['Si_Liq_cat_frac']
+        Liq_Ols['NF'] = (7 / 2) * np.log(1 - Liq_Ols['Al_Liq_cat_frac']
+                                            ) + 7 * np.log(1 - Liq_Ols['Ti_Liq_cat_frac'])
+        Liq_Ols['Den_Beat93'] = 52.05 / 8.3144 + 2 * np.log(Liq_Ols['DMg_Meas']) + 2 * np.log(
+            1.5 * Liq_Ols['CNML']) + 2 * np.log(3 * Liq_Ols['CSiO2L']) - Liq_Ols['NF']
 
-    # Checks if P-dependent function you have entered a P
-        if sig.parameters['P'].default is not None:
-            if P is None:
-                raise ValueError(f'{equationT} requires you to enter P')
-        else:
-            if P is not None:
-                print('Youve selected a P-independent function')
+    if equationT == "T_Sisson1992":
+        Liq_Ols['KdMg_TSG1992'] = (Liq_Ols['Mg_Ol_cat_frac'] /
+            (Liq_Ols['Mg_Liq_cat_frac'] *
+                (Liq_Ols['Si_Liq_cat_frac']**(0.5))))
 
 
-        kwargs = {name: Liq_Ols[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
-        if isinstance(P, str) or P is None:
-            if P == "Solve":
-                T_K = partial(func, **kwargs)
-            if P is None:
-                T_K=func(**kwargs)
+# Checks if P-dependent function you have entered a P
+    if sig.parameters['P'].default is not None:
+        if P is None:
+            raise ValueError(f'{equationT} requires you to enter P')
+    else:
+        if P is not None:
+            print('Youve selected a P-independent function')
 
-        else:
-            T_K=func(P, **kwargs)
 
-    if eq_tests is False and ol_comps is not None:
+    kwargs = {name: Liq_Ols[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
+    if isinstance(P, str) or P is None:
+        if P == "Solve":
+            T_K = partial(func, **kwargs)
+        if P is None:
+            T_K=func(**kwargs)
+
+    else:
+
+        T_K=func(P, **kwargs)
+
+    if eq_tests is False:
         KdFeMg_Meas = (
-            ((ol_comps_c['FeOt_Ol'] / 71.844) / (ol_comps_c['MgO_Ol'] / 40.3044)) /
-            ((liq_comps_c['FeOt_Liq'] * (1 - liq_comps_c['Fe3Fet_Liq']
-                                         ) / 71.844) / (liq_comps_c['MgO_Liq'] / 40.3044))
+            ((Liq_Ols['FeOt_Ol'] / 71.844) / (Liq_Ols['MgO_Ol'] / 40.3044)) /
+            ((Liq_Ols['FeOt_Liq'] * (1 - Liq_Ols['Fe3Fet_Liq']
+                                         ) / 71.844) / (Liq_Ols['MgO_Liq'] / 40.3044))
         )
         df = pd.DataFrame(
             data={'T_K_calc': T_K, 'Kd (Fe-Mg) Meas': KdFeMg_Meas})
@@ -408,22 +650,22 @@ def calculate_ol_liq_temp(*, liq_comps, equationT, ol_comps=None, P=None,
             P = 1
             print(
                 'You have not selected a pressure, so we have calculated Toplis Kd at 1kbar')
-        ol_fo = (ol_comps_c['MgO_Ol'] / 40.3044) / \
-            ((ol_comps_c['MgO_Ol'] / 40.3044) + ol_comps_c['FeOt_Ol'] / 71.844)
+        ol_fo = (Liq_Ols['MgO_Ol'] / 40.3044) / \
+            ((Liq_Ols['MgO_Ol'] / 40.3044) + Liq_Ols['FeOt_Ol'] / 71.844)
         KdFeMg_Meas = (
-            ((ol_comps_c['FeOt_Ol'] / 71.844) / (ol_comps_c['MgO_Ol'] / 40.3044)) /
-            ((liq_comps_c['FeOt_Liq'] * (1 - liq_comps_c['Fe3Fet_Liq']
-                                         ) / 71.844) / (liq_comps_c['MgO_Liq'] / 40.3044))
+            ((Liq_Ols['FeOt_Ol'] / 71.844) / (Liq_Ols['MgO_Ol'] / 40.3044)) /
+            ((Liq_Ols['FeOt_Liq'] * (1 - Liq_Ols['Fe3Fet_Liq']
+                                         ) / 71.844) / (Liq_Ols['MgO_Liq'] / 40.3044))
         )
         Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'], Na2O_mol=Liq_Ols[
                           'Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], P=P, H2O=Liq_Ols['H2O_Liq'], T=T_K)
         Kd_Toplis_calc = Kd_func(ol_fo)
 
-        DeltaKd_Toplis = abs(KdFeMg_Meas - Kd_Toplis_calc)
-        DeltaKd_Roeder = abs(KdFeMg_Meas - 0.3)
-        DeltaKd_Matzen = abs(KdFeMg_Meas - 0.34)
+        DeltaKd_Toplis = KdFeMg_Meas - Kd_Toplis_calc
+        DeltaKd_Roeder = KdFeMg_Meas - 0.3
+        DeltaKd_Matzen = KdFeMg_Meas - 0.34
         df = pd.DataFrame(data={'T_K_calc': T_K, 'Kd Meas': KdFeMg_Meas, 'Kd calc (Toplis)': Kd_Toplis_calc,
-                                'ΔKd, Toplis': DeltaKd_Toplis, 'ΔKd, Roeder': DeltaKd_Roeder, 'ΔKd, Matzen': DeltaKd_Matzen})
+                                'ΔKd, Toplis (M-P)': DeltaKd_Toplis, 'ΔKd, Roeder (M-P)': DeltaKd_Roeder, 'ΔKd, Matzen (M-P)': DeltaKd_Matzen})
         df_out = pd.concat([df, Liq_Ols], axis=1)
 
         return df_out
@@ -477,6 +719,8 @@ def calculate_ol_sp_temp(ol_comps, sp_comps, equationT):
     combo = pd.concat([ol_comps, sp_comps], axis=1)
     Cr_No = (sp_comps['Cr2O3_Sp'] / 151.99) / \
         (sp_comps['Cr2O3_Sp'] / 151.9 + sp_comps['Al2O3_Sp'] / 101.96)
+
+
     combo.insert(1, "Cr_No_sp", Cr_No)
     if equationT == "T_Coogan2014":
         T_func = T_Coogan2014

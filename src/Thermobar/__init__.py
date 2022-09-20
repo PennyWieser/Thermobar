@@ -1,4 +1,4 @@
-__author__ = 'Penny Wieser, Maurizio Petrelli, Jordan Lubbers, Eric Wieser'
+__author__ = 'Penny Wieser, Maurizio Petrelli, Jordan Lubbers, Sinan, Eric Wieser'
 
 
 import numpy as np
@@ -50,6 +50,8 @@ from Thermobar.garnet_plot import*
 from Thermobar.garnet_class import*
 # Geotherm
 from Thermobar.geotherm import *
+# Density profiles
+from Thermobar.density_profiles import *
 
 
 # version

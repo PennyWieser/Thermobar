@@ -22,7 +22,7 @@ Units
 ==============================
 
 Thermobar performs all calculations in Kelvin for temperature, kbar for Pressure.
-If you want results in celcius, you simply have to subtract 273.15 from results.
+If you want results in Celcius, you simply have to subtract 273.15 from results.
 
 
 

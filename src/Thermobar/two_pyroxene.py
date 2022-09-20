@@ -82,19 +82,6 @@ def T_Put2008_eq36(P, *, EnFs, Fm2Si2O6, Ca_Cpx_cat_6ox,
             CrCaTs + 33.2 * Mn_Opx_cat_6ox - 23.6 * Na_Opx_cat_6ox - 2.08 * En_Opx - 8.33 * Di_Opx - 0.05 * P))
 
 
-def T_Brey1990(P, *, Fet_Cpx_cat_6ox, Ca_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox,
-               Fet_Opx_cat_6ox, Mg_Opx_cat_6ox, Ca_Opx_cat_6ox, Na_Opx_cat_6ox):
-    '''
-    Two-pyroxene thermometer of Brey and Kohler (1990).
-    :cite:`brey1990geothermobarometry`
-
-    SEE=+-50C for Cpx Mg#>0.75
-    SEE=+-70C for all data
-    '''
-    return ((23664 + (24.9 + 126.3 * Fet_Cpx_cat_6ox / (Fet_Cpx_cat_6ox + Mg_Cpx_cat_6ox)) * P)
-    / (13.38 + (np.log((1 - Ca_Cpx_cat_6ox.astype(float) /(1 - Na_Cpx_cat_6ox.astype(float))) /
-    (1 - Ca_Opx_cat_6ox.astype(float) / (1 - Na_Opx_cat_6ox.astype(float)))))**2
-    + 11.59 * Fet_Opx_cat_6ox / (Fet_Opx_cat_6ox + Mg_Opx_cat_6ox)))
 
 
 def T_Put2008_eq37(P, *, EnFs, Di_Cpx, Fm2Si2O6, Mn_Opx_cat_6ox,
@@ -109,6 +96,20 @@ def T_Put2008_eq37(P, *, EnFs, Di_Cpx, Fm2Si2O6, Mn_Opx_cat_6ox,
     return (273.15 + 10**4 / (13.4 - 3.4 * np.log(EnFs.astype(float) / Fm2Si2O6.astype(float)) + 5.59 * np.log(Mg_Cpx_cat_6ox.astype(float))
     + 23.85 * Mn_Opx_cat_6ox +6.48 * FmAl2SiO6 - 2.38 * Di_Cpx - 0.044 * P
     - 8.8 * Mg_Cpx_cat_6ox / (Mg_Cpx_cat_6ox + Fet_Cpx_cat_6ox)))
+
+def T_Brey1990(P, *, Fet_Cpx_cat_6ox, Ca_Cpx_cat_6ox, Mg_Cpx_cat_6ox, Na_Cpx_cat_6ox,
+               Fet_Opx_cat_6ox, Mg_Opx_cat_6ox, Ca_Opx_cat_6ox, Na_Opx_cat_6ox):
+    '''
+    Two-pyroxene thermometer of Brey and Kohler (1990).
+    :cite:`brey1990geothermobarometry`
+
+    SEE=+-50C for Cpx Mg#>0.75
+    SEE=+-70C for all data
+    '''
+    return ((23664 + (24.9 + 126.3 * Fet_Cpx_cat_6ox / (Fet_Cpx_cat_6ox + Mg_Cpx_cat_6ox)) * P)
+    / (13.38 + (np.log((1 - Ca_Cpx_cat_6ox.astype(float) /(1 - Na_Cpx_cat_6ox.astype(float))) /
+    (1 - Ca_Opx_cat_6ox.astype(float) / (1 - Na_Opx_cat_6ox.astype(float)))))**2
+    + 11.59 * Fet_Opx_cat_6ox / (Fet_Opx_cat_6ox + Mg_Opx_cat_6ox)))
 
 
 def T_Wood1973(P=None, *, Mg_Opx_cat_6ox, Ca_Opx_cat_6ox, Mn_Opx_cat_6ox,
@@ -528,19 +529,40 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
     if isinstance(P_func, partial) and isinstance(T_func, partial):
 
         # Gives users flexibility to add a different guess temperature
-
+        count=0
         for _ in range(iterations):
+
+
+
+
             P_guess = P_func(T_K_guess)
             T_K_guess = T_func(P_guess)
+            if count==iterations-2:
+                # On the second last step, save the pressure
+                P_out_loop=P_guess.values
+                T_out_loop=T_K_guess.values
 
-        T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
-        T_K_guess[T_K_guess_is_bad] = np.nan
-        P_guess[T_K_guess_is_bad] = np.nan
+            count=count+1
+
+
+
+        DeltaP=P_guess-P_out_loop
+        DeltaT=T_K_guess-T_out_loop
+
+    else:
+        DeltaP=0
+        DeltaT=0
+
+    T_K_guess_is_bad = (T_K_guess == 0) | (T_K_guess == 273.15) | (T_K_guess ==  -np.inf) | (T_K_guess ==  np.inf)
+    T_K_guess[T_K_guess_is_bad] = np.nan
+    P_guess[T_K_guess_is_bad] = np.nan
 
 
     if eq_tests is False:
         PT_out = pd.DataFrame(data={'P_kbar_calc': P_guess,
-                                    'T_K_calc': T_K_guess})
+                                    'T_K_calc': T_K_guess,
+                                    'Delta_P_kbar_Iter': DeltaP,
+                                    'Delta_T_K_Iter': DeltaT})
 
         return PT_out
     if eq_tests is True:
@@ -563,7 +585,8 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
 ## Two pyroxene matching
 
 def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=None, equationP=None,
-                                  Kd_Match=None, Kd_Err=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None):
+                                  Kd_Match=None, Kd_Err=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None,
+                                  return_all_pairs=True, iterations=30):
     '''
     Evaluates all possible Cpx-Opx pairs for user supplied dataframes of opx and cpx
     comps (can be different lengths). Returns P (kbar) and T (K) for those in Kd Fe-Mg equilibrium.
@@ -603,6 +626,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         |  If "HighTemp", returns all cpxs-opxs within Kd cpx-opx=1.09+-0.14 suggested by Putirka (2008)
         |  If "Subsolidus" returns all cpxs-opxs within Kd cpx-opx=0.7+-0.2 suggested by Putirka (2008)
         |  If int or float, also need to specify Kd_Err. Returns all matches within Kd_Match +- Kd_Err
+    Or specify return_all_pairs=True to get all matches
 
     Kd_Err: float or int (defaults given in Kd_Match)
         Optional input to change defaults. Returns all cpx-opx pairs within Kd_Match+-Kd_Err
@@ -659,12 +683,18 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
 
     Combo_opxs_cpxs_1 = Combo_opxs_cpxs.copy()
     LenCombo = str(np.shape(Combo_opxs_cpxs)[0])
-    print("Considering " + LenCombo +
-          " Opx-Cpx pairs, be patient if this is >>1 million!")
+
+    LenCpx=len(cpx_comps)
+    LenOpx=len(opx_comps)
+    print("Considering N=" + str(LenCpx) + " Cpx & N=" + str(LenOpx) +" Opx, which is a total of N="+ str(LenCombo) +
+          " Cpx-Opx pairs, be patient if this is >>1 million!")
+
+
 
     # calculate Kd for these pairs
     En = (Combo_opxs_cpxs.Fm2Si2O6 * (Combo_opxs_cpxs.Mg_Opx_cat_6ox /
     (Combo_opxs_cpxs.Mg_Opx_cat_6ox +Combo_opxs_cpxs.Fet_Cpx_cat_6ox + Combo_opxs_cpxs.Mn_Cpx_cat_6ox)))
+
     Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'] = ((Combo_opxs_cpxs['Fet_Cpx_cat_6ox']
     / Combo_opxs_cpxs['Mg_Cpx_cat_6ox'])) / (Combo_opxs_cpxs['Fet_Opx_cat_6ox']
      / Combo_opxs_cpxs['Mg_Opx_cat_6ox'])
@@ -687,9 +717,12 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.loc[np.abs(
             Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < Kd_Err]  # +- 0.14 suggested by Putirka
 
-    if Kd_Match is None and Kd_Match is None and Kd_Err is None:
+    if return_all_pairs is True:
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.copy()
         print('No Kd selected, all matches are shown')
+
+    if return_all_pairs is False and Kd_Match is None:
+        raise Exception('You havent specified what Kd filter you want. Either enter Kd_Match= "Subsolidus", "HighTemp", or Kd_Match=value and Kd_Err=val, or  return_all_pairs=True')
 
 
     if len(Combo_opxs_cpxs_1) == 0:
@@ -730,24 +763,30 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         'The code doesnt know what you want it to do. Either enter an equation, or choose a temperature.')
     if equationP is not None and equationT is not None:
         PT_out = calculate_cpx_opx_press_temp(
-            Two_Px_Match=Combo_opxs_cpxs_2, equationP=equationP, equationT=equationT)
+            Two_Px_Match=Combo_opxs_cpxs_2, equationP=equationP, equationT=equationT, iterations=iterations)
         Combo_opxs_cpxs_2.insert(0, "T_K_calc", PT_out['T_K_calc'])
         Combo_opxs_cpxs_2.insert(1, "P_kbar_calc", PT_out['P_kbar_calc'])
+        Combo_opxs_cpxs_2.insert(2, "Delta_T_K_Iter", PT_out['Delta_T_K_Iter'].astype(float))
+        Combo_opxs_cpxs_2.insert(3, "Delta_P_kbar_Iter", PT_out['Delta_P_kbar_Iter'].astype(float))
 
-        Combo_opxs_cpxs_2.insert(2, "Equation Choice (T)", str(equationT))
-        Combo_opxs_cpxs_2.insert(3, "Equation Choice (P)", str(equationP))
+        Combo_opxs_cpxs_2.insert(4, "Equation Choice (T)", str(equationT))
+        Combo_opxs_cpxs_2.insert(5, "Equation Choice (P)", str(equationP))
     if P is not None:
         T_K_calc = calculate_cpx_opx_temp(
             Two_Px_Match=Combo_opxs_cpxs_2, equationT=equationT, P=P)
         Combo_opxs_cpxs_2.insert(0, "T_K_calc", T_K_calc)
         Combo_opxs_cpxs_2.insert(1, "P_kbar_input", P)
-        Combo_opxs_cpxs_2.insert(2, "Equation Choice (T)", str(equationT))
+        Combo_opxs_cpxs_2.insert(2, "Delta_T_K_Iter", 0)
+        Combo_opxs_cpxs_2.insert(3, "Delta_P_kbar_Iter", 0)
+        Combo_opxs_cpxs_2.insert(4, "Equation Choice (T)", str(equationT))
     if T is not None:
         P_kbar_calc = calculate_cpx_opx_press(
             Two_Px_Match=Combo_opxs_cpxs_2, equationP=equationP, T=T)
         Combo_opxs_cpxs_2.insert(0, "T_K_input", T)
         Combo_opxs_cpxs_2.insert(1, "P_kbar_calc", P_kbar_calc)
-        Combo_opxs_cpxs_2.insert(3, "Equation Choice (P)", str(equationP))
+        Combo_opxs_cpxs_2.insert(2, "Delta_T_K_Iter", 0)
+        Combo_opxs_cpxs_2.insert(3, "Delta_P_kbar_Iter", 0)
+        Combo_opxs_cpxs_2.insert(4, "Equation Choice (P)", str(equationP))
 
     cols_to_move = ['Kd_Fe_Mg_Cpx_Opx']
     Combo_opxs_cpxs_2 = Combo_opxs_cpxs_2[cols_to_move + [
@@ -836,8 +875,12 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
 
 
 
-
+    print('Done!!! I found a total of N='+str(len(Combo_opxs_cpxs_2)) + ' Cpx-Opx matches using the specified filter. ')
+    print('N=' + str(len(df1_M)) + ' Cpx out of the N='+str(LenCpx)+' Cpx that you input matched to 1 or more Opx')
+    print( 'N=' + str(len(df1_2M)) + ' Opx out of the N='+str(LenOpx)+' Opx that you input matched to 1 or more Cpx')
     print('Done!')
+
+
     return {'Av_PTs_perCPX': df1_M, 'Av_PTs_perOPX': df1_2M, 'All_PTs': Combo_opxs_cpxs_2}
 
 

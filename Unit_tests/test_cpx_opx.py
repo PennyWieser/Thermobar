@@ -78,13 +78,13 @@ class test_cpx_opx_press_temp_matching(unittest.TestCase):
     def test_36_38a_match_press(self):
         self.assertAlmostEqual(pt.calculate_cpx_opx_press_temp_matching(
         cpx_comps=Cpx_Several, opx_comps=Opx_Several, equationT="T_Put2008_eq36",
-        equationP="P_Put2008_eq38").get("All_PTs").P_kbar_calc[0], 2.9944999,
+        equationP="P_Put2008_eq38",  return_all_pairs=True).get("All_PTs").P_kbar_calc[0], 2.9944999,
         decimalPlace, "Kd Cpx-Opx not equal to test value")
 
     def test_36_38a_match_press(self):
         self.assertAlmostEqual(pt.calculate_cpx_opx_press_temp_matching(
         cpx_comps=Cpx_Several, opx_comps=Opx_Several, equationT="T_Put2008_eq36",
-        equationP="P_Put2008_eq38").get("Av_PTs_perCPX").Mean_T_K_calc[0], 1311.457528,
+        equationP="P_Put2008_eq38",  return_all_pairs=True).get("Av_PTs_perCPX").Mean_T_K_calc[0], 1311.457528,
         decimalPlace, "Kd Cpx-Opx not equal to test value")
 
     def test_36_38a_match_KdFilt_Temp(self):

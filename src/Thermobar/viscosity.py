@@ -72,6 +72,8 @@ def normalize_anhydrous_to_100_incF_mol_prop(liq_comps, F2O_content=0):
     cat_frac_anhyd.columns = [str(col).replace('mol_prop', 'mol_frac')
                               for col in cat_frac_anhyd.columns]
 
+    #print(cat_frac_anhyd)
+
     return cat_frac_anhyd  #mols_sum #liq_comps_N_mol['sum']
 
 
@@ -146,7 +148,10 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_conte
     df_C = pd.DataFrame(np.array([c1,c2,c3,c4,c5,c6,c11]).T,
                         columns = ['c1','c2','c3','c4','c5','c6','c11']
                        )
+
     df_params = pd.concat([df_B, df_C],axis = 'columns')
+
+    print(df_params)
 
 
 
@@ -156,8 +161,8 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_conte
 
 
     liq_comps_c.insert(0, 'A', A)
-    liq_comps_c.insert(1, 'B', B)
-    liq_comps_c.insert(2, 'C', C)
+    liq_comps_c.insert(1, 'B', B.values)
+    liq_comps_c.insert(2, 'C', C.values)
 
     if T is not None:
         df_params['T_K'] = T
@@ -165,8 +170,8 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_conte
         n_melt=10**(logn_melt)
         df_params['logn_melt'] = logn_melt
         liq_comps_c.insert(0, 'T_K', T)
-        liq_comps_c.insert(0, 'logn_melt', logn_melt)
-        liq_comps_c.insert(0, 'n_melt', n_melt)
+        liq_comps_c.insert(0, 'logn_melt', logn_melt.values)
+        liq_comps_c.insert(0, 'n_melt', n_melt.values)
 
-    return liq_comps_c
+    return liq_comps_c, df_params
 
