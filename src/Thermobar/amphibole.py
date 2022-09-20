@@ -639,7 +639,10 @@ def calculate_amp_only_press_all_eqs(amp_comps, plot=False, H2O_Liq=None, Ridolf
         #amp_comps_c=get_amp_sites_from_input(amp_comps=amp_comps)
         amp_calcs=calculate_amp_only_press(amp_comps=amp_comps_c,
         equationP="P_Ridolfi2021", Ridolfi_Filter=Ridolfi_Filter)
+        T_calc=calculate_amp_only_press_temp(amp_comps=amp_comps_c,
+        equationP="P_Ridolfi2021", equationT="T_Ridolfi2012", Ridolfi_Filter=Ridolfi_Filter).T_K_calc
         amp_calcs["P_Ridolfi21"]=amp_calcs['P_kbar_calc']
+        amp_calcs["T_Ridolfi12"]=T_calc
         X_Ridolfi21_Sorted=np.sort(amp_calcs['P_Ridolfi21'])
         if plot==True:
             plt.step(np.concatenate([X_Ridolfi21_Sorted, X_Ridolfi21_Sorted[[-1]]]),
