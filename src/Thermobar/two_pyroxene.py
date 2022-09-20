@@ -586,7 +586,7 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
 
 def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=None, equationP=None,
                                   Kd_Match=None, Kd_Err=None, Cpx_Quality=False, Opx_Quality=False, P=None, T=None,
-                                  return_all_pairs=True, iterations=30):
+                                  return_all_pairs=False, iterations=30):
     '''
     Evaluates all possible Cpx-Opx pairs for user supplied dataframes of opx and cpx
     comps (can be different lengths). Returns P (kbar) and T (K) for those in Kd Fe-Mg equilibrium.
@@ -700,10 +700,14 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
      / Combo_opxs_cpxs['Mg_Opx_cat_6ox'])
 
     if Kd_Match == "Subsolidus":
+        print('made it here')
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
             0.7 - Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'])
+        print(len(Combo_opxs_cpxs))
+
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.loc[np.abs(
             Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < 0.2]  # +- 0.2 suggested by Putirka spreadsheet
+        print(len(Combo_opxs_cpxs_1))
     if Kd_Match == "HighTemp":
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
             1.09 - Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'])
