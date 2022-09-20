@@ -141,7 +141,7 @@ Welcome to Thermobar's documentation!
    Examples/Other_features/fo2_to_Fe3FeT
    Examples/Other_features/fo2_to_BufferPosition
    Examples/Other_features/Calculating_Viscosity
-   Examples/Other_features/Density_to_depth
+   Examples/Other_features/Pressure_to_depth
 
 
 
