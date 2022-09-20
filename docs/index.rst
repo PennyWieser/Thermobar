@@ -52,6 +52,7 @@ Welcome to Thermobar's documentation!
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liq_Thermobarometry
    Examples/Cpx_Cpx_Liq_Thermobarometry/MachineLearning_Cpx_Liq_Thermobarometry
    Examples/Cpx_Cpx_Liq_Thermobarometry/Pyroxene_Ternary_Cpx_Example
+   Examples/General_Plotting/Pyroxene_Classification_Kilauea
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liquid_melt_matching/Cpx_MeltMatch1_Gleeson2020
    Examples/Cpx_Cpx_Liq_Thermobarometry/Cpx_Liquid_melt_matching/Cpx_MeltMatch2_ScruggsPutirka2018
 
@@ -96,6 +97,7 @@ Welcome to Thermobar's documentation!
    Examples/Feldspar_Thermobarometry/Two_Feldspar_All_Possible_Pairs
    Examples/Feldspar_Thermobarometry/Fspar_Liq_Matching
    Examples/Feldspar_Thermobarometry/Fspar_Ternary_Plot
+   Examples/General_Plotting/Plagioclase_Classification_Kilauea
 
    %
 .. toctree::
