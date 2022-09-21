@@ -43,7 +43,7 @@ df_ideal_opx = pd.DataFrame(columns=['SiO2_Opx', 'TiO2_Opx', 'Al2O3_Opx',
 'Cr2O3_Opx'])
 
 df_ideal_gt = pd.DataFrame(columns=['SiO2_Gt', 'TiO2_Gt', 'Al2O3_Gt',
-'Cr2O3_Gt', 'FeOt_Gt', 'MnO_Gt', 'MgO_Gt', 'CaO_Gt', 'K2O_Gt', 'Na2O_Gt',
+'Cr2O3_Gt', 'FeOt_Gt', 'MnO_Gt', 'MgO_Gt', 'CaO_Gt', 'K2O_Gt', 'Na2O_Gt', 'NiO_Gt',
 'Ni_Gt', 'Ti_Gt', 'Zr_Gt', 'Zn_Gt', 'Ga_Gt', 'Sr_Gt', 'Y_Gt'])
 
 df_ideal_plag = pd.DataFrame(columns=['SiO2_Plag', 'TiO2_Plag', 'Al2O3_Plag',
@@ -83,7 +83,7 @@ df_ideal_opx_Err = pd.DataFrame(columns=['SiO2_Opx_Err', 'TiO2_Opx_Err',
  'Na2O_Opx_Err', 'K2O_Opx_Err', 'Cr2O3_Opx_Err', 'P_kbar_Err', 'T_K_Err'])
 
 df_ideal_Gt_Err = pd.DataFrame(columns = ['SiO2_Gt_Err', 'TiO2_Gt_Err', 'Al2O3_Gt_Err',
-'Cr2O3_Gt_Err', 'FeOt_Gt_Err', 'MnO_Gt_Err', 'MgO_Gt_Err', 'CaO_Gt_Err', 'K2O_Gt_Err', 'Na2O_Gt_Err',
+'Cr2O3_Gt_Err', 'FeOt_Gt_Err', 'MnO_Gt_Err', 'MgO_Gt_Err', 'CaO_Gt_Err', 'K2O_Gt_Err', 'Na2O_Gt_Err', 'NiO_Gt_Err',
 'Ni_Gt_Err', 'Ti_Gt_Err', 'Zr_Gt_Err', 'Zn_Gt_Err', 'Ga_Gt_Err', 'Sr_Gt_Err', 'Y_Gt_Err'])
 
 df_ideal_plag_Err = pd.DataFrame(columns=['SiO2_Plag_Err', 'TiO2_Plag_Err',
@@ -1019,6 +1019,23 @@ def calculate_mol_proportions_garnet(gt_comps):
             gt_comps['TiO2_Gt'][i] = (gt_comps['Ti_Gt'][i] * 1.6685) / 1e4
         except KeyError:
             pass
+        ni_pass = True
+        try:
+            gt_comps['Ni_Gt'][i]
+        except KeyError:
+            ni_pass = False
+            try:
+                gt_comps['NiO_Gt'][i]
+            except KeyError:
+                gt_comps['Ni_Gt'][i] = (gt_comps['NiO_Gt'][i] * 1e4) / 1.27259
+
+        if ni_pass == True:
+            try:
+                gt_comps['NiO_Gt'][i] = (gt_comps['Ni_Gt'][i] * 1.27259) / 1e4
+            except KeyError:
+                pass
+
+
     pd.options.mode.chained_assignment = 'warn'
     # This makes the input match the columns in the oxide mass dataframe
     gt_wt = gt_comps.reindex(oxide_mass_gt_df.columns, axis=1).fillna(0)
