@@ -225,6 +225,59 @@ Gt_P_funcs = {P_Ryan1996} # put on outside
 
 Gt_P_funcs_by_name = {p.__name__: p for p in Gt_P_funcs}
 
+def calculate_gt_only_press(*, gt_comps=None, equationP=None, T = None):
+
+    '''
+
+    Parameters
+    ------------
+
+    gt_comps: pandas.DataFrame
+        Gt compositions with column headings SiO2_Gt, MgO_Gt etc.
+
+    equationP: str
+        Choose from:
+
+        |  P_Ryan1996
+
+    T: Array
+        Estimated temperature of garnet the sample
+
+
+    Returns
+    -----------
+        pandas.Series: Pressure in kbar
+    '''
+
+    try:
+        func = Gt_P_funcs_by_name[equationP]
+    except KeyError:
+        raise ValueError(f'{equationT} is not a valid equation') from None
+
+    try:
+        func_T = Gt_T_funcs_by_name[equationT]
+    except KeyError:
+        raise ValueError(f'{equationT} is not a valid equation') from None
+
+    sig=inspect.signature(func)
+
+    if gt_comps is not None:
+        if sig.parameters['T'].default is not None:
+            if len(gt_comps) == len(T):
+                P = func(gt_comps, T)
+            else:
+                raise ValueError(f'{equationT} does not match fully the length of the gt_comps')
+        else:
+            raise ValueError(f'{equationP} requires you to enter T')
+    else:
+        raise ValueError(f'{equationP} requires you to enter gt_comps')
+
+
+    P_kbar_series = pd.Series(P)
+
+    return P_kbar_series
+
+
 def calculate_gt_only_press_temp(*, gt_comps=None, equationP=None, equationT = None):
 
     '''
@@ -246,10 +299,6 @@ def calculate_gt_only_press_temp(*, gt_comps=None, equationP=None, equationT = N
         |  T_Ryan1996
         |  T_Sudholz2021
         |  T_Canil1999
-
-    T: Array
-        Estimated temperature of garnet the sample
-
 
     Returns
     -----------
