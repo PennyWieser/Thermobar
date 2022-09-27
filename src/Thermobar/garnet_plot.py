@@ -306,8 +306,8 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 
 	carp_depleted_harz, carp_depleted_lherz, carp_depleted_metasomatised, carp_fertile_lherz, carp_melt_metas, carp_unclass, len_tot = garnet_CARP_class_Griffin2002(gt_comps = gt_comps) #determining CARP classes from garnet composition
 	cacr_class = garnet_ca_cr_class_Griffin2002(gt_comps = gt_comps)
-	g_class = garnet_class_Grutter2003(gt_comps = gt_comps)
-	MG = calculate_ol_mg(gt_comps = gt_comps, T_Ni = T_Ni, xMg = xMg, xCa = xCa, xFe = xFe) #calculating olivine magnesium number from garnet composition
+	g_class = garnet_class_Grutter2004(gt_comps = gt_comps)
+	MG = calculate_ol_mg(gt_comps = gt_comps, T_Ni = T_Ni) #calculating olivine magnesium number from garnet composition
 	AL = calculate_al2o3_whole_rock(gt_comps = gt_comps) #calculating Al2O3 whole rock from garnet compostion
 
 	depth_normal = np.zeros(len(P_Cr))

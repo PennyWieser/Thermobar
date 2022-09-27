@@ -222,12 +222,12 @@ def garnet_CARP_class_Griffin2002(gt_comps):
 
     return carp_depleted_harz, carp_depleted_lherz, carp_depleted_metasomatised, carp_fertile_lherz, carp_melt_metas, carp_unclass, len_tot
 
-def garnet_class_Grutter2003(gt_comps):
+def garnet_class_Grutter2004(gt_comps):
 
     '''
     A function to classify Cr-pyrope garnet xenocrysts according to
-    the study of Grutter et al. (2003)
-    :cite: `grutter2003`
+    the study of Grutter et al. (2004)
+    :cite: `grutter2004`
 
     ###Parameters###
     gt_comps: garnet composition dataframe imported from core function
@@ -248,7 +248,7 @@ def garnet_class_Grutter2003(gt_comps):
 
     if len(idx_critical_missing) > 0:
         print('WARNING')
-        print('There are critical components missing in some of the samples for Grutter2003 analysis. For these samples analyses might be wrong. idx list: ')
+        print('There are critical components missing in some of the samples for Grutter2004 analysis. For these samples analyses might be wrong. idx list: ')
         print(idx_critical_missing)
 
     if len(idx_na_missing) > 0:
@@ -581,7 +581,7 @@ def y_zr_classification_Griffin2002(gt_comps):
 
     return yzr_class
 
-def calculate_ol_mg(gt_comps, T_Ni, xMg, xCa, xFe):
+def calculate_ol_mg(gt_comps, T_Ni):
 
     '''
     A function to derive olivine Mg# from coxisting Cr-pyrope garnet xenocrysts.
@@ -599,6 +599,12 @@ def calculate_ol_mg(gt_comps, T_Ni, xMg, xCa, xFe):
     '''
 
     mg_ol = np.zeros(len(gt_comps['MgO_Gt']))
+
+    gt_calc = calculate_garnet_components(gt_comps = gt_comps)
+
+    xMg = np.array(gt_calc['Mg_MgFeCa_Gt'])
+    xCa = np.array(gt_calc['Ca_MgFeCa_Gt'])
+    xFe = np.array(gt_calc['Fe_MgFeCa_Gt'])
 
     T_Ni = np.array(T_Ni) - 273.0 #converting to celsius for calculations
 
