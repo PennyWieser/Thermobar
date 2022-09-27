@@ -1009,6 +1009,7 @@ def calculate_cat_fractions_olivine(ol_comps):
 
     return cat_frac_anhyd
 
+## Garnet stuff
 def calculate_mol_proportions_garnet(gt_comps):
 
     #Exchanging oxide measurements with element one if it exists.

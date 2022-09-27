@@ -254,7 +254,9 @@ def calculate_gt_only_press_temp(*, gt_comps=None, equationP=None, equationT = N
     Returns
     -----------
         pandas.Series: Pressure in kbar
+
     '''
+
 
     try:
         func = Gt_P_funcs_by_name[equationP]

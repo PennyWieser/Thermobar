@@ -3109,7 +3109,7 @@ return_input=False):
 
 
 
-def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
+def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, return_cpx=True, H2O_Liq=0):
     import warnings
     with w.catch_warnings():
         w.simplefilter('ignore')
@@ -3190,13 +3190,16 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, H2O_Liq=0):
             plt.xlabel('P_kbar')
             plt.xlim([-3, 16])
 
-    cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Petrelli20', 'T_Petrelli21_H2O',
+    cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Jorgenson22', 'P_Jorgenson22', 'T_Petrelli20', 'T_Petrelli21_H2O',
     'P_Petrelli21_H2O', 'T_Put_Teq32d_Peq32a', 'T_Put_Teq32d_Peq32b', 'P_Petrelli20',
-    'P_Put_Teq32d_Peq32a', 'P_Put_Teq32d_Peq32b']
+    'P_Put_Teq32d_Peq32a', 'P_Put_Teq32d_Peq32b', 'Jd_from 0=Na, 1=Al']
     cpx_comps_c_move = cpx_comps_c[cols_to_move + [
         col for col in cpx_comps_c.columns if col not in cols_to_move]]
 
-    return cpx_comps_c_move
+    if return_cpx is True:
+        return cpx_comps_c_move
+    if return_cpx is False:
+        return cpx_comps_c_move.iloc[:, 0:13]
 ## Function for calculating Cpx-only temperature
 Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol,
 T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Jorgenson2022_Cpx_only,

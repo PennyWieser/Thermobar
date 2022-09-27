@@ -855,3 +855,4 @@ def plot_garnet_composition_section(gt_comps, depth_interval, min_section_depth,
 				plt.savefig(filename_save, dpi = 300.0,bbox_inches = "tight")
 			except ValueError:
 				print('Not a proper format for the filename_save')
+	return plt
