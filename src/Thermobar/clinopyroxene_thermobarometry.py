@@ -2895,6 +2895,7 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
     combo_liq_cpx_fur_filt = combo_liq_cpx_fur_filt[cols_to_move + [
         col for col in combo_liq_cpx_fur_filt.columns if col not in cols_to_move]]
 
+    Liquid_sample_ID=combo_liq_cpx_fur_filt["Sample_ID_Liq"]
     combo_liq_cpx_fur_filt.drop(["Sample_ID_Liq"], axis=1, inplace=True)
     if T is not None:
         combo_liq_cpx_fur_filt.rename(columns={'T_K_calc': 'T_K_input'}, inplace=True)
@@ -2954,6 +2955,8 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
 
 
     print('Done!!! I found a total of N='+str(len(combo_liq_cpx_fur_filt)) + ' Cpx-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Cpx out of the N='+str(LenCpx)+' Cpx that you input matched to 1 or more liquids')
+
+    combo_liq_cpx_fur_filt['Sample_ID_Liq']=Liquid_sample_ID
 
     return {'Av_PTs': df1_M, 'All_PTs': combo_liq_cpx_fur_filt}
 
