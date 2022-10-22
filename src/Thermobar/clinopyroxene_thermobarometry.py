@@ -2524,7 +2524,7 @@ def arrange_all_cpx_liq_pairs(liq_comps, cpx_comps, H2O_Liq=None, Fe3Fet_Liq=Non
 
 
 def calculate_cpx_liq_press_temp_matching(*, liq_comps, cpx_comps, equationT=None,
-equationP=None, P=None, T=None, PMax=30,
+equationP=None, P=None, T=None, PMax=30, PMin=-10,
 Fe3Fet_Liq=None, Kd_Match="Putirka", Kd_Err=0.03, DiHd_Err=0.06, EnFs_Err=0.05, CaTs_Err=0.03, Cpx_Quality=False,
 H2O_Liq=None, return_all_pairs=False, iterations=30):
 
@@ -2622,9 +2622,12 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
 
        Default value of 30 kbar. Uses to apply a preliminary KdFe-Mg filter
        based on the T equation specified by the user.
-       Uses - 20 kbar as a lower filter.
-       Users can set a lower pressure to save computation time (E.g., if
-       reasonably sure crystals are forming above 10 kbar)
+
+
+    PMin: int or float, optional
+       Default value of -10 kbar. Uses to apply a preliminary KdFe-Mg filter
+       based on the T equation specified by the user.
+
 
     Returns: dict
 
@@ -2738,7 +2741,7 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
 
             # Initial Mg# filter, done by calculating temperature for extreme pressures,
             # e.g, 0 and 3 Gpa. Reduces number of P-T solving
-            PMin = -20
+            PMin = PMin
             PMax = PMax
             Kd_Err = Kd_Err
 

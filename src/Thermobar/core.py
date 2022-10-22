@@ -4035,6 +4035,12 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
     liquid compositions with calculated Fe3Fet_Liq, FeO_Liq, Fe2O3_Liq, and XFe3Fe2.
 
     '''
+    if any(liq_comps.columns=="Sample_ID_Liq"):
+        liq_comps_c=liq_comps.copy()
+    else:
+
+        liq_comps_c=liq_comps.copy()
+        liq_comps_c['Sample_ID_Liq']=liq_comps_c.index
     if isinstance(fo2, str):
         fo2_int=fo2
         if fo2_int=="NNO":
@@ -4049,7 +4055,7 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
 
 
 
-    liq_comps_c=liq_comps.copy()
+
     mol_frac_hyd_short=calculate_hydrous_mol_fractions_liquid(liq_comps_c)
     mol_frac_hyd=pd.concat([mol_frac_hyd_short, liq_comps_c], axis=1)
     To=1673.15
@@ -4112,8 +4118,10 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
 
 
     if renorm==False:
+        New_Oxide_out_nonorm['ln_XFe2FeO3_XFeO']=ln_XFe2FeO3_XFeO
         return New_Oxide_out_nonorm
     else:
+        New_Oxide_out_New_old_total['ln_XFe2FeO3_XFeO']=ln_XFe2FeO3_XFeO
         return New_Oxide_out_New_old_total
 
 ## Need some functions for calculating mole proportions with Fe partition
@@ -4241,7 +4249,8 @@ def convert_fo2_to_buffer(fo2=None, T_K=None, P_kbar=None):
 
 
 
-def convert_fe_partition_to_fo2(*, liq_comps, T_K, P_kbar,  model="Kress1991", renorm=False):
+def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", Fe3Fet_Liq=None,
+ renorm=False):
     '''
     Calculates delta fo2 relative to QFM and NNO buffer for liq compositions with FeO and Fe2O3
 
@@ -4250,6 +4259,7 @@ def convert_fe_partition_to_fo2(*, liq_comps, T_K, P_kbar,  model="Kress1991", r
 
     liq_comps: pandas.DataFrame
         Liquid compositions with column headings SiO2_Liq, MgO_Liq, FeO_Liq and Fe2O3_Liq etc.
+        Or, have FeOt_Liq and Fe3Fet_Liq terms. In which case, you can overwrite with
 
     T_K:  int, flt, pandas.Series
         Temperature in Kelvin (buffer positions are very T-sensitive)
@@ -4275,11 +4285,33 @@ def convert_fe_partition_to_fo2(*, liq_comps, T_K, P_kbar,  model="Kress1991", r
     liquid compositions with calculated Fe3FeT_Liq, FeO_Liq, Fe2O3_Liq, and XFe3Fe2.
 
     '''
-
     liq_comps_c=liq_comps.copy()
+    # If the input has FeO and Fe2O3 contents already
+    if any(liq_comps.columns=="FeO_Liq") and any(liq_comps.columns=="Fe2O3_Liq"):
+        print('using inputted FeO and Fe2O3 contents')
+        if Fe3Fet_Liq is not None:
+            print('sorry, you entered FeO and Fe2O3, so you cant overwrite Fe3Fet_Liq')
+        #liq_comps_c['FeOt_Liq']=liq_comps_c['FeO_Liq']+c['Fe2O3_Liq']*0.8998
+
+    # If the person specifies Fe3Fet in the function itself, overwrite the input
+    else:
+        if Fe3Fet_Liq is not None:
+            liq_comps_c['Fe3Fet_Liq']=Fe3Fet_Liq
+            print('overwriting Fe3Fet_Liq to that specified in the function input')
+
+    # If any of the columns contain Fe3Fet_Liq
+    if any(liq_comps_c.columns=="Fe3Fet_Liq") and any(liq_comps_c.columns=="FeOt_Liq"):
+        liq_comps_c['FeO_Liq']=liq_comps['FeOt_Liq']*(1-liq_comps_c['Fe3Fet_Liq'])
+        liq_comps_c['Fe2O3_Liq']=liq_comps['FeOt_Liq']*(liq_comps_c['Fe3Fet_Liq'])*1.11111
+
+
     mol_frac_hyd_redox=calculate_hydrous_mol_fractions_liquid_redox(liq_comps=liq_comps_c)
-    liq_comps_FeOt=liq_comps_c.copy()
-    liq_comps_FeOt['FeOt_Liq']=liq_comps_FeOt['FeO_Liq']+liq_comps_FeOt['Fe2O3_Liq']*0.8998
+    if any(liq_comps_c.columns=="FeOt_Liq"):
+        liq_comps_FeOt=liq_comps_c.copy()
+    else:
+        liq_comps_c['FeOt_Liq']=liq_comps_c['FeO_Liq']+liq_comps_c['Fe2O3_Liq']*0.8998
+        liq_comps_FeOt=liq_comps_c.copy()
+
     hyd_mol_frac_test=calculate_hydrous_mol_fractions_liquid(liq_comps=liq_comps_FeOt)
 
     # Calculating buffer positions from Frost 1991
@@ -4288,6 +4320,7 @@ def convert_fe_partition_to_fo2(*, liq_comps, T_K, P_kbar,  model="Kress1991", r
 
     logfo2_NNO=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
     fo2_NNO=10**logfo2_NNO
+
 
 
 
@@ -4308,6 +4341,7 @@ def convert_fe_partition_to_fo2(*, liq_comps, T_K, P_kbar,  model="Kress1991", r
 
     ln_fo2_calc=(Z-rightside)/0.196
     fo2_calc=np.exp(ln_fo2_calc)
+
     # and back to log base 10
     log_fo2_calc=np.log10(fo2_calc)
     DeltaQFM=log_fo2_calc-logfo2_QFM

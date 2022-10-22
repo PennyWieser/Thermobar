@@ -72,7 +72,8 @@ Fm2Si2O6, En_Opx, EnFs):
 def T_Put2008_eq36(P, *, EnFs, Fm2Si2O6, Ca_Cpx_cat_6ox,
                    CrCaTs, Mn_Opx_cat_6ox, Na_Opx_cat_6ox, En_Opx, Di_Opx):
     '''
-    Two-pyroxene thermometer of Putirka (2008) eq 36. Best for Cpx with Mg#>0.75
+    Two-pyroxene thermometer of Putirka (2008) eq 36. Best for Cpx with Mg#>0.75,
+    but calibrated using all.
     :cite:`putirka2008thermometers`
 
     SEE=+-45C for Cpx Mg#>0.75
@@ -87,7 +88,8 @@ def T_Put2008_eq36(P, *, EnFs, Fm2Si2O6, Ca_Cpx_cat_6ox,
 def T_Put2008_eq37(P, *, EnFs, Di_Cpx, Fm2Si2O6, Mn_Opx_cat_6ox,
                    FmAl2SiO6, Mg_Cpx_cat_6ox, Fet_Cpx_cat_6ox):
     '''
-    Two-pyroxene thermometer of Putirka (2008) eq 37. For Cpx with Mg#<0.75
+    Two-pyroxene thermometer of Putirka (2008) eq 37.
+    Calibrated on Cpx with Mg#>0.75
     :cite:`putirka2008thermometers`
 
     SEE=+-38C for Cpx Mg#>0.75
@@ -278,9 +280,9 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
     if sig.parameters['T'].default is not None:
         if T is None:
             raise ValueError(f'{equationP} requires you to enter T, or specify T="Solve"')
-    else:
-        if T is not None:
-            print('Youve selected a T-independent function')
+    # else:
+    #     if T is not None:
+    #         print('Youve selected a T-independent function')
 
     if isinstance(T, pd.Series):
         if cpx_comps is not None:
