@@ -461,6 +461,9 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
                                         H2O_Liq=H2O_Liq, eq_tests=eq_tests, P=P)
 
 
+    Fo=calculate_ol_fo(ol_comps=ol_comps)
+
+    CalcT.insert(1, 'Ol_Fo_Meas', Fo, )
 
 
 

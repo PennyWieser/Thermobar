@@ -29,7 +29,7 @@ def T_Shi_Test(P, *, MgO_Liq, SiO2_Liq, H2O_Liq):
 + (3.08839706*SiO2_Liq)
 - (61.64200793*(np.log(1+H2O_Liq)))
 + (61.13449845*P/10)
-)
+)+273.15
 
 
 def T_Put2008_eq14(P=None, *, Mg_Number_Liq_NoFe3, MgO_Liq,

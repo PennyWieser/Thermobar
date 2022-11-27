@@ -1022,20 +1022,20 @@ def T_Petrelli2020_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, meltm
         import Thermobar_onnx
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
-
-
     import onnxruntime as rt
-    sess = rt.InferenceSession(str(Thermobar_dir/"Petrelli2020_Cpx_Liq_Temp.onnx"))
-    #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
+    path=Path(Thermobar_onnx.__file__).parent
+    sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Temp.onnx"))
+
+
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
     Pred_T_K = sess.run([label_name], {input_name: x_test.astype(np.float32)})[0]
 
-    #df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test, ETR_Temp_P2020_Cpx_Liq)
-
 
     T_K=pd.Series(Pred_T_K[:, 0])
     return T_K
+
+
 
 ## Clinopyroxene-only pressure equations
 
@@ -1176,26 +1176,24 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
 
     x_test=Cpx_test_noID_noT.values
 
-
     try:
         import Thermobar_onnx
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
-    path=Path(Thermobar_onnx.__file__).parent
     import onnxruntime as rt
+    path=Path(Thermobar_onnx.__file__).parent
     sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Press.onnx"))
 
 
-    #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
     Pred_P_kbar = sess.run([label_name], {input_name: x_test.astype(np.float32)})[0]
 
-    #df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test, ETR_Temp_P2020_Cpx_Liq)
 
     P_kbar=pd.Series(Pred_P_kbar[:, 0])
-
     return P_kbar
+
+
 
 
 def P_Jorgenson2022_Cpx_only_Norm(T=None, *, cpx_comps):
@@ -1514,11 +1512,11 @@ def T_Put2008_eq32d_subsol(P, *, Ti_Cpx_cat_6ox, Fet_Cpx_cat_6ox, Al_Cpx_cat_6ox
 
 def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
     '''
-    Clinopyroxene-only  thermometer of Petrelli et al. (2021) based on
-    Machine Learning.
+    Clinopyroxene-only  thermometer using the method and training dataset of Petrelli et al. (2020) (although they didnt
+    provide a Cpx-only thermometer).
     :cite:`petrelli2020machine`
 
-    SEE==+-51°C
+    SEE= N/A
     '''
     Cpx_test_noID_noT=pd.DataFrame(data={'SiO2_Cpx': cpx_comps['SiO2_Cpx'],
                                 'TiO2_Cpx': cpx_comps['TiO2_Cpx'],
@@ -1708,17 +1706,18 @@ def T_Petrelli2020_Cpx_only_onnx(P=None, *, cpx_comps):
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
+    path=Path(Thermobar_onnx.__file__).parent
+    sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Temp.onnx"))
 
-    sess = rt.InferenceSession(str(Thermobar_dir/"Petrelli2020_Cpx_only_Temp.onnx"))
-    #sess = rt.InferenceSession(Petrelli2020_Cpx_Liq_Temp.onnx)
+
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
     Pred_T_K = sess.run([label_name], {input_name: x_test.astype(np.float32)})[0]
 
     #df_stats, df_voting=get_voting_stats_ExtraTreesRegressor(x_test, ETR_Temp_P2020_Cpx_Liq)
 
+
     T_K=pd.Series(Pred_T_K[:, 0])
-    # print(T_K)
     return T_K
 
 

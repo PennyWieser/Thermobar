@@ -228,6 +228,11 @@ filter_q=None, append=False):
     if any(Sample_c.columns.str.contains("_Ol")):
         elx = 'Ol'
 
+    if any(Sample_c.columns.str.contains('Sample_ID_{}'.format(elx))):
+        name=True
+    else:
+        Sample_c['Sample_ID_{}'.format(elx)]='No Name Entered'
+
     if len(Sample_c['Sample_ID_{}'.format(elx)].unique() ) !=  len(Sample_c):
         w.warn('Non unique sample names. We have appended the index onto all sample names to save issues with averaging later')
         TEST=Sample_c.index.values
@@ -321,7 +326,7 @@ filter_q=None, append=False):
 
         # This is for when users enter 2 dataframes, 1 of measurements, 1 of 1
         # sigma errors
-        Data = phase_comp
+        Data = Sample_c
 
 
 
@@ -358,8 +363,11 @@ filter_q=None, append=False):
 
         for i in range(0, len(Data)):
 
+            if len(Err) != len(Data):
+                raise Exception('Your data and error input data frames arent the same length')
             Sample_name_num[i * duplicates:(i * duplicates + duplicates)] = i
             Sample_name_str[i * duplicates:(i * duplicates + duplicates)] = Data['Sample_ID_{}'.format(elx)].iloc[i]
+
 
             SiO2_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['SiO2_{}'.format(
                 elx)].iloc[i], scale=Err['SiO2_{}_Err'.format(elx)].iloc[i], size=duplicates)
