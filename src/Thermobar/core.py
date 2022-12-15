@@ -4069,7 +4069,7 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
         #print(fo2)
 
     if model=="Put2016_eq6b":
-        ln_XFe2FeO3_XFeO=(-6.35+10813.8/T_K + 0.19*np.log(fo2)+ 12.4*(mol_frac_hyd['Na2O_Liq_mol_frac_hyd']
+        ln_XFe2FeO3_XFeO=(-6.53+10813.8/T_K + 0.19*np.log(fo2)+ 12.4*(mol_frac_hyd['Na2O_Liq_mol_frac_hyd']
          +mol_frac_hyd['K2O_Liq_mol_frac_hyd'])
         -3.44*(mol_frac_hyd['Al2O3_Liq_mol_frac_hyd']/(mol_frac_hyd['Al2O3_Liq_mol_frac_hyd']+mol_frac_hyd['SiO2_Liq_mol_frac_hyd']))
         +4.15*mol_frac_hyd['CaO_Liq_mol_frac_hyd'])
