@@ -2244,35 +2244,38 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
 
-        if 'Jorgenson' in equationT:
-            liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
-        if 'Jorgenson' in equationP:
-            liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
+        if equationT is not None:
+            if 'Jorgenson' in equationT:
+                liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
+        if equationP is not None:
+            if 'Jorgenson' in equationP:
+                liq_comps_c=normalize_liquid_jorgenson(liq_comps_c)
 
         Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(liq_comps=liq_comps_c,
         cpx_comps=cpx_comps)
 
+    if equationT is not None:
+        if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
+            T_func_all=calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs,
+            equationT=equationT, P="Solve")
+            T_func = T_func_all.T_K_calc
+            Median_T=T_func_all.Median_Trees
+            Std_T=T_func_all.Std_Trees
+            IQR_T=T_func_all.IQR_Trees
+        else:
+            T_func = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs, equationT=equationT, P="Solve")
 
-    if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
-        T_func_all=calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs,
-        equationT=equationT, P="Solve")
-        T_func = T_func_all.T_K_calc
-        Median_T=T_func_all.Median_Trees
-        Std_T=T_func_all.Std_Trees
-        IQR_T=T_func_all.IQR_Trees
-    else:
-        T_func = calculate_cpx_liq_temp(meltmatch=Combo_liq_cpxs, equationT=equationT, P="Solve")
-
-    if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
-        P_func_all=calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs,
+    if equationP is not None:
+        if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
+            P_func_all=calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs,
+                equationP=equationP, T="Solve")
+            P_func = P_func_all.P_kbar_calc
+            Median_P=P_func_all.Median_Trees
+            Std_P=P_func_all.Std_Trees
+            IQR_P=P_func_all.IQR_Trees
+        else:
+            P_func = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs,
             equationP=equationP, T="Solve")
-        P_func = P_func_all.P_kbar_calc
-        Median_P=P_func_all.Median_Trees
-        Std_P=P_func_all.Std_Trees
-        IQR_P=P_func_all.IQR_Trees
-    else:
-        P_func = calculate_cpx_liq_press(meltmatch=Combo_liq_cpxs,
-        equationP=equationP, T="Solve")
 
 
 
@@ -2317,18 +2320,19 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
                                     'T_K_calc': T_K_guess,
                                     'Delta_P_kbar_Iter': DeltaP,
                                     'Delta_T_K_Iter': DeltaT})
+        if equationP is not None:
+            if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
 
-        if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
+                PT_out.insert(4, "Median_Trees_P", Median_P)
+                PT_out.insert(5, "Std_Trees_P", Std_P)
+                PT_out.insert(6, "IQR_Trees_P", Std_P)
 
-            PT_out.insert(4, "Median_Trees_P", Median_P)
-            PT_out.insert(5, "Std_Trees_P", Std_P)
-            PT_out.insert(6, "IQR_Trees_P", Std_P)
-
-        if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
-            PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
-            PT_out.insert(len(PT_out.columns), "Std_Trees_T", Std_T)
-            PT_out.insert(len(PT_out.columns), "IQR_Trees_T", Std_T)
-        return PT_out
+        if equationT is not None:
+            if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
+                PT_out.insert(len(PT_out.columns), "Median_Trees_T", Median_T)
+                PT_out.insert(len(PT_out.columns), "Std_Trees_T", Std_T)
+                PT_out.insert(len(PT_out.columns), "IQR_Trees_T", Std_T)
+            return PT_out
     if eq_tests is True:
         if meltmatch is not None:
             eq_tests = calculate_cpx_liq_eq_tests(
@@ -2336,18 +2340,20 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         if meltmatch is None:
             eq_tests = calculate_cpx_liq_eq_tests(cpx_comps=cpx_comps,
             liq_comps=liq_comps, P=P_guess, T=T_K_guess)
-        if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
-            eq_tests.insert(5, "Median_Trees_P", Median_P)
-            eq_tests.insert(6, "Std_Trees_P", Std_P)
-            eq_tests.insert(7, "IQR_Trees_P", Std_P)
-        if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
-            if "Petrelli" in equationP or "Jorgenson" in equationP:
-                a=7
-            else:
-                a=4
-            eq_tests.insert(a+1, "Median_Trees_T", Median_T)
-            eq_tests.insert(a+2, "Std_Trees_T", Std_T)
-            eq_tests.insert(a+3, "IQR_Trees_T", Std_T)
+        if equationP is not None:
+            if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
+                eq_tests.insert(5, "Median_Trees_P", Median_P)
+                eq_tests.insert(6, "Std_Trees_P", Std_P)
+                eq_tests.insert(7, "IQR_Trees_P", Std_P)
+        if equationT is not None:
+            if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:
+                if "Petrelli" in equationP or "Jorgenson" in equationP:
+                    a=7
+                else:
+                    a=4
+                eq_tests.insert(a+1, "Median_Trees_T", Median_T)
+                eq_tests.insert(a+2, "Std_Trees_T", Std_T)
+                eq_tests.insert(a+3, "IQR_Trees_T", Std_T)
 
         eq_tests.insert(3,'Delta_P_kbar_Iter',DeltaP )
         eq_tests.insert(4,'Delta_T_K_Iter',DeltaT)
