@@ -380,14 +380,20 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
             " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")
 
     if any(my_input.columns.str.contains("FeO_")) and (all(my_input.columns.str.contains("FeOt_")==False)):
-        raise ValueError("No FeOt found. You've got a column heading with FeO. To avoid errors based on common EPMA outputs"
+
+        if any(my_input.columns.str.contains("FeO_Liq")) and any(my_input.columns.str.contains("Fe2O3_Liq")):
+            my_input_c['FeOt_Liq']=my_input_c['FeO_Liq']+my_input_c['Fe2O3_Liq']*0.89998
+
+
+        else:
+            raise ValueError("No FeOt found. You've got a column heading with FeO. To avoid errors based on common EPMA outputs"
         " thermobar only recognises columns with FeOt for all phases except liquid"
         " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")
 
-    if any(my_input.columns.str.contains("Fe2O3_")) and (all(my_input.columns.str.contains("FeOt_")==False)):
-        raise ValueError("No FeOt column found. You've got a column heading with Fe2O3. To avoid errors based on common EPMA outputs"
-        " thermobar only recognises columns with FeOt for all phases except liquid"
-        " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")
+    # if any(my_input.columns.str.contains("Fe2O3_")) and (all(my_input.columns.str.contains("FeOt_")==False)):
+    #     raise ValueError("No FeOt column found. You've got a column heading with Fe2O3. To avoid errors based on common EPMA outputs"
+    #     " thermobar only recognises columns with FeOt for all phases except liquid"
+    #     " where you can also enter a Fe3Fet_Liq heading used for equilibrium tests")
 
     if any(my_input.columns.str.contains("FeOT_")) and (all(my_input.columns.str.contains("FeOt_")==False)):
         raise ValueError("No FeOt column found. You've got a column heading with FeOT. Change to a lower case t")
@@ -774,7 +780,7 @@ def convert_to_vesical(liq_comps, T1, unit='Kelvin', Fe3Fet_Liq=None):
 
     '''
     df = liq_comps.copy()
-    if unit is Kelvin:
+    if unit=='Kelvin':
         df['Temp'] = T1 - 273.15
     else:
         df['Temp'] = T1
