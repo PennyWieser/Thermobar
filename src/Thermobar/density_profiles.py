@@ -5,10 +5,18 @@ import inspect
 
 
 def rasmussen(P_kbar):
-    """ Linear fit to the supporting information of Rasmussen et al. 2022,
-    overall best fit density vs. depth"""
+    """ 4th degree fit to the supporting information of Rasmussen et al. 2022,
+    overall best fit density vs. depth. Above 5.24 kbar, returns Nan"""
     P=P_kbar
-    D=3.784444149179223*P+0.2857169093579655
+    if P<5.2474630296099205:
+        b=-0.0025915704129682504
+        c=0.037299399171806996
+        d=-0.21276925206828018
+        e=4.273285349609203
+        f=0.00430844920014402
+        D= b*(P**4) + c*(P**3) + d*(P**2) + e*P + f
+    else:
+        D=np.nan
     return D
 
 def hill_zucca(P_kbar):
@@ -23,13 +31,13 @@ def hill_zucca(P_kbar):
 
 def ryan_lerner(P_kbar):
     """ Parameterization of Ryan 1987, actual equation from Lerner et al. 2021
-    After 16.88 km (455 MPa), assume density is 2.746, as density turns around again. Used for Hawaii
+    After 16.88 km (455 MPa), returns Nan
     """
     P=P_kbar*100
     if P<455.09090909:
         D=(4.578*10**(-8) *P**3) - (4.151*10**(-5) *P**2) + (4.652*10**(-2) *P)
     else:
-        D=P/(9.8*2.749643038642074)
+        D=np.nan
 
     return D
 
@@ -60,7 +68,7 @@ Profile_funcs_by_name= {p.__name__: p for p in Profile_funcs}
 
 
 ## Two and three step profiles
-def convert_pressure_depth_2step(P_kbar=None, d1=None, rho1=None, rho2=None):
+def convert_pressure_depth_2step(P_kbar=None, d1=None, rho1=None, rho2=None, g=9.81):
     """ Converts Pressure to depth using a 2 step profile for int or float
 
     Parameters
@@ -85,21 +93,21 @@ def convert_pressure_depth_2step(P_kbar=None, d1=None, rho1=None, rho2=None):
     """
 
     d1_SI=d1*1000
-    P_step1=(9.81*rho1*d1_SI)/100000000
+    P_step1=(g*rho1*d1_SI)/100000000
     # print('Pressure Moho in kbar')
     # print(P_Moho)
     if P_kbar<P_step1:
-        depth_km=10**(-3)*((P_kbar*100000000))/(9.8*rho1)
+        depth_km=10**(-3)*((P_kbar*100000000))/(g*rho1)
     if P_kbar>=P_step1:
         P_belowstep1=P_kbar-P_step1
         # print('P below  Moho')
         # print(P_belowMoho)
-        depth_km_bm=10**(-3)*((P_belowstep1*100000000)/(9.8*rho2))
+        depth_km_bm=10**(-3)*((P_belowstep1*100000000)/(g*rho2))
         depth_km=d1+depth_km_bm
 
     return depth_km
 
-def loop_pressure_depth_2step(P_kbar=None, d1=14, rho1=2800, rho2=3100):
+def loop_pressure_depth_2step(P_kbar=None, d1=14, rho1=2800, rho2=3100, g=9.81):
 
     """ Converts Pressure to depth using a 2 step profile for a pandas.Series of presssures
 
@@ -125,17 +133,17 @@ def loop_pressure_depth_2step(P_kbar=None, d1=14, rho1=2800, rho2=3100):
     """
     if type(P_kbar) is int or type(P_kbar) is float:
         depth_km_loop=convert_pressure_depth_2step(P_kbar,
-            d1=d1, rho1=rho1, rho2=rho2)
+            d1=d1, rho1=rho1, rho2=rho2, g=g)
     else:
         depth_km_loop=np.empty(len(P_kbar))
         for i in range(0, len(P_kbar)):
             depth_km_loop[i]=convert_pressure_depth_2step(P_kbar[i],
-            d1=d1, rho1=rho1, rho2=rho2)
+            d1=d1, rho1=rho1, rho2=rho2, g=g)
     return depth_km_loop
 
 
 def convert_pressure_depth_3step(P_kbar=None, d1=5, d2=14,
-                                 rho1=2700, rho2=3000, rho3=3100):
+                                 rho1=2700, rho2=3000, rho3=3100, g=9,81):
     """ Converts Pressure to depth using a 3 step profile for int or float
 
     Parameters
@@ -168,29 +176,29 @@ def convert_pressure_depth_3step(P_kbar=None, d1=5, d2=14,
 
     d1_SI=d1*1000
     d2_SI=d2*1000
-    P_Step1=(9.81*rho1*d1_SI)/100000000
-    P_Step2=P_Step1+(9.81*(d2_SI-d1_SI)*rho2)/100000000
+    P_Step1=(g*rho1*d1_SI)/100000000
+    P_Step2=P_Step1+(g*(d2_SI-d1_SI)*rho2)/100000000
     # print('Pressure Moho in kbar')
     # print(P_Moho)
     if P_kbar<P_Step1:
-        depth_km=10**(-3)*((P_kbar*100000000))/(9.8*rho1)
+        depth_km=10**(-3)*((P_kbar*100000000))/(g*rho1)
     if P_kbar>=P_Step1 and P_kbar<P_Step2:
         P_belowStep2=P_kbar-P_Step1
         # print('P below  Moho')
         # print(P_belowMoho)
-        depth_km_bm=10**(-3)*((P_belowStep2*100000000)/(9.8*rho2))
+        depth_km_bm=10**(-3)*((P_belowStep2*100000000)/(g*rho2))
         depth_km=d1+depth_km_bm
     if P_kbar>=P_Step2:
         P_belowstep2=P_kbar-P_Step2
         # print('P below  Moho')
         # print(P_belowMoho)
-        depth_km_bm=10**(-3)*((P_belowstep2*100000000)/(9.8*rho3))
+        depth_km_bm=10**(-3)*((P_belowstep2*100000000)/(g*rho3))
         depth_km=d2+depth_km_bm
 
     return depth_km
 
 def loop_pressure_depth_3step(P_kbar=None,  d1=5, d2=14,
-                                 rho1=2700, rho2=3000, rho3=3100):
+                                 rho1=2700, rho2=3000, rho3=3100, g=9.81):
 
     """ Converts Pressure to depth using a 3 step profile for pd.Series
 
@@ -223,13 +231,13 @@ def loop_pressure_depth_3step(P_kbar=None,  d1=5, d2=14,
     """
     if type(P_kbar) is int or type(P_kbar) is float:
         depth_km_loop=convert_pressure_depth_3step(P_kbar,
-            d1=d1, rho1=rho1, rho2=rho2)
+            d1=d1, rho1=rho1, rho2=rho2, g=g)
     else:
 
         depth_km_loop=np.empty(len(P_kbar))
         for i in range(0, len(P_kbar)):
             depth_km_loop[i]=convert_pressure_depth_3step(P_kbar[i],
-            d1=d1, d2=d2,rho1=rho1, rho2=rho2, rho3=rho3)
+            d1=d1, d2=d2,rho1=rho1, rho2=rho2, rho3=rho3, g=g)
     return depth_km_loop
 
 
@@ -302,7 +310,7 @@ d1=None, d2=None,rho1=None, rho2=None, rho3=None, model=None):
 
     # Check, is it an integer, If so just calculate depth
     if type(crust_dens_kgm3)==int or type(crust_dens_kgm3)==float:
-        D=10**5*P_kbar/(9.8*crust_dens_kgm3)
+        D=10**5*P_kbar/(g*crust_dens_kgm3)
         model=None
 
 
@@ -314,7 +322,7 @@ d1=None, d2=None,rho1=None, rho2=None, rho3=None, model=None):
                 model=crust_dens_kgm3.iloc[0]
             else:
                 model=None
-                D=10**5*P_kbar/(9.8*crust_dens_kgm3)
+                D=10**5*P_kbar/(g*crust_dens_kgm3)
 
         # Check if its just a single string
         elif type(crust_dens_kgm3)==str:
@@ -327,14 +335,14 @@ d1=None, d2=None,rho1=None, rho2=None, rho3=None, model=None):
             if d1 is None or rho1 is None or rho2 is None:
                 raise Exception('You have selected the two-step model, You must enter d1 (km), rho1 and rho2 (kg/m3)')
             D=loop_pressure_depth_2step(P_kbar=P_kbar,
-            d1=d1, rho1=rho1, rho2=rho2)
+            d1=d1, rho1=rho1, rho2=rho2, g=g)
 
         if model == "three-step":
             if d1 is None or d2 is None or rho1 is None or rho2 is None or rho3 is None:
                 raise Exception('You have selected the two-step model, You must enter d1 and d2 (km), rho1, rho2 and rho3 (kg/m3)')
 
             D=loop_pressure_depth_3step(P_kbar=P_kbar,
-            d1=d1, d2=d2, rho1=rho1, rho2=rho2, rho3=rho3)
+            d1=d1, d2=d2, rho1=rho1, rho2=rho2, rho3=rho3, g=g)
 
         if model !="two-step" and model != "three-step":
             try:
@@ -363,9 +371,7 @@ d1=None, d2=None,rho1=None, rho2=None, rho3=None, model=None):
 
     D_series=pd.Series(D)
 
-    if g != 9.81:
-        print('You specified a g that wasnt 9.81, ive adjusted the profiles accordingly')
-        D_series=D_series*(9.81/g)
+
 
     return D_series
 

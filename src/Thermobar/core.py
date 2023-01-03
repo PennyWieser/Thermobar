@@ -4195,7 +4195,7 @@ def convert_fo2_to_buffer(fo2=None, T_K=None, P_kbar=None):
     based on user-entered T in Kelvin and P in kbar
     """
     logfo2=np.log10(fo2)
-# NNO Buffer position from frost (1991)
+    # NNO Buffer position from frost (1991)
     logfo2_NNO=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
 
     fo2_NNO=10**logfo2
