@@ -116,7 +116,7 @@ def import_lepr_file(filename):
     pandas DataFrames stored in a dictionary. E.g., Access Cpxs using output.Cpxs
         my_input = pandas dataframe of the entire spreadsheet
         mylabels = sample labels
-        Experimental_press_temp = User-entered PT
+        Experimental_PT = User-entered PT
         Fluid=pandas dataframe of fluid compositions
         Liqs=pandas dataframe of liquid oxides
         Ols=pandas dataframe of olivine oxides
@@ -136,7 +136,10 @@ def import_lepr_file(filename):
     if "Experiment" in sheet_names:
         my_input_Exp = pd.read_excel(filename, sheet_name="Experiment")
         myExp = pd.DataFrame(data={'Citation': my_input_Exp['Citation'], 'Experiment': my_input_Exp['Experiment'],
-                                   'T_K': my_input_Exp['T (C)'] + 273.15, 'P_kbar': 10 * my_input_Exp['P (GPa)']}
+                                   'T_K': my_input_Exp['T (C)']+273.15, 'P_kbar': 10*my_input_Exp['P (GPa)'],
+                                   'Duration': my_input_Exp['Duration (hours)'],
+                                   'Laboratory': my_input_Exp['Laboratory']
+                                   }
                              )
     if "Experiment" not in sheet_names:
         myExp = pd.DataFrame()
@@ -156,7 +159,7 @@ def import_lepr_file(filename):
         my_input_Plag = pd.read_excel(
             filename, sheet_name="Plagioclase").fillna(0)
         my_input_Plag['FeOT value'] = my_input_Plag['FeO value'] + \
-            0.89998 * my_input_Plag['Fe2O3 value']
+            0.89998*my_input_Plag['Fe2O3 value']
         myPlag = pd.DataFrame(data={'Experiment': my_input_Plag['Experiment'],
                                     'SiO2_Plag': my_input_Plag['SiO2 value'],
                                     'TiO2_Plag': my_input_Plag['TiO2 value'],
@@ -178,20 +181,28 @@ def import_lepr_file(filename):
         my_input_Cpx = pd.read_excel(
             filename, sheet_name="Clinopyroxene").fillna(0)
         my_input_Cpx['FeOT value'] = my_input_Cpx['FeO value'] + \
-            0.89998 * my_input_Cpx['Fe2O3 value']
+            0.89998*my_input_Cpx['Fe2O3 value']
         myCpx = pd.DataFrame(data={'Experiment': my_input_Cpx['Experiment'],
                                    'SiO2_Cpx': my_input_Cpx['SiO2 value'],
                                    'TiO2_Cpx': my_input_Cpx['TiO2 value'],
+                                   'TiO2_Cpx_Err': my_input_Cpx['TiO2 error'],
                                    'Al2O3_Cpx': my_input_Cpx['Al2O3 value'],
+                                   'Al2O3_Cpx_Err': my_input_Cpx['Al2O3 error'],
                                    'FeOt_Cpx': my_input_Cpx['FeOT value'],
                                    'MnO_Cpx': my_input_Cpx['MnO value'],
                                    'MgO_Cpx': my_input_Cpx['MgO value'],
                                    'CaO_Cpx': my_input_Cpx['CaO value'],
                                    'Na2O_Cpx': my_input_Cpx['Na2O value'],
+                                    'Na2O_Cpx_Err': my_input_Cpx['Na2O error'],
                                    'K2O_Cpx': my_input_Cpx['K2O value'],
                                    'Cr2O3_Cpx': my_input_Cpx['Cr2O3 value'],
                                    'P2O5_Cpx': my_input_Cpx['P2O5 value']})
+        if 'n' in my_input_Cpx.columns:
+            myCpx['N_meas_Cpx']=my_input_Cpx['n']
+        if 'Number of analyses' in my_input_Cpx.columns:
+            myCpx['N_meas_Cpx']=my_input_Cpx['Number of analyses']
         myCpx_Exp = pd.merge(myCpx, myExp, on="Experiment")
+
 
     if "Clinopyroxene" not in sheet_names:
         myCpx = pd.DataFrame()
@@ -201,7 +212,7 @@ def import_lepr_file(filename):
         my_input_Opx = pd.read_excel(
             filename, sheet_name="Orthopyroxene").fillna(0)
         my_input_Opx['FeOT value'] = my_input_Opx['FeO value'] + \
-            0.89998 * my_input_Opx['Fe2O3 value']
+            0.89998*my_input_Opx['Fe2O3 value']
         myOpx = pd.DataFrame(data={'Experiment': my_input_Opx['Experiment'],
                                    'SiO2_Opx': my_input_Opx['SiO2 value'],
                                    'TiO2_Opx': my_input_Opx['TiO2 value'],
@@ -219,10 +230,11 @@ def import_lepr_file(filename):
     if "Orthopyroxene" not in sheet_names:
         myOpx = pd.DataFrame()
         myOpx_Exp = pd.DataFrame()
+
     if "Liquid" in sheet_names:
         my_input_Liq = pd.read_excel(filename, sheet_name="Liquid").fillna(0)
         my_input_Liq['FeOT value'] = my_input_Liq['FeO value'] + \
-            0.89998 * my_input_Liq['Fe2O3 value']
+            0.89998*my_input_Liq['Fe2O3 value']
         myLiq = pd.DataFrame(data={'Experiment': my_input_Liq['Experiment'],
                                    'SiO2_Liq': my_input_Liq['SiO2 value'],
                                    'TiO2_Liq': my_input_Liq['TiO2 value'],
@@ -235,7 +247,11 @@ def import_lepr_file(filename):
                                    'K2O_Liq': my_input_Liq['K2O value'],
                                    'Cr2O3_Liq': my_input_Liq['Cr2O3 value'],
                                    'P2O5_Liq': my_input_Liq['P2O5 value'],
-                                   'H2O_Liq': my_input_Liq['H2O value']})
+                                   'H2O_Liq': my_input_Liq['H2O value'],
+                                   'Total': my_input_Liq['total value']})
+        if 'n' in my_input_Liq.columns:
+            myLiq['N_meas_Liq']=my_input_Liq['n']
+
         myLiq_Exp = pd.merge(myLiq, myExp, on="Experiment")
     if "Liquid" not in sheet_names:
         myLiq = pd.DataFrame()
@@ -244,7 +260,7 @@ def import_lepr_file(filename):
         my_input_Amp = pd.read_excel(
             filename, sheet_name="Amphibole").fillna(0)
         my_input_Amp['FeOT value'] = my_input_Amp['FeO value'] + \
-            0.89998 * my_input_Amp['Fe2O3 value']
+            0.89998*my_input_Amp['Fe2O3 value']
         myAmp = pd.DataFrame(data={'Experiment': my_input_Amp['Experiment'],
                                    'SiO2_Amp': my_input_Amp['SiO2 value'],
                                    'TiO2_Amp': my_input_Amp['TiO2 value'],
@@ -266,7 +282,7 @@ def import_lepr_file(filename):
     if "Olivine" in sheet_names:
         my_input_Ol = pd.read_excel(filename, sheet_name="Olivine").fillna(0)
         my_input_Ol['FeOT value'] = my_input_Ol['FeO value'] + \
-            0.89998 * my_input_Ol['Fe2O3 value']
+            0.89998*my_input_Ol['Fe2O3 value']
         myOl = pd.DataFrame(data={'Experiment': my_input_Ol['Experiment'],
                             'SiO2_Ol': my_input_Ol['SiO2 value'],
                                   'TiO2_Ol': my_input_Ol['TiO2 value'],
@@ -285,9 +301,8 @@ def import_lepr_file(filename):
         myOl = pd.DataFrame()
         myOl_Exp = pd.DataFrame()
 
-    return {'Experimental_press_temp': myExp, 'Liquids': myLiq, 'Liqs_Exp': myLiq_Exp, 'Fluids': myFluid, 'Fluids_Exp': myFluid_Exp, 'Plags': myPlag, 'Plags_Exp': myPlag_Exp,
-            'Cpxs': myCpx, 'Cpxs_Exp': myCpx_Exp, 'Opxs': myOpx, 'Opxs_Exp': myOpx_Exp, 'Amps': myAmp, 'Amps_Exp': myAmp_Exp, 'Ols_Exp': myOl_Exp}
-    # 'Experimental_press_temp':Experimental_press_temp1, 'Cpxs': myCPXs1, 'Opxs': myOPXs1, 'Liqs':myLiquids1, 'Plags': myPlags1, 'Kspars': myKspars1,'Amps': myAmphs1, 'Ols': myOls1, 'Sps': mySps1}#,
+    return {'Experimental_PT': myExp, 'Liquids': myLiq, 'Liqs_Exp': myLiq_Exp, 'Fluids': myFluid, 'Fluids_Exp': myFluid_Exp, 'Plags': myPlag, 'Plags_Exp': myPlag_Exp,
+            'Cpxs': myCpx,  'Cpxs_Exp': myCpx_Exp, 'Opxs': myOpx, 'Opxs_Exp': myOpx_Exp, 'Amps': myAmp, 'Amps_Exp': myAmp_Exp, 'Ols_Exp': myOl_Exp}
 
 
 # Loading Excel, returns a disctionry

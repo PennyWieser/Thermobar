@@ -143,7 +143,7 @@ def loop_pressure_depth_2step(P_kbar=None, d1=14, rho1=2800, rho2=3100, g=9.81):
 
 
 def convert_pressure_depth_3step(P_kbar=None, d1=5, d2=14,
-                                 rho1=2700, rho2=3000, rho3=3100, g=9,81):
+                                 rho1=2700, rho2=3000, rho3=3100, g=9.81):
     """ Converts Pressure to depth using a 3 step profile for int or float
 
     Parameters
