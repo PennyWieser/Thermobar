@@ -2,31 +2,10 @@
 Available mineral and mineral-melt equations
 ================================================
 
-.. contents::
+You can find a pdf showing all the different equations on the Github page
 
-Liquid equations
-============================
-.. image:: img/Liquid_thermometry_CheatSheet.png
+https://github.com/PennyWieser/Thermobar/blob/main/docs/img/All_Phases_Docs_Merged.pdf
 
-Olivine equations
-============================
+This is the best reference, as it will be updated as we add more models! You can easily download it using this 'download button', and then can ctrlF for your function of interest!
 
-.. image:: img/Just_Ol.png
-
-Pyroxene equations
-============================
-.. image:: img/Cheat_Sheet_Clinoyroxene_Ticks1.png
-.. image:: img/Cheat_Sheet_Clinoyroxene_Ticks2.png
-
-Feldspar equations
-============================
-
-.. image:: img/Cheat_Sheet_JustFel.png
-
-Amphibole equations
-============================
-.. image:: img/Cheat_Sheet_Amp.pdf
-
-.. image:: img/Amphibole_Chemometers.png
-
-
+.. image:: img/Download_Github.jpg
