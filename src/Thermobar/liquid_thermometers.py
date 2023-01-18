@@ -81,6 +81,16 @@ def T_Helz1987_MgO(P=None, *, MgO_Liq):
     return (20.1 * MgO_Liq + 1014 + 273.15)
 
 
+def T_Shea2022_MgO(P=None, *, MgO_Liq):
+    '''
+    Liquid-only thermometer for olivine-saturated liquids:
+    Shea et al. (2022) adaptation of Helz and Thornber
+    :cite:``
+
+    SEE=±10 °C
+    '''
+    return (21.2 * MgO_Liq + 1017 + 273.15)
+
 def T_Montierth1995_MgO(P=None, *, MgO_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids:
