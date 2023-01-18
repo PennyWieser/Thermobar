@@ -25,7 +25,7 @@ Feldspar equations
 
 Amphibole equations
 ============================
-.. image:: img/Cheat_Sheet_Amp.png
+.. image:: img/Cheat_Sheet_Amp.pdf
 
 .. image:: img/Amphibole_Chemometers.png
 
