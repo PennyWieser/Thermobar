@@ -153,7 +153,7 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
             Eq_ol_0325 = 1 / ((0.345 / Mgno) + (1 - 0.345))
             Eq_ol_0345 = 1 / ((0.325 / Mgno) + (1 - 0.325))
             Kd_out_shea = pd.DataFrame(data={'Eq Fo (Shea, Kd=0.335)': Eq_ol_0335,
-                                    'Eq Fo (SheaRoeder, Kd=0.325)': Eq_ol_0325, 'Eq Fo (Shea, Kd=0.345)': Eq_ol_0345})
+                                    'Eq Fo (Shea, Kd=0.325)': Eq_ol_0325, 'Eq Fo (Shea, Kd=0.345)': Eq_ol_0345})
 
         if Kd_model == "Roeder1970" or Kd_model == "All":
             Eq_ol_03 = 1 / ((0.3 / Mgno) + (1 - 0.3))
