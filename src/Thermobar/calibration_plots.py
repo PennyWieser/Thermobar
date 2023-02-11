@@ -40,6 +40,10 @@ def return_cali_dataset(model=None):
         PLAGIOCLASE
         Waters2015: Waters and Lange (2015) for plag-liq hygrometry
         Masotta2019: Masotta et al. (2019) plag-liq hygrometry
+
+        LIQUID
+        Shea2022: Shea et al. (2022) for Ol MgO thermometry and Kd values
+
     """
 
     # Amphibole models
@@ -63,6 +67,12 @@ def return_cali_dataset(model=None):
     if model=="Mutch2016":
         with open(Thermobar_dir/'Mutch_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
+
+    # Liq model
+    if model=="Shea2022":
+        with open(Thermobar_dir/'Shea2022_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+
 
     # Cpx model
     if model=="Wang2021":

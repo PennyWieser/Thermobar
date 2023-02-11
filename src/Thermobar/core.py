@@ -3855,7 +3855,7 @@ P, T):
             if Obs_Kd_Ab_An.iloc[i]>=0.05 and Obs_Kd_Ab_An.iloc[i]<=0.15:
                 relevantT[i] = 'Low T: Yes'
             else:
-                relevantT[i] = 'Low T: Yes'
+                relevantT[i] = 'Low T: No'
         if T[i] >= (1050+273.15):
             if Obs_Kd_Ab_An.iloc[i]>=0.17 and Obs_Kd_Ab_An.iloc[i]<=0.39:
                 relevantT[i] = 'High T: Yes'
