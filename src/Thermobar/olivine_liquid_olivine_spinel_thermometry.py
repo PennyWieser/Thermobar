@@ -115,7 +115,12 @@ P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
          return H2O_Calc
 
     if eq_tests is False and meltmatch is not None:
-        Liq_Ols.insert(0, 'H2O_calc', H2O_Calc)
+        if 'H2O_calc' in Liq_Ols.columns:
+            print("Column already exists in dataframe. Have ovewritten")
+            Liq_Ols['H2O_calc']=H2O_Calc
+
+        else:
+            Liq_Ols.insert(0, 'H2O_calc', H2O_Calc)
 
     if eq_tests is True:
         if P is None:
