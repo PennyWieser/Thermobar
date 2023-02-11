@@ -18,11 +18,8 @@ and machine learning packages in Python to easily produce new thermobarometry, h
 Thermobar can be downloaded via pip, on Github (you are here!), and extensive documentation and 
 example videos and Jupyter Notebooks are available at https://thermobar.readthedocs.io/en/latest/index.html
 
-We hope to submit Thermobar in the fall, for now please cite my GSA abstract:
-Penny Wieser, Maurizio Petrelli, Jordan Lubbers, Eric Wieser, Adam Kent, Christy Till. 
-Thermobar: A critical evaluation of mineral-melt thermobarometry and hygrometry in arc magmas using a new open-source Python3 tool.
-Geological Society of America Abstracts with Programs. Vol 53, No. 6. https://doi.org/10.1130/abs/2021AM-367080.
-
+Find more information in Volcanica - and please make sure you cite this work!!!
+https://www.jvolcanica.org/ojs/index.php/volcanica/article/view/161
 ________________________________
 Want your model in Thermobar?
 ________________________________

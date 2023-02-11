@@ -2,6 +2,9 @@
 Change Log
 ================================================
 
+Version 1.0.11, Feb 22th, 2023
+================================
+Fixed bug, in old version, T<1300 K, code returned 'Pass' for An-Ab in plag-liq, even if fail. Kd value was correct, just string was wrong. Thanks to Bryant platt for spotting this one.
 
 Version 0.12 Nov 23rd, 2021
 ================================
