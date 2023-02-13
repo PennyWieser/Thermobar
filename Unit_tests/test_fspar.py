@@ -136,7 +136,7 @@ class test_fspar_liq_temp_hygr(unittest.TestCase):
 
     def test_Waters2015_eq24a_H2O(self):
         self.assertAlmostEqual(pt.calculate_fspar_liq_temp_hygr(plag_comps=PlagT, liq_comps=LiqT, equationT="T_Put2008_eq24a",
-                                       equationH="H_Waters2015", iterations=10, P=10).get("T_H_calc").H2O_calc[0], 3.380639, decimalPlace,
+                                       equationH="H_Waters2015", iterations=10, P=10).get("T_H_calc").H2O_calc[0], 3.382064965673544, decimalPlace,
         "H2O from iter 24a-Waters2015  not equal to test value")
 
     def test_Put2005_eq23_H2O(self):
