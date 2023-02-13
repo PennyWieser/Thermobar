@@ -36,6 +36,7 @@ setup(
             'matplotlib',
             'scikit-learn',
             'scipy',
+            'tqdm',
             'statsmodels',
             'openpyxl',
             ],
