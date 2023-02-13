@@ -1,8 +1,12 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.12, Feb 13th, 2023
+================================
+If a user entered Kspar comps into plag-liq functions, returned Nan for eq tests, broke loop. Have fixed to add warning if you enter An<0.05, and also to not return yes or no if T is Nan
+Have also updated examples to get users to plot input fspar on a ternary diagram.
 
-Version 1.0.11, Feb 22th, 2023
+Version 1.0.11, Feb 11th, 2023
 ================================
 Fixed bug, in old version, T<1300 K, code returned 'Pass' for An-Ab in plag-liq, even if fail. Kd value was correct, just string was wrong. Thanks to Bryant platt for spotting this one.
 

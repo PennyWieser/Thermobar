@@ -3856,11 +3856,14 @@ P, T):
                 relevantT[i] = 'Low T: Yes'
             else:
                 relevantT[i] = 'Low T: No'
-        if T[i] >= (1050+273.15):
+        elif T[i] >= (1050+273.15):
             if Obs_Kd_Ab_An.iloc[i]>=0.17 and Obs_Kd_Ab_An.iloc[i]<=0.39:
                 relevantT[i] = 'High T: Yes'
             else:
                 relevantT[i] = 'High T: No'
+
+        else:
+            relevantT[i]='Temp Nan, test cant be performed'
 
 
     Delta_An=abs(Pred_An_EqE-combo_plag_liq['An_Plag'])
@@ -3875,6 +3878,7 @@ P, T):
     combo_plag_liq.insert(5, 'Pred_Ab_EqF', Pred_Ab_EqF)
     combo_plag_liq.insert(6, 'Pred_Or_EqG', Pred_Or_EqG)
     combo_plag_liq.insert(7, 'Obs_Kd_Ab_An', Obs_Kd_Ab_An)
+
     return combo_plag_liq
 
 ## Feldspar compnents of Elkins and Grove, adapted directly from Putirka (2008) supplementay spreadsheet
