@@ -346,6 +346,8 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
             my_input = pd.read_excel(filename)
             #my_input[my_input < 0] = 0
 
+    if any(my_input.columns.str.startswith(' ')):
+        w.warn('your input file has some columns that start with spaces. This could cause you big problems if they are at the start of oxide names. Please ammend your file and reload.')
     if suffix is not None:
         if any(my_input.columns.str.contains(suffix)):
             w.warn('We notice you have specified a suffix, but some of your columns already have this suffix. '

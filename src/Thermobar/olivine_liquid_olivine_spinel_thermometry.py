@@ -463,7 +463,7 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
           " Liq-Ol pairs, be patient if this is >>1 million!")
 
     CalcT=calculate_ol_liq_temp(equationT=equationT, meltmatch=Combo_Ol_liqs, Fe3Fet_Liq=Fe3Fet_Liq,
-                                        H2O_Liq=H2O_Liq, eq_tests=eq_tests, P=P)
+    H2O_Liq=H2O_Liq, eq_tests=eq_tests, P=P)
 
 
     Fo=calculate_ol_fo(ol_comps=ol_comps)
@@ -672,8 +672,9 @@ def calculate_ol_liq_temp(*, equationT, liq_comps=None, ol_comps=None, meltmatch
         DeltaKd_Toplis = KdFeMg_Meas - Kd_Toplis_calc
         DeltaKd_Roeder = KdFeMg_Meas - 0.3
         DeltaKd_Matzen = KdFeMg_Meas - 0.34
+        DeltaKd_Shea= KdFeMg_Meas-0.335
         df = pd.DataFrame(data={'T_K_calc': T_K, 'Kd Meas': KdFeMg_Meas, 'Kd calc (Toplis)': Kd_Toplis_calc,
-                                'ΔKd, Toplis (M-P)': DeltaKd_Toplis, 'ΔKd, Roeder (M-P)': DeltaKd_Roeder, 'ΔKd, Matzen (M-P)': DeltaKd_Matzen})
+                                'ΔKd, Toplis (M-P)': DeltaKd_Toplis, 'ΔKd, Roeder (M-P)': DeltaKd_Roeder, 'ΔKd, Matzen (M-P)': DeltaKd_Matzen, 'ΔKd, Shea (M-P)': DeltaKd_Shea})
         df_out = pd.concat([df, Liq_Ols], axis=1)
 
         return df_out
