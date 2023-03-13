@@ -470,9 +470,9 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
 
     CalcT.insert(1, 'Ol_Fo_Meas', Fo, )
 
+    df_out=pd.concat([CalcT, Combo_Ol_liqs_1], axis=1)
 
-
-    return CalcT
+    return df_out
 
 
 

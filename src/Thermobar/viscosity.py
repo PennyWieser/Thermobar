@@ -60,7 +60,15 @@ def normalize_anhydrous_to_100_incF_mol_prop(liq_comps, F2O_content=0):
     liq_comps_C['CaO_Liq']+liq_comps_C['Na2O_Liq']+liq_comps_C['K2O_Liq']+
     liq_comps_C['P2O5_Liq']+F2O_content)
     Norm_Factor=(100-liq_comps_C['H2O_Liq'])/(liq_comps_sum)
-    liq_comps_c_N=liq_comps_C.multiply(Norm_Factor, axis=0)
+
+
+    if 'Sample_ID_Liq' in liq_comps_C.columns:
+        liq_comps_C_nolabel= liq_comps_C.drop('Sample_ID_Liq', axis=1)
+    else:
+        liq_comps_C_nolabel=liq_comps_C
+    liq_comps_c_N=liq_comps_C_nolabel.multiply(Norm_Factor, axis=0)
+
+    liq_comps_c_N=liq_comps_C_nolabel.multiply(Norm_Factor, axis=0)
     # Don't normalize water
     liq_comps_c_N['H2O_Liq']=liq_comps_C['H2O_Liq']
     liq_comps_N_mol=calculate_hydrous_mol_proportions_liquid(liq_comps=liq_comps_c_N)
@@ -74,11 +82,12 @@ def normalize_anhydrous_to_100_incF_mol_prop(liq_comps, F2O_content=0):
 
     #print(cat_frac_anhyd)
 
+
     return cat_frac_anhyd  #mols_sum #liq_comps_N_mol['sum']
 
 
 
-def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_content=0):
+def calculate_viscosity_giordano_2008(liq_comps, T=None, T_K=None, H2O_Liq=None, F2O_content=0):
     '''
     Calculates viscosity parameters A, B, C from Giordano et al. 2008.
     If a temperature is supplied, calculates viscosity.
@@ -94,7 +103,7 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_conte
 
     Optional:
 
-    T: int, flt, pd.Series
+    T or T_K: int, flt, pd.Series
         Temperature in Kelvin.
         If specified, returns viscosity and log viscosity
 
@@ -107,10 +116,13 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, H2O_Liq=None, F2O_conte
         viscosity parameters, viscosity (if T supplied), as well user-entered
         liquid composition.
     '''
+    if T_K is not None:
+        T=T_K
     liq_comps_c=liq_comps.copy()
     if H2O_Liq is not None:
         liq_comps_c['H2O_Liq']=H2O_Liq
         print('Water content from input overridden')
+
 
 
 

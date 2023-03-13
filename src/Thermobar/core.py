@@ -4050,12 +4050,47 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
         if fo2_int=="NNO":
         # Buffer position from frost (1991)
             logfo2=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K+fo2_offset
-            fo2=10**logfo2
+
 
         if fo2_int=="QFM":
+
         # Buffer position from frost (1991)
-            logfo2=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K+fo2_offset
-            fo2=10**logfo2
+            logfo2_QFM_highT=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K
+            T_Choice='HighT Beta Qtz'
+
+            logfo2_QFM_lowT=(-26455.3/T_K) +10.344 + 0.092 * ((P_kbar*1000)-1)/T_K
+            T_Choice='Low T alpha Qtz'
+
+            if isinstance(logfo2_QFM_lowT, float) or isinstance(logfo2_QFM_lowT, int):
+                if T_K<Cut_off_T:
+                    logfo2_QFM=logfo2_QFM_lowT
+                if T_K>=Cut_off_T:
+                    logfo2_QFM=logfo2_QFM_highT
+
+            else:
+                logfo2_QFM=pd.Series(logfo2_QFM_highT)
+
+                T_K=pd.Series(T_K).fillna(0)
+
+                lowT = pd.Series(T_K)<Cut_off_T
+                # nanmask=np.isnan(T_K)
+                # final_mask=np.logical_or(lowT, nanmask)
+                # print(np.shape(lowT))
+                # print(sum(lowT))
+                # print(lowT)
+
+                print(np.shape(logfo2_QFM))
+                if sum(lowT)>0:
+
+                    logfo2_QFM.loc[lowT]=logfo2_QFM_lowT
+
+
+
+
+            logfo2=logfo2_QFM
+
+
+        fo2=10**logfo2
 
 
 
@@ -4195,15 +4230,16 @@ def calculate_hydrous_mol_fractions_liquid_redox(liq_comps):
 
 def convert_fo2_to_buffer(fo2=None, T_K=None, P_kbar=None):
 
-    """ Converts fo2 in bars to deltaNNO and delta QFM using Frost 1991
+    """ Converts fo2 in bars to deltaNNO and delta QFM using Frost 1991, ONeill et al. (2018)
+    and the equation in Petrolog3.
     based on user-entered T in Kelvin and P in kbar
     """
     logfo2=np.log10(fo2)
-    # NNO Buffer position from frost (1991)
-    logfo2_NNO=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
 
-    fo2_NNO=10**logfo2
-    DeltaNNO=logfo2-logfo2_NNO
+    # NNO Buffer position from frost (1991)
+    logfo2_NNO_Frost=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
+
+    DeltaNNO_Frost=logfo2-logfo2_NNO_Frost
 
 
 
@@ -4224,27 +4260,34 @@ def convert_fo2_to_buffer(fo2=None, T_K=None, P_kbar=None):
 
     Delta_QFM_highT=logfo2-logfo2_QFM_highT
     Delta_QFM_lowT=logfo2-logfo2_QFM_highT
+
     if isinstance(fo2, float) or isinstance(fo2, int):
         if T_K<Cut_off_T:
             DeltaQFM=Delta_QFM_lowT
         if T_K>=Cut_off_T:
             DeltaQFM=Delta_QFM_highT
-        out=pd.DataFrame(data={'deltaNNO_Frost1991':  DeltaNNO,
-                               'deltaQFM_Frost1991':  DeltaQFM,
+        out=pd.DataFrame(data={'DeltaNNO_Frost1991':  DeltaNNO_Frost,
+                               'DeltaQFM_Frost1991':  DeltaQFM,
                                'QFM_equation_Choice': 'High T',
                                'T_K': T_K,
                                'P_kbar': P_kbar,
                                'fo2': fo2}, index=[0])
     else:
-        print('using low temp')
-        out=pd.DataFrame(data={'deltaNNO_Frost1991':  DeltaNNO,
-                               'deltaQFM_Frost1991': Delta_QFM_highT,
+
+        out=pd.DataFrame(data={'DeltaNNO_Frost1991':  DeltaNNO_Frost,
+                               'DeltaQFM_Frost1991': Delta_QFM_highT,
                                'QFM_equation_Choice': 'High T',
                                'T_K': T_K,
                                'P_kbar': P_kbar,
                                'fo2': fo2})
-        out.loc[(T_K<Cut_off_T), 'deltaQFM_Frost1991']=Delta_QFM_lowT
+        out.loc[(T_K<Cut_off_T), 'DeltaQFM_Frost1991']=Delta_QFM_lowT
         out.loc[(T_K<Cut_off_T), 'QFM_equation_Choice']='Low T'
+
+    # Other buffer positions
+    logfo2_QFM_Oneill=8.58-25050/T_K
+    Delta_QFM_Oneill=logfo2-logfo2_QFM_Oneill
+    out['DeltaQFM_ONeill1987']=Delta_QFM_Oneill
+
 
     out['Cut off T (K)']=Cut_off_T
 
@@ -4325,11 +4368,54 @@ def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", 
     logfo2_NNO=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
     fo2_NNO=10**logfo2_NNO
 
+#  QFM Buffer position from frost (1991)
+
+    # Calculates cut off T for alpha-beta qtz transition that determins QFM
+    Cut_off_T=573+273.15+0.025*(P_kbar*1000)
+
+    logfo2_QFM_highT=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K
+    T_Choice='HighT Beta Qtz'
+
+    logfo2_QFM_lowT=(-26455.3/T_K) +10.344 + 0.092 * ((P_kbar*1000)-1)/T_K
+    T_Choice='Low T alpha Qtz'
+
+
+    fo2_QFM_highT=10**logfo2_QFM_highT
+    fo2_QFM_lowT=10**logfo2_QFM_lowT
 
 
 
-    logfo2_QFM=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K
+    if isinstance(logfo2_QFM_lowT, float) or isinstance(logfo2_QFM_lowT, int):
+        if T_K<Cut_off_T:
+            logfo2_QFM=logfo2_QFM_lowT
+        if T_K>=Cut_off_T:
+            logfo2_QFM=logfo2_QFM_highT
+
+    else:
+        logfo2_QFM=pd.Series(logfo2_QFM_highT)
+
+        T_K=pd.Series(T_K).fillna(0)
+
+        lowT = pd.Series(T_K)<Cut_off_T
+        # nanmask=np.isnan(T_K)
+        # final_mask=np.logical_or(lowT, nanmask)
+        # print(np.shape(lowT))
+        # print(sum(lowT))
+        # print(lowT)
+
+        print(np.shape(logfo2_QFM))
+        if sum(lowT)>0:
+
+            logfo2_QFM.loc[lowT]=logfo2_QFM_lowT
+
+
+
+
+
     fo2_QFM=10**logfo2_QFM
+
+
+
 
     # This is Ln (XFe2O3/XFeO) from the Kress and Carmichael 1991 paper
     Z=np.log(mol_frac_hyd_redox['Fe2O3_Liq_mol_frac_hyd']/
@@ -4339,12 +4425,12 @@ def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", 
 
     rightside=( (11492/T_K)-6.675+((-2.243*mol_frac_hyd_redox['Al2O3_Liq_mol_frac_hyd'])+(-1.828*hyd_mol_frac_test['FeOt_Liq_mol_frac_hyd'])
     +(3.201*mol_frac_hyd_redox['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd_redox['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd_redox['K2O_Liq_mol_frac_hyd']))
-    -3.36*(1-(To/T_K) - np.log(T_K/To)) -0.000000701*((P_kbar*100000000)/T_K)
+    -3.36*(1-(To/T_K) - np.log(T_K.astype(float)/To)) -0.000000701*((P_kbar*100000000)/T_K)
     + -0.000000000154*(((T_K-1673)*(P_kbar*100000000))/T_K) + 0.0000000000000000385*((P_kbar*100000000)**2/T_K)
     )
 
     ln_fo2_calc=(Z-rightside)/0.196
-    fo2_calc=np.exp(ln_fo2_calc)
+    fo2_calc=np.exp(ln_fo2_calc.astype(float))
 
     # and back to log base 10
     log_fo2_calc=np.log10(fo2_calc)
@@ -4352,8 +4438,8 @@ def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", 
     DeltaNNO=log_fo2_calc-logfo2_NNO
 
 
-    liq_comps_c.insert(0, 'DeltaQFM', DeltaQFM)
-    liq_comps_c.insert(1, 'DeltaNNO', DeltaNNO)
+    liq_comps_c.insert(0, 'DeltaQFM_Frost1991', DeltaQFM)
+    liq_comps_c.insert(1, 'DeltaNNO_Frost1991', DeltaNNO)
     liq_comps_c.insert(2, 'fo2_calc', fo2_calc)
     return liq_comps_c
 

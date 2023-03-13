@@ -143,8 +143,8 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
 
     if isinstance(Kd_model, int) or isinstance(Kd_model, float):
         Eq_ol=1 / ((Kd_model / Mgno) + (1 - Kd_model))
-        print(Eq_ol)
-        Kd_out=pd.DataFrame(data={'Eq Fo': Eq_ol})
+
+        Kd_out=pd.Series(Eq_ol)
 
         return Kd_out
     else:

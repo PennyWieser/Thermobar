@@ -1,6 +1,14 @@
 ================================================
 Change Log
 ================================================
+
+Version 1.0.14 March 13th, 2023
+================================
+Felix boschetty showed that viscosity doesnt work if sample name is a string. Have changed to drop the sample column during the norm step.
+
+Conversion between fo2 and melt redox only used high T QFM value. Have now changed to allocate based on entered T_K
+
+
 Version 1.0.12, Feb 13th, 2023
 ================================
 If a user entered Kspar comps into plag-liq functions, returned Nan for eq tests, broke loop. Have fixed to add warning if you enter An<0.05, and also to not return yes or no if T is Nan

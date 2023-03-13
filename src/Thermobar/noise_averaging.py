@@ -38,6 +38,12 @@ def av_noise_samples_series(calc, sampleID):
         i=0
         for ID in sampleID.unique():
             sam=ID
+            # print(sam)
+            # print(i)
+            # print(np.nanmean(calc[sampleID == sam]))
+
+
+
             Av_mean[i] = np.nanmean(calc[sampleID == sam])
             Av_median[i] = np.nanmedian(calc[sampleID == sam])
             Std[i] = np.nanstd(calc[sampleID == sam])
