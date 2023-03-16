@@ -4061,6 +4061,8 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
             logfo2_QFM_lowT=(-26455.3/T_K) +10.344 + 0.092 * ((P_kbar*1000)-1)/T_K
             T_Choice='Low T alpha Qtz'
 
+            Cut_off_T=573+273.15+0.025*(P_kbar*1000)
+
             if isinstance(logfo2_QFM_lowT, float) or isinstance(logfo2_QFM_lowT, int):
                 if T_K<Cut_off_T:
                     logfo2_QFM=logfo2_QFM_lowT
@@ -4079,7 +4081,7 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
                 # print(sum(lowT))
                 # print(lowT)
 
-                print(np.shape(logfo2_QFM))
+
                 if sum(lowT)>0:
 
                     logfo2_QFM.loc[lowT]=logfo2_QFM_lowT
