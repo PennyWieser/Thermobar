@@ -1656,9 +1656,9 @@ def calculate_clinopyroxene_liquid_components(
             combo_liq_cpxs = pd.concat(
                 [myLiquids1_comps, myCPXs1_comp], axis=1)
             if "Sample_ID_Cpx" in combo_liq_cpxs:
-                combo_liq_cpxs.drop(['Sample_ID_Cpx'], axis=1)
+                combo_liq_cpxs=combo_liq_cpxs.drop(['Sample_ID_Cpx'], axis=1)
             if "Sample_ID_Liq" in combo_liq_cpxs:
-                combo_liq_cpxs.drop(['Sample_ID_Liq'], axis=1)
+                combo_liq_cpxs=combo_liq_cpxs.drop(['Sample_ID_Liq'], axis=1)
 
 
 

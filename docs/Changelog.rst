@@ -2,6 +2,10 @@
 Change Log
 ================================================
 
+Version 1.0.16 April 1st, 2023
+==============================
+Added ability to do confidence intervals in matplotlib
+
 Version 1.0.14 March 13th, 2023
 ================================
 Felix boschetty showed that viscosity doesnt work if sample name is a string. Have changed to drop the sample column during the norm step.
