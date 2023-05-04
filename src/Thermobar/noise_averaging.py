@@ -158,6 +158,35 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
 
     return Err_out
 
+def turn_series_into_error(*, elx='Cpx', variable, variable_err):
+# Define variables
+    n_samples = len(variable_err)
+    var = variable
+
+# Define the column names
+    cols = [
+        'SiO2_{}_Err'.format(elx),
+            'TiO2_{}_Err'.format(elx),
+            'Al2O3_{}_Err'.format(elx),
+            'FeOt_{}_Err'.format(elx),
+            'MnO_{}_Err'.format(elx),
+            'MgO_{}_Err'.format(elx),
+            'CaO_{}_Err'.format(elx),
+            'Na2O_{}_Err'.format(elx),
+            'K2O_{}_Err'.format(elx),
+            'Cr2O3_{}_Err'.format(elx)]
+
+    # Create the empty DataFrame
+    Error = pd.DataFrame(data=0, columns=cols, index=range(n_samples))
+
+    # Fill in the appropriate column with the variable value
+    var2=var + '_' + elx + '_Err'
+    if var2 in cols:
+        print(var2)
+        Error[var2]=variable_err
+
+    return Error
+
 
 def add_noise_sample_1phase(phase_comp, phase_err=None,
 phase_err_type="Abs",
@@ -317,7 +346,7 @@ filter_q=None, append=False):
         Dup_Sample.drop('Sample_ID_{}_Num'.format(elx), axis=1, inplace=True)
         Dup_Sample.drop('Sample_ID_{}'.format(elx), axis=1, inplace=True)
 
-        if variable is not None:
+        if variable is not None and not isinstance(variable, pd.Series) and not isinstance(variable, np.ndarray):
 
             ely = variable
             if variable == "P_kbar" or variable == "T_K":
@@ -383,15 +412,28 @@ filter_q=None, append=False):
             noise = np.random.uniform(1, -1, Dup_Noise.shape)
             mynoisedDataframe = (Dup_Noise * noise).to_numpy() + Dup_Sample
 
+        if variable is not None and (isinstance(variable_err, pd.Series) or isinstance(variable_err, np.ndarray)):
+            print('got to here')
+            phase_err=turn_series_into_error(elx=elx,
+variable=variable,
+variable_err=variable_err)
+            phase_err_type=variable_err_type
+
+
+
+
     if phase_err is not None and err_dist == "normal":
 
         # This is for when users enter 2 dataframes, 1 of measurements, 1 of 1
         # sigma errors
         Data = Sample_c
+        if 'Sample_ID_{}'.format(elx) in Data:
+
+            Data=Data.drop('Sample_ID_{}'.format(elx), axis=1)
 
 
 
-
+        # Set up empty things to fill in
         SiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
         TiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
         Al2O3_Err = np.empty((duplicates * len(Data)), dtype=float)
@@ -417,7 +459,11 @@ filter_q=None, append=False):
         if phase_err_type == "Perc":
             Err_perc = phase_err.copy()
             # removing headings so can multiply 2 pandas
+
+
             Err_perc.columns = Err_perc.columns.str.replace('_Err', '')
+
+
             Err = Data * (Err_perc / 100)
             # adding Err back in
             Err.columns = [str(col) + '_Err' for col in Err.columns]
@@ -427,7 +473,7 @@ filter_q=None, append=False):
             if len(Err) != len(Data):
                 raise Exception('Your data and error input data frames arent the same length')
             Sample_name_num[i * duplicates:(i * duplicates + duplicates)] = i
-            Sample_name_str[i * duplicates:(i * duplicates + duplicates)] = Data['Sample_ID_{}'.format(elx)].iloc[i]
+            Sample_name_str[i * duplicates:(i * duplicates + duplicates)] = Sample_c['Sample_ID_{}'.format(elx)].iloc[i]
 
 
             SiO2_Err[i * duplicates:(i * duplicates + duplicates)] = np.random.normal(loc=Data['SiO2_{}'.format(

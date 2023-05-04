@@ -248,7 +248,7 @@ def import_lepr_file(filename):
                                    'Cr2O3_Liq': my_input_Liq['Cr2O3 value'],
                                    'P2O5_Liq': my_input_Liq['P2O5 value'],
                                    'H2O_Liq': my_input_Liq['H2O value'],
-                                   'Total': my_input_Liq['total value']})
+                                   'Total_Liq': my_input_Liq['total value']})
         if 'n' in my_input_Liq.columns:
             myLiq['N_meas_Liq']=my_input_Liq['n']
 
