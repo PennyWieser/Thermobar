@@ -702,14 +702,14 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
      / Combo_opxs_cpxs['Mg_Opx_cat_6ox'])
 
     if Kd_Match == "Subsolidus":
-        print('made it here')
+        #print('made it here')
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
             0.7 - Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'])
         print(len(Combo_opxs_cpxs))
 
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.loc[np.abs(
             Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < 0.2]  # +- 0.2 suggested by Putirka spreadsheet
-        print(len(Combo_opxs_cpxs_1))
+        #print(len(Combo_opxs_cpxs_1))
     if Kd_Match == "HighTemp":
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
             1.09 - Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'])
@@ -775,8 +775,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         Combo_opxs_cpxs_2.insert(2, "Delta_T_K_Iter", PT_out['Delta_T_K_Iter'].astype(float))
         Combo_opxs_cpxs_2.insert(3, "Delta_P_kbar_Iter", PT_out['Delta_P_kbar_Iter'].astype(float))
 
-        Combo_opxs_cpxs_2.insert(4, "Equation Choice (T)", str(equationT))
-        Combo_opxs_cpxs_2.insert(5, "Equation Choice (P)", str(equationP))
+
     if P is not None:
         T_K_calc = calculate_cpx_opx_temp(
             Two_Px_Match=Combo_opxs_cpxs_2, equationT=equationT, P=P)
@@ -784,7 +783,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         Combo_opxs_cpxs_2.insert(1, "P_kbar_input", P)
         Combo_opxs_cpxs_2.insert(2, "Delta_T_K_Iter", 0)
         Combo_opxs_cpxs_2.insert(3, "Delta_P_kbar_Iter", 0)
-        Combo_opxs_cpxs_2.insert(4, "Equation Choice (T)", str(equationT))
+
     if T is not None:
         P_kbar_calc = calculate_cpx_opx_press(
             Two_Px_Match=Combo_opxs_cpxs_2, equationP=equationP, T=T)
@@ -792,7 +791,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         Combo_opxs_cpxs_2.insert(1, "P_kbar_calc", P_kbar_calc)
         Combo_opxs_cpxs_2.insert(2, "Delta_T_K_Iter", 0)
         Combo_opxs_cpxs_2.insert(3, "Delta_P_kbar_Iter", 0)
-        Combo_opxs_cpxs_2.insert(4, "Equation Choice (P)", str(equationP))
+
 
     cols_to_move = ['Kd_Fe_Mg_Cpx_Opx']
     Combo_opxs_cpxs_2 = Combo_opxs_cpxs_2[cols_to_move + [
@@ -885,6 +884,17 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     print('N=' + str(len(df1_M)) + ' Cpx out of the N='+str(LenCpx)+' Cpx that you input matched to 1 or more Opx')
     print( 'N=' + str(len(df1_2M)) + ' Opx out of the N='+str(LenOpx)+' Opx that you input matched to 1 or more Cpx')
     print('Done!')
+
+    if equationT is not None:
+        df1_M.insert(4, "Equation Choice (T)", str(equationT))
+        df1_2M.insert(4, "Equation Choice (T)", str(equationT))
+        Combo_opxs_cpxs_2.insert(4, "Equation Choice (T)", str(equationT))
+
+
+    if equationP is not None:
+        df1_M.insert(5, "Equation Choice (P)", str(equationP))
+        df1_2M.insert(5, "Equation Choice (P)", str(equationP))
+        Combo_opxs_cpxs_2.insert(5, "Equation Choice (P)", str(equationP))
 
 
     return {'Av_PTs_perCPX': df1_M, 'Av_PTs_perOPX': df1_2M, 'All_PTs': Combo_opxs_cpxs_2}
