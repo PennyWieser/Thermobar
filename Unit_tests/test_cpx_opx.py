@@ -3,7 +3,7 @@ import pandas as pd
 import Thermobar as pt
 import numpy as np
 
-CpxT=pd.DataFrame(data={"Sample_ID_Cpx": 'test',
+CpxT=pd.DataFrame(data={"Sample_ID_Cpx": 'test1',
                         "SiO2_Cpx": 49,
                             "TiO2_Cpx": 0.3,
                             "Al2O3_Cpx": 4.89,
@@ -15,7 +15,7 @@ CpxT=pd.DataFrame(data={"Sample_ID_Cpx": 'test',
                             "K2O_Cpx": 0.1,
                             "Cr2O3_Cpx": 0.11}, index=[0])
 
-OpxT=pd.DataFrame(data={"Sample_ID_Opx": 'test',
+OpxT=pd.DataFrame(data={"Sample_ID_Opx": 'test2',
                             "SiO2_Opx": 55,
                             "TiO2_Opx": 0.34,
                             "Al2O3_Opx": 1.5,
