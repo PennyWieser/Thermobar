@@ -2,7 +2,8 @@ import unittest
 import pandas as pd
 import Thermobar as pt
 
-CpxT=pd.DataFrame(data={"SiO2_Cpx": 49,
+CpxT=pd.DataFrame(data={"Sample_ID_Cpx": 'test',
+                        "SiO2_Cpx": 49,
                             "TiO2_Cpx": 0.3,
                             "Al2O3_Cpx": 4.89,
                             "FeOt_Cpx": 5.71,
@@ -13,7 +14,8 @@ CpxT=pd.DataFrame(data={"SiO2_Cpx": 49,
                             "K2O_Cpx": 0.1,
                             "Cr2O3_Cpx": 0.11}, index=[0])
 
-OpxT=pd.DataFrame(data={"SiO2_Opx": 55,
+OpxT=pd.DataFrame(data={"Sample_ID_Opx: 'test',
+                            "SiO2_Opx": 55,
                             "TiO2_Opx": 0.34,
                             "Al2O3_Opx": 1.5,
                             "FeOt_Opx": 11.3,

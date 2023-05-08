@@ -861,7 +861,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     Combo_liq_opx_fur_filt.insert(3, "Delta_P_kbar_Iter",  Delta_T_K_Iter)
 
     Liquid_sample_ID=Combo_liq_opx_fur_filt["Sample_ID_Liq"]
-    Combo_liq_opx_fur_filt.drop(["Sample_ID_Liq"], axis=1, inplace=True)
+    Combo_liq_opx_fur_filt.drop(["Sample_ID_Liq", "Kd Eq (Put2008+-0.06)"], axis=1, inplace=True)
 
 
     # # This bit averages all the matches for a given Opx (e.g, Opx1-Liq1,
