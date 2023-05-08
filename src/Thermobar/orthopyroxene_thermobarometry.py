@@ -732,6 +732,7 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     if "Fe3Fet_Liq" not in liq_comps:
         liq_comps_c['Fe3Fet_Liq'] = 0
 
+
     # Adding sample names if there aren't any
     if "Sample_ID_Liq" not in liq_comps:
         liq_comps_c['Sample_ID_Liq'] = liq_comps_c.index
@@ -859,6 +860,8 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
     Combo_liq_opx_fur_filt.insert(2, "Delta_T_K_Iter", Delta_P_kbar_Iter)
     Combo_liq_opx_fur_filt.insert(3, "Delta_P_kbar_Iter",  Delta_T_K_Iter)
 
+    Liquid_sample_ID=Combo_liq_opx_fur_filt["Sample_ID_Liq"]
+    Combo_liq_opx_fur_filt.drop(["Sample_ID_Liq"], axis=1, inplace=True)
 
 
     # # This bit averages all the matches for a given Opx (e.g, Opx1-Liq1,
@@ -915,11 +918,14 @@ equationP=None, P=None, T=None, eq_crit=False, Fe3Fet_Liq=None, H2O_Liq=None,
      ' Opx out of the N='+str(LenOpx)
      +' Opx that you input matched to 1 or more liquids')
 
+    Combo_liq_opx_fur_filt['Sample_ID_Liq']=Liquid_sample_ID
 
     cols_to_move = ['Sample_ID_Opx', 'Sample_ID_Liq']
 
     Combo_liq_opx_fur_filt = Combo_liq_opx_fur_filt[cols_to_move +
                         [col for col in Combo_liq_opx_fur_filt.columns if col not in cols_to_move]]
+
+
 
     return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_opx_fur_filt}
         # return Combo_liq_opx_fur_filt
