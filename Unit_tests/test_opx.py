@@ -90,7 +90,7 @@ with w.catch_warnings():
         "Calc Kd Fet not equal to test value")
 
 
-        def test_Global_KdcalcT(self):
+        def test_Global_KdcalcT2(self):
             self.assertAlmostEqual(pt.calculate_opx_liq_press(opx_comps=OpxT,
         liq_comps=LiqT, equationP="P_Put_Global_Opx", T=1300, eq_tests=True)
         .get("Kd Eq (Put2008+-0.06)")[0], "Y",
@@ -174,7 +174,7 @@ with w.catch_warnings():
             equationT="T_Put2008_eq28a").get("Av_PTs").Mean_P_kbar_calc[0], 3.327589, decimalPlace,
     "Calc P from melt matching 29a-28a not equal to test value")
     #
-        def test_eq29a_28a_press(self):
+        def test_eq29a_28a_press2(self):
             self.assertAlmostEqual(pt.calculate_opx_liq_press_temp_matching(liq_comps=Liq2,
         opx_comps=Opx2, equationP="P_Put2008_eq29a",
             equationT="T_Put2008_eq28a").get("Av_PTs").Mean_T_K_calc[0], 1384.287957, decimalPlace,
