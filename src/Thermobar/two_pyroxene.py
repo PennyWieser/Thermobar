@@ -806,7 +806,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         # Final step, calcuate a 3rd output which is the average and standard
         # deviation for each CPx (e.g., CPx1-Melt1, CPx1-melt3 etc. )
     CpxNumbers = Combo_opxs_cpxs_2['ID_CPX'].unique()
-    Opx_sample_ID=combo_liq_cpx_fur_filt["Sample_ID_Opx"]
+    Opx_sample_ID=Combo_opxs_cpxs_2["Sample_ID_Opx"]
     Combo_opxs_cpxs_2.drop(["Sample_ID_Opx"], axis=1, inplace=True)
 
     if len(CpxNumbers) > 0:
@@ -841,6 +841,10 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
                     [col for col in df1_M.columns if col not in cols_to_move]]
 
     opxNumbers = Combo_opxs_cpxs_2['ID_OPX'].unique()
+    Combo_opxs_cpxs_2['Sample_ID_Opx']=Opx_sample_ID
+    Combo_opxs_cpxs_2.drop(["Sample_ID_Cpx"], axis=1, inplace=True)
+
+
     if len(opxNumbers) > 0:
         df1_2Mean_nopref=Combo_opxs_cpxs_2.groupby(['ID_OPX', 'Sample_ID_Opx'], as_index=False).mean()
         df1_2Std_nopref=Combo_opxs_cpxs_2.groupby(['ID_OPX', 'Sample_ID_Opx'], as_index=False).std()
