@@ -14,7 +14,7 @@ CpxT=pd.DataFrame(data={"Sample_ID_Cpx": 'test',
                             "K2O_Cpx": 0.1,
                             "Cr2O3_Cpx": 0.11}, index=[0])
 
-OpxT=pd.DataFrame(data={"Sample_ID_Opx: 'test',
+OpxT=pd.DataFrame(data={"Sample_ID_Opx": 'test',
                             "SiO2_Opx": 55,
                             "TiO2_Opx": 0.34,
                             "Al2O3_Opx": 1.5,
