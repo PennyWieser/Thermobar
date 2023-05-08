@@ -1,6 +1,7 @@
 import unittest
 import pandas as pd
 import Thermobar as pt
+import numpy as np
 
 CpxT=pd.DataFrame(data={"Sample_ID_Cpx": 'test',
                         "SiO2_Cpx": 49,
@@ -72,9 +73,30 @@ class test_cpx_opx_press_temp(unittest.TestCase):
         eq_tests=True).Kd_Fe_Mg_Cpx_Opx[0], 0.918473,
         decimalPlace, "Kd Cpx-Opx not equal to test value")
 
+OpxT1=OpxT.copy()
+num_cols1 = OpxT1.select_dtypes(include=[np.number]).columns
+OpxT1[num_cols1] = OpxT1[num_cols1].apply(lambda x: x + 0.2)
 
-Cpx_Several=pd.concat([CpxT, CpxT+0.1, CpxT-0.1, CpxT-0.02])
-Opx_Several=pd.concat([OpxT, OpxT+0.2, OpxT-0.05])
+OpxT2=OpxT.copy()
+num_cols2 = OpxT2.select_dtypes(include=[np.number]).columns
+OpxT2[num_cols2] = OpxT2[num_cols2].apply(lambda x: x -0.05)
+
+CpxT1=CpxT.copy()
+num_cols1 = CpxT1.select_dtypes(include=[np.number]).columns
+CpxT1[num_cols1] = CpxT1[num_cols1].apply(lambda x: x +0.1)
+
+CpxT3=CpxT.copy()
+num_cols1 = CpxT3.select_dtypes(include=[np.number]).columns
+CpxT3[num_cols1] = CpxT3[num_cols1].apply(lambda x: x -0.1)
+
+CpxT2=CpxT.copy()
+num_cols2 = CpxT2.select_dtypes(include=[np.number]).columns
+CpxT2[num_cols2] = CpxT2[num_cols2].apply(lambda x: x -0.02)
+
+
+
+Cpx_Several=pd.concat([CpxT, CpxT1, CpxT3, CpxT2])
+Opx_Several=pd.concat([OpxT, OpxT1, OpxT2])
 
 class test_cpx_opx_press_temp_matching(unittest.TestCase):
     def test_36_38a_match_press(self):
