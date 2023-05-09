@@ -2,6 +2,10 @@
 Change Log
 ================================================
 
+Version 1.0.18 April 1st, 2023
+==============================
+Support for non numerical sample names for Opx-Cpx, Opx-Liq matching, Fspar-Liq, Amp-Liq.
+
 Version 1.0.16 April 1st, 2023
 ==============================
 Added ability to do confidence intervals in matplotlib

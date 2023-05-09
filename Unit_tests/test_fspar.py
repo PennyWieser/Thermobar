@@ -1,8 +1,8 @@
 import unittest
 import pandas as pd
 import Thermobar as pt
-
-LiqT=pd.DataFrame(data={"SiO2_Liq": 51,
+LiqT=pd.DataFrame(data={"Sample_ID_Liq": 'test',
+                        "SiO2_Liq": 51,
                             "TiO2_Liq": 0.48,
                             "Al2O3_Liq": 19,
                             "FeOt_Liq": 5.3,
@@ -14,10 +14,47 @@ LiqT=pd.DataFrame(data={"SiO2_Liq": 51,
                             "Cr2O3_Liq": 0.11,
                             "P2O5_Liq": 0.11,
                             "H2O_Liq": 5,
-                            "Fe3Fet_Liq":0.1,
+ "Fe3FeT_Liq":0.1,
 }, index=[0])
 
-LiqT2=pd.DataFrame(data={"SiO2_Liq": 61,
+PlagT=pd.DataFrame(data={"Sample_ID_Plag": 'test1',
+                         "SiO2_Plag": 57.3,
+                            "TiO2_Plag": 0.09,
+                            "Al2O3_Plag": 26.6,
+                            "FeOt_Plag": 0.43,
+                            "MnO_Plag": 0,
+                            "MgO_Plag": 0.03,
+                            "CaO_Plag": 8.83,
+                            "Na2O_Plag": 6.11,
+                            "K2O_Plag": 0.49,
+                            "Cr2O3_Plag": 0.0}, index=[0])
+
+PlagT2=pd.DataFrame(data={"Sample_ID_Plag": 'testplg2',
+                         "SiO2_Plag": 57.9,
+                            "TiO2_Plag": 1.09,
+                            "Al2O3_Plag": 26.6,
+                            "FeOt_Plag": 0.43,
+                            "MnO_Plag": 0,
+                            "MgO_Plag": 0.03,
+                            "CaO_Plag": 8.83,
+                            "Na2O_Plag": 6.11,
+                            "K2O_Plag": 0.49,
+                            "Cr2O3_Plag": 0.0}, index=[0])
+
+KsparT=pd.DataFrame(data={"Sample_ID_Kspar": 'test2',
+                          "SiO2_Kspar": 65.5,
+                            "TiO2_Kspar": 0.0,
+                            "Al2O3_Kspar": 19.6,
+                            "FeOt_Kspar": 0.07,
+                            "MnO_Kspar": 0,
+                            "MgO_Kspar": 0.0,
+                            "CaO_Kspar": 0.75,
+                            "Na2O_Kspar": 4.81,
+                            "K2O_Kspar": 9.36,
+                            "Cr2O3_Kspar": 0.0}, index=[0])
+
+LiqT2=pd.DataFrame(data={"Sample_ID_Liq": 'testliq2',
+                         "SiO2_Liq": 61,
                             "TiO2_Liq": 0.45,
                             "Al2O3_Liq": 18.56,
                             "FeOt_Liq": 3.17,
@@ -29,30 +66,13 @@ LiqT2=pd.DataFrame(data={"SiO2_Liq": 61,
                             "Cr2O3_Liq": 0,
                             "P2O5_Liq": 0.02,
                             "H2O_Liq": 2,
-                            "Fe3Fet_Liq":0,
+                            "Fe3FeT_Liq":0,
 }, index=[0])
 
-PlagT=pd.DataFrame(data={"SiO2_Plag": 57.3,
-                            "TiO2_Plag": 0.09,
-                            "Al2O3_Plag": 26.6,
-                            "FeOt_Plag": 0.43,
-                            "MnO_Plag": 0,
-                            "MgO_Plag": 0.03,
-                            "CaO_Plag": 8.83,
-                            "Na2O_Plag": 6.11,
-                            "K2O_Plag": 0.49,
-                            "Cr2O3_Plag": 0.0}, index=[0])
 
-KsparT=pd.DataFrame(data={"SiO2_Kspar": 65.5,
-                            "TiO2_Kspar": 0.0,
-                            "Al2O3_Kspar": 19.6,
-                            "FeOt_Kspar": 0.07,
-                            "MnO_Kspar": 0,
-                            "MgO_Kspar": 0.0,
-                            "CaO_Kspar": 0.75,
-                            "Na2O_Kspar": 4.81,
-                            "K2O_Kspar": 9.36,
-                            "Cr2O3_Kspar": 0.0}, index=[0])
+Liq_Several=pd.concat([LiqT, LiqT2])
+Plag_Several=pd.concat([PlagT, PlagT2])
+
 decimalPlace=4
 
 
@@ -143,6 +163,13 @@ class test_fspar_liq_temp_hygr(unittest.TestCase):
         self.assertAlmostEqual(pt.calculate_fspar_liq_temp_hygr(plag_comps=PlagT, liq_comps=LiqT, equationT="T_Put2008_eq24a",
                                        equationH="H_Put2005_eqH", iterations=10, P=10).get("T_H_calc").H2O_calc[0], 9.09812, decimalPlace,
         "H2O from iter 23-Putirka 2005  not equal to test value")
+
+class test_fspar_liq_temp_match(unittest.TestCase):
+    def test_24a_matching(self):
+        self.assertAlmostEqual(pt.calculate_fspar_liq_temp_matching(liq_comps=Liq_Several, plag_comps=Plag_Several,
+ equationT='T_Put2008_eq24a',
+P=5, Ab_An_P2008=True)['All_PTs']['T_K_calc'][0], 1236.0082305446053, decimalPlace,
+        "match 24a  not equal to test value")
 
 
 if __name__ == '__main__':

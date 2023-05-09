@@ -412,7 +412,7 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
     -------
     pandas.DataFrame
         Temp (K) for all posible ol-liq matches, along with equilibrium
-        tests, components and input mineral compositions
+        tests, components and input mineral compositions. At the moment, doesnt average per olivine.. But could upon request.
     '''
 
     ol_comps_c=ol_comps.copy()

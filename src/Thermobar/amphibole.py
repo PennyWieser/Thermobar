@@ -1569,8 +1569,15 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
 
     Combo_liq_amp_fur_filt.insert(4, 'Delta_Kd', Kd_Match-Combo_liq_amps['Kd'])
 
+
+
+
+
     # Final step, calcuate a 3rd output which is the average and standard
     # deviation for each Amp (e.g., Amp1-Melt1, Amp1-melt3 etc. )
+    Liq_sample_ID=Combo_liq_amp_fur_filt['Sample_ID_Liq']
+    Combo_liq_amp_fur_filt.drop(["Sample_ID_Liq"], axis=1, inplace=True)
+
     AmpNumbers = Combo_liq_amp_fur_filt['ID_AMP'].unique()
     if len(AmpNumbers) > 0:
         df1_Mean_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).mean()
@@ -1617,6 +1624,7 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
 
 
     print('Done!!! I found a total of N='+str(len(Combo_liq_amp_fur_filt)) + ' Amp-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Amp out of the N='+str(LenAmp)+' Amp that you input matched to 1 or more liquids')
+    Combo_liq_amp_fur_filt['Sample_ID_Liq']=Liq_sample_ID
     return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_amp_fur_filt}
 
 

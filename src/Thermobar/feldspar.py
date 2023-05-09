@@ -1631,6 +1631,10 @@ P=None, Ab_An_P2008=False):
 
     FsparNumbers = Combo_fspar_liqs2['ID_Fspar'].unique()
 
+    Sample_ID_Liq=Combo_fspar_liqs2['Sample_ID_Liq']
+    Combo_fspar_liqs2.drop(["Sample_ID_Liq"], axis=1, inplace=True)
+
+
 
     Combo_fspar_liqs3['T_K_calc']=Combo_fspar_liqs2['T_K_calc'].astype(float)
     if len(FsparNumbers) > 0:
@@ -1691,6 +1695,8 @@ P=None, Ab_An_P2008=False):
 
 
     print('Done!!! I found a total of N='+str(len(Combo_fspar_liqs3)) + ' Fspar-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Fspar out of the N='+str(LenFspar)+' Fspar that you input matched to 1 or more liquids')
+
+    Combo_fspar_liqs2['Sample_ID_Liq']=Sample_ID_Liq
 
     return {'Av_PTs': df1_M, 'All_PTs': Combo_fspar_liqs2}
     # Now we do the averaging step for each feldspar crystal
