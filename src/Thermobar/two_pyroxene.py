@@ -290,6 +290,9 @@ Two_Px_Match=None, equationP=None, eq_tests=False, T=None):
                 raise ValueError('The panda series entered for temperature isnt the'
                 ' same length as the dataframe of Cpx compositions')
 
+    if Two_Px_Match is None:
+        if len(opx_comps)!=len(cpx_comps):
+            raise ValueError('Opx comps need to be same length as Cpx comps. use the _matching function calculate_cpx_opx_press_temp_matching() instead if you want to consider all pairs')
 
 
     if Two_Px_Match is not None:
@@ -377,6 +380,9 @@ def calculate_cpx_opx_temp(*, cpx_comps=None, opx_comps=None,
         pandas.DataFrame: Temperature in K + Kd-Fe-Mg + cpx + opx comps
 
     '''
+    if Two_Px_Match is None:
+        if len(opx_comps)!=len(cpx_comps):
+            raise ValueError('Opx comps need to be same length as Cpx comps. use the _matching function calculate_cpx_opx_press_temp_matching() instead if you want to consider all pairs')
 
     try:
         func = Cpx_Opx_T_funcs_by_name[equationT]
@@ -500,6 +506,10 @@ def calculate_cpx_opx_press_temp(*, cpx_comps=None, opx_comps=None, Two_Px_Match
 
     '''
     # Gives users flexibility to reduce or increase iterations
+
+    if Two_Px_Match is None:
+        if len(opx_comps)!=len(cpx_comps):
+            raise ValueError('Opx comps need to be same length as Cpx comps. use the _matching function calculate_cpx_opx_press_temp_matching() instead if you want to consider all pairs')
 
 
 
