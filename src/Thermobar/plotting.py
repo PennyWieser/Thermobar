@@ -69,7 +69,7 @@ def Tukey_calc(x,y): #, name):
     plt.annotate(print(tukey), xy=(1, 1.5), xycoords="axes fraction", fontsize=9)
 
 
-def calculate_R2(x, y, xy=True, df=False):
+def calculate_R2(x, y, xy=True, df=False, round=5):
     """ Calculates statistics
     if xy= False doesnt return y and x pred
     """
@@ -77,20 +77,24 @@ def calculate_R2(x, y, xy=True, df=False):
     regx=x[masknan].values.reshape(-1, 1)
     regy=y[masknan].values.reshape(-1, 1)
     slope, intercept, r_value, p_value, std_err = stats.linregress(regx[:,0],regy[:,0])
-    p_value=np.round(p_value, 3)
+    p_value=np.round(p_value, round)
     lr=LinearRegression()
     lr.fit(regx,regy)
     Y_pred=lr.predict(regx)
     Int=lr.intercept_
     Grad=lr.coef_
     #R="R\N{SUPERSCRIPT TWO} = " +  str(np.round(r2_score(regy, Y_pred), 2))
-    R=(np.round(r2_score(regy, Y_pred), 2))
+    R=(np.round(r2_score(regy, Y_pred), round))
     RMSE=std_dev(regx, regy)
-    RMSEp=np.round(RMSE, 2)
+    RMSEp=np.round(RMSE, round)
     Median=np.nanmedian(regy-regx)#
-    Medianp=np.round(Median, 2)
+    Medianp=np.round(Median, round)
     Mean=np.nanmean(regy-regx)
-    Meanp=np.round(Mean, 2)
+    Meanp=np.round(Mean, round)
+    if round is False:
+        return {'R2': '{0:.5f}'.format(R), 'RMSE':'{0:.5f}'.format(RMSEp), 'RMSE_num':RMSEp,
+        'P_val':'{0:.5f}'.format(p_value), 'Median':'{0:.5f}'.format(Medianp), 'Mean':'{0:.5f}'.format(Meanp),
+        'Int': Int, 'Grad':Grad[0]}
 
     if xy is True:
 

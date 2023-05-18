@@ -1835,6 +1835,11 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         If eq_tests is True
 
     '''
+    # Check liq and cpx same length
+    if meltmatch is None and len(cpx_comps)!=len(liq_comps):
+        raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching functions instead')
+
+
     # This checks if your equation is one of the accepted equations
     try:
         func = Cpx_Liq_P_funcs_by_name[equationP]
@@ -2024,6 +2029,11 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
 
     '''
     # Various warnings etc. to check inputs make sense.
+
+    if meltmatch is None and len(cpx_comps)!=len(liq_comps):
+        raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching functions instead')
+
+
     try:
         func = Cpx_Liq_T_funcs_by_name[equationT]
     except KeyError:
@@ -2222,6 +2232,9 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
     '''
 
     # Gives users flexibility to reduce or increase iterations
+    if meltmatch is None and len(cpx_comps)!=len(liq_comps):
+        raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching functions instead')
+
     if iterations is not None:
         iterations = iterations
     else:
@@ -2364,6 +2377,10 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
     import warnings
     with w.catch_warnings():
         w.simplefilter('ignore')
+        if len(cpx_comps)!=len(liq_comps):
+            raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching functions instead')
+
+
         cpx_comps_c=cpx_comps.reset_index(drop=True).copy()
         liq_comps_c=liq_comps.reset_index(drop=True).copy()
         print('We have reset the index on Cpx and Liq comps for the Petrelli expressions')
@@ -2481,6 +2498,7 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
 ## Clinopyroxene melt-matching algorithm
 def arrange_all_cpx_liq_pairs(liq_comps, cpx_comps, H2O_Liq=None, Fe3Fet_Liq=None):
     # This allows users to overwrite H2O and Fe3Fet
+
     liq_comps_c = liq_comps.copy().reset_index(drop=True)
     cpx_comps_c = cpx_comps.copy().reset_index(drop=True)
 

@@ -91,6 +91,8 @@ def P_Put2008_eq29c(T, *, Al_Opx_cat_6ox,
 
     '''
     logCr2O3 = np.log(Cr_Opx_cat_6ox.astype(float))
+
+    #print(logCr2O3)
     #print(logCr2O3)
 
 
@@ -99,6 +101,28 @@ def P_Put2008_eq29c(T, *, Al_Opx_cat_6ox,
             (Al_Opx_cat_6ox - 0.1715)**2 - 372 *
             (Al_Opx_cat_6ox - 0.1715) * (Ca_Opx_cat_6ox - 0.0736)
             + 1.54 * logCr2O3)
+
+
+def P_Put2008_eq29cnoCr(T, *, Al_Opx_cat_6ox,
+                    Ca_Opx_cat_6ox, Cr_Opx_cat_6ox):
+    '''
+    Orthopyroxene-only barometer of Putirka, (2008) eq 29c. Doesn't require liquid composition.
+    Global calibration of experiments, has systematic error for hydrous data.
+    :cite:`putirka2008thermometers`
+
+    SEE=+-3 kbar (anhydrous)
+
+    SEE=+-4.1 kbar (hydrous)
+
+    '''
+    logCr2O3 = np.log(Cr_Opx_cat_6ox.astype(float))
+    #print(logCr2O3)
+
+
+    return (2064 + 0.321 * (T - 273.15) - 343.4 * np.log((T - 273.15)) + 31.52 * Al_Opx_cat_6ox - 12.28 * Ca_Opx_cat_6ox
+            - 290 * Cr_Opx_cat_6ox - 177.2 *
+            (Al_Opx_cat_6ox - 0.1715)**2 - 372 *
+            (Al_Opx_cat_6ox - 0.1715) * (Ca_Opx_cat_6ox - 0.0736))
 
 ## Opx-Liquid thermometers
 
@@ -155,7 +179,7 @@ def T_Beatt1993_opx(P, *, Ca_Liq_cat_frac, Fet_Liq_cat_frac, Mg_Liq_cat_frac,
     return Num_B1993 / Den_B1993
 
 ##  Opx-Only barometry function
-Opx_only_P_funcs = {P_Put2008_eq29c} # put on outside
+Opx_only_P_funcs = {P_Put2008_eq29c, P_Put2008_eq29cnoCr} # put on outside
 
 Opx_only_P_funcs_by_name = {p.__name__: p for p in Opx_only_P_funcs}
 
@@ -233,7 +257,7 @@ def calculate_opx_only_press(*, opx_comps, equationP, T=None):
 
 ## Orthopyroxene-Liquid pressure
 
-Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Felsic_Opx, P_Put2008_eq29c} # put on outside
+Opx_Liq_P_funcs = {P_Put2008_eq29a, P_Put2008_eq29b, P_Put_Global_Opx, P_Put_Felsic_Opx, P_Put2008_eq29c, P_Put2008_eq29cnoCr} # put on outside
 
 Opx_Liq_P_funcs_by_name = {p.__name__: p for p in Opx_Liq_P_funcs}
 

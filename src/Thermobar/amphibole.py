@@ -656,25 +656,29 @@ def calculate_amp_only_press_all_eqs(amp_comps, plot=False, H2O_Liq=None, Ridolf
 
 def calculate_amp_liq_all_equations(amp_comps, liq_comps, H2O_Liq=None):
 
+    if len(amp_comps)!=len(liq_comps):
+        raise ValueError('Liq comps need to be same length as Amp comps. If you want to match up all possible pairs, use the _matching functions instead')
+
+
     # Eq5 and 7s
     CalcPT_Teq4b_P7a=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq4b", equationT="P_Put2006_eq7a")
+liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq4b", equationP="P_Put2016_eq7a")
 
     CalcPT_Teq4b_P7b=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq4b", equationT="P_Put2006_eq7b")
+liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq4b", equationP="P_Put2016_eq7b")
 
     CalcPT_Teq4b_P7c=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq4b", equationT="P_Put2006_eq7c")
+liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq4b", equationP="P_Put2016_eq7c")
 
     # Equation 6 and 7s
     CalcPT_Teq9_P7a=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq9", equationT="P_Put2006_eq7a")
+liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq9", equationP="P_Put2016_eq7a")
 
     CalcPT_Teq9_P7b=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq9", equationT="P_Put2006_eq7b")
+liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq9", equationP="P_Put2016_eq7b")
 
     CalcPT_Teq9_P7c=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps_comps, H2O_Liq=H2O_Liq, equationP="T_Put2016_eq9", equationT="P_Put2006_eq7c")
+liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq9", equationP="P_Put2016_eq7c")
 
 
     out=pd.DataFrame(data={
@@ -1109,6 +1113,9 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
     pandas DataFrame for barometers like P_Ridolfi_2021, P_Mutch2016
 
     '''
+
+    if meltmatch is None and len(amp_comps)!=len(liq_comps):
+        raise ValueError('Liq comps need to be same length as Amp comps. If you want to match up all possible pairs, use the _matching functions instead')
     try:
         func = Amp_Liq_P_funcs_by_name[equationP]
     except KeyError:
@@ -1116,7 +1123,7 @@ def calculate_amp_liq_press(*, amp_comps=None, liq_comps=None,
     sig=inspect.signature(func)
 
     if equationP == "P_Put2016_eq7a" and meltmatch is None:
-        print('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H2O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
+        w.warn('Note - Putirka 2016 spreadsheet calculates H2O using a H2O-solubility law of uncertian origin based on the pressure calculated for 7a, and iterates H2O and P. We dont do this, as we dont believe a pure h2o model is necessarily valid as you may be mixed fluid saturated or undersaturated. We recomend instead you choose a reasonable H2O content based on your system.')
 
     if sig.parameters['T'].default is not None:
         if T is None:
@@ -1213,6 +1220,10 @@ P=None, H2O_Liq=None, eq_tests=False):
     pandas.core.series.Series
         Temperature in Kelvin
     '''
+
+    if meltmatch is None and len(amp_comps)!=len(liq_comps):
+        raise ValueError('Liq comps need to be same length as Amp comps. If you want to match up all possible pairs, use the _matching functions instead')
+
     try:
         func = Amp_Liq_T_funcs_by_name[equationT]
     except KeyError:
@@ -1323,6 +1334,9 @@ T_K_guess=1300, H2O_Liq=None, eq_tests=False):
     -------
     pandas.DataFrame: Pressure in Kbar, Temperature in K, Kd-Fe-Mg if eq_tests=True
     '''
+
+    if meltmatch is None and len(amp_comps)!=len(liq_comps):
+        raise ValueError('Liq comps need to be same length as Amp comps. If you want to match up all possible pairs, use the _matching functions instead')
 
     if meltmatch is None:
 
@@ -1632,27 +1646,72 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
 ## Amphibole-Plag temperatures, Holland and Blundy 1994
 
 
-def calculate_amp_plag_temp(amp_comps, plag_comps=None, XAn=None, XAb=None, equationT=None, P=None):
+def calculate_amp_plag_temp(*, amp_comps=None, plag_comps=None, XAn=None, XAb=None, equationT=None, P=None, meltmatch=None):
+    """ This function calculates Plag and Amp temperatures
+
+    Parameters
+    ------------------
+
+
+
+    amp_comps: pandas.DataFrame
+        Panda DataFrame of amp compositions with column headings SiO2_Amp etc.
+
+    Either
+
+    plag_comps: pandas.DataFrame
+        Panda DataFrame of plag compositions with column headings SiO2_Plag etc.
+
+    OR
+
+    XAn, XAb: int, float, pd.Series
+        An and Ab content of plag, all the function uses
+
+    equationT: str
+        Choose from T_HB1994_A and T_HB1994__B (Holland and Blundy, 1994).
+
+    P: str, int, pd.Series:
+        Pressure in kbar.
+
+    Returns
+    -----------------
+    pd.Series of temp
+
+
+    """
+
+    if meltmatch is not None and plag_comps is not None and len(plag_comps)!=len(amp_comps):
+        raise ValueError('Amp comps need to be same length as Plag comps. If you want to match up all possible pairs, use the _matching functions instead')
+
     if equationT != "T_HB1994_A" and equationT != "T_HB1994_B":
         raise Exception('At the moment, the only options are T_HB1994_A and _B')
     if P is None:
         raise Exception('Please select a P in kbar')
-    amp_comps_c=amp_comps.copy()
 
-    if plag_comps is not None:
-        plag_comps_c=plag_comps.copy()
-        plag_components=calculate_cat_fractions_plagioclase(plag_comps=plag_comps_c)
-        XAb=plag_components['Ab_Plag']
-        XAn=plag_components['An_Plag']
-    if plag_comps is None:
-        if isinstance(XAn, int) or isinstance(XAn, float):
-            XAn=pd.Series(data=XAn)
-        if isinstance(XAb, int) or isinstance(XAb, float):
-            XAb=pd.Series(data=XAb)
+    if meltmatch is None:
+        # Dealing with individual ones
+        amp_comps_c=amp_comps.copy()
 
 
 
-    amp_apfu_df=calculate_23oxygens_amphibole(amp_comps=amp_comps_c)
+        if plag_comps is not None:
+            plag_comps_c=plag_comps.copy()
+            plag_components=calculate_cat_fractions_plagioclase(plag_comps=plag_comps_c)
+            XAb=plag_components['Ab_Plag']
+            XAn=plag_components['An_Plag']
+        if plag_comps is None:
+            if isinstance(XAn, int) or isinstance(XAn, float):
+                XAn = pd.Series([XAn] * len(amp_comps))
+                XAb = pd.Series([XAb] * len(amp_comps))
+
+        amp_apfu_df=calculate_23oxygens_amphibole(amp_comps=amp_comps_c)
+
+    if meltmatch is not None:
+        amp_apfu_df=meltmatch
+        XAb=meltmatch['Ab_Plag']
+        XAn=meltmatch['An_Plag']
+
+
     f1=16/(amp_apfu_df['cation_sum_All'])
     f2=8/(amp_apfu_df['Si_Amp_cat_23ox'])
     f3=15/(amp_apfu_df['cation_sum_All']-amp_apfu_df['Na_Amp_cat_23ox']-amp_apfu_df['K_Amp_cat_23ox'])
@@ -1713,6 +1772,89 @@ def calculate_amp_plag_temp(amp_comps, plag_comps=None, XAn=None, XAb=None, equa
         return Ta
     if equationT=="T_HB1994_B":
         return Tb
+
+def calculate_amp_plag_temp_matching(amp_comps, plag_comps, equationT=None, P=None):
+    """ This function pairs up all possible plag-amp pairs, and calculates temps for them.
+
+    Parameters
+    ------------------
+
+
+
+    amp_comps: pandas.DataFrame
+        Panda DataFrame of amp compositions with column headings SiO2_Amp etc.
+
+
+
+    plag_comps: pandas.DataFrame
+        Panda DataFrame of plag compositions with column headings SiO2_Plag etc.
+
+
+
+    equationT: str
+        Choose from T_HB1994_A and T_HB1994__B (Holland and Blundy, 1994).
+
+    P: str, int, pd.Series:
+        Pressure in kbar.
+
+    Returns
+    -----------------
+    Dataframe of temps and matches and all intermediate calc steps
+
+
+    """
+
+# Adding an ID label to help with melt-Amp rematching later
+
+
+    myAmps1_concat=calculate_23oxygens_amphibole(amp_comps=amp_comps)
+    myPlag_concat=calculate_cat_fractions_plagioclase(plag_comps=plag_comps)
+
+    myAmps1_concat['ID_Amp'] = myAmps1_concat.index
+    if "Sample_ID_Amp" not in amp_comps:
+        myAmps1_concat['Sample_ID_Amp'] = myAmps1_concat.index
+    else:
+        myAmps1_concat['Sample_ID_Amp']=amp_comps['Sample_ID_Amp']
+
+    if "Sample_ID_Plag" not in plag_comps:
+        myPlag_concat['Sample_ID_Plag'] = myPlag_concat.index
+    else:
+        myPlag_concat['Sample_ID_Plag']=plag_comps['Sample_ID_Plag']
+
+    myAmps1_concat['ID_Amp']=myAmps1_concat.index
+    myPlag_concat['ID_Plag'] = myPlag_concat.index
+
+
+    # This duplicates Amps, repeats Amp1-Amp1*N, Amp2-Amp2*N etc.
+    DupAmps = pd.DataFrame(np.repeat(myAmps1_concat.values,
+    np.shape(myPlag_concat)[0], axis=0))
+    DupAmps.columns = myAmps1_concat.columns
+
+    # This duplicates Plaguids like Plag1-Plag2-Plag3 for Amp1, Plag1-Plag2-Plag3 for
+    # Amp2 etc.
+    DupPlags = pd.concat([myPlag_concat] *
+                        np.shape(myAmps1_concat)[0]).reset_index(drop=True)
+
+    # Combines these merged Plaguids and Amp dataframes
+    Combo_Plag_Amps = pd.concat([DupPlags, DupAmps], axis=1)
+    LenCombo = str(np.shape(Combo_Plag_Amps)[0])
+
+    # Status update for user
+    LenAmp=len(amp_comps)
+    LenPlags=len(plag_comps)
+    print("Considering N=" + str(LenAmp) + " Amp & N=" + str(LenPlags) +" Plags, which is a total of N="+ str(LenCombo) +
+            " Plag-Amp pairs, be patient if this is >>1 million!")
+
+    Temp=calculate_amp_plag_temp(meltmatch=Combo_Plag_Amps, equationT=equationT, P=P)
+
+    Combo_Plag_Amps['T_K_calc']= Temp
+
+    cols_to_move = ['T_K_calc', 'Sample_ID_Plag', 'Sample_ID_Amp']
+    Combo_Plag_Amps_filt = Combo_Plag_Amps[cols_to_move + [
+        col for col in Combo_Plag_Amps.columns if col not in cols_to_move]]
+
+
+    return Combo_Plag_Amps_filt
 
 
 
