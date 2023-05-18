@@ -342,6 +342,9 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
         if Fe3Fet_Liq is not None:
             liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
+    if meltmatch is None and liq_comps is not None and opx_comps is not None:
+        if len(liq_comps)!=len(opx_comps):
+            raise ValueError('opx comps need to be same length as liq comps. use a _matching function instead if you want to consider all pairs: calculate_opx_liq_press_temp_matching')
 
 
     if meltmatch is not None:
@@ -448,6 +451,10 @@ def calculate_opx_liq_temp(*, equationT, opx_comps=None, liq_comps=None, meltmat
     except KeyError:
         raise ValueError(f'{equationT} is not a valid equation') from None
     sig=inspect.signature(func)
+
+    if meltmatch is None and liq_comps is not None and opx_comps is not None:
+        if len(liq_comps)!=len(opx_comps):
+            raise ValueError('opx comps need to be same length as liq comps. use a _matching function instead if you want to consider all pairs: calculate_opx_liq_press_temp_matching')
 
     if sig.parameters['P'].default is not None:
         if P is None:
@@ -567,6 +574,11 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
 
     '''
     # Gives users flexibility to reduce or increase iterations
+
+    if meltmatch is None and liq_comps is not None and opx_comps is not None:
+        if len(liq_comps)!=len(opx_comps):
+            raise ValueError('opx comps need to be same length as liq comps. use a _matching function instead if you want to consider all pairs: calculate_opx_liq_press_temp_matching')
+
     if iterations is not None:
         iterations = iterations
     else:

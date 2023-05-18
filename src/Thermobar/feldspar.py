@@ -134,6 +134,14 @@ meltmatch_kspar=None,
             If eq_tests is True
 
     '''
+    if meltmatch_plag is None and meltmatch_kspar is None and plag_comps is not None and liq_comps is not None:
+        if len(plag_comps)!=len(liq_comps):
+            raise ValueError('Liq comps need to be same length as plag comps. If you want to match up all possible pairs, use the _matching functions instead')
+
+    if meltmatch_plag is None and meltmatch_kspar is None and kspar_comps is not None and liq_comps is not None:
+        if len(kspar_comps)!=len(liq_comps):
+            raise ValueError('Liq comps need to be same length as kspar comps. If you want to match up all possible pairs, use the _matching functions instead')
+
     if kspar_comps is not None:
         kspar_comps_c=kspar_comps.copy()
         kspar_comps_c=kspar_comps_c.reset_index(drop=True)
@@ -281,6 +289,14 @@ def calculate_fspar_liq_press(*, plag_comps=None, kspar_comps=None, liq_comps=No
 
 
     '''
+    if  plag_comps is not None and liq_comps is not None:
+        if len(plag_comps)!=len(liq_comps):
+            raise ValueError('Liq comps need to be same length as plag comps. We dont currently having a matching function for plag-liq barometry, as it is so bad, but if you really need one, reach out!')
+
+    if kspar_comps is not None and liq_comps is not None:
+        if len(kspar_comps)!=len(liq_comps):
+            raise ValueError('Liq comps need to be same length as kspar comps. We dont currently having a matching function for plag-liq barometry, as it is so bad, but if you really need one, reach out!')
+
     if kspar_comps is not None:
         kspar_comps_c=kspar_comps.copy()
         kspar_comps_c=kspar_comps_c.reset_index(drop=True)
@@ -406,6 +422,14 @@ def calculate_fspar_liq_press_temp(*, liq_comps=None, plag_comps=None, kspar_com
         liq_comps_c=liq_comps_c.reset_index(drop=True)
         if H2O_Liq is not None:
             liq_comps_c['H2O_Liq'] = H2O_Liq
+
+    if  plag_comps is not None and liq_comps is not None:
+        if len(plag_comps)!=len(liq_comps):
+            raise ValueError('Liq comps need to be same length as plag comps. We dont currently having a matching function for plag-liq barometry, as it is so bad, but if you really need one, reach out!')
+
+
+
+
 
     if kspar_comps is not None:
         raise Exception(
@@ -761,6 +785,12 @@ def calculate_fspar_liq_hygr(*, liq_comps, plag_comps=None, kspar_comps=None,
     Calculated H2O, eq tests, and input plag and liq parameters: pandas.DataFrame
 
     '''
+    if  plag_comps is not None and liq_comps is not None:
+        if len(plag_comps)!=len(liq_comps):
+            raise ValueError('Liq comps need to be same length as plag comps. We dont currently having a matching function for plag-liq hygrometry, but if you need one, reach out!')
+
+
+
     if kspar_comps is not None:
         raise ValueError('Sorry, no k-fspar hygrometers implemented in this tool. You must enter plag_comps=')
     try:
@@ -912,8 +942,14 @@ def calculate_fspar_liq_temp_hygr(*, liq_comps, plag_comps, equationT, equationH
     if kspar_comps is not None:
         raise ValueError('Sorry, no k-fspar hygrometers implemented in this tool. You must enter plag_comps=')
 
+    if  plag_comps is not None and liq_comps is not None:
+        if len(plag_comps)!=len(liq_comps):
+            raise ValueError('Liq comps need to be same length as plag comps. IF you want to consider all pairs, use the matching function: calculate_fspar_liq_temp_hygr_matching')
+
+
+
     if eq_tests is False:
-        print('Too bad, we return the equilibrium tests anyway, as you really need to look at them!')
+        print('eq_tests=False? too bad, we return the equilibrium tests anyway, as you really need to look at them!')
     #Check valid equation for T
     try:
         func = plag_liq_T_funcs_by_name[equationT]
@@ -1104,12 +1140,13 @@ equationT=None, P=None, eq_tests=False):
     sig=inspect.signature(func)
 
     if Two_Fspar_Match is None:
+        if len(plag_comps)!=len(kspar_comps):
+            raise ValueError('Kspar comps need to be same length as plag comps. use a _matching function instead if you want to consider all pairs')
         if isinstance(P, pd.Series):
             if len(P) != len(plag_comps):
                 raise ValueError('The panda series entered for pressure isnt the same length '
                 'as the dataframe of Plag compositions')
-            if len(plag_comps) != len(kspar_comps):
-                raise ValueError('The panda series entered for Plag isnt the same length as for KSpar')
+
 
 
 
@@ -1632,7 +1669,7 @@ P=None, Ab_An_P2008=False):
     FsparNumbers = Combo_fspar_liqs2['ID_Fspar'].unique()
 
     Sample_ID_Liq=Combo_fspar_liqs2['Sample_ID_Liq']
-    Combo_fspar_liqs2.drop(["Sample_ID_Liq"], axis=1, inplace=True)
+    Combo_fspar_liqs3.drop(["Sample_ID_Liq"], axis=1, inplace=True)
 
 
 
