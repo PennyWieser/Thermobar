@@ -79,6 +79,10 @@ P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
         H2O content in wt%.
  '''
 # These are checks that our inputs are okay
+    if meltmatch is None:
+        if len(liq_comps)!=len(ol_comps):
+            raise ValueError('Ol comps need to be same length as Liq comps. use a _matching function calculate_ol_liq_hygr_matching instead if you want to consider all pairs')
+
 
 
     try:
@@ -527,6 +531,11 @@ def calculate_ol_liq_temp(*, equationT, liq_comps=None, ol_comps=None, meltmatch
         raise ValueError(f'{equationT} is not a valid equation') from None
     sig=inspect.signature(func)
 
+    if meltmatch is None:
+        if len(liq_comps)!=len(ol_comps):
+            raise ValueError('Ol comps need to be same length as Liq comps. use a _matching function calculate_ol_liq_temp_matching instead if you want to consider all pairs')
+
+
 
 
 # Replacing H2O and Fe3FeT if relevant
@@ -725,6 +734,12 @@ def calculate_ol_sp_temp(ol_comps, sp_comps, equationT):
        Temperature in K
 
     '''
+
+    if len(sp_comps)!=len(ol_comps):
+        raise ValueError('Ol comps need to be same length as Sp comps.we dont have a matching function yet if want to consider all pairs, but could make one on request!')
+
+
+
     combo = pd.concat([ol_comps, sp_comps], axis=1)
     Cr_No = (sp_comps['Cr2O3_Sp'] / 151.99) / \
         (sp_comps['Cr2O3_Sp'] / 151.9 + sp_comps['Al2O3_Sp'] / 101.96)
