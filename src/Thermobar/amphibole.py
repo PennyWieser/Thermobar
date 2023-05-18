@@ -1632,86 +1632,228 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
 ## Amphibole-Plag temperatures, Holland and Blundy 1994
 
 
-def calculate_amp_plag_temp(amp_comps, plag_comps=None, XAn=None, XAb=None, equationT=None, P=None):
+def calculate_amp_plag_temp(
+    amp_comps,
+    plag_comps=None,
+    XAn=None,
+    XAb=None,
+    equationT=None,
+    P=None,
+    ravel_results=True,
+    
+):
+    """Calculate amphibole - plagioclase crystallization temperatures according to
+    Holland and Blundy (1994)
+
+    Args:
+        amp_comps (pandas DataFrame): wt % oxide composition of amphiboles
+        
+        plag_comps (pandas DataFrame, optional): wt% oxide composition of plagioclase. Defaults to None.
+        
+        XAn (array-like, optional): mol fraction anorthite for plagiocalse analyses. Defaults to None.
+        
+        XAb (array-like, optional): mol fraction albite for plagioclase analyses. Defaults to None.
+        
+        equationT (str, optional): which thermometer to use. Options are "T_HB1994_A" and "T_HB1994_B" 
+        Defaults to None.
+        
+        P (scalar, optional): Pressure in kbar. Defaults to None.
+        
+        ravel_results (bool, optional): Whether or not to output the temperatures as a 2D
+        grid of plag x amphibole number of analyses grid for inspection of pairwise temperature
+        calculations or a 1D pandas series. Defaults to True.
+
+    Returns:
+        Ta or Tb: Temperature according to which thermometer is chosen. 
+        
+        If ravel_results = False, This will be a 2D pandas dataframe of plag x amphibole 
+        analyses otherwise output will be 1D pandas series. ravel_results may be useful if you have 
+        multiple analyses for both plag and amphibole on one crystal however they are not 1:1. 
+        This then allows for easier linking between temperatures calculated for each plag-amphibole pair. 
+    """
     if equationT != "T_HB1994_A" and equationT != "T_HB1994_B":
-        raise Exception('At the moment, the only options are T_HB1994_A and _B')
+        raise Exception("At the moment, the only options are T_HB1994_A and _B")
     if P is None:
-        raise Exception('Please select a P in kbar')
-    amp_comps_c=amp_comps.copy()
+        raise Exception("Please select a P in kbar")
+    amp_comps_c = amp_comps.copy()
 
     if plag_comps is not None:
-        plag_comps_c=plag_comps.copy()
-        plag_components=calculate_cat_fractions_plagioclase(plag_comps=plag_comps_c)
-        XAb=plag_components['Ab_Plag']
-        XAn=plag_components['An_Plag']
+        plag_comps_c = plag_comps.copy()
+        plag_components = pt.calculate_cat_fractions_plagioclase(
+            plag_comps=plag_comps_c
+        )
+        XAb = plag_components["Ab_Plag"]
+        XAn = plag_components["An_Plag"]
     if plag_comps is None:
         if isinstance(XAn, int) or isinstance(XAn, float):
-            XAn=pd.Series(data=XAn)
+            XAn = pd.Series(data=XAn)
         if isinstance(XAb, int) or isinstance(XAb, float):
-            XAb=pd.Series(data=XAb)
+            XAb = pd.Series(data=XAb)
 
+    amp_apfu_df = pt.calculate_23oxygens_amphibole(amp_comps=amp_comps_c)
+    f1 = 16 / (amp_apfu_df["cation_sum_All"])
+    f2 = 8 / (amp_apfu_df["Si_Amp_cat_23ox"])
+    f3 = 15 / (
+        amp_apfu_df["cation_sum_All"]
+        - amp_apfu_df["Na_Amp_cat_23ox"]
+        - amp_apfu_df["K_Amp_cat_23ox"]
+    )
+    f4 = 2 / amp_apfu_df["Ca_Amp_cat_23ox"]
+    f5 = 1
+    f6 = 8 / (amp_apfu_df["Si_Amp_cat_23ox"] + amp_apfu_df["Al_Amp_cat_23ox"])
+    f7 = 15 / (amp_apfu_df["cation_sum_All"] - amp_apfu_df["K_Amp_cat_23ox"])
+    f8 = 12.9 / (
+        amp_apfu_df["cation_sum_All"]
+        - amp_apfu_df["Ca_Amp_cat_23ox"]
+        - amp_apfu_df["Na_Amp_cat_23ox"]
+        - amp_apfu_df["K_Amp_cat_23ox"]
+    )
+    f9 = 36 / (
+        46
+        - amp_apfu_df["Si_Amp_cat_23ox"]
+        - amp_apfu_df["Al_Amp_cat_23ox"]
+        - amp_apfu_df["Ti_Amp_cat_23ox"]
+    )
+    f10 = 46 / (amp_apfu_df["Fet_Amp_cat_23ox"] + 46)
+    fa = pd.DataFrame(data={"f1": f1, "f2": f2, "f3": f3, "f4": f4, "f5": f5})
+    fb = pd.DataFrame(data={"f6": f6, "f7": f7, "f8": f8, "f9": f9, "f10": f10})
+    fa_min = fa.min(axis="columns")
+    fb_max = fb.max(axis="columns")
+    f = (fa_min + fb_max) / 2
+    fmin_greater1 = fa_min > 1
+    fmax_greater1 = fb_max > 1
+    f.loc[fmin_greater1] = 1
+    f.loc[fmax_greater1] = 1
 
+    amp_apfu_df_recalc = amp_apfu_df.drop(
+        columns=[
+            "Fet_Amp_cat_23ox",
+            "oxy_renorm_factor",
+            "cation_sum_Si_Mg",
+            "cation_sum_Si_Ca",
+            "cation_sum_All",
+            "Mgno_Amp",
+        ]
+    )
+    amp_apfu_df_recalc = amp_apfu_df_recalc.multiply(f, axis="rows")
+    amp_apfu_df_recalc["Fe3_Amp_cat_23ox"] = 46 * (1 - f)
+    amp_apfu_df_recalc["Fe2_Amp_cat_23ox"] = (
+        amp_apfu_df.multiply(f, axis="rows").get("Fet_Amp_cat_23ox")
+        - amp_apfu_df_recalc["Fe3_Amp_cat_23ox"]
+    )
 
-    amp_apfu_df=calculate_23oxygens_amphibole(amp_comps=amp_comps_c)
-    f1=16/(amp_apfu_df['cation_sum_All'])
-    f2=8/(amp_apfu_df['Si_Amp_cat_23ox'])
-    f3=15/(amp_apfu_df['cation_sum_All']-amp_apfu_df['Na_Amp_cat_23ox']-amp_apfu_df['K_Amp_cat_23ox'])
-    f4=2/amp_apfu_df['Ca_Amp_cat_23ox']
-    f5=1
-    f6=8/(amp_apfu_df['Si_Amp_cat_23ox']+amp_apfu_df['Al_Amp_cat_23ox'])
-    f7=15/(amp_apfu_df['cation_sum_All']-amp_apfu_df['K_Amp_cat_23ox'])
-    f8=12.9/(amp_apfu_df['cation_sum_All']-amp_apfu_df['Ca_Amp_cat_23ox']-amp_apfu_df['Na_Amp_cat_23ox']
-            -amp_apfu_df['K_Amp_cat_23ox'])
-    f9=36/(46-amp_apfu_df['Si_Amp_cat_23ox']-amp_apfu_df['Al_Amp_cat_23ox']-amp_apfu_df['Ti_Amp_cat_23ox'])
-    f10=46/(amp_apfu_df['Fet_Amp_cat_23ox']+46)
-    fa=pd.DataFrame(data={'f1': f1, 'f2': f2, 'f3':f3, 'f4': f4, 'f5': f5})
-    fb=pd.DataFrame(data={'f6': f6, 'f7': f7, 'f8':f8, 'f9': f9, 'f10': f10})
-    fa_min=fa.min(axis="columns")
-    fb_max=fb.max(axis="columns")
-    f=(fa_min+fb_max)/2
-    fmin_greater1=fa_min>1
-    fmax_greater1=fb_max>1
-    f.loc[fmin_greater1]=1
-    f.loc[fmax_greater1]=1
+    cm = (
+        amp_apfu_df_recalc["Si_Amp_cat_23ox"]
+        + amp_apfu_df_recalc["Al_Amp_cat_23ox"]
+        + amp_apfu_df_recalc["Ti_Amp_cat_23ox"]
+        + amp_apfu_df_recalc["Fe3_Amp_cat_23ox"]
+        + amp_apfu_df_recalc["Fe2_Amp_cat_23ox"]
+        + amp_apfu_df_recalc["Mg_Amp_cat_23ox"]
+        + amp_apfu_df_recalc["Mn_Amp_cat_23ox"]
+    ) - 13
 
-    amp_apfu_df_recalc=amp_apfu_df.drop(columns=['Fet_Amp_cat_23ox', 'oxy_renorm_factor',
-                            'cation_sum_Si_Mg', 'cation_sum_Si_Ca', 'cation_sum_All', 'Mgno_Amp'])
-    amp_apfu_df_recalc=amp_apfu_df_recalc.multiply(f, axis='rows')
-    amp_apfu_df_recalc['Fe3_Amp_cat_23ox']=46*(1-f)
-    amp_apfu_df_recalc['Fe2_Amp_cat_23ox']=(amp_apfu_df.multiply(f, axis='rows').get('Fet_Amp_cat_23ox')
-    - amp_apfu_df_recalc['Fe3_Amp_cat_23ox'])
+    XSi_T1 = (amp_apfu_df_recalc["Si_Amp_cat_23ox"] - 4) / 4
+    XAl_T1 = (8 - amp_apfu_df_recalc["Si_Amp_cat_23ox"]) / 4
+    XAl_M2 = (
+        amp_apfu_df_recalc["Si_Amp_cat_23ox"]
+        + amp_apfu_df_recalc["Al_Amp_cat_23ox"]
+        - 8
+    ) / 2
+    XK_A = amp_apfu_df_recalc["K_Amp_cat_23ox"]
+    Xsq_A = (
+        3
+        - amp_apfu_df_recalc["Ca_Amp_cat_23ox"]
+        - amp_apfu_df_recalc["Na_Amp_cat_23ox"]
+        - amp_apfu_df_recalc["K_Amp_cat_23ox"]
+        - cm
+    )
+    XNa_A = (
+        amp_apfu_df_recalc["Ca_Amp_cat_23ox"]
+        + amp_apfu_df_recalc["Na_Amp_cat_23ox"]
+        + cm
+        - 2
+    )
+    XNa_M4 = (2 - amp_apfu_df_recalc["Ca_Amp_cat_23ox"] - cm) / 2
+    XCa_M4 = amp_apfu_df_recalc["Ca_Amp_cat_23ox"] / 2
+    # FIXED MATRIX MATH ALGEBRA THAT WAS CREATING THE WRONG NUMBER
+    # OF COMBINATIONS POSSIBLE FROM INPUT DATA. EASY BUT "UGLY" FIX
+    # WAS TO TURN EVERYTHING INTO A NUMPY ARRAY AND THEN BACK INTO
+    # A DATAFRAME
+    Ked_trA = (27 / 256) * (Xsq_A * XSi_T1 * XAb) / (XNa_A * XAl_T1)
+    Ked_trA = (
+        (27 / 256)
+        * (np.array(Xsq_A) * np.array(XSi_T1) * np.array(XAb)[:, np.newaxis])
+        / (np.array(XNa_A) * np.array(XAl_T1))
+    )
+    Ked_trB = (27 / 64) * (XNa_M4 * XSi_T1 * XAn) / (XCa_M4 * XAl_T1 * XAb)
+    Ked_trB = (
+        (27 / 64)
+        * (np.array(XNa_M4) * np.array(XSi_T1) * np.array(XAn)[:, np.newaxis])
+        / (np.array(XCa_M4) * np.array(XAl_T1) * np.array(XAb)[:, np.newaxis])
+    )
 
-    cm=((amp_apfu_df_recalc['Si_Amp_cat_23ox']+amp_apfu_df_recalc['Al_Amp_cat_23ox']
-    +amp_apfu_df_recalc['Ti_Amp_cat_23ox']+amp_apfu_df_recalc['Fe3_Amp_cat_23ox']
-    + amp_apfu_df_recalc['Fe2_Amp_cat_23ox']+amp_apfu_df_recalc['Mg_Amp_cat_23ox']
-    +amp_apfu_df_recalc['Mn_Amp_cat_23ox'])-13)
+    YAb = 12 * (1 - XAb) ** 2 - 3
+    HighXAb = XAb > 0.5
+    YAb[HighXAb] = 0
 
-    XSi_T1=(amp_apfu_df_recalc['Si_Amp_cat_23ox']-4)/4
-    XAl_T1=(8-amp_apfu_df_recalc['Si_Amp_cat_23ox'])/4
-    XAl_M2=(amp_apfu_df_recalc['Si_Amp_cat_23ox']+amp_apfu_df_recalc['Al_Amp_cat_23ox']-8)/2
-    XK_A=amp_apfu_df_recalc['K_Amp_cat_23ox']
-    Xsq_A=(3-amp_apfu_df_recalc['Ca_Amp_cat_23ox']-amp_apfu_df_recalc['Na_Amp_cat_23ox']-amp_apfu_df_recalc['K_Amp_cat_23ox']
-    -cm)
-    XNa_A=amp_apfu_df_recalc['Ca_Amp_cat_23ox']+amp_apfu_df_recalc['Na_Amp_cat_23ox']+cm-2
-    XNa_M4=(2-amp_apfu_df_recalc['Ca_Amp_cat_23ox']-cm)/2
-    XCa_M4=amp_apfu_df_recalc['Ca_Amp_cat_23ox']/2
-    Ked_trA=(27/256)*(Xsq_A*XSi_T1*XAb)/(XNa_A*XAl_T1)
-    Ked_trB=(27/64)*(XNa_M4*XSi_T1*XAn)/(XCa_M4*XAl_T1*XAb)
-    YAb=12*(1-XAb)**2-3
-    HighXAb=XAb>0.5
-    YAb[HighXAb]=0
+    Ta = (
+        -76.95
+        + P * 0.79
+        + np.array(YAb)[:, np.newaxis]
+        + 39.4 * np.array(XNa_A)
+        + 22.4 * np.array(XK_A)
+        + (41.5 - 2.89 * P) * np.array(XAl_M2)
+    ) / (-0.065 - 0.0083144 * np.log(Ked_trA.astype(float)))
 
-    Ta=((-76.95+P*0.79+YAb+39.4*XNa_A+22.4*XK_A+(41.5-2.89*P)*XAl_M2)/
-        (-0.065-0.0083144*np.log(Ked_trA.astype(float))))
+    YAb_B = 12 * (2 * np.array(XAb) - 1) + 3
+    YAb_B[HighXAb] = 3
+    Tb = (
+        78.44
+        + YAb_B[:, np.newaxis]
+        - 33.6 * np.array(XNa_M4)
+        - (66.8 - 2.92 * P) * np.array(XAl_M2)
+        + 78.5 * np.array(XAl_T1)
+        + 9.4 * np.array(XNa_A)
+    ) / (0.0721 - 0.0083144 * np.log(Ked_trB.astype(float)))
 
-    YAb_B=12*(2*XAb-1)+3
-    YAb_B[HighXAb]=3
-    Tb=((78.44 +YAb_B - 33.6*XNa_M4 - (66.8 -2.92*P)*XAl_M2 +78.5*XAl_T1 +9.4*XNa_A )/
-        (0.0721-0.0083144*np.log(Ked_trB.astype(float))))
+    Ta = pd.DataFrame(Ta)
+    Ta.columns = [
+        f"{index}_Amp{i+1}"
+        for index, i in zip(amp_comps.index, range(amp_comps.shape[0]))
+    ]
+    Ta.index = [
+        f"{index}_Plag{i+1}"
+        for index, i in zip(plag_comps.index, range(plag_comps.shape[0]))
+    ]
+    Ta.index.name = "plag_spot"
 
-    if equationT=="T_HB1994_A":
+    Tb = pd.DataFrame(Tb)
+    Tb.columns = [
+        f"{index}_Amp{i+1}"
+        for index, i in zip(amp_comps.index, range(amp_comps.shape[0]))
+    ]
+    Tb.index = [
+        f"{index}_Plag{i+1}"
+        for index, i in zip(plag_comps.index, range(plag_comps.shape[0]))
+    ]
+    Tb.index.name = "plag_spot"
+
+    # GIVE THE OPTION ON OUTPUT TO HAVE A 1D OR 2-D RESULTS. IF 2D
+    # DATA ARE OUTPUT AS N_plag x M_amphibole ANALYSES SO THE USER CAN
+    # SEE WHICH TEMPERATURES BELONG TO EACH ANALYSIS PAIR.
+    if equationT == "T_HB1994_A":
+        if ravel_results == True:
+            Ta = pd.Series(
+                Ta.values.ravel(),
+                index=plag_comps.index.unique().tolist() * Ta.values.ravel().shape[0],
+            )
         return Ta
-    if equationT=="T_HB1994_B":
+    if equationT == "T_HB1994_B":
+        if ravel_results == True:
+            Tb = pd.Series(
+                Tb.values.ravel(),
+                index=plag_comps.index.unique().tolist() * Tb.values.ravel().shape[0],
+            )
         return Tb
 
 
