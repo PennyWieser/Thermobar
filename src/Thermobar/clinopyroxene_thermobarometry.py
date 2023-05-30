@@ -2723,6 +2723,8 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
     Combo_liq_cpxs = pd.concat([DupLiqs, DupCPXs], axis=1)
     LenCombo = str(np.shape(Combo_liq_cpxs)[0])
 
+
+
     # Status update for user
     LenCpx=len(cpx_comps)
     LenLiqs=len(liq_comps)
@@ -2743,6 +2745,8 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
     # This section of code is for when users specify a presssure or
     # temperature, its much faster to not have to iterate, so we don't need
     # the preliminary Kd filter
+
+
 
     if P is not None:
         Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs.copy()
@@ -2820,6 +2824,8 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
             Combo_liq_cpxs_FeMgMatch = Combo_liq_cpxs_2.loc[~((Delta_Kd_T_MaxP > Kd_Err) &
                                                                 (Delta_Kd_T_MinP > Kd_Err))].reset_index(drop = True)
 
+
+
             str2 = str(np.shape(Combo_liq_cpxs_FeMgMatch)[0])
             print(str2 + ' Matches remaining after initial Kd filter. '
             'Now moving onto iterative calculations')
@@ -2858,10 +2864,19 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
 
 
 
+
+
+
+
+
         combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.copy()
+
+
+
 
         # First, make filter based on various Kd optoins
         if Kd_Match != "Masotta" and Kd_Match != "Putirka":
+
 
             Combo_liq_cpxs_eq_comp.loc[:, 'DeltaKd_Kd_Match_userSp']= abs(
                 Kd_Match - Combo_liq_cpxs_eq_comp['Kd_Fe_Mg_Fe2'])
@@ -2875,13 +2890,23 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
         # Then filter other components based on user-selected errors
         # (default values from NEave et al. 2009)
 
-        combo_liq_cpx_fur_filt = (
-        Combo_liq_cpxs_eq_comp.loc[filtKd & (Combo_liq_cpxs_eq_comp['Delta_DiHd_Mollo13'] < DiHd_Err)
+        # Lets make filter
+        eqfilter=((filtKd) & (Combo_liq_cpxs_eq_comp['Delta_DiHd_Mollo13'] < DiHd_Err)
         & (Combo_liq_cpxs_eq_comp['Delta_EnFs_Mollo13'] < EnFs_Err)
-        & (Combo_liq_cpxs_eq_comp['Delta_CaTs_Put1999'] < CaTs_Err)])
+        & (Combo_liq_cpxs_eq_comp['Delta_CaTs_Put1999'] < CaTs_Err))
+
+
+        combo_liq_cpx_fur_filt = (
+        Combo_liq_cpxs_eq_comp.loc[eqfilter])
+
+        CpxNumbers = sum(eqfilter)
+
+
+
 
     if return_all_pairs is True:
         print('No equilibrium filters applied')
+        CpxNumbers=len(cpx_comps)
 
         if equationP is not None and equationT is not None:
 
@@ -2914,15 +2939,21 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
 
 
 
+
+
     combo_liq_cpx_fur_filt.insert(2, 'Delta_T_K_Iter', Delta_T_K_Iter)
     combo_liq_cpx_fur_filt.insert(3, 'Delta_P_kbar_Iter', Delta_P_kbar_Iter)
 
 
 
     # This just tidies up some columns to put stuff nearer the start
+
+
     cols_to_move = ['Sample_ID_Liq', 'Sample_ID_Cpx']
     combo_liq_cpx_fur_filt = combo_liq_cpx_fur_filt[cols_to_move + [
         col for col in combo_liq_cpx_fur_filt.columns if col not in cols_to_move]]
+
+
 
     Liquid_sample_ID=combo_liq_cpx_fur_filt["Sample_ID_Liq"]
     combo_liq_cpx_fur_filt.drop(["Sample_ID_Liq"], axis=1, inplace=True)
@@ -2935,14 +2966,15 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
 
     # Final step, calcuate a 3rd output which is the average and standard
     # deviation for each CPx (e.g., CPx1-Melt1, CPx1-melt3 etc. )
-    CpxNumbers = combo_liq_cpx_fur_filt['ID_CPX'].unique()
 
-    if len(CpxNumbers) > 0:
+
+    if CpxNumbers > 0:
         with w.catch_warnings():
             w.filterwarnings("ignore", category=pd.errors.PerformanceWarning)
 
-            combo_liq_cpx_fur_filt_copy = combo_liq_cpx_fur_filt.copy()
+
             df1_Mean_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).mean()
+
             df1_Std_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).std()
             count=combo_liq_cpx_fur_filt.groupby('ID_CPX',as_index=False).count().iloc[:, 1]
             df1_Mean_nopref['# of Liqs Averaged']=count
