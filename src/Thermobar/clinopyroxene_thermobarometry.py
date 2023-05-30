@@ -1837,7 +1837,7 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
     '''
     # Check liq and cpx same length
     if meltmatch is None and len(cpx_comps)!=len(liq_comps):
-        raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching functions instead')
+        raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching functions instead: calculate_cpx_liq_press_temp_matching')
 
 
     # This checks if your equation is one of the accepted equations
@@ -2031,7 +2031,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
     # Various warnings etc. to check inputs make sense.
 
     if meltmatch is None and len(cpx_comps)!=len(liq_comps):
-        raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching functions instead')
+        raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching function: calculate_cpx_liq_press_temp_matching')
 
 
     try:
@@ -2233,7 +2233,7 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
 
     # Gives users flexibility to reduce or increase iterations
     if meltmatch is None and len(cpx_comps)!=len(liq_comps):
-        raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching functions instead')
+        raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching function: calculate_cpx_liq_press_temp_matching')
 
     if iterations is not None:
         iterations = iterations
@@ -2378,7 +2378,7 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
     with w.catch_warnings():
         w.simplefilter('ignore')
         if len(cpx_comps)!=len(liq_comps):
-            raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching functions instead')
+            raise ValueError('Liq comps need to be same length as cpx  comps. If you want to match up all possible pairs, use the _matching function instead for 1 equation at a time: calculate_cpx_liq_press_temp_matching')
 
 
         cpx_comps_c=cpx_comps.reset_index(drop=True).copy()
@@ -2855,6 +2855,9 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
         Combo_liq_cpxs_eq_comp = calculate_cpx_liq_eq_tests(
             meltmatch=Combo_liq_cpxs_FeMgMatch, P=P_guess, T=T_K_guess)
 
+
+
+
         combo_liq_cpx_fur_filt = Combo_liq_cpxs_eq_comp.copy()
 
         # First, make filter based on various Kd optoins
@@ -2933,43 +2936,60 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
     # Final step, calcuate a 3rd output which is the average and standard
     # deviation for each CPx (e.g., CPx1-Melt1, CPx1-melt3 etc. )
     CpxNumbers = combo_liq_cpx_fur_filt['ID_CPX'].unique()
+
     if len(CpxNumbers) > 0:
-        df1_Mean_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).mean()
-        df1_Std_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).std()
-        count=combo_liq_cpx_fur_filt.groupby('ID_CPX',as_index=False).count().iloc[:, 1]
-        df1_Mean_nopref['# of Liqs Averaged']=count
-        Sample_ID_Cpx_Mean=df1_Mean_nopref['Sample_ID_Cpx']
-        Sample_ID_Cpx_Std=df1_Std_nopref['Sample_ID_Cpx']
-        df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
-        df1_Std=df1_Std_nopref.add_prefix('Std_')
-        df1_Mean=df1_Mean.drop(['Mean_Eq Tests Neave2017?', 'Mean_Sample_ID_Cpx'], axis=1)
-        df1_Std=df1_Std.drop(['Std_Eq Tests Neave2017?','Std_Sample_ID_Cpx'], axis=1)
-        df1_Mean.rename(columns={"Mean_ID_CPX": "ID_CPX"}, inplace=True)
-        df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
-        df1_Std.rename(columns={"Std_ID_CPX": "ID_CPX"}, inplace=True)
+        with w.catch_warnings():
+            w.filterwarnings("ignore", category=pd.errors.PerformanceWarning)
+
+            combo_liq_cpx_fur_filt_copy = combo_liq_cpx_fur_filt.copy()
+            df1_Mean_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).mean()
+            df1_Std_nopref=combo_liq_cpx_fur_filt.groupby(['ID_CPX', 'Sample_ID_Cpx'], as_index=False).std()
+            count=combo_liq_cpx_fur_filt.groupby('ID_CPX',as_index=False).count().iloc[:, 1]
+            df1_Mean_nopref['# of Liqs Averaged']=count
+            Sample_ID_Cpx_Mean=df1_Mean_nopref['Sample_ID_Cpx']
+            Sample_ID_Cpx_Std=df1_Std_nopref['Sample_ID_Cpx']
+            df1_Mean=df1_Mean_nopref.add_prefix('Mean_')
+
+            df1_Std=df1_Std_nopref.add_prefix('Std_')
+            # Drop columns if present
+            if 'Mean_Eq Tests Neave2017?' in df1_Mean.columns:
+                df1_Mean = df1_Mean.drop(['Mean_Eq Tests Neave2017?'], axis=1)
+
+            if 'Mean_Sample_ID_Cpx' in df1_Mean.columns:
+                df1_Mean = df1_Mean.drop(['Mean_Sample_ID_Cpx'], axis=1)
+
+            if 'Std_Eq Tests Neave2017?' in df1_Std.columns:
+                df1_Std = df1_Std.drop(['Std_Eq Tests Neave2017?'], axis=1)
+
+            if 'Std_Sample_ID_Cpx' in df1_Std.columns:
+                df1_Std = df1_Std.drop(['Std_Sample_ID_Cpx'], axis=1)
+
+            df1_Mean.rename(columns={"Mean_ID_CPX": "ID_CPX"}, inplace=True)
+            df1_Mean.rename(columns={"Mean_# of Liqs Averaged": "# of Liqs Averaged"}, inplace=True)
+            df1_Std.rename(columns={"Std_ID_CPX": "ID_CPX"}, inplace=True)
 
 
 
-        df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_CPX'])
-        df1_M['Sample_ID_Cpx']=Sample_ID_Cpx_Mean
+            df1_M=pd.merge(df1_Mean, df1_Std, on=['ID_CPX'])
+            df1_M['Sample_ID_Cpx']=Sample_ID_Cpx_Mean
 
-        if equationT is not None and equationP is not None:
-            cols_to_move = ['Sample_ID_Cpx', '# of Liqs Averaged',
-                        'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
-                        'Std_P_kbar_calc']
+            if equationT is not None and equationP is not None:
+                cols_to_move = ['Sample_ID_Cpx', '# of Liqs Averaged',
+                            'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+                            'Std_P_kbar_calc']
 
-        if equationT is not None and equationP is None:
-            cols_to_move = ['Sample_ID_Cpx',
-                        'Mean_P_kbar_input',
-                        'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
+            if equationT is not None and equationP is None:
+                cols_to_move = ['Sample_ID_Cpx',
+                            'Mean_P_kbar_input',
+                            'Std_P_kbar_input', 'Mean_T_K_calc', 'Std_T_K_calc']
 
-        if equationT is None and equationP is not None:
-            cols_to_move = ['Sample_ID_Cpx',
-                        'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
-                        'Std_P_kbar_calc']
+            if equationT is None and equationP is not None:
+                cols_to_move = ['Sample_ID_Cpx',
+                            'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
+                            'Std_P_kbar_calc']
 
-        df1_M = df1_M[cols_to_move +
-                    [col for col in df1_M.columns if col not in cols_to_move]]
+            df1_M = df1_M[cols_to_move +
+                        [col for col in df1_M.columns if col not in cols_to_move]]
 
 
     else:
