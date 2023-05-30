@@ -3026,8 +3026,7 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
 
     else:
         raise Exception(
-            'No Matches - to set less strict filters, change perhaps change sigma to a value greater'
-            ' than one, or specify eq_crit for only a subset of the values in Neave and Putirka')
+            'No Matches - what you should do now - type the arguement return_all_pairs=True in this function to get all matches and look at which filters are fail')
 
 
 
