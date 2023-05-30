@@ -2,6 +2,18 @@
 Change Log
 ================================================
 
+
+Version 1.0.20 Mayn 30th, 2023
+==============================
+Cpx matching function thros error if one column all Nans, have done a check if column there first. Thanks Divya!
+
+
+
+Version 1.0.19 April 1st, 2023
+==============================
+Raises warning if people enter non equal length dataframes into functions which dont melt match. Add melt match for plag-fspar (Thanks Jordan!)
+
+
 Version 1.0.18 April 1st, 2023
 ==============================
 Support for non numerical sample names for Opx-Cpx, Opx-Liq matching, Fspar-Liq, Amp-Liq.
