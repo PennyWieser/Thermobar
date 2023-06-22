@@ -3572,7 +3572,7 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
     # Di Hd equilibrium
 
-    # Putirka (1999) DiHd
+    # Putirka (1999) DiHd Eq3.1a
     Combo_liq_cpxs['DiHd_Pred_Put1999']=(np.exp(-9.8
     + 0.24*np.log(Combo_liq_cpxs['Ca_Liq_cat_frac']*(Combo_liq_cpxs['Fet_Liq_cat_frac']+Combo_liq_cpxs['Mg_Liq_cat_frac'])*
     Combo_liq_cpxs['Si_Liq_cat_frac']**2)+17558/T+8.7*np.log(T/1670)-4.61*10**3*(Combo_liq_cpxs['EnFs']**2/T))
@@ -3590,7 +3590,7 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
 
 
-    # Mollo 2013 for DiHd
+    # Mollo 2013 for DiHd - Eq7
     Combo_liq_cpxs['DiHd_Pred_Mollo13'] = (np.exp(-2.18 - 3.16 * Combo_liq_cpxs['Ti_Liq_cat_frac']
     - 0.365 * np.log(Combo_liq_cpxs['Al_Liq_cat_frac'].astype(float))
      + 0.05 * np.log(Combo_liq_cpxs['Mg_Liq_cat_frac']) - 3858.2 * (
@@ -3614,7 +3614,7 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
 
 
-    # En Fs Mollo
+    # En Fs Mollo eq6
 
     Combo_liq_cpxs['EnFs_Pred_Mollo13'] = (np.exp(0.018 - 9.61 * Combo_liq_cpxs['Ca_Liq_cat_frac'] +
                                                 7.46 *
@@ -3629,7 +3629,7 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
 
 
     #  CaTs equilibrium (Mollo didnt release on of these)
-
+    # This is equation 3.4 of Putirka
     Combo_liq_cpxs['CaTs_Pred_Put1999'] = (np.exp(2.58 + 0.12 * P / T - 9 * 10**(-7) * P**2 / T
     + 0.78 * np.log(Combo_liq_cpxs['Ca_Liq_cat_frac'].astype(float)
     * Combo_liq_cpxs['Al_Liq_cat_frac'].astype(float)**2
@@ -3647,7 +3647,7 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     Combo_liq_cpxs['Delta_CrCaTs_Put1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_Put1999'])
     Combo_liq_cpxs['Delta_CrCaTs_I_M_Put1999']=abs(Combo_liq_cpxs['CrCaTs']-Combo_liq_cpxs['CrCaTs_Pred_Put1999'])
 
-    # CaTi component
+    # CaTi component - Eq 3.6
 
     Combo_liq_cpxs['CaTi_Pred_Put1999']=( np.exp(5.1 + 0.52*np.log(Combo_liq_cpxs['Ca_Liq_cat_frac']*Combo_liq_cpxs['Ti_Liq_cat_frac']*Combo_liq_cpxs['Al_Liq_cat_frac']**2)
     +2.04*10**(3)* (Combo_liq_cpxs['DiHd_1996']**2 / T)- 6.2* Combo_liq_cpxs['Si_Liq_cat_frac']
@@ -3659,7 +3659,7 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     Combo_liq_cpxs['Delta_CaTi_I_M_Put1999']=abs(Combo_liq_cpxs['CaTi']-Combo_liq_cpxs['CaTi_Pred_Put1999'])
 
 
-    # Jd component
+    # Jd component Eq3.5
     Combo_liq_cpxs['Jd_Pred_Put1999']=(np.exp(-1.06+0.23*P/T-6*10**(-7)*P**2/T
     +1.02*np.log(Combo_liq_cpxs['Na_Liq_cat_frac']*Combo_liq_cpxs['Al_Liq_cat_frac']*Combo_liq_cpxs['Si_Liq_cat_frac']**2)
     -0.8*np.log(Combo_liq_cpxs['Al_Liq_cat_frac'])-2.2*np.log(Combo_liq_cpxs['Si_Liq_cat_frac'])))

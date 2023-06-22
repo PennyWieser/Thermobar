@@ -659,43 +659,39 @@ def calculate_amp_liq_all_equations(amp_comps, liq_comps, H2O_Liq=None):
     if len(amp_comps)!=len(liq_comps):
         raise ValueError('Liq comps need to be same length as Amp comps. If you want to match up all possible pairs, use the _matching functions instead')
 
+    # Amp-Liq temp, not P sensitive, but are H2O sensitive
 
-    # Eq5 and 7s
-    CalcPT_Teq4b_P7a=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq4b", equationP="P_Put2016_eq7a")
+    CalcT_4a=calculate_amp_liq_temp(amp_comps=amp_comps,
+liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq4a_amp_sat")
 
-    CalcPT_Teq4b_P7b=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq4b", equationP="P_Put2016_eq7b")
+    CalcT_4b=calculate_amp_liq_temp(amp_comps=amp_comps,
+liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq4b")
 
-    CalcPT_Teq4b_P7c=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq4b", equationP="P_Put2016_eq7c")
+    CalcT_9=calculate_amp_liq_temp(amp_comps=amp_comps,
+liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq9")
 
-    # Equation 6 and 7s
-    CalcPT_Teq9_P7a=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq9", equationP="P_Put2016_eq7a")
+    # Amp-Liq pressure - Eq 7a, 7b, and Eq7c, all H2O sensitive, but T not
 
-    CalcPT_Teq9_P7b=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq9", equationP="P_Put2016_eq7b")
+    CalcP_eq7a=calculate_amp_liq_press(amp_comps=amp_comps,
+liq_comps=liq_comps, H2O_Liq=H2O_Liq,  equationP="P_Put2016_eq7a")
 
-    CalcPT_Teq9_P7c=calculate_amp_liq_press_temp(amp_comps=amp_comps,
-liq_comps=liq_comps, H2O_Liq=H2O_Liq, equationT="T_Put2016_eq9", equationP="P_Put2016_eq7c")
+    CalcP_eq7b=calculate_amp_liq_press(amp_comps=amp_comps,
+liq_comps=liq_comps, H2O_Liq=H2O_Liq,  equationP="P_Put2016_eq7b")
 
+    CalcP_eq7c=calculate_amp_liq_press(amp_comps=amp_comps,
+liq_comps=liq_comps, H2O_Liq=H2O_Liq,  equationP="P_Put2016_eq7c")
 
-    out=pd.DataFrame(data={
-                            'P_kbar_Teq4b_P7a': CalcPT_Teq4b_P7a.P_kbar_calc,
-                            'T_K_Teq4b_P7a': CalcPT_Teq4b_P7a.T_K_calc,
-                            'P_kbar_Teq4b_P7b': CalcPT_Teq4b_P7b.P_kbar_calc,
-                            'T_K_Teq4b_P7b': CalcPT_Teq4b_P7b.T_K_calc,
-                            'P_kbar_Teq4b_P7c': CalcPT_Teq4b_P7c.P_kbar_calc,
-                            'T_K_Teq4b_P7c': CalcPT_Teq4b_P7c.T_K_calc,
-                            'P_kbar_Teq9_P7a': CalcPT_Teq9_P7a.P_kbar_calc,
-                            'T_K_Teq9_P7a': CalcPT_Teq9_P7a.T_K_calc,
-                            'P_kbar_Teq9_P7b': CalcPT_Teq9_P7b.P_kbar_calc,
-                            'T_K_Teq9_P7b': CalcPT_Teq9_P7b.T_K_calc,
-                            'P_kbar_Teq9_P7c': CalcPT_Teq9_P7c.P_kbar_calc,
-                            'T_K_Teq9_P7c': CalcPT_Teq9_P7c.T_K_calc}
-     )
-    return out
+    df_out=pd.DataFrame(data={'CalcT_4a_amp_sat (P-ind)': CalcT_4a,
+                            'CalcT_4b (P-ind)': CalcT_4b,
+                            'CalcT_9 (P-ind)': CalcT_9,
+                            'CalcP_7a (T-ind)': CalcP_eq7a,
+                            'CalcP_7b (T-ind)': CalcP_eq7b,
+                            'CalcP_7c (T-ind)': CalcP_eq7c,
+                                })
+
+    # Eq4b for T,
+
+    return df_out
 
 
 ## Amphibole-only thermometers

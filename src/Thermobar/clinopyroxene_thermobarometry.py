@@ -2372,8 +2372,57 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         eq_tests.insert(4,'Delta_T_K_Iter',DeltaT)
         return eq_tests
 ## All popular option for Cpx-Liq thermobarometry
+import sys
+from io import StringIO
+
+def block_prints():
+    # Save the current stdout
+    original_stdout = sys.stdout
+
+    # Redirect stdout to a StringIO object
+    sys.stdout = StringIO()
+
+    # Call the functions that produce prints
+    function1()
+    function2()
+    # ...
+
+    # Restore the original stdout
+    sys.stdout = original_stdout
+
 
 def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
+    """ This function calculates Cpx-Liq and Cpx-only P and T using a wide range of popular equations in the literature. Happy to add more to this on request!
+
+    Parameters
+    -------
+
+     cpx_comps: pandas.DataFrame (opt, either specify cpx_comps AND liq_comps or meltmatch)
+        Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
+
+    liq_comps: pandas.DataFrame
+        Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
+
+    H2O_Liq: float, int, pandas.Series, optional
+        If users don't specify, uses H2O_Liq from liq_comps,
+        if specified overwrites this.
+
+    Returns
+    -------
+    Pandas dataframe with temperature in kelvin, pressure in kbar.
+
+    """
+
+    class BlockPrints:
+        def write(self, text):
+            pass
+
+    # Save the current stdout
+    original_stdout = sys.stdout
+
+    # Redirect stdout to the custom file-like object
+    sys.stdout = BlockPrints()
+
     import warnings
     with w.catch_warnings():
         w.simplefilter('ignore')
@@ -2490,6 +2539,8 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
                                     'P_kbar: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.P_kbar_calc,
 
             })
+
+        sys.stdout = original_stdout
 
         return df_out
 
