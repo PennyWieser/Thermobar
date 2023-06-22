@@ -2413,15 +2413,7 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
 
     """
 
-    class BlockPrints:
-        def write(self, text):
-            pass
 
-    # Save the current stdout
-    original_stdout = sys.stdout
-
-    # Redirect stdout to the custom file-like object
-    sys.stdout = BlockPrints()
 
     import warnings
     with w.catch_warnings():
@@ -2540,7 +2532,7 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
 
             })
 
-        sys.stdout = original_stdout
+
 
         return df_out
 
