@@ -52,6 +52,8 @@ from Thermobar.garnet_class import*
 from Thermobar.geotherm import *
 # Density profiles
 from Thermobar.density_profiles import *
+# CHOMPI
+from Thermobar.chompi import *
 
 
 # version
