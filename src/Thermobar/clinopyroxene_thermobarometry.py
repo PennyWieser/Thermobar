@@ -2524,8 +2524,8 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
                                     'P_kbar: (Petrelli, 2020)': Pet2020.P_kbar_calc,
                                     'T_K: (Petrelli, 2020)': Pet2020.T_K_calc,
 
-                                    'P_kbar: (Jorgeson, 2022)': Jorg2020.P_kbar_calc,
-                                    'T_K: (Jorgeson, 2022)': Jorg2020.T_K_calc,
+                                    'P_kbar: (Jorgenson, 2022)': Jorg2020.P_kbar_calc,
+                                    'T_K: (Jorgenson, 2022)': Jorg2020.T_K_calc,
 
                                     'T_K: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.T_K_calc,
                                     'P_kbar: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.P_kbar_calc,

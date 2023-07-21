@@ -131,6 +131,7 @@ def duplicate_rows(liq_norm_to_dup, N_rep):
 
 def calculate_CHOMPI(liq_comps,  deltaNNO, T_K_guess, N_rep=100):
     """ This function follows the CHOMPI algorithmic steps of Blundy et al. (2022)
+https://doi.org/10.1093/petrology/egac054
 
     Parameters
     --------------

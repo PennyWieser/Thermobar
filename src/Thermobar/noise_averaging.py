@@ -624,9 +624,7 @@ def calculate_bootstrap_mixes(
     # end-members
     if self_mixing == "Partial":
         # self mixing part
-        my_dataset3_self = endmember1
-        my_dataset3_self = my_dataset3_self.append(
-            endmember2, ignore_index=True)
+        my_dataset3_self = pd.concat([endmember1, endmember2], ignore_index=True)
         endmember1_self = my_dataset3_self[Elements].sample(
             n=num_samples, replace=True).to_numpy()
         endmember2_self = my_dataset3_self[Elements].sample(
@@ -649,8 +647,7 @@ def calculate_bootstrap_mixes(
         myDataframe = myDataframe.sample(n=num_samples, replace=True)
 
     if self_mixing is True:
-        my_dataset3 = endmember1
-        my_dataset3 = my_dataset3.append(endmember2, ignore_index=True)
+        my_dataset3 = pd.concat([endmember1, endmember2], ignore_index=True)
 
         endmember1 = my_dataset3[Elements].sample(
             n=num_samples, replace=True).to_numpy()

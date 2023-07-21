@@ -109,6 +109,12 @@ def return_cali_dataset(model=None):
         with open(Thermobar_dir/'Waters_Lange2015_Cali_input.pkl', 'rb') as f:
             Cali_input=load(f)
 
+    if model=="Masotta2019":
+        with open(Thermobar_dir/'Masotta2019_Cali_input.pkl', 'rb') as f:
+            Cali_input=load(f)
+            cat_plags = calculate_cat_fractions_plagioclase(plag_comps=Cali_input)
+            Cali_input['XAn']=cat_plags['An_Plag']
+            Cali_input['XAb']=cat_plags['Ab_Plag']
     return Cali_input
 
 
