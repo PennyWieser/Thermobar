@@ -11,7 +11,7 @@ from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy import stats
 
 # Redit says equation for RMSE ignores DoF. so /n instead of /n-k-1
-def std_dev(x, x2):
+def RMSE_func(x, x2):
     N=len(x)
     sum_squares=np.sum((x-x2)**2)
     RMSE=np.sqrt((1/N)*sum_squares)
@@ -85,7 +85,8 @@ def calculate_R2(x, y, xy=True, df=False, round=5):
     Grad=lr.coef_
     #R="R\N{SUPERSCRIPT TWO} = " +  str(np.round(r2_score(regy, Y_pred), 2))
     R=(np.round(r2_score(regy, Y_pred), round))
-    RMSE=std_dev(regx, regy)
+    RMSE=RMSE_func(regx, regy)
+
     RMSEp=np.round(RMSE, round)
     Median=np.nanmedian(regy-regx)#
     Medianp=np.round(Median, round)
@@ -120,6 +121,53 @@ def calculate_R2(x, y, xy=True, df=False, round=5):
         df=df.round(decimals=2)
         return df
 
+def calculate_R2_devitre(x, y, xy=True, df=False, round=5,pval_format='decimal'):
+    """ Calculates statistics
+    if xy= False doesn't return y and x pred
+    """
+    masknan = (~np.isnan(x) & ~np.isnan(y))
+    regx = x[masknan].values.reshape(-1, 1)
+    regy = y[masknan].values.reshape(-1, 1)
+
+    slope, intercept, r_value, p_value, std_err = stats.linregress(regx[:, 0], regy[:, 0])
+
+    lr = LinearRegression()
+    lr.fit(regx, regy)
+    Y_pred = lr.predict(regx)
+    Int = lr.intercept_[0]
+    Grad = lr.coef_[0][0]
+
+    R = r2_score(regy, Y_pred)
+    RMSE = np.sqrt(np.mean((regy - Y_pred) ** 2))
+    Median = np.nanmedian(regy - regx)
+    Mean = np.nanmean(regy - regx)
+
+    if pval_format=='decimal':
+        p_value=format(p_value, '.'+str(round)+'f')
+
+    Rp = np.round(R, round)
+    RMSEp = np.round(RMSE, round)
+    Medianp = np.round(Median, round)
+    Meanp = np.round(Mean, round)
+    Intp=np.round(Int,round)
+    Gradp=np.round(Grad,round)
+
+    output = {
+        "R\u00B2": str(Rp),
+        'RMSE': str(RMSEp),
+        'P_val': str(p_value),
+        'Median': str(Medianp),
+        'Mean': str(Meanp),
+        'Int': str(Intp),
+        'Grad': str(Gradp)
+    }
+
+    if xy:
+        output['x_pred'] = Y_pred.tolist()
+        output['y_pred'] = regy.tolist()
+
+    return output
+
 
 def calculate_R2_Tukey(x, y):
     masknan=(~np.isnan(x) & ~np.isnan(y))
@@ -136,7 +184,7 @@ def calculate_R2_Tukey(x, y):
     Grad=np.round(Grad[0][0], 2)
     #R="R\N{SUPERSCRIPT TWO} = " +  str(np.round(r2_score(regy, Y_pred), 2))
     R=(np.round(r2_score(regy, Y_pred), 2))
-    RMSE=std_dev(regx, regy)
+    RMSE=RMSE_func(regx, regy)
     RMSEp=np.round(RMSE, 1)
     Median=np.nanmedian(regy-regx)#
     Medianp=np.round(Median, 2)
@@ -160,7 +208,7 @@ def calculate_R2_np(x, y, xy=True):
     lr.fit(regx,regy)
     Y_pred=lr.predict(regx)
     R='R2' +  str(np.round(r2_score(regy, Y_pred), 2))
-    RMSE=std_dev(regx, regy)
+    RMSE=RMSE_func(regx, regy)
     RMSEp='RMSE= ' +  str(np.round(RMSE, 5))
     Median=np.nanmedian(regy-regx)#
     Medianp='Median Off= ' +  str(np.round(Median, 5))

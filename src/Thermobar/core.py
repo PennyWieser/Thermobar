@@ -4629,6 +4629,9 @@ def normalize_liquid_jorgenson(liq_comps):
     Liq_test=liq_comps.copy()
     Liq_no_H2O=Liq_test.drop(labels=['Sample_ID_Liq', 'Fe3Fet_Liq', 'NiO_Liq',
                                    'CoO_Liq', 'CO2_Liq', 'H2O_Liq'], axis=1)
+    if 'Sample_ID_Liq_num' in Liq_no_H2O:
+        Liq_no_H2O.drop('Sample_ID_Liq_num', axis=1, inplace=True)
+
     Liq_no_H2O
     sum_row= 0.01*Liq_no_H2O.sum(axis=1)
     Liq_norm1=Liq_no_H2O.divide(sum_row, axis='rows')
@@ -4649,6 +4652,8 @@ def normalize_liquid_100_anhydrous_chompi(liq_comps):
     Liq_test=liq_comps.copy()
     Liq_no_H2O=Liq_test.drop(labels=['Sample_ID_Liq', 'Fe3Fet_Liq', 'MnO_Liq', 'Cr2O3_Liq', 'P2O5_Liq', 'NiO_Liq',
                                    'CoO_Liq', 'CO2_Liq', 'H2O_Liq'], axis=1)
+    if 'Sample_ID_Liq_num' in Liq_no_H2O:
+        Liq_no_H2O.drop('Sample_ID_Liq_num', axis=1, inplace=True)
     sum_row= 0.01*Liq_no_H2O.sum(axis=1)
     Liq_norm1=Liq_no_H2O.divide(sum_row, axis='rows')
     Liq_norm=Liq_norm1.copy()

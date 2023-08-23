@@ -1,10 +1,17 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.27 - Augst 23rd, 2023
+=====================================
+Fixed bug with Jorgenson - was doing normalizatoin using the Sample_ID_Liq_num column for MonteCarlo simulations, resulted in liquid getting less and less data as you go to higher iterations. Added if statement
+to drop column before normalization stage.
+
+
 Version 1.0.25 - July 6th, 2023
 ==============================
 Added CHOMPI from Blundy (2022)
 function calculate_CHOMPI
+
 
 Version 1.0.20 Mayn 30th, 2023
 ==============================
