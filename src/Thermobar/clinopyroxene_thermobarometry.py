@@ -249,6 +249,10 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -317,6 +321,10 @@ def P_Jorgenson2022_Cpx_Liq_Norm(T=None, *, cpx_comps=None, liq_comps=None, melt
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -384,6 +392,10 @@ def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -451,6 +463,10 @@ liq_comps=None, meltmatch=None):
     #sess = rt.InferenceSession(path+'/'+'Jorg21_Cpx_Liq_Press.onnx')
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
@@ -528,6 +544,10 @@ def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltm
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
@@ -764,15 +784,19 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     # Old version using pickles
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq.pkl', 'rb') as f:
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq_sklearn_1_3.pkl', 'rb') as f:
         scaler_P2020_Cpx_Liq=load(f)
 
-    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Liq.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Liq_sklearn_1_3.pkl', 'rb') as f:
         ETR_Temp_P2020_Cpx_Liq=joblib.load(f)
 
     x_test_scaled=scaler_P2020_Cpx_Liq.transform(x_test)
@@ -834,6 +858,10 @@ def T_Jorgenson2022_Cpx_Liq_Norm(P=None, *, cpx_comps=None, liq_comps=None, melt
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -901,6 +929,10 @@ def T_Jorgenson2022_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -964,6 +996,10 @@ def T_Jorgenson2022_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, melt
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
@@ -1036,6 +1072,10 @@ def T_Petrelli2020_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, meltm
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
@@ -1151,6 +1191,10 @@ def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -1197,6 +1241,10 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
@@ -1282,6 +1330,10 @@ def P_Jorgenson2022_Cpx_only(T=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -1324,6 +1376,10 @@ def P_Jorgenson2022_Cpx_only_onnx(T=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
@@ -1367,6 +1423,10 @@ def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -1562,14 +1622,18 @@ def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_Jan22.pkl', 'rb') as f:
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_sklearn_1_3.pkl', 'rb') as f:
         scaler_P2020_Cpx_only=load(f)
 
-    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only_Jan22.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only_sklearn_1_3.pkl', 'rb') as f:
         ETR_Temp_P2020_Cpx_only=joblib.load(f)
 
     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
@@ -1604,6 +1668,9 @@ def T_Jorgenson2022_Cpx_only_Norm(P=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -1647,6 +1714,10 @@ def T_Jorgenson2022_Cpx_only(P=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -1687,6 +1758,10 @@ def T_Jorgenson2022_Cpx_only_onnx(P=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
@@ -1729,6 +1804,10 @@ def T_Petrelli2020_Cpx_only_onnx(P=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
@@ -1777,6 +1856,10 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
 
     try:
         import Thermobar_onnx
+        version=Thermobar_onnx.__version__
+        if version != '0.0.4':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent

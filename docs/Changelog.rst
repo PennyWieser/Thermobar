@@ -1,6 +1,13 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.28 - October 6th, 2023
+=====================================
+Saved pkl files for Jorgenson and Petrelli were failing with Sklearn 1.3. retrained models using this version + released new version on github for Thermobar_onnx.
+Sklearn also changed 'mse' to now be called 'squared_error'
+For Cpx_all functions, as doesnt do voting anyway, swapped to onnx versions, so at least those work when people have wrong versions.
+
+================================================
 Version 1.0.27 - Augst 23rd, 2023
 =====================================
 Fixed bug with Jorgenson - was doing normalizatoin using the Sample_ID_Liq_num column for MonteCarlo simulations, resulted in liquid getting less and less data as you go to higher iterations. Added if statement
