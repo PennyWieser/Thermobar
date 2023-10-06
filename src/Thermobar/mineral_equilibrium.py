@@ -331,6 +331,10 @@ def calculate_ol_rhodes_diagram_lines(
     Eq_Roeder_03 = 1 / ((0.3 / Mgno) + (1 - 0.3))
     Eq_Roeder_027 = 1 / ((0.27 / Mgno) + (1 - 0.27))
     Eq_Roeder_033 = 1 / ((0.33 / Mgno) + (1 - 0.33))
+    Eq_Shea_0335 = 1 / ((0.335 / Mgno) + (1 - 0.335))
+    Eq_Shea_0345 = 1 / ((0.345 / Mgno) + (1 - 0.345))
+    Eq_Shea_0325 = 1 / ((0.325 / Mgno) + (1 - 0.325))
+
 
     Eq_ol_034 = 1 / ((0.34 / Mgno) + (1 - 0.34))
     Eq_ol_032 = 1 / ((0.328 / Mgno) + (1 - 0.328))
@@ -340,7 +344,12 @@ def calculate_ol_rhodes_diagram_lines(
                                     'Eq_Ol_Fo_Roeder (Kd=0.33)': Eq_Roeder_033,
                                     'Eq_Ol_Fo_Matzen (Kd=0.34)': Eq_ol_034,
                                     'Eq_Ol_Fo_Matzen (Kd=0.328)': Eq_ol_032,
-                                    'Eq_Ol_Fo_Matzen (Kd=0.352)': Eq_ol_035})
+                                    'Eq_Ol_Fo_Matzen (Kd=0.352)': Eq_ol_035,
+                                    'Eq_Ol_Fo_Shea (Kd=0.335)': Eq_Shea_0335,
+                                    'Eq_Ol_Fo_Shea (Kd=0.345)': Eq_Shea_0345,
+                                    'Eq_Ol_Fo_Shea (Kd=0.325)': Eq_Shea_0325,
+
+                                    })
 
     if KdMin is not None and KdMax is not None:
         Eq_ol_KdMin = 1 / ((KdMin / Mgno) + (1 - KdMin))

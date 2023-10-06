@@ -452,8 +452,15 @@ liq_comps=None, meltmatch=None):
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
-    path=Path(Thermobar_onnx.__file__).parent
-    sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Press.onnx"))
+
+    # path=Path(Thermobar_onnx.__file__).parent
+    # sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Press.onnx"))
+    #
+    path = Path(Thermobar_onnx.__file__).parent
+    providers = ['AzureExecutionProvider', 'CPUExecutionProvider']
+    model_path = path / "Jorg21_Cpx_Liq_Press.onnx"
+    sess = rt.InferenceSession(str(model_path), providers=providers)
+
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
     Pred_P_kbar = sess.run([label_name], {input_name: x_test.astype(np.float32)})[0]
@@ -523,7 +530,11 @@ def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltm
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
     import onnxruntime as rt
-    sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Press.onnx"))
+    #sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Press.onnx"))
+
+    providers = ['AzureExecutionProvider', 'CPUExecutionProvider']
+    model_path = path / "Petrelli2020_Cpx_Liq_Press.onnx"
+    sess = rt.InferenceSession(str(model_path), providers=providers)
 
 
 
@@ -955,7 +966,10 @@ def T_Jorgenson2022_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, melt
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
     path=Path(Thermobar_onnx.__file__).parent
-    sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Temp.onnx"))
+    #sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Temp.onnx"))
+    providers = ['AzureExecutionProvider', 'CPUExecutionProvider']
+    model_path = path / "Jorg21_Cpx_Liq_Temp.onnx"
+    sess = rt.InferenceSession(str(model_path), providers=providers)
 
 
     #sess = rt.InferenceSession(str(Thermobar_dir/"Jorg21_Cpx_Liq_Temp.onnx"))
@@ -1024,7 +1038,10 @@ def T_Petrelli2020_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, meltm
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
     path=Path(Thermobar_onnx.__file__).parent
-    sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Temp.onnx"))
+    #sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Temp.onnx"))
+    providers = ['AzureExecutionProvider', 'CPUExecutionProvider']
+    model_path = path / "Petrelli2020_Cpx_Liq_Temp.onnx"
+    sess = rt.InferenceSession(str(model_path), providers=providers)
 
 
     input_name = sess.get_inputs()[0].name
@@ -1182,7 +1199,10 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
     path=Path(Thermobar_onnx.__file__).parent
-    sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Press.onnx"))
+    #sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Press.onnx"))
+    providers = ['AzureExecutionProvider', 'CPUExecutionProvider']
+    model_path = path / "Petrelli2020_Cpx_only_Press.onnx"
+    sess = rt.InferenceSession(str(model_path), providers=providers)
 
 
     input_name = sess.get_inputs()[0].name
@@ -1306,7 +1326,11 @@ def P_Jorgenson2022_Cpx_only_onnx(T=None, *, cpx_comps):
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     path=Path(Thermobar_onnx.__file__).parent
     import onnxruntime as rt
-    sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Press.onnx"))
+    #sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Press.onnx"))
+
+    providers = ['AzureExecutionProvider', 'CPUExecutionProvider']
+    model_path = path / "Jorg21_Cpx_only_Press.onnx"
+    sess = rt.InferenceSession(str(model_path), providers=providers)
 
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
@@ -1706,8 +1730,12 @@ def T_Petrelli2020_Cpx_only_onnx(P=None, *, cpx_comps):
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     import onnxruntime as rt
-    path=Path(Thermobar_onnx.__file__).parent
-    sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Temp.onnx"))
+    # path=Path(Thermobar_onnx.__file__).parent
+    # sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Temp.onnx"))
+    path = Path(Thermobar_onnx.__file__).parent
+    providers = ['AzureExecutionProvider', 'CPUExecutionProvider']
+    model_path = path / "Petrelli2020_Cpx_only_Temp.onnx"
+    sess = rt.InferenceSession(str(model_path), providers=providers)
 
 
     input_name = sess.get_inputs()[0].name
@@ -3247,19 +3275,20 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, return_cpx=True, H2O
         cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq2", H2O_Liq=H2O_Liq)
 
         cpx_comps_c['T_Petrelli20']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
-        equationT="T_Petrelli2020_Cpx_only").T_K_calc
+        equationT="T_Petrelli2020_Cpx_only_onnx")
 
         cpx_comps_c['T_Jorgenson22']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
-        equationT="T_Jorgenson2022_Cpx_only").T_K_calc
+        equationT="T_Jorgenson2022_Cpx_only_onnx")
 
-        cpx_comps_c['T_Petrelli21_H2O']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
-        equationT="T_Petrelli2020_Cpx_only_withH2O").T_K_calc
-
-        cpx_comps_c['P_Petrelli21_H2O']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
-        equationP="P_Petrelli2020_Cpx_only_withH2O").P_kbar_calc
+        # cpx_comps_c['T_Petrelli21_H2O']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
+        # equationT="T_Petrelli2020_Cpx_only_withH2O_onnx").T_K_calc
+        #
+        # cpx_comps_c['P_Petrelli21_H2O']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
+        # equationP="P_Petrelli2020_Cpx_only_withH2O").P_kbar_calc
 
         cpx_comps_c['T_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").T_K_calc
+
         cpx_comps_c['T_Put_Teq32d_Peq32b']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).T_K_calc
 
@@ -3275,10 +3304,10 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, return_cpx=True, H2O
 
 
         cpx_comps_c['P_Petrelli20']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
-        equationP="P_Petrelli2020_Cpx_only").P_kbar_calc
+        equationP="P_Petrelli2020_Cpx_only_onnx")
 
         cpx_comps_c['P_Jorgenson22']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
-        equationP="P_Jorgenson2022_Cpx_only").P_kbar_calc
+        equationP="P_Jorgenson2022_Cpx_only_onnx")
 
         cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
@@ -3323,6 +3352,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, return_cpx=True, H2O
         return cpx_comps_c_move
     if return_cpx is False:
         return cpx_comps_c_move.iloc[:, 0:13]
+
 ## Function for calculating Cpx-only temperature
 Cpx_only_T_funcs = {T_Put2008_eq32d, T_Put2008_eq32d_subsol,
 T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Jorgenson2022_Cpx_only,
