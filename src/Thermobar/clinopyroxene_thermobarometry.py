@@ -23,7 +23,9 @@ from Thermobar.core import *
 from Thermobar.Nimis_1999 import *
 
 # Machine learning training scripts are in the src/Thermobar folder, both traditional and onnx.
-
+# In this file, you can see there are 4 for the onnx ones
+# There are then 3 for Petrelli on its own. Cpx-Liq, Cpx-only, and Cpx-only with water we were playing with.
+# Then need to release a new machine learning version.
 
 
 ## Equations for Cpx-Liquid Barometry written as functions
@@ -252,10 +254,10 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
 
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq_Jan22.pkl', 'rb') as f:
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq_sklearn_1_3.pkl', 'rb') as f:
         scaler_P2020_Cpx_Liq=load(f)
 
-    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Liq_Jan22.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Liq_sklearn_1_3.pkl', 'rb') as f:
         ETR_Press_P2020_Cpx_Liq=joblib.load(f)
 
 
@@ -386,7 +388,7 @@ def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_April24_NotNorm.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_NotNorm_sklearn_1_3.pkl', 'rb') as f:
         ETR_Press_J22_Cpx_Liq=joblib.load(f)
 
 
@@ -903,7 +905,7 @@ def T_Jorgenson2022_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_Liq_April24_NotNorm.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_Liq_NotNorm_sklearn_1_3.pkl', 'rb') as f:
         ETR_Temp_J22_Cpx_Liq=joblib.load(f)
 
 
@@ -1154,10 +1156,10 @@ def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
 
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_Jan22.pkl', 'rb') as f:
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_sklearn_1_3.pkl', 'rb') as f:
         scaler_P2020_Cpx_only=load(f)
 
-    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_Jan22.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_sklearn_1_3.pkl', 'rb') as f:
         ETR_Press_P2020_Cpx_only=joblib.load(f)
 
 
@@ -1284,7 +1286,7 @@ def P_Jorgenson2022_Cpx_only(T=None, *, cpx_comps):
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_only_April24_NoNorm.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_only_NotNorm_sklearn_1_3.pkl', 'rb') as f:
         ETR_Press_J21_Cpx_only=joblib.load(f)
 
 
@@ -1649,7 +1651,7 @@ def T_Jorgenson2022_Cpx_only(P=None, *, cpx_comps):
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_only_April24_NoNorm.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_only_NotNorm_sklearn_1_3.pkl', 'rb') as f:
         ETR_Temp_J22_Cpx_only=joblib.load(f)
 
 
@@ -3166,7 +3168,7 @@ return_input=False):
 
         if  check_consecative(cpx_comps_c)==False:
             cpx_comps_c=cpx_comps_c.reset_index(drop=True)
-            print('Weve reset the index of your Cpx compositions for Petrelli ML calculations, as non-consecative indexes or missing indices cause problems for iteration' )
+            print('Weve reset the index of your Cpx compositions for ML calculations, as non-consecative indexes or missing indices cause problems for iteration' )
 
 
     cpx_components = calculate_clinopyroxene_components(cpx_comps=cpx_comps_c)
