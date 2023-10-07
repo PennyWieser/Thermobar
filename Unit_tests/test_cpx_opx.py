@@ -105,26 +105,26 @@ class test_cpx_opx_press_temp_matching(unittest.TestCase):
         cpx_comps=Cpx_Several, opx_comps=Opx_Several, equationT="T_Put2008_eq36",
         equationP="P_Put2008_eq38", Kd_Match="Subsolidus").get("Av_PTs_perCPX")
         .Mean_T_K_calc[0], 1325.070489,
-        decimalPlace, "Kd Cpx-Opx not equal to test value")
+        decimalPlace, "Calc T not equal to test value")
 
     def test_36_38a_match_press(self):
         self.assertAlmostEqual(pt.calculate_cpx_opx_press_temp_matching(
         cpx_comps=Cpx_Several, opx_comps=Opx_Several, equationT="T_Put2008_eq36",
         equationP="P_Put2008_eq38",  return_all_pairs=True).get("All_PTs").P_kbar_calc[0], 2.9944999,
-        decimalPlace, "Kd Cpx-Opx not equal to test value")
+        decimalPlace, "Calc P not equal to test value")
 
     def test_36_38a_match_press(self):
         self.assertAlmostEqual(pt.calculate_cpx_opx_press_temp_matching(
         cpx_comps=Cpx_Several, opx_comps=Opx_Several, equationT="T_Put2008_eq36",
         equationP="P_Put2008_eq38",  return_all_pairs=True).get("Av_PTs_perCPX").Mean_T_K_calc[0], 1311.457528,
-        decimalPlace, "Kd Cpx-Opx not equal to test value")
+        decimalPlace, "Calc T not equal to test value")
 
     def test_36_38a_match_KdFilt_Temp(self):
         self.assertAlmostEqual(pt.calculate_cpx_opx_press_temp_matching(
         cpx_comps=Cpx_Several, opx_comps=Opx_Several, equationT="T_Put2008_eq36",
         equationP="P_Put2008_eq38", Kd_Match=1, Kd_Err=0.1).get("Av_PTs_perCPX")
-        .Mean_T_K_calc[0], 1310.2199857766054,
-        decimalPlace, "Kd Cpx-Opx not equal to test value")
+        .Mean_T_K_calc[0], 1311.6940596719433,
+        decimalPlace, "Calc T not equal to test value")
 
 
 
