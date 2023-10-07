@@ -95,8 +95,8 @@ CpxT2[num_cols2] = CpxT2[num_cols2].apply(lambda x: x -0.02)
 
 
 
-Cpx_Several=pd.concat([CpxT, CpxT1, CpxT3, CpxT2])
-Opx_Several=pd.concat([OpxT, OpxT1, OpxT2])
+Cpx_Several=pd.concat([CpxT, CpxT1, CpxT3, CpxT2]).reset_index(drop=True)
+Opx_Several=pd.concat([OpxT, OpxT1, OpxT2]).reset_index(drop=True)
 
 class test_cpx_opx_press_temp_matching(unittest.TestCase):
 

@@ -2492,9 +2492,14 @@ def calculate_sites_ridolfi(amp_comps):
     # Printing composition
     norm_cations['A_Sum']=norm_cations['Na_A']+norm_cations['K_A']
     norm_cations['class']="N/A"
+    # Fix to be explicit
+    norm_cations['classification'] = norm_cations['classification'].astype(str)
     # If <1.5, low Ca,
     lowCa=norm_cations['Ca_B']<1.5
     norm_cations.loc[(lowCa), 'classification']="low-Ca"
+
+
+
     # Else, if high Ca, If Mgno<5, its low Mg
     LowMgno=norm_cations['Mgno_Fe2']<0.5
     norm_cations.loc[((~lowCa)&(LowMgno)), 'classification']="low-Mg"
