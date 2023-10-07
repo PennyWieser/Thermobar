@@ -1530,9 +1530,15 @@ def calculate_clinopyroxene_components(cpx_comps):
 
     cpx_calc['Lindley_Fe3_Cpx'] = (cpx_calc['Na_Cpx_cat_6ox'] + cpx_calc['Al_IV_cat_6ox'] - cpx_calc['Al_VI_cat_6ox'] -
         2 * cpx_calc['Ti_Cpx_cat_6ox'] - cpx_calc['Cr_Cpx_cat_6ox'])  # This is cell FR
+
+
     cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] < 0.0000000001),  'Lindley_Fe3_Cpx'] = 0
     cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] >= cpx_calc['Fet_Cpx_cat_6ox'] ),  'Lindley_Fe3_Cpx'] = (
     cpx_calc['Fet_Cpx_cat_6ox'])
+
+
+
+
     cpx_calc['Lindley_Fe2_Cpx']=cpx_calc['Fet_Cpx_cat_6ox']-cpx_calc['Lindley_Fe3_Cpx']
     cpx_calc['Lindley_Fe3_Cpx_prop']=cpx_calc['Lindley_Fe3_Cpx']/cpx_calc['Fet_Cpx_cat_6ox']
 
@@ -2493,7 +2499,7 @@ def calculate_sites_ridolfi(amp_comps):
     norm_cations['A_Sum']=norm_cations['Na_A']+norm_cations['K_A']
     norm_cations['class']="N/A"
     # Fix to be explicit
-    norm_cations['classification'] = norm_cations['classification'].astype(str)
+    norm_cations['classification'] = ""
     # If <1.5, low Ca,
     lowCa=norm_cations['Ca_B']<1.5
     norm_cations.loc[(lowCa), 'classification']="low-Ca"
