@@ -26,7 +26,7 @@ OpxT=pd.DataFrame(data={"Sample_ID_Opx": 'test2',
                             "Na2O_Opx": 0.01,
                             "K2O_Opx": 0,
                             "Cr2O3_Opx": 0.19}, index=[0])
-decimalPlace=4
+decimalPlace=1
 
 
 
