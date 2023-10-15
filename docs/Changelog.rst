@@ -1,6 +1,12 @@
 ================================================
 Change Log
 ================================================
+
+Version 1.0.30 - October 6th, 2023
+=====================================
+Issue with Amp-Liq melt mathcing, particularly if non unique values for liqiud names. Fixed so dont end up with a duplicate column name that errors out.
+
+
 Version 1.0.28 - October 6th, 2023
 =====================================
 Saved pkl files for Jorgenson and Petrelli were failing with Sklearn 1.3. retrained models using this version + released new version on github for Thermobar_onnx.

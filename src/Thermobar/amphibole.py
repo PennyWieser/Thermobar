@@ -1509,7 +1509,12 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
     amp_comps_23=pd.concat([amp_comps_23_sim, amp_mols, amp_comps_c], axis=1)
     liq_comps_hy = calculate_hydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
     liq_comps_an = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+
+    if 'Sample_ID_Liq' in liq_comps_hy.columns:
+        liq_comps_hy.drop(["Sample_ID_Liq"], axis=1, inplace=True)
+
     Combo_liqs_hyd_anhyd = pd.concat([liq_comps_hy, liq_comps_an], axis=1)
+
 
 
 
@@ -1519,12 +1524,18 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
         np.repeat(amp_comps_23.values, np.shape(Combo_liqs_hyd_anhyd)[0], axis=0))
     DupAMPs.columns = amp_comps_23.columns
 
+
+
     # This duplicates liquids like liq1-liq2-liq3 for amp1, liq1-liq2-liq3 for
     # amp2 etc.
     DupLiqs = pd.concat([Combo_liqs_hyd_anhyd] *
                         np.shape(amp_comps_23)[0]).reset_index(drop=True)
+
+
     # Combines these merged liquids and amp dataframes
     Combo_liq_amps = pd.concat([DupLiqs, DupAMPs], axis=1)
+
+
 
     LenAmp=len(amp_comps)
     LenLiqs=len(liq_comps)
@@ -1538,12 +1549,16 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
     (Combo_liq_amps['FeOt_Liq_mol_frac_hyd']/Combo_liq_amps['MgO_Liq_mol_frac_hyd']))
 
 
+
     if return_all_pairs is True:
         Combo_liq_amp_fur_filt=Combo_liq_amps.copy()
 
     if return_all_pairs is False:
         Filt=np.abs(Combo_liq_amps['Kd']-Kd_Match)<=Kd_Err
-        Combo_liq_amp_fur_filt=Combo_liq_amps.loc[Filt]
+        Combo_liq_amp_fur_filt=Combo_liq_amps.loc[Filt].reset_index(drop=True)
+
+
+
 
 
 
@@ -1583,12 +1598,23 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
 
 
 
+
+
+
     # Final step, calcuate a 3rd output which is the average and standard
     # deviation for each Amp (e.g., Amp1-Melt1, Amp1-melt3 etc. )
-    Liq_sample_ID=Combo_liq_amp_fur_filt['Sample_ID_Liq']
+
+
+
+    Liq_sample_ID=Combo_liq_amp_fur_filt["Sample_ID_Liq"]
     Combo_liq_amp_fur_filt.drop(["Sample_ID_Liq"], axis=1, inplace=True)
+    print('Liq ID you are giving')
+    print(Liq_sample_ID)
+
+
 
     AmpNumbers = Combo_liq_amp_fur_filt['ID_AMP'].unique()
+
     if len(AmpNumbers) > 0:
         df1_Mean_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).mean()
         df1_Std_nopref=Combo_liq_amp_fur_filt.groupby(['ID_AMP', 'Sample_ID_Amp'], as_index=False).std()
@@ -1634,6 +1660,9 @@ equationP=None, P=None, T=None,  H2O_Liq=None,
 
 
     print('Done!!! I found a total of N='+str(len(Combo_liq_amp_fur_filt)) + ' Amp-Liq matches using the specified filter. N=' + str(len(df1_M)) + ' Amp out of the N='+str(LenAmp)+' Amp that you input matched to 1 or more liquids')
+
+
+
     Combo_liq_amp_fur_filt['Sample_ID_Liq']=Liq_sample_ID
     return {'Av_PTs': df1_M, 'All_PTs': Combo_liq_amp_fur_filt}
 
