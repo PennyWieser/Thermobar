@@ -90,6 +90,7 @@ def av_noise_samples_series(calc, sampleID):
         Max = np.empty(len(N), dtype=float)
         Min = np.empty(len(N), dtype=float)
         Std = np.empty(len(N), dtype=float)
+        IQR_Std=np.empty(len(N), dtype=float)
         i=0
         for ID in sampleID.unique():
             sam=ID
@@ -104,11 +105,13 @@ def av_noise_samples_series(calc, sampleID):
             Std[i] = np.nanstd(calc[sampleID == sam])
             Min[i] = np.nanmin(calc[sampleID == sam])
             Max[i] = np.nanmax(calc[sampleID == sam])
+            var=calc[sampleID == sam]
+            IQR_Std[i]=0.5*np.abs((np.percentile(var, 84) -np.percentile(var, 16)))
 
             i=i+1
     len1=len(calc[sampleID == sam])
     Err_out = pd.DataFrame(data={'Sample': N, '# averaged': len1, 'Mean_calc': Av_mean,
-    'Median_calc': Av_median, 'St_dev_calc': Std,
+    'Median_calc': Av_median, 'St_dev_calc': Std, 'St_dev_calc_from_percentiles': IQR_Std,
     'Max_calc': Max, 'Min_calc': Min})
 
     return Err_out
@@ -145,15 +148,19 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
         Max = np.empty(len(N), dtype=float)
         Min = np.empty(len(N), dtype=float)
         Std = np.empty(len(N), dtype=float)
+        IQR_Std=np.empty(len(N), dtype=float)
         for i in range(0, len(N)):
             Av_mean[i] = np.nanmean(calc[sampleID == i])
             Av_median[i] = np.nanmedian(calc[sampleID == i])
             Std[i] = np.nanstd(calc[sampleID == i])
             Min[i] = np.nanmin(calc[sampleID == i])
             Max[i] = np.nanmax(calc[sampleID == i])
+            var=calc[sampleID == sam]
+            IQR_Std[i]=0.5*np.abs((np.percentile(var, 84) -np.percentile(var, 16)))
+
 
     Err_out = pd.DataFrame(data={'Sample': N, 'Mean_calc': Av_mean,
-    'Median_calc': Av_median, 'St_dev_calc': Std,
+    'Median_calc': Av_median, 'St_dev_calc': Std,'St_dev_calc_from_percentiles': IQR_Std,
     'Max_calc': Max, 'Min_calc': Min})
 
     return Err_out
