@@ -59,7 +59,7 @@ def return_cali_dataset(model=None):
     if model=="Ridolfi2021":
         csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Ridolfi_Cali_input.csv')
         Cali_input=pd.read_csv(csv_file_path)
-
+        print(csv_file_path)
     if model=="Zhang2017":
         csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Zhang17_Cali_input.csv')
         Cali_input=pd.read_csv(csv_file_path)
@@ -223,59 +223,9 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
     if T_K is not None:
         df_c['T_K']=T_K
 
-    # Amphibole models
-    if model=="Ridolfi2021":
-        with open(Thermobar_dir/'Ridolfi_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
+    Cali_input=return_cali_dataset(model=model)
 
-    if model=="Putirka2016":
-        with open(Thermobar_dir/'Putirka16_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
 
-    if model=="Mutch2016":
-        with open(Thermobar_dir/'Mutch_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
-
-    if model=="Zhang2017":
-        with open(Thermobar_dir/'Zhang17_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
-            Cali_input['F_Amp']=0
-
-    # Cpx model
-    if model=="Wang2021":
-        with open(Thermobar_dir/'Wang21_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
-
-    if model=="Petrelli2020":
-        with open(Thermobar_dir/'Petrelli20_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
-
-    if model=="Putirka2008":
-        with open(Thermobar_dir/'Putirka2008_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
-
-    if model=="Neave2017":
-        with open(Thermobar_dir/'NeavePutirka_2017_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
-
-    if model=="Brugman2019":
-        with open(Thermobar_dir/'Brugman_2019_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
-
-    if model=="Masotta2013":
-        with open(Thermobar_dir/'Masotta_2013_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
-
-    if model=="Jorgenson2022":
-        with open(Thermobar_dir/'Jorgenson2022_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
-            Cali_input['Cl_Amp']=0
-
-    # Plag models
-
-    if model=="Waters2015":
-        with open(Thermobar_dir/'Waters_Lange2015_Cali_input.pkl', 'rb') as f:
-            Cali_input=load(f)
 
 
 

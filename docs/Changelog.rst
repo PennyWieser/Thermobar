@@ -2,6 +2,11 @@
 Change Log
 ================================================
 
+
+Version 1.0.31 - November 17th, 2023
+=====================================
+Sorted issues with .pkl incompatability for calibration datasets by resaving all as csv files and loading those. 
+
 Version 1.0.30 - October 6th, 2023
 =====================================
 Issue with Amp-Liq melt mathcing, particularly if non unique values for liqiud names. Fixed so dont end up with a duplicate column name that errors out.
