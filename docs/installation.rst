@@ -30,6 +30,8 @@ You then need to import Thermobar into the script you are running code in. In al
 
 This means any time you want to call a function from Thermobar, you do pt.function_name.
 
+If you want to use the machine learning models, you will need to pip install a second package, see this page for more instructions
+https://thermobar.readthedocs.io/en/latest/Examples/Cpx_Cpx_Liq_Thermobarometry/MachineLearning_Cpx_Liq_Thermobarometry.html
 
 
 Updating
