@@ -3,20 +3,15 @@
 [![codecov](https://codecov.io/gh/PennyWieser/Thermobar/branch/main/graph/badge.svg)](https://codecov.io/gh/PennyWieser/Thermobar/branch/main)
 
 Thermobar is a python tool for thermobarometry, chemometry and mineral equilibrium.
-
-Thermobar is written in the open-source language Python3. 
 Thermobar allows users to easily choose between more than 100 popular parameterizations involving liquid, olivine-liquid, olivine-spinel, 
 pyroxene only, pyroxene-liquid, two pyroxene, feldspar-liquid, two feldspar, amphibole and amphibole-liquid, garnet and biotite equilibrium. 
 
-Thermobar is also the first open-source tool for assessing equilibrium, and calculating pressures and temperatures for all possible pairs of phases
- from a given sample/volcanic center (e.g., clinopyroxene-liquid, orthopyroxene-liquid, two-pyroxene, feldspar-liquid, two feldspar, amphibole-liquid).
-Thermobar also contains a number of functions allowing users to propagate errors using Monte-Carlo methods, plot mineral classification diagrams 
-and assess mineral-melt equilibrium (e.g. olivine-melt Rhodes diagrams), calculate liquid viscosities, and convert between different measures for 
-oxygen fugacity and Fe speciation. Finally, in order to perform its calculations, Thermobar contains a number of functions 
-for calculating molar and cation fractions, cation site allocations, and mineral components. These can be leveraged alongside various statistical 
-and machine learning packages in Python to easily produce new thermobarometry, hygrometry or chemometry calibration. 
-Thermobar can be downloaded via pip, on Github (you are here!), and extensive documentation and 
+It can be downloaded via pip, on Github (you are here!), and extensive documentation and 
 example videos and Jupyter Notebooks are available at https://thermobar.readthedocs.io/en/latest/index.html
+
+If you want to use Machine learning models, you will need to pip install a separate package (the pkl and onnx files are too big for one release). Please see the instructions here:
+https://thermobar.readthedocs.io/en/latest/Examples/Cpx_Cpx_Liq_Thermobarometry/MachineLearning_Cpx_Liq_Thermobarometry.html
+
 
 Find more information in Volcanica - and please make sure you cite this work!!!
 https://www.jvolcanica.org/ojs/index.php/volcanica/article/view/161
