@@ -286,6 +286,12 @@ filter_q=None, append=False):
 
     '''
 
+    if phase_err_type not in ['Abs', 'Perc']:
+            raise ValueError("Invalid value for phase_err_type. Please choose 'Abs' or 'Perc'.")
+    if err_dist not in ['normal', 'uniform']:
+            raise ValueError("Invalid value for phase_err_type. Please choose 'normal' or 'uniform'.'")
+
+
     # if variable_err is not None:
     #     if (type(variable_err) is not float) and (type(variable_err) is not int) and (type(variable_err) is not np.ndarray):
     #         raise Exception('variable error must be a float, integer, or np.ndarray. If youve entered a pandas series, do series.values')
@@ -469,6 +475,10 @@ variable_err=variable_err)
 
 
             Err_perc.columns = Err_perc.columns.str.replace('_Err', '')
+
+            if 'Sample_ID_Cpx' in Err_perc.columns:
+                Err_perc = Err_perc.drop('Sample_ID_Cpx', axis=1)
+
 
 
             Err = Data * (Err_perc / 100)

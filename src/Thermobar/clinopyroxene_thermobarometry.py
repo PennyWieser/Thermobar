@@ -538,8 +538,7 @@ def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltm
 
     x_test=Cpx_Liq_ML_in.values
 
-    # using Onnx #Thermobar_dir/
-    #str(load_dir / "model.onnx")
+
 
 
     try:
@@ -1764,9 +1763,15 @@ def T_Jorgenson2022_Cpx_only_onnx(P=None, *, cpx_comps):
 
     except ImportError:
         raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+
+
     import onnxruntime as rt
-    path=Path(Thermobar_onnx.__file__).parent
-    sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Temp.onnx"))
+    # path=Path(Thermobar_onnx.__file__).parent
+    # sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Temp.onnx"))
+    path = Path(Thermobar_onnx.__file__).parent
+    providers = ['AzureExecutionProvider', 'CPUExecutionProvider']
+    model_path = path / "Jorg21_Cpx_only_Temp.onnx"
+    sess = rt.InferenceSession(str(model_path), providers=providers)
 
 
     input_name = sess.get_inputs()[0].name
@@ -3203,7 +3208,7 @@ Cpx_only_P_funcs_by_name = {p.__name__: p for p in Cpx_only_P_funcs}
 
 
 def calculate_cpx_only_press(*, cpx_comps, equationP, T=None, H2O_Liq=None,
-return_input=False):
+eq_tests=False, return_input=None):
     '''
     Clinopyroxene only barometry. Enter a panda dataframe with Cpx compositions,
     returns a pressure in kbar.
@@ -3232,8 +3237,8 @@ return_input=False):
         If enter T="Solve", returns a partial function
         Else, enter an integer, float, or panda series
 
-    return_input: bool
-        If True, returns cpx_comps as well.
+    eq_tests: bool
+        If True, returns cpx_components as well.
 
     Returns
     -------
@@ -3241,6 +3246,8 @@ return_input=False):
        Pressure in kbar
 
     '''
+    if return_input is not None:
+        raise TypeError('For consistency with other functions, please now use eq_tests=, not return_input=....')
 
     cpx_comps_c=cpx_comps.copy()
 
@@ -3324,7 +3331,7 @@ return_input=False):
             P_kbar.replace([np.inf, -np.inf], np.nan, inplace=True)
 
 
-    if return_input is False:
+    if eq_tests is False:
         if equationP =="P_Nimis1999_BA":
             return calc_Nimis['P_kbar_calc']
         if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
@@ -3333,15 +3340,24 @@ return_input=False):
         else:
             return P_kbar
 
-    if return_input is True:
-        if equationP =="P_Nimis1999_BA":
-            return calc_Nimis
-        if equationP == "P_Petrelli2020_Cpx_only" or equationP == "P_Petrelli2020_Cpx_only_withH2O" or equationP == "P_Petrelli2020_Cpx_only_noCr":
-            out=pd.concat([df_stats, cpx_comps],axis=0)
+    # if return_input is True:
+    #     if equationP =="P_Nimis1999_BA":
+    #         return calc_Nimis
+    #     if equationP == "P_Petrelli2020_Cpx_only" or equationP == "P_Petrelli2020_Cpx_only_withH2O" or equationP == "P_Petrelli2020_Cpx_only_noCr" or ("Jorgenson" in equationP and "onnx" not in equationP):
+    #         out=pd.concat([df_stats, cpx_comps],axis=1)
+    #         return out
+    #     else:
+    #         cpx_comps_c.insert(0, 'P_kbar_calc', P_kbar)
+    #         return cpx_comps_c
+
+
+    if eq_tests is True:
+        if ('Petrelli' in equationP or "Jorgenson" in equationP) and "onnx" not in equationP:
+            out=pd.concat([df_stats, cpx_components],axis=1)
             return out
         else:
-            cpx_comps_c.insert(0, 'P_kbar_calc', P_kbar)
-            return cpx_comps_c
+            cpx_components.insert(0, 'P_kbar', P_kbar)
+            return cpx_components
 
 
 
@@ -3447,7 +3463,7 @@ Cpx_only_T_funcs_by_name = {p.__name__: p for p in Cpx_only_T_funcs}
 
 
 def calculate_cpx_only_temp(*, cpx_comps=None, equationT=None, P=None,
-H2O_Liq=None, eq_tests=False):
+H2O_Liq=None, eq_tests=False, return_input=None):
     '''
     Clinopyroxene only thermometer. Enter a panda dataframe with Cpx compositions,
     returns a temperature in Kelvin.
@@ -3485,6 +3501,9 @@ H2O_Liq=None, eq_tests=False):
        Temperature in Kelvin
 
     '''
+    if return_input is not None:
+        raise TypeError('For consistency with other functions, please now use eq_tests=, not return_input=....')
+
     cpx_comps_c=cpx_comps.copy()
 
     if 'Petrelli' in equationT or 'Jorgenson' in equationT:
@@ -3571,7 +3590,7 @@ H2O_Liq=None, eq_tests=False):
 
 ## Iterating PT- Cpx only
 def calculate_cpx_only_press_temp(*, cpx_comps=None, equationP=None,
-equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
+equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, eq_tests=True, return_input=None):
 
 
     '''
@@ -3605,14 +3624,16 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
     T_K_guess: int or float. Default is 1300 K
          Initial guess of temperature.
 
-    return_input: bool
-        if True, also returns cpx_comps
+    eq_tests: bool
+        if True, also returns cpx_components
 
 
     Returns:
     -------
     pandas.DataFrame: Pressure in kbar, Temperature in K
     '''
+    if return_input is not None:
+        raise TypeError('For consistency with other functions, please now use eq_tests=, not return_input=....')
 
 
     cpx_comps_c=cpx_comps.copy()
@@ -3699,9 +3720,9 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, return_input=True):
 
 
 
-    if return_input is False:
+    if eq_tests is False:
         return PT_out
-    if return_input is True:
+    if eq_tests is True:
         out=pd.concat([PT_out, cpx_comps_c],axis=1)
         return out
 

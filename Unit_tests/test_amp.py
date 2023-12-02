@@ -31,6 +31,13 @@ AmpT=pd.DataFrame(data={"SiO2_Amp": 40.57,
 decimalPlace=4
 
 
+# Lets test cali datasets
+
+class test_cali_dataset(unittest.TestCase):
+    def test_cali_(self):
+        self.assertAlmostEqual(pt.return_cali_dataset(model='Ridolfi2021').SiO2_Amp[0], 42.43, 1, "Rildofi2021 Cali not equal to test value")
+
+
 class test_amp_only_press(unittest.TestCase):
     def test_press_ridolfi21(self):
         self.assertAlmostEqual(pt.calculate_amp_only_press(amp_comps=AmpT,

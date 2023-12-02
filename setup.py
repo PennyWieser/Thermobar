@@ -26,8 +26,8 @@ setup(
     packages=find_packages(where='src'),  # Required
 
     package_data={
-        # Include all pickle files
-        "": ["*.pkl"],
+        # Include all pickle files, and CSVs
+        "": ["*.pkl", "Cali_Datasets_CSVs/*.csv"],
     },
     install_requires=[
             'pandas',
