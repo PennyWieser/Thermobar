@@ -27,7 +27,7 @@ setup(
     package_data={
         # Assuming 'Thermobar' is the package name
         # Specify both CSVs in the 'Cali_Datasets_CSVs' folder and pickle files
-        "Thermobar": ["Cali_Datasets_CSVs/*.csv", "*.pkl"],
+        "Thermobar": ["*.csv", "*.pkl"],
     },
 
     install_requires=[
