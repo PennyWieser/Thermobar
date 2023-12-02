@@ -51,8 +51,7 @@ def return_cali_dataset(model=None):
     """
     import pkg_resources
 
-    # Base directory name within the package
-    subfolder_name = 'Cali_Dataset_CSVs'
+
 
 
 
@@ -82,7 +81,7 @@ def return_cali_dataset(model=None):
 
     if file_name:
         # Construct the relative path to the CSV file
-        csv_file_relative_path = os.path.join(subfolder_name, file_name)
+        csv_file_relative_path = file_name
 
         # Get the absolute path to the CSV file within the package
         csv_file_path = pkg_resources.resource_filename('Thermobar', csv_file_relative_path)
