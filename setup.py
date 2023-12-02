@@ -23,12 +23,13 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/PennyWieser/Thermobar",
     package_dir={'': 'src'},  # Optional
-    packages=find_packages(where='src'),  # Required
-
+    packages=find_packages(where='src'),
     package_data={
-        # Include all pickle files, and CSVs
-        "": ["*.pkl", "Cali_Datasets_CSVs/*.csv"],
+        # Assuming 'Thermobar' is the package name
+        # Specify both CSVs in the 'Cali_Datasets_CSVs' folder and pickle files
+        "Thermobar": ["Cali_Datasets_CSVs/*.csv", "*.pkl"],
     },
+
     install_requires=[
             'pandas',
             'numpy',
