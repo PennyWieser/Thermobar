@@ -75,6 +75,7 @@ def return_cali_dataset(model=None):
     "Masotta2019": 'Masotta2019_Cali_input.csv'}
 
     # Get the file name for the given model
+
     file_name = model_to_filename.get(model)
 
 
@@ -85,6 +86,13 @@ def return_cali_dataset(model=None):
 
         # Get the absolute path to the CSV file within the package
         csv_file_path = pkg_resources.resource_filename('Thermobar', csv_file_relative_path)
+
+        # Debugging: Print the resolved file path
+        print(f"Resolved CSV file path: {csv_file_path}")
+
+        # Check if the file exists at the resolved path
+        if not os.path.exists(csv_file_path):
+            print(f"File not found at path: {csv_file_path}")
 
         # Now you can use csv_file_path with pandas or other libraries
         Cali_input = pd.read_csv(csv_file_path)
