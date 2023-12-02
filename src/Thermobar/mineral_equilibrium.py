@@ -51,10 +51,18 @@ def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
     Adjusted_Si_Ksparalis_H2O_60minus = Adjusted_Si_Ksparalis_60minus + 0.8 * H2O
 
 
+    # Issues with object
+    X_fo = X_fo.astype(float) if isinstance(X_fo, pd.Series) else float(X_fo)
+    R = R.astype(float) if isinstance(R, pd.Series) else float(R)
+    T = T.astype(float) if isinstance(T, pd.Series) else float(T)
+    P = P.astype(float) if isinstance(P, pd.Series) else float(P)
+
     Kd_Toplis_60plus = np.exp((-6766 / (R * T) - 7.34 / R) + np.log(0.036 * Adjusted_Si_Ksparalis_H2O_60plus - 0.22)
                               + (3000 * (1 - 2 * X_fo)) / (R * T) + (0.035 * (P - 1)) / (R * T))
     Kd_Toplis_60minus = np.exp((-6766 / (R * T) - 7.34 / R) + np.log(0.036 * Adjusted_Si_Ksparalis_H2O_60minus - 0.22)
                                + (3000 * (1 - 2 * X_fo)) / (R * T) + (0.035 * (P - 1)) / (R * T))
+
+
     if isinstance(SiO2_mol, int) or isinstance(SiO2_mol, float):
         if SiO2_mol > 60:
             Kd_Toplis = Kd_Toplis_60plus

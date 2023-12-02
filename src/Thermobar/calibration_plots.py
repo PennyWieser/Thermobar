@@ -8,7 +8,10 @@ import pandas as pd
 
 from Thermobar.core import *
 
-subfolder_name='Cali_Dataset_CSVs'
+
+
+
+
 
 import os
 def return_cali_dataset(model=None):
@@ -46,6 +49,45 @@ def return_cali_dataset(model=None):
         Shea2022: Shea et al. (2022) for Ol MgO thermometry and Kd values
 
     """
+    import pkg_resources
+
+    # Base directory name within the package
+    subfolder_name = 'Cali_Dataset_CSVs'
+
+
+
+    model_to_filename = {
+        "Zhang2017": "Zhang17_Cali_input.csv",
+        "Ridolfi2021": "Ridolfi_Cali_input.csv",
+    "Putirka2016": "Putirka16_Cali_input.csv",
+    "Mutch2016": 'Mutch_Cali_input.csv',
+    "Shea2022":"Shea2022_Cali_input.csv",
+    "Wang2021": "Wang21_Cali_input.csv",
+
+    "Petrelli2020": 'Petrelli20_Cali_input.csv',
+    "Putirka2008": 'Putirka2008_Cali_input.csv',
+
+    "Neave2017": 'NeavePutirka_2017_Cali_input.csv',
+    "Brugman2019": 'Brugman_2019_Cali_input.csv',
+    "Masotta2013": 'Masotta_2013_Cali_input.csv',
+    "Jorgenson2022":'Jorgenson2022_Cali_input.csv',
+    "Waters2015":'Waters_Lange2015_Cali_input.csv',
+    "Masotta2019": 'Masotta2019_Cali_input.csv'}
+
+    # Get the file name for the given model
+    file_name = model_to_filename.get(model)
+
+    if file_name:
+        # Construct the relative path to the CSV file
+        csv_file_relative_path = os.path.join(subfolder_name, file_name)
+
+        # Get the absolute path to the CSV file within the package
+        csv_file_path = pkg_resources.resource_filename('Thermobar', csv_file_relative_path)
+
+        # Now you can use csv_file_path with pandas or other libraries
+        Cali_input = pd.read_csv(csv_file_path)
+    else:
+        raise ValueError(f"Model '{model}' not recognized")
 
     # check model is supported.
     sup_models = ['Ridolfi2021', 'Zhang2017', 'Putirka2016', 'Mutch2016', 'Shea2022', 'Wang2021', 'Petrelli2020', 'Putirka2008', 'Neave2017',
@@ -56,73 +98,22 @@ def return_cali_dataset(model=None):
         raise ValueError(f"Invalid model: {model}. Supported models with inbuilt calibration datasets are {', '.join(sup_models)}")
 
 
-    # Amphibole models
-    if model=="Ridolfi2021":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Ridolfi_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
-        print(csv_file_path)
+
 
     if model=="Zhang2017":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Zhang17_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
+
         Cali_input['F_Amp']=0
         Cali_input['Cl_Amp']=0
 
     if model=="Putirka2016":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Putirka16_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
+
         Cali_input['F_Amp']=0
         Cali_input['Cl_Amp']=0
 
 
-    if model=="Mutch2016":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Mutch_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
 
-    # Liq model
-    if model=="Shea2022":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Shea2022_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
-
-
-    # Cpx model
-    if model=="Wang2021":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Wang21_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
-
-    if model=="Petrelli2020":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Petrelli20_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
-
-    if model=="Putirka2008":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Putirka2008_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
-
-    if model=="Neave2017":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'NeavePutirka_2017_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
-
-    if model=="Brugman2019":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Brugman_2019_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
-
-    if model=="Masotta2013":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Masotta_2013_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
-
-    if model=="Jorgenson2022":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Jorgenson2022_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
-
-    # Plag models
-
-    if model=="Waters2015":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Waters_Lange2015_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
 
     if model=="Masotta2019":
-        csv_file_path = os.path.join(Thermobar_dir, subfolder_name, 'Masotta2019_Cali_input.csv')
-        Cali_input=pd.read_csv(csv_file_path)
         cat_plags = calculate_cat_fractions_plagioclase(plag_comps=Cali_input)
         Cali_input['XAn']=cat_plags['An_Plag']
         Cali_input['XAb']=cat_plags['Ab_Plag']
