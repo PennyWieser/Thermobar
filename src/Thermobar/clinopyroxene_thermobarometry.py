@@ -2840,8 +2840,16 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
         'Either enter a T equation, or choose a temperature, not both  ')
 
     # This allows users to overwrite H2O and Fe3Fet
+
     liq_comps_c = liq_comps.copy().reset_index(drop=True)
     cpx_comps_c = cpx_comps.copy().reset_index(drop=True)
+
+
+    # Status update for user
+    LenCpx=len(cpx_comps)
+    LenLiqs=len(liq_comps)
+    print("Considering N=" + str(LenCpx) + " Cpx & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCpx*LenLiqs) +
+          " Liq-Cpx pairs, be patient if this is >>1 million!")
 
 
     if Fe3Fet_Liq is not None:
@@ -2886,11 +2894,7 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
 
 
 
-    # Status update for user
-    LenCpx=len(cpx_comps)
-    LenLiqs=len(liq_comps)
-    print("Considering N=" + str(LenCpx) + " Cpx & N=" + str(LenLiqs) +" Liqs, which is a total of N="+ str(LenCombo) +
-          " Liq-Cpx pairs, be patient if this is >>1 million!")
+
 
     # calculate clinopyroxene-liquid components for this merged dataframe
     Combo_liq_cpxs = calculate_clinopyroxene_liquid_components(meltmatch=Combo_liq_cpxs)
@@ -2936,7 +2940,7 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
         # Filter out bad analysis first off
 
 
-            if "Petrelli" in equationT:
+            if "Petrelli" in equationT or 'Jorgenson' in equationT:
                 Combo_liq_cpxs_2['T_Liq_MinP'] = calculate_cpx_liq_temp(
                     meltmatch=Combo_liq_cpxs_2, equationT=equationT, P=PMin).T_K_calc
                 Combo_liq_cpxs_2['T_Liq_MaxP'] = calculate_cpx_liq_temp(
@@ -2972,6 +2976,7 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
                     0, "DeltaKd_userselected=" + str3, Delta_Kd_T_MinP)
 
             if Kd_Match == "Masotta":
+                print('using sigma='+ str(Kd_Err) +'If you want a different test, specify Kd_err in the function')
 
                 ratioMasotta = Combo_liq_cpxs_2['Na_Liq_cat_frac'] / (
                     Combo_liq_cpxs_2['Na_Liq_cat_frac'] + Combo_liq_cpxs_2['K_Liq_cat_frac'])
