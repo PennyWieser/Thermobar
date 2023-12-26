@@ -35,7 +35,7 @@ setup(
             'numpy',
             'python-ternary',
             'matplotlib',
-            'scikit-learn',
+            'scikit-learn>=1.3',
             'scipy',
             'tqdm',
             'statsmodels',

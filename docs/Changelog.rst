@@ -1,11 +1,23 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.36 - Dec 26th, 2023
+=====================================
+After numerous issues with peoples old (2020-2021 sklearn issues, have required 1.3 onwards in setup.py file now. )
+
+
+Version 1.0.31 to Version 1.0.34 - Dec, 2023
+=====================================
+Fixing additional issues related to pandas2 and shift to csv file paths.
 
 
 Version 1.0.31 - November 17th, 2023
 =====================================
-Sorted issues with .pkl incompatability for calibration datasets by resaving all as csv files and loading those. 
+Sorted issues with .pkl incompatability for calibration datasets by resaving all as csv files and loading those.
+
+Version 1.0.31 - November 17th, 2023
+=====================================
+Sorted issues with .pkl incompatability for calibration datasets by resaving all as csv files and loading those.
 
 Version 1.0.30 - October 6th, 2023
 =====================================
