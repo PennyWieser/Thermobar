@@ -340,7 +340,7 @@ filter_q=None, append=False):
         w.warn('Non unique sample names. We have appended the index onto all sample names to save issues with averaging later')
         TEST=Sample_c.index.values
         for i in range(0, len(Sample_c)):
-            Sample_c.loc[i, 'Sample_ID_Liq']=Sample_c['Sample_ID_Liq'].iloc[i]+'_'+str(TEST[i])
+            Sample_c.loc[i, 'Sample_ID_{}'.format(elx)]=Sample_c['Sample_ID_{}'.format(elx)].iloc[i] + '_'+str(TEST[i])
 
 
     if phase_err is None or (phase_err is not None and err_dist == "uniform"):
