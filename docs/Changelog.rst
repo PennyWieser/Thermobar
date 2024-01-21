@@ -1,9 +1,11 @@
 ================================================
 Change Log
 ================================================
-Version 1.0.36 - Dec 26th, 2023
+Version 1.0.36 - Jan 21st, 2024
 =====================================
 After numerous issues with peoples old (2020-2021 sklearn issues, have required 1.3 onwards in setup.py file now. )
+This meant that had to change python to be 3.7+, as skitlearn only supports 3.8-3.11. People with older installations can pip install earlier versions
+
 
 
 Version 1.0.31 to Version 1.0.34 - Dec, 2023
