@@ -314,22 +314,10 @@ filter_q=None, append=False):
         'specified a percent noise. Select only 1 of these options')
 
     # This works out what phase you have entered data for
-    if any(Sample_c.columns.str.contains("_Cpx")):
-        elx = 'Cpx'
-    if any(Sample_c.columns.str.contains("_Plag")):
-        elx = 'Plag'
-    if any(Sample_c.columns.str.contains("_Opx")):
-        elx = 'Opx'
-    if any(Sample_c.columns.str.contains("_Sp")):
-        elx = 'Sp'
-    if any(Sample_c.columns.str.contains("_Kspar")):
-        elx = 'Kspar'
-    if any(Sample_c.columns.str.contains("_Amp")):
-        elx = 'Amp'
-    if any(Sample_c.columns.str.contains("_Liq")):
-        elx = 'Liq'
-    if any(Sample_c.columns.str.contains("_Ol")):
-        elx = 'Ol'
+    Phase_Options = ["Cpx", "Plag", "Opx", "Sp", "Kspar", "Amp", "Liq", "Ol"]
+    for Option in Phase_Options:
+        if any(Sample_c.columns.str.contains(f"_{Option}")):
+            elx = Option
 
     if any(Sample_c.columns.str.contains('Sample_ID_{}'.format(elx))):
         name=True
