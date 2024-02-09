@@ -17,6 +17,7 @@ Welcome to Thermobar's documentation!
    Adding_new_models
    FAQs
    Changelog
+   worked_examples_liqs_ols
 
 .. toctree::
    :maxdepth: 2
@@ -40,8 +41,8 @@ Welcome to Thermobar's documentation!
    Examples/Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_thermometry
    Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_hygrometry
-   Examples/Liquid_Ol_Liq_Themometry/Olivine_MatrixGlass_Mg_Fe_Eq_MultipleSamples
    Examples/Liquid_Ol_Liq_Themometry/Olivine_MatrixGlass_Mg_Fe_Eq_SingleSamples
+   Examples/Liquid_Ol_Liq_Themometry/Olivine_MatrixGlass_Mg_Fe_Eq_MultipleSamples
    Examples/Liquid_Ol_Liq_Themometry/CHOMPI_Liq_calcs
 
 
