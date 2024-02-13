@@ -11,6 +11,7 @@ This :doc:`example <Examples/Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry>` 
 as well as sensitivity to temperature and pressure. 
 
 This :doc:`example <Examples/Liquid_Ol_Liq_Themometry/Olivine_Liquid_thermometry>` shows:
+    
 - how to perform olivine-liquid thermometry, 
 both for paired olivines and liquids, and showing how to consider all possible pairings. 
 - How to calculate equilibrium olivine-liquid
@@ -77,7 +78,7 @@ This :doc:`example <Examples/Feldspar_Thermobarometry/Feldspar_Liquid_Thermobaro
 This :doc:`example <Examples/Feldspar_Thermobarometry/Feldspar_Liquid_Thermobarometry>` shows how to perform plagioclase-liquid hygrometry calculations.
 
 
-This :doc:`example <Examples/Feldspar_Thermobarometry/Two_Feldspar_All_Possible_Pairs>'' shows how to perform two feldspar thermobarometry. 
+This :doc:`example <Examples/Feldspar_Thermobarometry/Two_Feldspar_All_Possible_Pairs>' shows how to perform two feldspar thermobarometry. 
 
 
 This :doc:`example <Examples/Feldspar_Thermobarometry/Fspar_Liq_Matching>' shows how to perform Kspar-liq and plag-liq melt matching. 
