@@ -3727,7 +3727,9 @@ equationT=None, iterations=30, T_K_guess=1300, H2O_Liq=None, eq_tests=True, retu
     if eq_tests is False:
         return PT_out
     if eq_tests is True:
-        out=pd.concat([PT_out, cpx_comps_c],axis=1)
+        # Lets calcuate Cpx components
+        cpx_components=calculate_clinopyroxene_components(cpx_comps=cpx_comps_c)
+        out=pd.concat([PT_out, cpx_components],axis=1)
         return out
 
 

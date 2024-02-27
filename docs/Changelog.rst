@@ -1,6 +1,11 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.37 - Feb 26th, 2024
+=====================================
+For cpx-only press-temp used to only return Cpx composition if eq_tests=True, now also return Cpx components (e.g. Jd, Mg#, etc) for ease of plotting and workflows subdividing by textural types
+
+
 Version 1.0.36 - Jan 21st, 2024
 =====================================
 After numerous issues with peoples old (2020-2021 sklearn issues, have required 1.3 onwards in setup.py file now. )
