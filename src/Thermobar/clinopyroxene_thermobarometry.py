@@ -254,7 +254,10 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
+
+
+
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
 
@@ -326,7 +329,7 @@ def P_Jorgenson2022_Cpx_Liq_Norm(T=None, *, cpx_comps=None, liq_comps=None, melt
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'scaler_Jorg21_Cpx_Liq_April24.pkl', 'rb') as f:
@@ -397,7 +400,7 @@ def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_NotNorm_sklearn_1_3.pkl', 'rb') as f:
@@ -468,7 +471,7 @@ liq_comps=None, meltmatch=None):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     import onnxruntime as rt
 
     # path=Path(Thermobar_onnx.__file__).parent
@@ -548,7 +551,7 @@ def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltm
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     path=Path(Thermobar_onnx.__file__).parent
     import onnxruntime as rt
     #sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Press.onnx"))
@@ -788,7 +791,7 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     # Old version using pickles
@@ -862,7 +865,7 @@ def T_Jorgenson2022_Cpx_Liq_Norm(P=None, *, cpx_comps=None, liq_comps=None, melt
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     # Old version using pickles
@@ -933,7 +936,7 @@ def T_Jorgenson2022_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_Liq_NotNorm_sklearn_1_3.pkl', 'rb') as f:
@@ -1000,7 +1003,7 @@ def T_Jorgenson2022_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, melt
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     import onnxruntime as rt
     path=Path(Thermobar_onnx.__file__).parent
     #sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_Liq_Temp.onnx"))
@@ -1076,7 +1079,7 @@ def T_Petrelli2020_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, meltm
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     import onnxruntime as rt
     path=Path(Thermobar_onnx.__file__).parent
     #sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_Liq_Temp.onnx"))
@@ -1195,7 +1198,7 @@ def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
 
@@ -1245,7 +1248,7 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     import onnxruntime as rt
     path=Path(Thermobar_onnx.__file__).parent
     #sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Press.onnx"))
@@ -1334,7 +1337,7 @@ def P_Jorgenson2022_Cpx_only(T=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_only_NotNorm_sklearn_1_3.pkl', 'rb') as f:
@@ -1380,7 +1383,7 @@ def P_Jorgenson2022_Cpx_only_onnx(T=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     path=Path(Thermobar_onnx.__file__).parent
     import onnxruntime as rt
     #sess =  rt.InferenceSession(str(path/"Jorg21_Cpx_only_Press.onnx"))
@@ -1427,7 +1430,7 @@ def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_H2O_Jan22.pkl', 'rb') as f:
@@ -1626,7 +1629,7 @@ def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_sklearn_1_3.pkl', 'rb') as f:
@@ -1671,7 +1674,7 @@ def T_Jorgenson2022_Cpx_only_Norm(P=None, *, cpx_comps):
         if version != '0.0.4':
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'scaler_Jorg21_Cpx_only_April24.pkl', 'rb') as f:
@@ -1718,7 +1721,7 @@ def T_Jorgenson2022_Cpx_only(P=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_only_NotNorm_sklearn_1_3.pkl', 'rb') as f:
@@ -1762,7 +1765,7 @@ def T_Jorgenson2022_Cpx_only_onnx(P=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
 
 
     import onnxruntime as rt
@@ -1814,7 +1817,7 @@ def T_Petrelli2020_Cpx_only_onnx(P=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     import onnxruntime as rt
     # path=Path(Thermobar_onnx.__file__).parent
     # sess =  rt.InferenceSession(str(path/"Petrelli2020_Cpx_only_Temp.onnx"))
@@ -1866,7 +1869,7 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
             raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
 
     except ImportError:
-        raise RuntimeError('You havent installed the extra package to get onnx and pkl files for machine learning. See README')
+        raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
 
@@ -2629,7 +2632,6 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
                                     'T_K: (P_Put2008_eq32c, T_Put2008_eq34))': Teq34_eq32c.T_K_calc,
 
 
-
                                     'P_kbar: (P2003 P&T)': Put2003.P_kbar_calc,
                                     'T_K: (P2003 P&T)': Put2003.T_K_calc,
 
@@ -2657,7 +2659,7 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
 
         except ImportError:  # If the package is not installed
             # Print a warning message
-            print('Warning: Thermobar_onnx is not installed. Cannot perform the calculations using Petrelli and Jorgenson. See the ReadME for further instructions')
+            print('Warning: Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions')
 
         # Machine learning - only if available
 
@@ -3250,11 +3252,15 @@ eq_tests=False, return_input=None):
 
 
 
-    T: float, int, pandas.Series, str  ("Solve")
+    T: float, int, pandas.Series, float, None
         Temperature in Kelvin
         Only needed for T-sensitive barometers.
         If enter T="Solve", returns a partial function
         Else, enter an integer, float, or panda series
+
+    H2O_Liq: int, float, pd.Series, None
+        H2O content in the liquid. used for some Cpx-only equations.
+
 
     eq_tests: bool
         If True, returns cpx_components as well.
@@ -3380,7 +3386,27 @@ eq_tests=False, return_input=None):
 
 
 
-def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, return_cpx=True, H2O_Liq=0):
+def calculate_cpx_only_press_all_eqs(cpx_comps, eq_tests=True, H2O_Liq=None):
+    """ This function calculates Cpx-only pressures and temperatures using all supported equations. It returns these calcs as a dataframe
+
+    Parameters
+    -------
+
+    cpx_comps: pandas.DataFrame
+        Clinopyroxene compositions with column headings SiO2_Cpx, MgO_Cpx etc.
+
+    H2O_Liq: int, float, pd.Series
+        Used for equations which have a term for this. Uses 0 by default and returns a warning
+
+    eq_tests: bool
+        If True, returns cpx_components as well.
+
+    Returns
+    --------------
+    pd.DataFrame of calcs and Cpx comps
+
+    """
+
     import warnings
     with w.catch_warnings():
         w.simplefilter('ignore')
@@ -3394,17 +3420,7 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, return_cpx=True, H2O
 
         cpx_comps_c['T_Wang21_eq2']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy, equationT="T_Wang2021_eq2", H2O_Liq=H2O_Liq)
 
-        cpx_comps_c['T_Petrelli20']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
-        equationT="T_Petrelli2020_Cpx_only_onnx")
 
-        cpx_comps_c['T_Jorgenson22']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
-        equationT="T_Jorgenson2022_Cpx_only_onnx")
-
-        # cpx_comps_c['T_Petrelli21_H2O']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
-        # equationT="T_Petrelli2020_Cpx_only_withH2O_onnx").T_K_calc
-        #
-        # cpx_comps_c['P_Petrelli21_H2O']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
-        # equationP="P_Petrelli2020_Cpx_only_withH2O").P_kbar_calc
 
         cpx_comps_c['T_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").T_K_calc
@@ -3423,11 +3439,6 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, return_cpx=True, H2O
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d_subsol", H2O_Liq=H2O_Liq).P_kbar_calc
 
 
-        cpx_comps_c['P_Petrelli20']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
-        equationP="P_Petrelli2020_Cpx_only_onnx")
-
-        cpx_comps_c['P_Jorgenson22']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
-        equationP="P_Jorgenson2022_Cpx_only_onnx")
 
         cpx_comps_c['P_Put_Teq32d_Peq32a']=calculate_cpx_only_press_temp(cpx_comps=cpx_comps_copy,
         equationP="P_Put2008_eq32a", equationT="T_Put2008_eq32d").P_kbar_calc
@@ -3436,40 +3447,52 @@ def calculate_cpx_only_press_all_eqs(cpx_comps, plot=False, return_cpx=True, H2O
         equationP="P_Put2008_eq32b", equationT="T_Put2008_eq32d", H2O_Liq=H2O_Liq).P_kbar_calc
 
 
-        X_Wangeq1_Sorted=np.sort(cpx_comps_c['P_Wang21_eq1'])
-        X_Pet_Sorted=np.sort(cpx_comps_c['P_Petrelli20'])
-        X_Put_32d32a=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32a'])
-        X_Put_32d32b=np.sort(cpx_comps_c['P_Put_Teq32d_Peq32b'])
-        if plot==True:
-            plt.step(np.concatenate([X_Wangeq1_Sorted, X_Wangeq1_Sorted[[-1]]]),
-            np.arange(X_Wangeq1_Sorted.size+1)/X_Wangeq1_Sorted.size, color='blue', linewidth=1,
-            label="Wang21_eq1")
 
-            plt.step(np.concatenate([X_Pet_Sorted, X_Pet_Sorted[[-1]]]),
-            np.arange(X_Pet_Sorted.size+1)/X_Pet_Sorted.size, color='orange', linewidth=1,
-            label="X_Pet_Sorted")
 
-            plt.step(np.concatenate([X_Put_32d32a, X_Put_32d32a[[-1]]]),
-            np.arange(X_Put_32d32a.size+1)/X_Put_32d32a.size, color='black', linewidth=1,
-            label="X_Put_32d32a")
 
-            plt.step(np.concatenate([X_Put_32d32b, X_Put_32d32b[[-1]]]),
-            np.arange(X_Put_32d32b.size+1)/X_Put_32d32b.size, color='grey', linewidth=1,
-            label="X_Put_32d32b")
-            plt.title('Cpx-only Barometry, N='+ str(len(cpx_comps)))
+        # Check if marchine learning package is installed
 
-            plt.legend()
-            plt.xlabel('P_kbar')
-            plt.xlim([-3, 16])
 
-    cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Jorgenson22', 'P_Jorgenson22', 'T_Petrelli20', 'T_Put_Teq32d_Peq32a', 'T_Put_Teq32d_Peq32b', 'P_Petrelli20',
-    'P_Put_Teq32d_Peq32a', 'P_Put_Teq32d_Peq32b', 'Jd_from 0=Na, 1=Al']
-    cpx_comps_c_move = cpx_comps_c[cols_to_move + [
+        try:
+            import Thermobar_onnx  # Try importing the package
+
+            cpx_comps_c['P_Petrelli20']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
+            equationP="P_Petrelli2020_Cpx_only_onnx")
+
+            cpx_comps_c['P_Jorgenson22']=calculate_cpx_only_press(cpx_comps=cpx_comps_copy,
+            equationP="P_Jorgenson2022_Cpx_only_onnx")
+
+            cpx_comps_c['T_Petrelli20']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
+            equationT="T_Petrelli2020_Cpx_only_onnx")
+
+            cpx_comps_c['T_Jorgenson22']=calculate_cpx_only_temp(cpx_comps=cpx_comps_copy,
+            equationT="T_Jorgenson2022_Cpx_only_onnx")
+
+
+            cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Jorgenson22', 'P_Jorgenson22', 'T_Petrelli20', 'T_Put_Teq32d_Peq32a', 'T_Put_Teq32d_Peq32b', 'P_Petrelli20',
+            'P_Put_Teq32d_Peq32a', 'P_Put_Teq32d_Peq32b', 'Jd_from 0=Na, 1=Al']
+
+
+
+
+
+        except ImportError:  # If the package is not installed
+            # Print a warning message
+            print('Warning: Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions')
+
+            cols_to_move = ['P_Wang21_eq1', 'T_Wang21_eq2', 'T_Put_Teq32d_Peq32a', 'T_Put_Teq32d_Peq32b',
+            'P_Put_Teq32d_Peq32a', 'P_Put_Teq32d_Peq32b', 'Jd_from 0=Na, 1=Al']
+
+
+        cpx_comps_c_move = cpx_comps_c[cols_to_move + [
         col for col in cpx_comps_c.columns if col not in cols_to_move]]
 
-    if return_cpx is True:
+
+
+
+    if eq_tests is True:
         return cpx_comps_c_move
-    if return_cpx is False:
+    if eq_tests is False:
         return cpx_comps_c_move.iloc[:, 0:13]
 
 ## Function for calculating Cpx-only temperature
