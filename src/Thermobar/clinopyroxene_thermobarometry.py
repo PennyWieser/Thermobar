@@ -2592,11 +2592,6 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
         Put2003=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
         liq_comps=liq_comps_c, equationT="T_Put2003", equationP="P_Put2003")
 
-        Pet2020=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
-        liq_comps=liq_comps_c, equationT="T_Petrelli2020_Cpx_Liq", equationP="P_Petrelli2020_Cpx_Liq")
-
-        Jorg2020=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
-        liq_comps=liq_comps_c, equationT="T_Jorgenson2022_Cpx_Liq", equationP="P_Jorgenson2022_Cpx_Liq")
 
         Teq34_NP17=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
         liq_comps=liq_comps_c, equationT="T_Put2008_eq34_cpx_sat", equationP="P_Neave2017")
@@ -2639,16 +2634,35 @@ def calculate_cpx_liq_press_all_eqs(cpx_comps, liq_comps, H2O_Liq=None):
                                     'T_K: (P2003 P&T)': Put2003.T_K_calc,
 
 
-                                    'P_kbar: (Petrelli, 2020)': Pet2020.P_kbar_calc,
-                                    'T_K: (Petrelli, 2020)': Pet2020.T_K_calc,
-
-                                    'P_kbar: (Jorgenson, 2022)': Jorg2020.P_kbar_calc,
-                                    'T_K: (Jorgenson, 2022)': Jorg2020.T_K_calc,
-
                                     'T_K: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.T_K_calc,
                                     'P_kbar: (P_Put1996_eqP1, T_Put1996_eqT2)':T1996_P1_T2.P_kbar_calc,
 
             })
+
+        try:
+            import Thermobar_onnx  # Try importing the package
+
+            Pet2020=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+            liq_comps=liq_comps_c, equationT="T_Petrelli2020_Cpx_Liq", equationP="P_Petrelli2020_Cpx_Liq")
+
+            Jorg2020=calculate_cpx_liq_press_temp(cpx_comps=cpx_comps_c,
+            liq_comps=liq_comps_c, equationT="T_Jorgenson2022_Cpx_Liq", equationP="P_Jorgenson2022_Cpx_Liq")
+
+            df_out['P_kbar: (Petrelli, 2020)']=Pet2020.P_kbar_calc
+            df_out['T_K: (Petrelli, 2020)']=Pet2020.T_K_calc
+
+            df_out['P_kbar: (Jorgenson, 2022)']=Jorg2020.P_kbar_calc
+            df_out['T_K: (Jorgenson, 2022)']=Jorg2020.T_K_calc
+
+
+        except ImportError:  # If the package is not installed
+            # Print a warning message
+            print('Warning: Thermobar_onnx is not installed. Cannot perform the calculations using Petrelli and Jorgenson. See the ReadME for further instructions')
+
+        # Machine learning - only if available
+
+
+
 
 
 
