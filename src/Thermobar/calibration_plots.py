@@ -13,6 +13,10 @@ from Thermobar.core import *
 
 
 
+
+
+
+
 import os
 def return_cali_dataset(model=None):
     """
@@ -50,6 +54,16 @@ def return_cali_dataset(model=None):
 
     """
     import pkg_resources
+
+    # Check model is supported
+    sup_models = ['Ridolfi2021', 'Zhang2017', 'Putirka2016', 'Mutch2016', 'Shea2022', 'Wang2021',
+              'Petrelli2020', 'Putirka2008', 'Neave2017', 'Brugman2019', 'Masotta2013',
+              'Jorgenson2022', 'Waters2015', 'Masotta2019']
+
+
+    if model not in sup_models:
+        raise ValueError(f"The model '{model}' is not supported yet.")
+
 
 
 
@@ -171,6 +185,11 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         Waters2015: Waters and Lange (2015) for plag-liq hygrometry
         Masotta2019: Masotta et al. (2019) plag-liq hygrometry
 
+        LIQUID
+        Shea2022: Shea et al. (2022) for Ol MgO thermometry and Kd values
+
+
+
     P_kbar and T_K: pd.Series
         if you want to plot calculated pressure and temperature against the calibration range,
         specify those panda series here, and it will append them onto your dataframe
@@ -213,20 +232,25 @@ def generic_cali_plot(df, model=None, x=None, y=None, P_kbar=None, T_K=None, fig
         df_c=pd.concat([df, Amp_sites], axis=1)
 
 
-    if model=="Petrelli2020" or model=="Wang2021" or model=="Putirka2008" or model=="Neave2017" or model=="Brugman2019" or model=="Masotta2013" or model=="Jorgenson2022":
+    elif model=="Petrelli2020" or model=="Wang2021" or model=="Putirka2008" or model=="Neave2017" or model=="Brugman2019" or model=="Masotta2013" or model=="Jorgenson2022":
         if "Jd" not in df:
             Cpx_sites=calculate_clinopyroxene_components(cpx_comps=df)
             df_c=Cpx_sites
         else:
             df_c=df
+    else:
+
+        df_c=df
+
 
     if P_kbar is not None:
         df_c['P_kbar']=P_kbar
     if T_K is not None:
         df_c['T_K']=T_K
 
-    Cali_input=return_cali_dataset(model=model)
+    # Now get the cali dataset
 
+    Cali_input=return_cali_dataset(model=model)
 
 
 
