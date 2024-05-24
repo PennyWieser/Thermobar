@@ -85,12 +85,12 @@ def av_noise_samples_series(calc, sampleID):
 
     if isinstance(calc, pd.Series):
         N = sampleID.unique()
-        Av_mean = np.empty(len(N), dtype=float)
-        Av_median = np.empty(len(N), dtype=float)
-        Max = np.empty(len(N), dtype=float)
-        Min = np.empty(len(N), dtype=float)
-        Std = np.empty(len(N), dtype=float)
-        IQR_Std=np.empty(len(N), dtype=float)
+        Av_mean = np.zeros(len(N), dtype=float)
+        Av_median = np.zeros(len(N), dtype=float)
+        Max = np.zeros(len(N), dtype=float)
+        Min = np.zeros(len(N), dtype=float)
+        Std = np.zeros(len(N), dtype=float)
+        IQR_Std=np.zeros(len(N), dtype=float)
         i=0
         for ID in sampleID.unique():
             sam=ID
@@ -143,12 +143,12 @@ def av_noise_samples_df(dataframe, calc_heading, ID_heading):
     sampleID=dataframe[ID_heading]
     if isinstance(calc, pd.Series):
         N = sampleID.unique()
-        Av_mean = np.empty(len(N), dtype=float)
-        Av_median = np.empty(len(N), dtype=float)
-        Max = np.empty(len(N), dtype=float)
-        Min = np.empty(len(N), dtype=float)
-        Std = np.empty(len(N), dtype=float)
-        IQR_Std=np.empty(len(N), dtype=float)
+        Av_mean = np.zeros(len(N), dtype=float)
+        Av_median = np.zeros(len(N), dtype=float)
+        Max = np.zeros(len(N), dtype=float)
+        Min = np.zeros(len(N), dtype=float)
+        Std = np.zeros(len(N), dtype=float)
+        IQR_Std=np.zeros(len(N), dtype=float)
         for i in range(0, len(N)):
             Av_mean[i] = np.nanmean(calc[sampleID == i])
             Av_median[i] = np.nanmedian(calc[sampleID == i])
@@ -435,25 +435,25 @@ variable_err=variable_err)
 
 
         # Set up empty things to fill in
-        SiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
-        TiO2_Err = np.empty((duplicates * len(Data)), dtype=float)
-        Al2O3_Err = np.empty((duplicates * len(Data)), dtype=float)
-        FeOt_Err = np.empty((duplicates * len(Data)), dtype=float)
-        MnO_Err = np.empty((duplicates * len(Data)), dtype=float)
-        MgO_Err = np.empty((duplicates * len(Data)), dtype=float)
-        CaO_Err = np.empty((duplicates * len(Data)), dtype=float)
-        Na2O_Err = np.empty((duplicates * len(Data)), dtype=float)
-        K2O_Err = np.empty((duplicates * len(Data)), dtype=float)
-        Cr2O3_Err = np.empty((duplicates * len(Data)), dtype=float)
-        NiO_Err = np.empty((duplicates * len(Data)), dtype=float)
-        P2O5_Err = np.empty((duplicates * len(Data)), dtype=float)
-        H2O_Err = np.empty((duplicates * len(Data)), dtype=float)
-        P_kbar_Err = np.empty((duplicates * len(Data)), dtype=float)
-        T_K_Err = np.empty((duplicates * len(Data)), dtype=float)
-        F_Err = np.empty((duplicates * len(Data)), dtype=float)
-        Cl_Err = np.empty((duplicates * len(Data)), dtype=float)
-        Sample_name_num = np.empty((duplicates * len(Data)), dtype=float)
-        Sample_name_str = np.empty((duplicates * len(Data)), dtype=object)
+        SiO2_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        TiO2_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        Al2O3_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        FeOt_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        MnO_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        MgO_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        CaO_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        Na2O_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        K2O_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        Cr2O3_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        NiO_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        P2O5_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        H2O_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        P_kbar_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        T_K_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        F_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        Cl_Err = np.zeros((duplicates * len(Data)), dtype=float)
+        Sample_name_num = np.zeros((duplicates * len(Data)), dtype=float)
+        Sample_name_str = np.zeros((duplicates * len(Data)), dtype=object)
 
         if phase_err_type == "Abs":
             Err = phase_err

@@ -23,6 +23,10 @@ def calculate_cpx_mgno(cpx_comps):
     Mgno=(cpx_comps['MgO_Cpx']/40.3044)/((cpx_comps['MgO_Cpx']/40.3044)+(cpx_comps['FeOt_Cpx']/71.844))
     return Mgno
 
+def calculate_opx_mgno(opx_comps):
+    Mgno=(cpx_comps['MgO_Opx']/40.3044)/((cpx_comps['MgO_Opx']/40.3044)+(cpx_comps['FeOt_Opx']/71.844))
+    return Mgno
+
 def calculate_liq_mgno(liq_comps, Fe3Fet_Liq=None):
     liq_comps_c=liq_comps.copy()
     if Fe3Fet_Liq is not None:
@@ -69,7 +73,7 @@ def calculate_toplis2005_kd(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, P, H2O, T):
         if SiO2_mol < 60:
             Kd_Toplis = Kd_Toplis_60minus
     else:
-        Kd_Toplis = np.empty(len(SiO2_mol), dtype=float)
+        Kd_Toplis = np.zeros(len(SiO2_mol), dtype=float)
 
         for i in range(0, len(SiO2_mol)):
             if SiO2_mol[i] > 60:
