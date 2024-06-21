@@ -536,120 +536,142 @@ def calculate_ol_liq_temp(*, equationT, liq_comps=None, ol_comps=None, meltmatch
             raise ValueError('Ol comps need to be same length as Liq comps. use a _matching function calculate_ol_liq_temp_matching instead if you want to consider all pairs')
 
 
+# Lets do Pu method separatly
+    if equationT == "T_Pu2017" or equationT == "T_Pu2021":
+        if meltmatch is not None:
 
-
-# Replacing H2O and Fe3FeT if relevant
-    if meltmatch is None:
-
-        if isinstance(P, pd.Series):
-            if len(P) != len(liq_comps):
-                raise ValueError('The panda series entered for pressure isnt the same length '
-                'as the dataframe of liquid compositions')
-            if len(liq_comps) != len(ol_comps):
-                raise ValueError('The panda series entered for olivine isnt the same length as for liquids')
-        liq_comps_c = liq_comps.copy()
+            raise Exception('Sorry, we havent yet integrated the Pu equations into this method. We can do this if you need it')
         ol_comps_c=ol_comps.copy()
+        liq_comps_c=liq_comps.copy()
 
 
-        if H2O_Liq is not None:
-            liq_comps_c['H2O_Liq'] = H2O_Liq
-        if Fe3Fet_Liq is not None:
-            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
+        anhyd_mol_frac_Ni = calculate_anhydrous_mol_fractions_liquid_Ni(
+            liq_comps=liq_comps_c)
 
-# Allows different calculation scheme for Ni-bearing equations
-        if equationT == "T_Pu2017" or equationT == "T_Pu2021":
-            anhyd_mol_frac_Ni = calculate_anhydrous_mol_fractions_liquid_Ni(
-                liq_comps=liq_comps_c)
-            if NiO_Ol_Mol is None:
-                ol_mol_frac_Ni = calculate_mol_fractions_olivine_ni(
-                    ol_comps=ol_comps_c)
-                Liq_Ols_Ni = pd.concat([anhyd_mol_frac_Ni, ol_mol_frac_Ni], axis=1)
-                if eq_tests is True:
-                    anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(
-                        liq_comps=liq_comps_c)
-                    Liq_Ols = pd.concat([Liq_Ols_Ni, liq_comps_c], axis=1)
-        # This means the equilibrium testwork
-            if NiO_Ol_Mol is not None:
-                if eq_tests is True and ol_comps is None:
-                    raise Exception(
-                        'you dont have any ol compositions, so we cant calculate Kd values')
+        # This assumes they entered olivine compositions, not just a Ni fraction.
 
-                NiO_Ol_Mol = NiO_Ol_Mol
-                Liq_Ols_Ni = anhyd_mol_frac_Ni.copy()
-                Liq_Ols_Ni['NiO_Ol_mol_frac'] = NiO_Ol_Mol
-            if equationT == "T_Pu2017":
-                func = T_Pu2017
-                kwargs = {name: Liq_Ols_Ni[name] for name, p in inspect.signature(
-                    func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
+        if NiO_Ol_Mol is None:
+            ol_mol_frac_Ni = calculate_mol_fractions_olivine_ni(
+                ol_comps=ol_comps_c)
+            Liq_Ols_Ni = pd.concat([anhyd_mol_frac_Ni, ol_mol_frac_Ni], axis=1)
+            if eq_tests is True:
+                anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(
+                    liq_comps=liq_comps_c)
+                Liq_Ols = pd.concat([Liq_Ols_Ni, liq_comps_c], axis=1)
+
+    # If they just entered NiO contents in the olivine
+        if NiO_Ol_Mol is not None:
+            if eq_tests is True and ol_comps is None:
+                raise Exception(
+                    'you dont have any ol compositions, so we cant calculate Kd values')
+
+            NiO_Ol_Mol = NiO_Ol_Mol
+            Liq_Ols_Ni = anhyd_mol_frac_Ni.copy()
+            Liq_Ols_Ni['NiO_Ol_mol_frac'] = NiO_Ol_Mol
+
+
+        if equationT == "T_Pu2017":
+            func = T_Pu2017
+            kwargs = {name: Liq_Ols_Ni[name] for name, p in inspect.signature(
+                func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
+            T_K=func(**kwargs)
+        if equationT=="T_Pu2021":
+            if P is None:
+                raise ValueError(f'{equationT} requires you to enter P, or set P=Solve')
+            func = T_Pu2021
+            kwargs = {name: Liq_Ols_Ni[name] for name, p in inspect.signature(
+                func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
+            T_K=func(P, **kwargs)
+
+        Liq_Ols = pd.concat([ol_comps_c, liq_comps_c], axis=1)
+
+    else:
+        # i.e. not using Pu et al.
+
+    # Replacing H2O and Fe3FeT if relevant
+        if meltmatch is None:
+
+            if isinstance(P, pd.Series):
+                if len(P) != len(liq_comps):
+                    raise ValueError('The panda series entered for pressure isnt the same length '
+                    'as the dataframe of liquid compositions')
+                if len(liq_comps) != len(ol_comps):
+                    raise ValueError('The panda series entered for olivine isnt the same length as for liquids')
+            liq_comps_c = liq_comps.copy()
+            ol_comps_c=ol_comps.copy()
+
+
+            if H2O_Liq is not None:
+                liq_comps_c['H2O_Liq'] = H2O_Liq
+            if Fe3Fet_Liq is not None:
+                liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
+
+    # Allows different calculation scheme for Ni-bearing equations
+
+
+
+            else:
+            # Keiths spreadsheets dont use Cr2O3 and P2O5. So have set this to zero.
+                liq_comps_c['Cr2O3_Liq']=0
+                liq_comps_c['P2O5_Liq']=0
+                ol_comps_c['Cr2O3_Ol']=0
+                ol_comps_c['P2O5_Ol']=0
+        # Now calculate cation fractions
+
+
+            anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
+            ol_cat_frac = calculate_cat_fractions_olivine(ol_comps=ol_comps_c)
+            Liq_Ols = pd.concat([anhyd_cat_frac, ol_cat_frac, ol_comps_c], axis=1)
+
+
+        if meltmatch is not None:
+            Liq_Ols=meltmatch
+
+        # This performs extra calculation steps for Beattie equations
+        if equationT == "T_Put2008_eq22" or equationT == "T_Put2008_eq21" or \
+        equationT == "T_Beatt93_ol" or equationT == "T_Beatt93_ol_HerzCorr" or equationT=="T_Put2008_eq19":
+
+
+
+            Liq_Ols['DMg_Meas'] = Liq_Ols['Mg_Ol_cat_frac'].astype(float) /Liq_Ols['Mg_Liq_cat_frac'].astype(float)
+            Liq_Ols['CNML'] = (Liq_Ols['Mg_Liq_cat_frac'] + Liq_Ols['Fet_Liq_cat_frac'] +
+                                    Liq_Ols['Ca_Liq_cat_frac'] + Liq_Ols['Mn_Liq_cat_frac'])
+            Liq_Ols['CSiO2L'] = Liq_Ols['Si_Liq_cat_frac']
+            Liq_Ols['NF'] = (7 / 2) * np.log(1 - Liq_Ols['Al_Liq_cat_frac']
+                                                ) + 7 * np.log(1 - Liq_Ols['Ti_Liq_cat_frac'])
+            Liq_Ols['Den_Beat93'] = 52.05 / 8.3144 + 2 * np.log(Liq_Ols['DMg_Meas']) + 2 * np.log(
+                1.5 * Liq_Ols['CNML']) + 2 * np.log(3 * Liq_Ols['CSiO2L']) - Liq_Ols['NF']
+
+        if equationT == "T_Sisson1992":
+            Liq_Ols['KdMg_TSG1992'] = (Liq_Ols['Mg_Ol_cat_frac'] /
+                (Liq_Ols['Mg_Liq_cat_frac'] *
+                    (Liq_Ols['Si_Liq_cat_frac']**(0.5))))
+
+
+    # Checks if P-dependent function you have entered a P
+        if sig.parameters['P'].default is not None:
+            if P is None:
+                raise ValueError(f'{equationT} requires you to enter P')
+        else:
+            if P is not None:
+                print('Youve selected a P-independent function')
+
+
+        kwargs = {name: Liq_Ols[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
+        if isinstance(P, str) or P is None:
+            if P == "Solve":
+                T_K = partial(func, **kwargs)
+            if P is None:
                 T_K=func(**kwargs)
-            if equationT=="T_Pu2021":
-                if P is None:
-                    raise ValueError(f'{equationT} requires you to enter P, or set P=Solve')
-                func = T_Pu2021
-                kwargs = {name: Liq_Ols_Ni[name] for name, p in inspect.signature(
-                    func).parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
-                T_K=func(P, **kwargs)
-
 
         else:
-        # Keiths spreadsheets dont use Cr2O3 and P2O5. So have set this to zero.
-            liq_comps_c['Cr2O3_Liq']=0
-            liq_comps_c['P2O5_Liq']=0
-            ol_comps_c['Cr2O3_Ol']=0
-            ol_comps_c['P2O5_Ol']=0
-    # Now calculate cation fractions
-    if meltmatch is None:
 
-        anhyd_cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c)
-        ol_cat_frac = calculate_cat_fractions_olivine(ol_comps=ol_comps_c)
-        Liq_Ols = pd.concat([anhyd_cat_frac, ol_cat_frac, ol_comps_c], axis=1)
-
-    if meltmatch is not None:
-        if equationT == "T_Pu2017" or equationT == "T_Pu2021":
-            raise Exception('Sorry, we havent yet integrated the Pu equations into this method. We can do this if you need it')
-
-        Liq_Ols=meltmatch
-
-# This performs extra calculation steps for Beattie equations
-    if equationT == "T_Put2008_eq22" or equationT == "T_Put2008_eq21" or \
-    equationT == "T_Beatt93_ol" or equationT == "T_Beatt93_ol_HerzCorr" or equationT=="T_Put2008_eq19":
-
-        Liq_Ols['DMg_Meas'] = Liq_Ols['Mg_Ol_cat_frac'].astype(float) /Liq_Ols['Mg_Liq_cat_frac'].astype(float)
-        Liq_Ols['CNML'] = (Liq_Ols['Mg_Liq_cat_frac'] + Liq_Ols['Fet_Liq_cat_frac'] +
-                                Liq_Ols['Ca_Liq_cat_frac'] + Liq_Ols['Mn_Liq_cat_frac'])
-        Liq_Ols['CSiO2L'] = Liq_Ols['Si_Liq_cat_frac']
-        Liq_Ols['NF'] = (7 / 2) * np.log(1 - Liq_Ols['Al_Liq_cat_frac']
-                                            ) + 7 * np.log(1 - Liq_Ols['Ti_Liq_cat_frac'])
-        Liq_Ols['Den_Beat93'] = 52.05 / 8.3144 + 2 * np.log(Liq_Ols['DMg_Meas']) + 2 * np.log(
-            1.5 * Liq_Ols['CNML']) + 2 * np.log(3 * Liq_Ols['CSiO2L']) - Liq_Ols['NF']
-
-    if equationT == "T_Sisson1992":
-        Liq_Ols['KdMg_TSG1992'] = (Liq_Ols['Mg_Ol_cat_frac'] /
-            (Liq_Ols['Mg_Liq_cat_frac'] *
-                (Liq_Ols['Si_Liq_cat_frac']**(0.5))))
-
-
-# Checks if P-dependent function you have entered a P
-    if sig.parameters['P'].default is not None:
-        if P is None:
-            raise ValueError(f'{equationT} requires you to enter P')
-    else:
-        if P is not None:
-            print('Youve selected a P-independent function')
-
-
-    kwargs = {name: Liq_Ols[name] for name, p in sig.parameters.items() if p.kind == inspect.Parameter.KEYWORD_ONLY}
-    if isinstance(P, str) or P is None:
-        if P == "Solve":
-            T_K = partial(func, **kwargs)
-        if P is None:
-            T_K=func(**kwargs)
-
-    else:
-
-        T_K=func(P, **kwargs)
+            T_K=func(P, **kwargs)
 
     if eq_tests is False:
+        if NiO_Ol_Mol is not None:
+            raise Exception(
+                'No olivine composition, so cannot calculate equilibrium test. Set eq_tests=False')
         KdFeMg_Meas = (
             ((Liq_Ols['FeOt_Ol'] / 71.844) / (Liq_Ols['MgO_Ol'] / 40.3044)) /
             ((Liq_Ols['FeOt_Liq'] * (1 - Liq_Ols['Fe3Fet_Liq']

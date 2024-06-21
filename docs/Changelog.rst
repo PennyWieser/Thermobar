@@ -1,6 +1,13 @@
 ================================================
 Change Log
 ================================================
+
+Version 1.0.42 - Feb 26th, 2024
+=====================================
+Fixed Pu et al. (2017) and (2021) thermometers - bug in NiO allocation that returned error.
+
+
+
 Version 1.0.37 - Feb 26th, 2024
 =====================================
 For cpx-only press-temp used to only return Cpx composition if eq_tests=True, now also return Cpx components (e.g. Jd, Mg#, etc) for ease of plotting and workflows subdividing by textural types

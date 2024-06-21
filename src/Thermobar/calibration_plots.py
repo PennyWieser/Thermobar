@@ -51,6 +51,7 @@ def return_cali_dataset(model=None):
 
         LIQUID
         Shea2022: Shea et al. (2022) for Ol MgO thermometry and Kd values
+        HelzThornber87: Helz and Thornber (1987).
 
     """
     import pkg_resources
@@ -58,7 +59,7 @@ def return_cali_dataset(model=None):
     # Check model is supported
     sup_models = ['Ridolfi2021', 'Zhang2017', 'Putirka2016', 'Mutch2016', 'Shea2022', 'Wang2021',
               'Petrelli2020', 'Putirka2008', 'Neave2017', 'Brugman2019', 'Masotta2013',
-              'Jorgenson2022', 'Waters2015', 'Masotta2019']
+              'Jorgenson2022', 'Waters2015', 'Masotta2019', 'HelzThornber87']
 
 
     if model not in sup_models:
@@ -85,7 +86,8 @@ def return_cali_dataset(model=None):
     "Masotta2013": 'Masotta_2013_Cali_input.csv',
     "Jorgenson2022":'Jorgenson2022_Cali_input.csv',
     "Waters2015":'Waters_Lange2015_Cali_input.csv',
-    "Masotta2019": 'Masotta2019_Cali_input.csv'}
+    "Masotta2019": 'Masotta2019_Cali_input.csv',
+    'HelzThornber87': 'HelzThornber_1987_Cali_Liq.csv'}
 
     # Get the file name for the given model
 
