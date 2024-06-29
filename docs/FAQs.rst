@@ -2,12 +2,17 @@
 FAQs and Troubleshooting
 ========================
 
-It is very possible that there are errors in Thermobar., and I really appreciate people alerting me to them. However, I get an awful lot of emails with the same problems, so please have a look through these FAQs first!
+IAs with most software packages - Thermobar will contain bugs. However, most emails I get are user errors. So please go through these FAQs first.
 
-If your problem isnt covered here, it would be great if you could raise an issue on GitHub, as it might help future people with the same question.
-https://github.com/PennyWieser/Thermobar/issues
-Select "New Issue"
-Make sure you give me enough information to troubleshoot- E.g., attach your .ipynb notebook with the problem, and some input data, screenshots of error messsages etc. If you have a problem of Thermobar vs. an existing tool, attach the other spreadsheet you are comparing it too.
+If your answer is not found, when you email me make sure you include:
+1) the version of thermobar you are using (pt.__version__)
+2) Attach your Jupyter notebook and all the files it pulls from. If possible, please simplify your code to just emphasize the cell that isnt working (e.g. I dont need to see all your calculations.
+3) Screenshots of what the error was - In python, the most useful info is at the bottom of the error message, so please dont just screenshot the top!
+
+General - For any error
+==================================================================
+Check what version of Thermobar you are on - if it doesn't match the number here, https://pypi.org/project/Thermobar/, first try upgrading.
+Make sure you restart your kernel before you try again.
 
 
 Thermobar doesn't match the Putirka (2008) spreadsheets
@@ -26,10 +31,9 @@ A: Remember, Thermobar outputs temperature in Kelvin, not celcius.
 Importing Data Issues
 ======================
 
-Q: Columns are filled with zeros that you expect to be filled with numbers.
-
+Q: My columns are filled with zeros that you expect to be filled with numbers.
 A: Check for special characters, e.g., zeros rather than capital 0s, spaces at the start or end of the word, incorrect phase identifiers (e.g., typos like oxps)
 
-Q: What do I do about H$_2$O?.
 
+Q: What do I do about H$_2$O?.
 A: If you know H2O content, have a column in your input spreadsheet named H2O_Liq. If not, it assumes its 0 wt%. You can then overwrite this in various functions to investigate how much H2O affects your results.

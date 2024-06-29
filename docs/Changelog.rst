@@ -1,8 +1,12 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.43 - June 29th 2024
+=====================================
+Added functionality for melt matching for Pu et al (upon user request). Also, updated FAQs.
 
-Version 1.0.42 - Feb 26th, 2024
+
+Version 1.0.42 - June 20th 2024
 =====================================
 Fixed Pu et al. (2017) and (2021) thermometers - bug in NiO allocation that returned error.
 
