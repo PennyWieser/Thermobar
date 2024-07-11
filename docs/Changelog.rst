@@ -1,7 +1,7 @@
 ================================================
 Change Log
 ================================================
-Version 1.0.44 - July 11th, 2024
+Version 1.0.45 - July 11th, 2024
 =====================================
 Based on issue from Jordan lubbers, changed import_excel function to allow you to supply a path using pathlib. Added as dependency as well. Old path functionality should be preserved.
 
