@@ -1,6 +1,11 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.44 - July 11th, 2024
+=====================================
+Based on issue from Jordan lubbers, changed import_excel function to allow you to supply a path using pathlib. Added as dependency as well. Old path functionality should be preserved.
+
+
 Version 1.0.43 - June 29th 2024
 =====================================
 Added functionality for melt matching for Pu et al (upon user request). Also, updated FAQs.

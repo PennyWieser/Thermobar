@@ -40,6 +40,7 @@ setup(
             'tqdm',
             'statsmodels',
             'openpyxl',
+            'pathlib'
             ],
             # PyPI doesnt allow this :(
     # extras_require={

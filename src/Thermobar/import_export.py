@@ -5,6 +5,7 @@ import inspect
 import warnings as w
 import numbers
 import pandas as pd
+from pathlib import Path
 
 
 from Thermobar.core import *
@@ -306,7 +307,7 @@ def import_lepr_file(filename):
 
 
 # Loading Excel, returns a disctionry
-def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=None):
+def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=False, suffix=None):
     '''
     Import excel sheet of oxides in wt%, headings should be of the form SiO2_Liq (for the melt/liquid), SiO2_Ol (for olivine comps), SiO2_Cpx (for clinopyroxene compositions). Order doesn't matter
 
@@ -319,6 +320,14 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
 
     filename: str
         specifies the file name (e.g., Python_OlLiq_Thermometers_Test.xlsx)
+
+    Optional:
+
+    path: provide a pathlib path to where the file is stored
+
+    GEOROC: bool (defualt False) - reads in GEOROC files
+
+    suffix: default None, can be '_Liq' etc. Used to add a suffix onto all column headings.
 
     Returns
     -------
@@ -335,16 +344,26 @@ def import_excel(filename, sheet_name, sample_label=None, GEOROC=False, suffix=N
         Amps=pandas dataframe of amphibole oxides
         Sps=pandas dataframe of spinel oxides
     '''
-    if 'csv' in filename:
-        my_input = pd.read_csv(filename)
+    if path is not None:
+        file_path = Path(path) / file_name
+    else:
+        file_path = Path(file_name)
 
-    elif 'xls' in filename:
+    # Convert to string if needed
+    if isinstance(file_path, Path):
+        file_path = str(file_path)
+
+    # Check the file extension and read the file accordingly
+    if file_path.endswith('.csv'):
+        my_input = pd.read_csv(file_path)
+    elif file_path.endswith(('.xls', '.xlsx')):
         if sheet_name is not None:
-            my_input = pd.read_excel(filename, sheet_name=sheet_name)
-            #my_input[my_input < 0] = 0
+            my_input = pd.read_excel(file_path, sheet_name=sheet_name)
         else:
-            my_input = pd.read_excel(filename)
-            #my_input[my_input < 0] = 0
+            my_input = pd.read_excel(file_path)
+    else:
+        raise ValueError(f"Unsupported file extension: {Path(file_path).suffix}")
+
 
     if any(my_input.columns.str.startswith(' ')):
         w.warn('your input file has some columns that start with spaces. This could cause you big problems if they are at the start of oxide names. Please ammend your file and reload.')
