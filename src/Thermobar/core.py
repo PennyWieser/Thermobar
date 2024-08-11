@@ -1208,7 +1208,7 @@ def calculate_6oxygens_orthopyroxene(opx_comps):
     cation_6['Al_IV_Opx_cat_6ox'] = 2 - cation_6['SiO2_Opx_cat_6ox']
     cation_6['Al_VI_Opx_cat_6ox'] = cation_6['Al2O3_Opx_cat_6ox'] - \
         cation_6['Al_IV_Opx_cat_6ox']
-    cation_6.Al_VI_Opx_cat_6ox[cation_6.Al_VI_Opx_cat_6ox < 0] = 0
+    cation_6.loc[cation_6['Al_VI_Opx_cat_6ox'] < 0, 'Al_VI_Opx_cat_6ox'] = 0
     cation_6['Si_Ti_Opx_cat_6ox'] = cation_6['SiO2_Opx_cat_6ox'] + \
         cation_6['TiO2_Opx_cat_6ox']
 
@@ -1274,7 +1274,9 @@ def calculate_orthopyroxene_components(opx_comps):
     opx_calc['CrAl2SiO6'] = opx_calc['Cr_Opx_cat_6ox']
     opx_calc['FmAl2SiO6'] = opx_calc['Al_VI_Opx_cat_6ox'] - \
         opx_calc['NaAlSi2O6'] - opx_calc['CrAl2SiO6']
-    opx_calc.FmAl2SiO6[opx_calc.FmAl2SiO6 < 0] = 0
+
+    opx_calc.loc[opx_calc['FmAl2SiO6'] < 0, 'FmAl2SiO6'] = 0
+
     opx_calc['CaFmSi2O6'] = opx_calc['Ca_Opx_cat_6ox']
     opx_calc['Fm2Si2O6'] = (((opx_calc['Fet_Opx_cat_6ox'] + opx_calc['Mg_Opx_cat_6ox']
     + opx_calc['Mn_Opx_cat_6ox'])- opx_calc['FmTiAlSiO6'] - opx_calc['FmAl2SiO6'] - opx_calc['CaFmSi2O6']) / 2)
@@ -1469,7 +1471,7 @@ def calculate_6oxygens_clinopyroxene(cpx_comps):
     cation_6['Al_IV_cat_6ox'] = 2 - cation_6['SiO2_Cpx_cat_6ox']
     cation_6['Al_VI_cat_6ox'] = cation_6['Al2O3_Cpx_cat_6ox'] - \
         cation_6['Al_IV_cat_6ox']
-    cation_6.Al_VI_cat_6ox[cation_6.Al_VI_cat_6ox < 0] = 0
+    cation_6.loc[cation_6['Al_VI_cat_6ox'] < 0, 'Al_VI_cat_6ox'] = 0
 
 
     cation_6_2=cation_6.rename(columns={
@@ -1591,9 +1593,9 @@ def calculate_clinopyroxene_components(cpx_comps):
                              cpx_calc['CaTs'] - cpx_calc['CaTi'] - cpx_calc['CrCaTs'])
     cpx_calc['Di_Cpx'] = cpx_calc['DiHd_2003'] * (cpx_calc['Mg_Cpx_cat_6ox'] / (
         cpx_calc['Mg_Cpx_cat_6ox'] + cpx_calc['Mn_Cpx_cat_6ox'] + cpx_calc['Fet_Cpx_cat_6ox']))
-    cpx_calc['DiHd_1996'].clip(lower=0, inplace=True)
-    cpx_calc['DiHd_2003'].clip(lower=0, inplace=True)
-    cpx_calc['Jd'].clip(lower=0, inplace=True)
+    cpx_calc['DiHd_1996'] = cpx_calc['DiHd_1996'].clip(lower=0)
+    cpx_calc['DiHd_2003'] = cpx_calc['DiHd_2003'].clip(lower=0)
+    cpx_calc['Jd'] = cpx_calc['Jd'].clip(lower=0)
 
     cpx_calc['FeIII_Wang21']=(cpx_calc['Na_Cpx_cat_6ox']+cpx_calc['Al_IV_cat_6ox']
     -cpx_calc['Al_VI_cat_6ox']-2*cpx_calc['Ti_Cpx_cat_6ox']-cpx_calc['Cr_Cpx_cat_6ox'])
