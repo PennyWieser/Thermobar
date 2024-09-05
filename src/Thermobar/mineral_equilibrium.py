@@ -305,6 +305,87 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
 
         return Kd_out
 
+## Same for Orhopyroxene
+def calculate_eq_px_content(liq_comps,
+Fe3Fet_Liq=None, px='Opx'):
+    '''calculates equilibrium pyroxene contents based on inputtted liquid compositions.
+
+
+   Parameters
+    -------
+
+    liq_comps: pandas.DataFrame
+        Liquid compositions with column headings SiO2_Ol, MgO_Ol etc.
+
+    px: 'Opx' or 'Cpx'
+
+    Fe3FeT: optional, float or int.
+        overwrites Fe3Fet_Liq in liq_comps DataFrame
+
+
+
+    Returns
+    -------
+    pandas DataFrame
+        returns equilibrium Px Mg#s (+- sigma) from Putirka 2008
+
+    '''
+    liq_comps_c=liq_comps.copy()
+    if Fe3Fet_Liq is not None:
+        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
+
+
+    liq = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
+    Mgno = liq['Mg_Number_Liq_Fe3']
+    Mgno_noFe3 = liq['Mg_Number_Liq_NoFe3']
+
+
+
+
+    if px == 'Opx':
+
+        # These values are 0.29+0-.06, which is from Putirka, He also gives an expression in terms of the si content of the liquid.
+
+        Eq_023 = 1 / ((0.23 / Mgno) + (1 - 0.23))
+        Eq_029 = 1 / ((0.29 / Mgno) + (1 - 0.29))
+        Eq_035 = 1 / ((0.35 / Mgno) + (1 - 0.35))
+
+
+        # Or calculating as a function of the Si content.
+        cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
+        Si_mean_frac = np.nanmean(cat_frac['Si_Liq_cat_frac'])
+        Kd = 0.4805 - 0.3733 * Si_mean_frac
+        Eq_Opx = 1 / ((Kd / Mgno) + (1 - Kd))
+        Kd_p_1_s = Kd + 0.06
+        Kd_m_1_s = Kd - 0.06
+        Eq_Opx_p1sigma = 1 / ((Kd_p_1_s / Mgno) + (1 - Kd_p_1_s))
+        Eq_Opx_m1sigma = 1 / ((Kd_m_1_s / Mgno) + (1 - Kd_m_1_s))
+
+
+        Kd_out= pd.DataFrame(data={'Kd_XSi_P2008': Kd,
+        'Eq_Opx_Mg# (Kd_XSi_P2008)': Eq_Opx,
+         'Eq_Opx_Mg# (Kd_XSi_P2008)+0.06': Eq_Opx_p1sigma,
+        'Eq_Opx_Mg# (Kd_XSi_P2008)-0.06': Eq_Opx_m1sigma,
+        'Eq_Opx_Mg# (Kd=0.23)': Eq_023,
+        'Eq_Opx_Mg# (Kd=0.29)': Eq_029,
+        'Eq_Opx_Mg# (Kd=0.35)': Eq_035
+
+        })
+
+
+
+
+
+        Kd_out.insert(0, 'Mg#_Liq_Fe2', Mgno)
+        Kd_out.insert(1, 'Mg#_Liq_Fet', Mgno_noFe3)
+
+
+        return Kd_out
+
+    if px == 'Cpx':
+        raise TypeError('Penny still needs to add this, if you need it , please message me!')
+
+
 
 def calculate_ol_rhodes_diagram_lines(
         Min_Mgno, Max_Mgno, KdMin=None, KdMax=None):

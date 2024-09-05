@@ -307,7 +307,7 @@ def import_lepr_file(filename):
 
 
 # Loading Excel, returns a disctionry
-def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=False, suffix=None):
+def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=False, suffix=None, df=None):
     '''
     Import excel sheet of oxides in wt%, headings should be of the form SiO2_Liq (for the melt/liquid), SiO2_Ol (for olivine comps), SiO2_Cpx (for clinopyroxene compositions). Order doesn't matter
 
@@ -320,6 +320,9 @@ def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=Fa
 
     filename: str
         specifies the file name (e.g., Python_OlLiq_Thermometers_Test.xlsx)
+
+    OR
+    enter a dataframe instead of an excel file.
 
     Optional:
 
@@ -344,25 +347,30 @@ def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=Fa
         Amps=pandas dataframe of amphibole oxides
         Sps=pandas dataframe of spinel oxides
     '''
-    if path is not None:
-        file_path = Path(path) / file_name
-    else:
-        file_path = Path(file_name)
 
-    # Convert to string if needed
-    if isinstance(file_path, Path):
-        file_path = str(file_path)
+    if df is None:
 
-    # Check the file extension and read the file accordingly
-    if file_path.endswith('.csv'):
-        my_input = pd.read_csv(file_path)
-    elif file_path.endswith(('.xls', '.xlsx')):
-        if sheet_name is not None:
-            my_input = pd.read_excel(file_path, sheet_name=sheet_name)
+        if path is not None:
+            file_path = Path(path) / file_name
         else:
-            my_input = pd.read_excel(file_path)
+            file_path = Path(file_name)
+
+        # Convert to string if needed
+        if isinstance(file_path, Path):
+            file_path = str(file_path)
+
+        # Check the file extension and read the file accordingly
+        if file_path.endswith('.csv'):
+            my_input = pd.read_csv(file_path)
+        elif file_path.endswith(('.xls', '.xlsx')):
+            if sheet_name is not None:
+                my_input = pd.read_excel(file_path, sheet_name=sheet_name)
+            else:
+                my_input = pd.read_excel(file_path)
+        else:
+            raise ValueError(f"Unsupported file extension: {Path(file_path).suffix}")
     else:
-        raise ValueError(f"Unsupported file extension: {Path(file_path).suffix}")
+        my_input=df
 
 
     if any(my_input.columns.str.startswith(' ')):
@@ -437,11 +445,16 @@ def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=Fa
 
 
  #   myLabels=my_input.Sample_ID
+    duplicates = df_ideal_exp.columns[df_ideal_exp.columns.duplicated()]
 
+    # If duplicates are found, return them to the user
+    if not duplicates.empty:
+        print("Duplicate columns found:", duplicates)
+        return "Duplicate columns detected. Please handle them before reindexing."
+
+    # Proceed with reindexing if no duplicates are found
     Experimental_press_temp1 = my_input.reindex(df_ideal_exp.columns, axis=1)
-# This deals with the fact almost everyone will enter as FeO, but the code uses FeOt for these minerals.
-# E.g., if users only enter FeO (not FeOt and Fe2O3), allocates a FeOt
-# column. If enter FeO and Fe2O3, put a FeOt column
+
 
 
     if GEOROC is True:
