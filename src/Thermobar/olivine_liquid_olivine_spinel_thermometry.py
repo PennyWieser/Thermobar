@@ -340,7 +340,13 @@ def T_Pu2017(P=None, *, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, Mg
     meaning this thermometer has far less sensitivity to H2O or pressure at 0-1 GPa.
     SEE=±29°C
     '''
-    D_Ni_Mol = NiO_Ol_mol_frac / NiO_Liq_mol_frac
+    # Check it has Ni
+    NiO_Ol_mol_frac = np.asarray(NiO_Ol_mol_frac, dtype=float)
+    NiO_Liq_mol_frac = np.asarray(NiO_Liq_mol_frac, dtype=float)
+
+    hasNi=(NiO_Ol_mol_frac>0) & (NiO_Liq_mol_frac>0)
+
+    D_Ni_Mol = np.divide(NiO_Ol_mol_frac, NiO_Liq_mol_frac, out=np.full_like(NiO_Ol_mol_frac, np.nan), where=hasNi)
     XNm = FeOt_Liq_mol_frac + MnO_Liq_mol_frac + \
         MgO_Liq_mol_frac + CaO_Liq_mol_frac + NiO_Liq_mol_frac
     NFX = 3.5 * np.log(1 - Al2O3_Liq_mol_frac) + 7 * \
@@ -381,8 +387,13 @@ def T_Pu2021(P, *, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, MgO_Liq
     else:
         raise ValueError("P must be either a float, integer, or a pandas Series.")
 
+    NiO_Ol_mol_frac = np.asarray(NiO_Ol_mol_frac, dtype=float)
+    NiO_Liq_mol_frac = np.asarray(NiO_Liq_mol_frac, dtype=float)
 
-    D_Ni_Mol = NiO_Ol_mol_frac / NiO_Liq_mol_frac
+    hasNi=(NiO_Ol_mol_frac>0) & (NiO_Liq_mol_frac>0)
+
+    D_Ni_Mol = np.divide(NiO_Ol_mol_frac, NiO_Liq_mol_frac, out=np.full_like(NiO_Ol_mol_frac, np.nan), where=hasNi)
+
     XNm = FeOt_Liq_mol_frac + MnO_Liq_mol_frac + \
         MgO_Liq_mol_frac + CaO_Liq_mol_frac + NiO_Liq_mol_frac
     NFX = 3.5 * np.log(1 - Al2O3_Liq_mol_frac) + 7 * \
