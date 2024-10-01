@@ -345,8 +345,21 @@ def T_Pu2017(P=None, *, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, Mg
         MgO_Liq_mol_frac + CaO_Liq_mol_frac + NiO_Liq_mol_frac
     NFX = 3.5 * np.log(1 - Al2O3_Liq_mol_frac) + 7 * \
         np.log(1 - TiO2_Liq_mol_frac)
-    return 9416 / (np.log(D_Ni_Mol) + 0.71 * np.log(XNm) -
-                   0.349 * NFX - 0.532 * np.log(SiO2_Liq_mol_frac) + 4.319)
+
+
+ # Calculate the log terms only for valid entries
+    valid_indices = (D_Ni_Mol > 0) & (XNm > 0) & (SiO2_Liq_mol_frac > 0)
+
+    # Calculate the temperature for valid values
+
+    temperature = np.where(valid_indices,
+                       9416 / (np.log(D_Ni_Mol.astype(float)) + 0.71 * np.log(XNm.astype(float)) -
+                                0.349 * NFX - 0.532 * np.log(SiO2_Liq_mol_frac.astype(float)) + 4.319),
+                       np.nan)
+
+
+
+    return temperature
 
 
 def T_Pu2021(P, *, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, MgO_Liq_mol_frac,
@@ -381,8 +394,18 @@ def T_Pu2021(P, *, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, MgO_Liq
     mask = (P_values >= 10) & (P_values <= 30)
     P_Corr[mask] = - 70 + 110 * (P_values[mask] * 0.1) - 18 * (P_values[mask] * 0.1)**2
 
-    return (9416 / (np.log(D_Ni_Mol) + 0.71 * np.log(XNm) - 0.349 * NFX - 0.532 *
-            np.log(SiO2_Liq_mol_frac) + 4.319)) + P_Corr
+
+
+ # Calculate the log terms only for valid entries
+    valid_indices = (D_Ni_Mol > 0) & (XNm > 0) & (SiO2_Liq_mol_frac > 0)
+
+    # Calculate the temperature for valid values
+    temperature = np.where(valid_indices,
+                       9416 / (np.log(D_Ni_Mol.astype(float)) + 0.71 * np.log(XNm.astype(float)) - 0.349 * NFX - 0.532 * np.log(SiO2_Liq_mol_frac.astype(float)) + 4.319),
+                       np.nan)
+
+    return temperature
+
 
 
 

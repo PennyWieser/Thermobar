@@ -1539,6 +1539,58 @@ def tern_points_px(px_comps=None):
     return points
 
 
+def tern_points_opx(px_comps=None):
+    """Tern_points takes a dataframe, finds columns with _Opx in them, and calculates Fs, En and Wo,
+    and returns co-ordinates to plot on a ternary diagram as a np.array
+    """
+    # This just replaces columns, so if you load Opx, it treats as Cpx,
+    # There are more elegant ways to handle this probably!
+    px_comps_c=px_comps.copy()
+    px_comps_c = px_comps_c.filter(like='Opx')
+    px_comps_c.columns = px_comps_c.columns.str.replace("_Opx", "_Cpx")
+    cpx_comps=calculate_clinopyroxene_components(cpx_comps=px_comps_c)
+    right=cpx_comps["Fs_Simple_MgFeCa_Cpx"]
+    top=cpx_comps["Wo_Simple_MgFeCa_Cpx"]
+    left=cpx_comps["En_Simple_MgFeCa_Cpx"]
+
+
+    if isinstance(right, pd.Series):
+        right = right.to_numpy()
+    if isinstance(top, pd.Series):
+        top = top.to_numpy()
+    if isinstance(left, pd.Series):
+        left = left.to_numpy()
+
+    points = np.hstack([right[:, None], top[:, None], left[:, None]])
+
+    return points
+
+def tern_points_cpx(px_comps=None):
+    """Tern_points takes a dataframe, finds columns with _Cpx in them, and calculates Fs, En and Wo,
+    and returns co-ordinates to plot on a ternary diagram as a np.array
+    """
+    # This just replaces columns, so if you load Opx, it treats as Cpx,
+    # There are more elegant ways to handle this probably!
+    px_comps_c=px_comps.copy()
+    px_comps_c = px_comps_c.filter(like='Cpx')
+    cpx_comps=calculate_clinopyroxene_components(cpx_comps=px_comps_c)
+    right=cpx_comps["Fs_Simple_MgFeCa_Cpx"]
+    top=cpx_comps["Wo_Simple_MgFeCa_Cpx"]
+    left=cpx_comps["En_Simple_MgFeCa_Cpx"]
+
+
+    if isinstance(right, pd.Series):
+        right = right.to_numpy()
+    if isinstance(top, pd.Series):
+        top = top.to_numpy()
+    if isinstance(left, pd.Series):
+        left = left.to_numpy()
+
+    points = np.hstack([right[:, None], top[:, None], left[:, None]])
+
+    return points
+
+
 def tern_points_fspar(fspar_comps=None):
     """Tern_points takes feldspar compositions, and calculates An, Ab, Or,
     and returns co-ordinates to plot on a ternary diagram as a np.array
