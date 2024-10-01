@@ -1,10 +1,13 @@
 ================================================
 Change Log
 ================================================
-Version 1.0.46 - Sept 30th, 2024
+Version 1.0.47 - Sept 30th, 2024
 =====================================
 Fixed Pu et al. so it works for integers, floats and series. Also put in filter so if one of the log results in Nan, it returns Nan, rather than killing the function.
 
+Version 1.0.46 - Aug 11, 2024
+=====================================
+Fixed some pandas future warnings
 
 Version 1.0.45 - July 11th, 2024
 =====================================
