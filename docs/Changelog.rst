@@ -1,6 +1,13 @@
 ================================================
 Change Log
 ================================================
+
+Version 1.0.48 - Oct 30th, 2024
+=====================================
+Added functionality for turning Aztec individual outputs into a dataframe, and extracting standards.
+
+
+
 Version 1.0.47 - Sept 30th, 2024
 =====================================
 Fixed Pu et al. so it works for integers, floats and series. Also put in filter so if one of the log results in Nan, it returns Nan, rather than killing the function.
