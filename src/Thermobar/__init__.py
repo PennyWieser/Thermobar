@@ -54,7 +54,8 @@ from Thermobar.geotherm import *
 from Thermobar.density_profiles import *
 # CHOMPI
 from Thermobar.chompi import *
-
+# This deals with importing Aztec mineral and melt data
+from Thermobar.aztecloading import *
 
 # version
 from ._version import __version__
