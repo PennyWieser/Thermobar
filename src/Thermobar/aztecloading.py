@@ -257,17 +257,18 @@ def extract_silicate_standard_data(df_final, PersonName, StdName, AnalysisDate, 
 
 
     # Display the new DataFrame
-    df_filtered2=df_standard.loc[df_standard['SampleID'].str.contains(StdString)]
+    #df_filtered2=df_standard.loc[df_standard['SampleID'].str.contains(StdString)]
+    df_filtered2 = df_standard.loc[df_standard['SampleID'].fillna('').str.contains(StdString, na=False)]
 
- # Fill 'Standard Name' columns with 'Factory' if empty
-    standard_name_cols = [col for col in df_standard.columns if col.startswith('Standard Name')]
-    df_filtered2.loc[:, standard_name_cols] = df_filtered2.loc[:, standard_name_cols].fillna('Factory')
 
-    # Fill 'Standardization Date' columns with 'Feb 2024' if empty
+    # Fill 'Standardization Date' columns with 'Factory' if empty
     standard_date_cols = [col for col in df_standard.columns if col.startswith('Standardization Date')]
-    df_filtered2.loc[:, standard_date_cols] = df_filtered2.loc[:, standard_date_cols].fillna('Feb 2024')
 
+    # Use .copy() to ensure we're working with a copy to avoid chained assignment issues
+    df_filtered2 = df_filtered2.copy()
 
+    # Fill only the 'Standardization Date' columns with 'Factory' where values are empty (NaN)
+    df_filtered2[standard_date_cols] = df_filtered2[standard_date_cols].fillna('Factory')
     display(df_filtered2.head())
 
     return df_filtered2
