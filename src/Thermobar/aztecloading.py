@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def process_excel_file(file_path, sheet_name=1):
+def process_excel_file(file_path, sheet_name=0):
     # Load the Excel file from the specified sheet without headers
     data = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
 
@@ -225,11 +225,20 @@ def minClass(df):
 
 ## Making nice things for the standards to paste into
 
-ideal_cols_standards_silicates=['AnalysisDate', 'PersonName', 'SampleID', 'Total_Oxide%',
- 'MgO', 'SiO2', 'TiO2', 'Al2O3', 'CaO', 'MnO', 'P2O5', 'Na2O', 'K2O','FeOt', 'NiO', 'SO3', 'Cr2O3',
+ideal_cols_standards_silicates=['AnalysisDate', 'PersonName', 'SampleID',
+
+'Total_Oxide%', 'MgO', 'SiO2', 'TiO2', 'Al2O3', 'CaO', 'MnO', 'P2O5', 'Na2O', 'K2O','FeOt', 'NiO', 'SO3', 'Cr2O3',
+
   'MgO_norm', 'SiO2_norm', 'TiO2_norm', 'Al2O3_norm', 'CaO_norm', 'MnO_norm', 'P2O5_norm', 'Na2O_norm', 'K2O_norm','FeOt_norm', 'NiO_norm', 'SO3_norm', 'Cr2O3_norm',
-                       'Oxide % Sigma_MgO', 'Oxide % Sigma_SiO2', 'Oxide % Sigma_TiO2', 'Oxide % Sigma_Al2O3', 'Oxide % Sigma_CaO', 'Oxide % Sigma_MnO', 'Oxide % Sigma_P2O5',
-                     'Oxide % Sigma_Na2O', 'Oxide % Sigma_K2O','Oxide % Sigma_FeOt', 'Oxide % Sigma_NiO', 'Oxide % Sigma_SO3', 'Oxide % Sigma_Cr2O3']
+
+'Oxide % Sigma_MgO', 'Oxide % Sigma_SiO2', 'Oxide % Sigma_TiO2', 'Oxide % Sigma_Al2O3', 'Oxide % Sigma_CaO', 'Oxide % Sigma_MnO', 'Oxide % Sigma_P2O5',
+'Oxide % Sigma_Na2O', 'Oxide % Sigma_K2O','Oxide % Sigma_FeOt', 'Oxide % Sigma_NiO', 'Oxide % Sigma_SO3', 'Oxide % Sigma_Cr2O3',
+
+'Standard Name_Mg', 'Standardization Date_Mg','Standard Name_Si',  'Standardization Date_Si', 'Standard Name_Ti',  'Standardization Date_Ti', 'Standard Name_Al',  'Standardization Date_Al', 'Standard Name_Ca', 'Standardization Date_Ca',
+ 'Standard Name_Mn','Standardization Date_Mn',  'Standard Name_P','Standardization Date_P',
+'Standard Name_Na','Standardization Date_Na', 'Standard Name_K', 'Standardization Date_K','Standard Name_Fe','Standardization Date_Fe', 'Standard Name_Ni',  'Standardization Date_Ni',
+'Standard Name_S','Standardization Date_S', 'Standard Name_Cr','Standardization Date_Cr',
+                     ]
 
 def extract_silicate_standard_data(df_final, PersonName, StdName, AnalysisDate, StdString):
     # Set the required fields
@@ -245,8 +254,19 @@ def extract_silicate_standard_data(df_final, PersonName, StdName, AnalysisDate, 
         if col in df_standard.columns:
             df_standard[col] = df_final[col]
 
+
+
     # Display the new DataFrame
     df_filtered2=df_standard.loc[df_standard['SampleID'].str.contains(StdString)]
+
+ # Fill 'Standard Name' columns with 'Factory' if empty
+    standard_name_cols = [col for col in df_standard.columns if col.startswith('Standard Name')]
+    df_filtered2.loc[:, standard_name_cols] = df_filtered2.loc[:, standard_name_cols].fillna('Factory')
+
+    # Fill 'Standardization Date' columns with 'Feb 2024' if empty
+    standard_date_cols = [col for col in df_standard.columns if col.startswith('Standardization Date')]
+    df_filtered2.loc[:, standard_date_cols] = df_filtered2.loc[:, standard_date_cols].fillna('Feb 2024')
+
 
     display(df_filtered2.head())
 
