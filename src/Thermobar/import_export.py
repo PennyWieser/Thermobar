@@ -102,15 +102,15 @@ df_ideal_amp_Err = pd.DataFrame(columns=['SiO2_Amp_Err', 'TiO2_Amp_Err',
 df_ideal_exp = pd.DataFrame(columns=['P_kbar', 'T_K'])
 df_ideal_exp_Err = pd.DataFrame(columns=['P_kbar_Err', 'T_K_Err'])
 
-def import_lepr_file(filename):
+def import_lepr_file(file_name):
     """
     Reads in data from the outputs from the Caltech LEPR site (where oxides are followed by the word "value")
     Splits the data into phases, as for the read_excel function.
 
    Parameters
     -------
-    filename: str
-        Excel filename from LEPR
+    file_name: str
+        Excel file_name from LEPR
 
     Returns
     -------
@@ -131,11 +131,11 @@ def import_lepr_file(filename):
 
     """
 
-    my_input = pd.ExcelFile(filename)
+    my_input = pd.ExcelFile(file_name)
     sheet_names = my_input.sheet_names
 
     if "Experiment" in sheet_names:
-        my_input_Exp = pd.read_excel(filename, sheet_name="Experiment")
+        my_input_Exp = pd.read_excel(file_name, sheet_name="Experiment")
         myExp = pd.DataFrame(data={'Citation': my_input_Exp['Citation'], 'Experiment': my_input_Exp['Experiment'],
                                    'T_K': my_input_Exp['T (C)']+273.15, 'P_kbar': 10*my_input_Exp['P (GPa)'],
                                    'Duration': my_input_Exp['Duration (hours)'],
@@ -146,7 +146,7 @@ def import_lepr_file(filename):
         myExp = pd.DataFrame()
 
     if "Fluid" in sheet_names:
-        my_input_Fluid = pd.read_excel(filename, sheet_name="Fluid").fillna(0)
+        my_input_Fluid = pd.read_excel(file_name, sheet_name="Fluid").fillna(0)
         myFluid = pd.DataFrame(data={'Experiment': my_input_Fluid['Experiment'],
                                      'H2O_Val': my_input_Fluid['H2O value'],
                                      'CO2_Val': my_input_Fluid['CO2 value']})
@@ -158,7 +158,7 @@ def import_lepr_file(filename):
 
     if "Plagioclase" in sheet_names:
         my_input_Plag = pd.read_excel(
-            filename, sheet_name="Plagioclase").fillna(0)
+            file_name, sheet_name="Plagioclase").fillna(0)
         my_input_Plag['FeOT value'] = my_input_Plag['FeO value'] + \
             0.89998*my_input_Plag['Fe2O3 value']
         myPlag = pd.DataFrame(data={'Experiment': my_input_Plag['Experiment'],
@@ -180,7 +180,7 @@ def import_lepr_file(filename):
         myPlag_Exp = pd.DataFrame()
     if "Clinopyroxene" in sheet_names:
         my_input_Cpx = pd.read_excel(
-            filename, sheet_name="Clinopyroxene").fillna(0)
+            file_name, sheet_name="Clinopyroxene").fillna(0)
         my_input_Cpx['FeOT value'] = my_input_Cpx['FeO value'] + \
             0.89998*my_input_Cpx['Fe2O3 value']
         myCpx = pd.DataFrame(data={'Experiment': my_input_Cpx['Experiment'],
@@ -211,7 +211,7 @@ def import_lepr_file(filename):
 
     if "Orthopyroxene" in sheet_names:
         my_input_Opx = pd.read_excel(
-            filename, sheet_name="Orthopyroxene").fillna(0)
+            file_name, sheet_name="Orthopyroxene").fillna(0)
         my_input_Opx['FeOT value'] = my_input_Opx['FeO value'] + \
             0.89998*my_input_Opx['Fe2O3 value']
         myOpx = pd.DataFrame(data={'Experiment': my_input_Opx['Experiment'],
@@ -233,7 +233,7 @@ def import_lepr_file(filename):
         myOpx_Exp = pd.DataFrame()
 
     if "Liquid" in sheet_names:
-        my_input_Liq = pd.read_excel(filename, sheet_name="Liquid").fillna(0)
+        my_input_Liq = pd.read_excel(file_name, sheet_name="Liquid").fillna(0)
         my_input_Liq['FeOT value'] = my_input_Liq['FeO value'] + \
             0.89998*my_input_Liq['Fe2O3 value']
         myLiq = pd.DataFrame(data={'Experiment': my_input_Liq['Experiment'],
@@ -259,7 +259,7 @@ def import_lepr_file(filename):
         myLiq_Exp = pd.DataFrame()
     if "Amphibole" in sheet_names:
         my_input_Amp = pd.read_excel(
-            filename, sheet_name="Amphibole").fillna(0)
+            file_name, sheet_name="Amphibole").fillna(0)
         my_input_Amp['FeOT value'] = my_input_Amp['FeO value'] + \
             0.89998*my_input_Amp['Fe2O3 value']
         myAmp = pd.DataFrame(data={'Experiment': my_input_Amp['Experiment'],
@@ -281,7 +281,7 @@ def import_lepr_file(filename):
         myAmp_Exp = pd.DataFrame()
 
     if "Olivine" in sheet_names:
-        my_input_Ol = pd.read_excel(filename, sheet_name="Olivine").fillna(0)
+        my_input_Ol = pd.read_excel(file_name, sheet_name="Olivine").fillna(0)
         my_input_Ol['FeOT value'] = my_input_Ol['FeO value'] + \
             0.89998*my_input_Ol['Fe2O3 value']
         myOl = pd.DataFrame(data={'Experiment': my_input_Ol['Experiment'],
@@ -306,7 +306,7 @@ def import_lepr_file(filename):
             'Cpxs': myCpx,  'Cpxs_Exp': myCpx_Exp, 'Opxs': myOpx, 'Opxs_Exp': myOpx_Exp, 'Amps': myAmp, 'Amps_Exp': myAmp_Exp, 'Ols_Exp': myOl_Exp}
 
 
-# Loading Excel, returns a disctionry
+# Loading Excel, returns a dictionary
 def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=False, suffix=None, df=None):
     '''
     Import excel sheet of oxides in wt%, headings should be of the form SiO2_Liq (for the melt/liquid), SiO2_Ol (for olivine comps), SiO2_Cpx (for clinopyroxene compositions). Order doesn't matter
@@ -315,10 +315,10 @@ def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=Fa
    Parameters
     -------
 
-    filename: .xlsx, .csv, .xls file
+    file_name: .xlsx, .csv, .xls file
         Compositional data as an Excel spreadsheet (.xlsx, .xls) or a comma separated values (.csv) file with columns labelled SiO2_Liq, SiO2_Ol, SiO2_Cpx etc, and each row corresponding to an analysis.
 
-    filename: str
+    file_name: str
         specifies the file name (e.g., Python_OlLiq_Thermometers_Test.xlsx)
 
     OR
@@ -571,7 +571,7 @@ def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=Fa
             'Plags': myPlags1, 'Kspars': myKspars1, 'Amps': myAmphs1, 'Ols': myOls1, 'Sps': mySps1}  # , 'y1': y1 ,'y2': y2}
 
 
-def import_excel_errors(filename, sheet_name, GEOROC=False):
+def import_excel_errors(file_name, sheet_name, GEOROC=False):
     '''
     Import excel sheet of oxide errors in wt%, headings should be of the form SiO2_Liq_Err (for the melt/liquid), SiO2_Ol_Err (for olivine comps), SiO2_Cpx_Err (for clinopyroxene compositions).
 
@@ -579,10 +579,10 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
    Parameters
     -------
 
-    filename: pExcel file
+    file_name: pExcel file
                 Excel file of oxides in wt% with columns labelled SiO2_Liq, SiO2_Ol, SiO2_Cpx etc.
 
-    filename: str
+    file_name: str
         specifies the file name (e.g., Python_OlLiq_Thermometers_Test.xlsx)
 
     Returns
@@ -599,15 +599,15 @@ def import_excel_errors(filename, sheet_name, GEOROC=False):
         Amps_Err=pandas dataframe of amphibole oxide errors
         Sps_Err=pandas dataframe of spinel oxide errors
     '''
-    if 'csv' in filename:
-        my_input = pd.read_csv(filename)
+    if 'csv' in file_name:
+        my_input = pd.read_csv(file_name)
         #my_input[my_input < 0] = 0
-    elif 'xls' in filename:
+    elif 'xls' in file_name:
         if sheet_name is not None:
-            my_input = pd.read_excel(filename, sheet_name=sheet_name)
+            my_input = pd.read_excel(file_name, sheet_name=sheet_name)
             #my_input[my_input < 0] = 0
         else:
-            my_input = pd.read_excel(filename)
+            my_input = pd.read_excel(file_name)
             #my_input[my_input < 0] = 0
 
     my_input_c = my_input.copy()
