@@ -15,7 +15,10 @@
 import os
 import sys
 import sphinx_rtd_theme
-sys.path.insert(0, os.path.abspath('..'))
+#sys.path.insert(0, os.path.abspath('..'))
+
+sys.path.insert(0, os.path.abspath('../src'))
+
 
 
 # -- Project information -----------------------------------------------------
@@ -70,17 +73,14 @@ bibtex_reference_style = 'author_year'
 # Some change in dependencies made us need to replace `var` with
 # `env.config.html_context['var']`.
 
+
 nbsphinx_prolog = r"""
-
-{% set docname = 'docs/' + str(env.doc2path(env.docname, base=None)) %}
-
-
-
-
+{% set docname = 'docs/' + env.doc2path(env.docname, base=None) %}
 {% set git_ref = 'main' if not env.config.html_context['READTHEDOCS'] else
                  env.config.html_context['github_version']
                  if '.' not in env.config.html_context['current_version'] else
                  'v' + env.config.release %}
+
 .. raw:: html
 
     <div class="admonition note">
@@ -237,6 +237,8 @@ intersphinx_mapping = {
 }
 
 html_context = {
-    'str': str,  # Make str() available in Jinja2 templates
+    'READTHEDOCS': os.environ.get('READTHEDOCS', False),
+    'github_version': 'main',
+    'current_version': release,  # Set the correct version
 }
 
