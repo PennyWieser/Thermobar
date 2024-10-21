@@ -3,3 +3,4 @@ ipython
 sphinxcontrib-bibtex>=2.3.0
 nbsphinx==0.8.12
 ipykernel
+numpy
