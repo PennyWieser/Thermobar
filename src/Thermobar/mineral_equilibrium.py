@@ -1619,3 +1619,157 @@ def tern_points_fspar(fspar_comps=None):
 
 
     #return fig
+
+## Plotting optimized for RhyoliteMELTS
+
+def is_all_nan(array):
+    """Check if all elements in the array are NaN."""
+    return np.all(np.isnan(array))
+
+
+def pyroxene_plotting_from_MELTS(df):
+    """ Takes PetThermoTools output dict['All'] and calculates the components needed to plot Opx, Cpx, Cpx2, Cpx3. Returns a ternary plot figure,
+    and a dictionary with a key for each phase it finds
+    Parameters
+    ------------------
+    df: pd.DataFrame
+        dict['All'] from MELTS output
+
+    Returns
+    ------------------
+    results, fig: Dictionary with a key for each of the 3 required coordinates, and the fig object itself so natural data can be added to it.
+
+
+    """
+    suffixes = ['Opx', 'Cpx', 'Cpx2', 'Cpx3']
+
+    # Initialize an empty dictionary to store results
+    results = {}
+
+    # Loop through each suffix and perform the operations
+    for suffix in suffixes:
+        columns = [col for col in df.columns if col.endswith(suffix)]
+
+        if columns:
+            # Filter the relevant columns from df
+            filter_df = df.filter(like=suffix)
+
+            # Special case for 'Cpx2' to rename columns
+            if suffix == 'Cpx2':
+                filter_df.columns = filter_df.columns.str.replace('_Cpx2', '_Cpx')
+
+            elif suffix == 'Cpx3':
+                filter_df.columns = filter_df.columns.str.replace('_Cpx3', '_Cpx')
+
+            # Store the result in the dictionary
+            results[suffix] = pt.tern_points_px(px_comps=filter_df)
+        else:
+            # If no columns exist for the suffix, return an array of NaNs
+            results[suffix] = np.array([[np.nan, np.nan, np.nan]])
+
+    # Ensure the function always returns these four variables
+    cpx2_tern = results.get('Cpx2', None)
+    cpx3_tern = results.get('Cpx3', None)
+    cpx_tern = results.get('Cpx', None)
+    opx_tern = results.get('Opx', None)
+
+    # Lets make a nice plot
+    fig, tax = pt.plot_px_classification(figsize=(10, 5),  fontsize_component_labels=12, labels = True)
+
+    # Now feed in the Kilauea, natural cpx data in terms of ternary axes!
+    if not is_all_nan(opx_tern):
+        tax.scatter(opx_tern, edgecolor="k", marker="s",
+            facecolor="red", label='Opx', s=90)
+    if not is_all_nan(cpx_tern):
+        tax.scatter(cpx_tern, edgecolor="k", marker="^",
+        facecolor="blue", label='Cpx', s=90)
+    if not is_all_nan(cpx2_tern):
+        tax.scatter(cpx2_tern, edgecolor="k", marker="o",
+        facecolor="cyan", label='Cpx2', s=90)
+    if not is_all_nan(cpx3_tern):
+        tax.scatter(cpx3_tern, edgecolor="k", marker="+",
+        facecolor="cornflowerblue", label='Cpx3', s=90)
+
+    tax.legend()
+
+    # Make a nice dictionary
+
+
+
+
+
+    return results, fig
+
+
+
+
+def feldspar_plotting_from_MELTS(df):
+    """ Takes PetThermoTools output dict['All'] and calculates the components needed to plot Plag1, Plag2, Kspar1, Kspar2, etc. Returns a ternary plot figure, and a dictionary with a key for each phase it finds
+    Parameters
+    ------------------
+    df: pd.DataFrame
+        dict['All'] from MELTS output
+
+    Returns
+    ------------------
+    results, fig: Dictionary with a key for each of the 3 required coordinates, and the fig object itself so natural data can be added to it.
+
+
+    """
+    suffixes = ['Plag', 'Plag2', 'Kspar', 'Kspar2']
+
+    # Initialize an empty dictionary to store results
+    results = {}
+
+    # Loop through each suffix and perform the operations
+    for suffix in suffixes:
+        columns = [col for col in df.columns if col.endswith(suffix)]
+
+        if columns:
+            # Filter the relevant columns from df
+            filter_df = df.filter(like=suffix)
+
+            # Special case for 'Cpx2' to rename columns
+            if suffix == 'Plag2':
+                filter_df.columns = filter_df.columns.str.replace('_Plag2', '_Plag')
+
+            elif suffix == 'Kspar2':
+                filter_df.columns = filter_df.columns.str.replace('_Kspar2', '_Kspar')
+
+            # Store the result in the dictionary
+            results[suffix] = pt.tern_points_fspar(fspar_comps=filter_df)
+        else:
+            # If no columns exist for the suffix, return an array of NaNs
+            results[suffix] = np.array([[np.nan, np.nan, np.nan]])
+
+    # Ensure the function always returns these four variables
+    plag_tern = results.get('Plag', None)
+    plag2_tern = results.get('Plag2', None)
+    kspar_tern = results.get('Kspar', None)
+    kspar2_tern = results.get('Kspar2', None)
+
+    # Lets make a nice plot
+    fig, tax = pt.plot_fspar_classification(figsize=(8, 8),  fontsize_component_labels=12, labels = True)
+
+    # Now feed in the Kilauea, natural cpx data in terms of ternary axes!
+    if not is_all_nan(plag_tern):
+        tax.scatter(plag_tern, edgecolor="k", marker="s",
+            facecolor="red", label='Plag', s=90)
+    if not is_all_nan(plag2_tern):
+        tax.scatter(plag2_tern, edgecolor="k", marker="^",
+        facecolor="blue", label='Plag2', s=90)
+    if not is_all_nan(kspar_tern):
+        tax.scatter(kspar_tern, edgecolor="k", marker="o",
+        facecolor="cyan", label='Kspar', s=90)
+    if not is_all_nan(kspar2_tern):
+        tax.scatter(kspar2_tern, edgecolor="k", marker="+",
+        facecolor="cornflowerblue", label='Kspar2', s=90)
+
+    tax.legend()
+
+    return results, fig
+
+
+
+
+

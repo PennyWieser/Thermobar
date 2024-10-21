@@ -2,7 +2,17 @@
 Change Log
 ================================================
 
-Version 1.0.48 - Oct 30th, 2024
+
+
+ '1.0.51'
+
+Version 1.0.51 - Oct 20th 2024
+=====================================
+Added functionality for ternary pyroxene and feldspar plots directly from MELTS dictionary.
+
+
+
+Version 1.0.48 and 49 - Oct 10th, 2024
 =====================================
 Added functionality for turning Aztec individual outputs into a dataframe, and extracting standards.
 
