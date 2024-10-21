@@ -15,9 +15,8 @@
 import os
 import sys
 import sphinx_rtd_theme
-#sys.path.insert(0, os.path.abspath('..'))
-
 sys.path.insert(0, os.path.abspath('../src'))
+
 
 
 
@@ -36,7 +35,7 @@ release = 'v.0'
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('..'))
+
 
 # -- General configuration ---------------------------------------------------
 
@@ -236,9 +235,11 @@ intersphinx_mapping = {
     'numpy': ('https://docs.scipy.org/doc/numpy', None),
 }
 
+
+
 html_context = {
-    'READTHEDOCS': os.environ.get('READTHEDOCS', False),
-    'github_version': 'main',
-    'current_version': release,  # Set the correct version
+    'READTHEDOCS': os.environ.get('READTHEDOCS', '') == 'True',
+    'github_version': os.environ.get('READTHEDOCS_VERSION', 'main'),  # Pull correct version info
+    'current_version': release,  # Use release variable defined earlier
 }
 
