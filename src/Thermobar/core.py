@@ -4012,6 +4012,73 @@ def calculate_eq_plag_components(liq_comps, H2O_Liq, T,P):
 
 
 ## Tool to get Fe3Fet from logfo2 or buffer value.
+
+def calculate_logfo2_from_buffer_pos(*, buffer='QFM', T_K, P_kbar, fo2_offset):
+    """ Calculates fo2 value for a specified buffer position
+
+    Parameters
+    ------------
+    buffer: 'QFM' or 'FMQ', 'NNO', 'C-CO-CO2' or 'CCO', IW', 'WM' or 'MW'
+
+    fo2_offset:
+
+    """
+    if buffer=='QFM' or buffer=='FMQ':
+        logfo2=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
+
+    if buffer=='NNO':
+        # Buffer position from frost (1991)
+        logfo2=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
+
+        # Buffer position from frost (1991)
+        logfo2_QFM_highT=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K
+        T_Choice='HighT Beta Qtz'
+
+        logfo2_QFM_lowT=(-26455.3/T_K) +10.344 + 0.092 * ((P_kbar*1000)-1)/T_K
+        T_Choice='Low T alpha Qtz'
+
+        Cut_off_T=573+273.15+0.025*(P_kbar*1000)
+
+        if isinstance(logfo2_QFM_lowT, float) or isinstance(logfo2_QFM_lowT, int):
+            if T_K<Cut_off_T:
+                logfo2_QFM=logfo2_QFM_lowT
+            if T_K>=Cut_off_T:
+                logfo2_QFM=logfo2_QFM_highT
+
+        else:
+            logfo2_QFM=pd.Series(logfo2_QFM_highT)
+            T_K=pd.Series(T_K).fillna(0)
+            lowT = pd.Series(T_K)<Cut_off_T
+
+
+
+            if sum(lowT)>0:
+
+                logfo2_QFM.loc[lowT]=logfo2_QFM_lowT
+
+
+
+
+    if buffer=='C-CO-CO2' or buffer=='CCO':
+        # French and Eugster (1965)
+        logfo2=(-20586/T_K) - 0.044 + np.log10(P_kbar*1000) - 0.028 * (P_kbar*1000-1)/T_K
+
+
+    if buffer=='IW':
+        # Frost 1991
+        logfo2=(-27489/T_K) + 6.702 + 0.055 * ((P_kbar*1000)-1)/T_K
+
+    if buffer=='WM'or buffer=='MW':
+        # Front 1991
+        logfo2=(-32807/T_K) + 13.012 + 0.083 * ((P_kbar*1000)-1)/T_K
+
+    logfo2_off=logfo2+fo2_offset
+
+    # MW, IW,
+
+
+    return logfo2_off
+
 def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", fo2, renorm=False, fo2_offset=0):
     '''
     Calculates Fe3Fet_Liq, FeO and Fe2O3 based on user-specified buffer or fo2 value (in bars)
@@ -4102,7 +4169,7 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
 
 
 
-            logfo2=logfo2_QFM
+            logfo2=logfo2_QFM+logfo2_offset
 
 
         fo2=10**logfo2

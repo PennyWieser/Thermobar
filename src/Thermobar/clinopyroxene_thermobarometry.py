@@ -2208,9 +2208,8 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
         if np.max(Combo_liq_cpxs['SiO2_Liq']) < 70:
             w.warn("Some inputted Liq compositions have  SiO2<70 wt%;",
                 stacklevel=2)
-        if np.max(Combo_liq_cpxs['Mgno_Cpx']) > 0.65 or Combo_liq_cpxs['Al2O3_Cpx'] or p.max(
-                Combo_liq_cpxs['SiO2_Liq']) < 70:
-            w.warn("which is outside the recomended calibration range of Brugman and Till (2019)")
+        if np.max(Combo_liq_cpxs['Mgno_Cpx']) > 0.65 or Combo_liq_cpxs['Al2O3_Cpx'].any() or np.max(Combo_liq_cpxs['SiO2_Liq']) < 70:
+            w.warn("Some of your compositions are outside the recomended calibration range of Brugman and Till (2019)")
 
     # Easiest to treat Machine Learning ones differently
     if ('Petrelli' in equationT or "Jorgenson" in equationT) and "onnx" not in equationT:

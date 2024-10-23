@@ -243,3 +243,13 @@ html_context = {
     'current_version': release,  # Use release variable defined earlier
 }
 
+
+# Optionally set the version of Python and requirements required to build your docs
+python:
+  version: 3.8
+  install:
+    - method: pip
+      path: .
+    - requirements: docs/requirements.txt
+
+
