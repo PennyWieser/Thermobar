@@ -74,7 +74,7 @@ bibtex_reference_style = 'author_year'
 
 
 nbsphinx_prolog = r"""
-{% set docname = 'docs/' + env.doc2path(env.docname, base=None) %}
+{% set docname = 'docs' / env.doc2path(env.docname, base=None) %}
 {% set git_ref = 'main' if not env.config.html_context['READTHEDOCS'] else
                  env.config.html_context['github_version']
                  if '.' not in env.config.html_context['current_version'] else
