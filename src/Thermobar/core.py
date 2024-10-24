@@ -4013,6 +4013,8 @@ def calculate_eq_plag_components(liq_comps, H2O_Liq, T,P):
 
 ## Tool to get Fe3Fet from logfo2 or buffer value.
 
+
+Supp_buffers=['QFM','FMQ', 'NNO', 'C-CO-CO2','CCO','IW','MW']
 def calculate_logfo2_from_buffer_pos(*, buffer='QFM', T_K, P_kbar, fo2_offset):
     """ Calculates fo2 value for a specified buffer position
 
@@ -4023,12 +4025,18 @@ def calculate_logfo2_from_buffer_pos(*, buffer='QFM', T_K, P_kbar, fo2_offset):
     fo2_offset:
 
     """
-    if buffer=='QFM' or buffer=='FMQ':
-        logfo2=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
+    if buffer not in Supp_buffers:
+        warning_msg = (f"Warning: '{buffer}' is not supported. "
+                       f"Please choose from: {', '.join(Supp_buffers)}")
+        raise ValueError(warning_msg)
 
     if buffer=='NNO':
         # Buffer position from frost (1991)
         logfo2=(-24930/T_K) + 9.36 + 0.046 * ((P_kbar*1000)-1)/T_K
+
+
+
+    if buffer=='QFM' or buffer=='FMQ':
 
         # Buffer position from frost (1991)
         logfo2_QFM_highT=(-25096.3/T_K) + 8.735 + 0.11 * ((P_kbar*1000)-1)/T_K
@@ -4056,13 +4064,17 @@ def calculate_logfo2_from_buffer_pos(*, buffer='QFM', T_K, P_kbar, fo2_offset):
 
                 logfo2_QFM.loc[lowT]=logfo2_QFM_lowT
 
+        logfo2=logfo2_QFM
+
 
 
 
     if buffer=='C-CO-CO2' or buffer=='CCO':
         # French and Eugster (1965)
-        logfo2=(-20586/T_K) - 0.044 + np.log10(P_kbar*1000) - 0.028 * (P_kbar*1000-1)/T_K
+        #logfo2=(-20586/T_K) - 0.044 + np.log10(P_kbar*1000) - 0.028 * (P_kbar*1000-1)/T_K
 
+        # Frost and Wood, 1997, from Anenberg webapp
+        logfo2=4.3927 - (21234 - 117.9*(P_kbar)+0.891*P_kbar**2)/T_K + 7.679*10**(-3)* (P_kbar)+3.627*10**(-4)*(P_kbar)**2
 
     if buffer=='IW':
         # Frost 1991
@@ -4078,6 +4090,38 @@ def calculate_logfo2_from_buffer_pos(*, buffer='QFM', T_K, P_kbar, fo2_offset):
 
 
     return logfo2_off
+
+
+# This is a function to apply to a series
+
+def calculate_logfo2_series(T_K_series, buffer_series, P_kbar_series, fo2_offset_series):
+    """Wrapper function to handle pandas Series for logfo2 calculation."""
+
+    # Initialize an empty list to store results
+    logfo2_results = []
+
+    # Iterate over each row of the Series
+    for T_K, buffer, P_kbar, fo2_offset in zip(T_K_series, buffer_series, P_kbar_series, fo2_offset_series):
+        try:
+
+            if buffer in Supp_buffers:
+                # Calculate logfo2 for supported buffers
+                logfo2 = calculate_logfo2_from_buffer_pos(buffer=buffer, T_K=T_K, P_kbar=P_kbar, fo2_offset=fo2_offset)
+                logfo2_results.append(logfo2)
+            else:
+                # If buffer is not supported, append NaN (empty value)
+                print(f"Buffer '{buffer}' not supported.")  # Debugging print
+                logfo2_results.append(np.nan)
+        except Exception as e:
+            # In case of any other error, return NaN for that row and log the error
+            print(f"Error processing row: {e}")  # Debugging print
+            logfo2_results.append(np.nan)
+
+    # Return the results as a pandas Series
+    return pd.Series(logfo2_results)
+
+
+
 
 def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", fo2, renorm=False, fo2_offset=0):
     '''
