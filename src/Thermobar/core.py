@@ -4094,8 +4094,22 @@ def calculate_logfo2_from_buffer_pos(*, buffer='QFM', T_K, P_kbar, fo2_offset):
 
 # This is a function to apply to a series
 
+
 def calculate_logfo2_series(T_K_series, buffer_series, P_kbar_series, fo2_offset_series):
-    """Wrapper function to handle pandas Series for logfo2 calculation."""
+    """Wrapper function to handle pandas Series or single values for logfo2 calculation."""
+
+    # Determine the length of inputs; if any input is a Series, use its length; otherwise, assume length 1
+    length = max(len(x) if isinstance(x, pd.Series) else 1 for x in [T_K_series, buffer_series, P_kbar_series, fo2_offset_series])
+
+    # Convert single values to arrays of the same length
+    if not isinstance(T_K_series, pd.Series):
+        T_K_series = pd.Series([T_K_series] * length)
+    if not isinstance(buffer_series, pd.Series):
+        buffer_series = pd.Series([buffer_series] * length)
+    if not isinstance(P_kbar_series, pd.Series):
+        P_kbar_series = pd.Series([P_kbar_series] * length)
+    if not isinstance(fo2_offset_series, pd.Series):
+        fo2_offset_series = pd.Series([fo2_offset_series] * length)
 
     # Initialize an empty list to store results
     logfo2_results = []
@@ -4103,13 +4117,12 @@ def calculate_logfo2_series(T_K_series, buffer_series, P_kbar_series, fo2_offset
     # Iterate over each row of the Series
     for T_K, buffer, P_kbar, fo2_offset in zip(T_K_series, buffer_series, P_kbar_series, fo2_offset_series):
         try:
-
             if buffer in Supp_buffers:
                 # Calculate logfo2 for supported buffers
                 logfo2 = calculate_logfo2_from_buffer_pos(buffer=buffer, T_K=T_K, P_kbar=P_kbar, fo2_offset=fo2_offset)
                 logfo2_results.append(logfo2)
             else:
-                # If buffer is not supported, append NaN (empty value)
+                # If buffer is not supported, append NaN
                 print(f"Buffer '{buffer}' not supported.")  # Debugging print
                 logfo2_results.append(np.nan)
         except Exception as e:
@@ -4119,6 +4132,7 @@ def calculate_logfo2_series(T_K_series, buffer_series, P_kbar_series, fo2_offset
 
     # Return the results as a pandas Series
     return pd.Series(logfo2_results)
+
 
 
 

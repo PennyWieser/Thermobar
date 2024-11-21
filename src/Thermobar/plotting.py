@@ -70,7 +70,13 @@ def Tukey_calc(x,y): #, name):
 
 
 def calculate_R2(x, y, xy=True, df=False, round=5):
-    """ Calculates statistics
+    """ Calculates statistics given a set of x and y data
+    returns:
+    R2: R2 value
+    RMSE: Root Mean Square Error (rounded to 2dp)
+    RMSE_num: Root Mean square (unrounded)
+    Median: Median bias error (y pred - y true)
+    Mean: Mean bias error (y pred - y true)
     if xy= False doesnt return y and x pred
     """
     masknan=(~np.isnan(x) & ~np.isnan(y))
@@ -92,6 +98,7 @@ def calculate_R2(x, y, xy=True, df=False, round=5):
     Medianp=np.round(Median, round)
     Mean=np.nanmean(regy-regx)
     Meanp=np.round(Mean, round)
+    print(Mean)
     if round is False:
         return {'R2': '{0:.5f}'.format(R), 'RMSE':'{0:.5f}'.format(RMSEp), 'RMSE_num':RMSEp,
         'P_val':'{0:.5f}'.format(p_value), 'Median':'{0:.5f}'.format(Medianp), 'Mean':'{0:.5f}'.format(Meanp),

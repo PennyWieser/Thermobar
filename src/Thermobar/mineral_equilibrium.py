@@ -308,7 +308,7 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
 ## Same for Orhopyroxene
 def calculate_eq_px_content(liq_comps,
 Fe3Fet_Liq=None, px='Opx'):
-    '''calculates equilibrium pyroxene contents based on inputtted liquid compositions.
+    '''calculates equilibrium pyroxene contents based on inputtted liquid compositions using the Si-sensitive expression of Putirka (2008).
 
 
    Parameters
@@ -353,8 +353,10 @@ Fe3Fet_Liq=None, px='Opx'):
 
         # Or calculating as a function of the Si content.
         cat_frac = calculate_anhydrous_cat_fractions_liquid(liq_comps_c)
-        Si_mean_frac = np.nanmean(cat_frac['Si_Liq_cat_frac'])
-        Kd = 0.4805 - 0.3733 * Si_mean_frac
+        # Previous versions was using the mean cation fraction - great for drawing equilibrium lines, not great for 1:1 comparisons.
+
+        # Si_mean_frac = np.nanmean(cat_frac['Si_Liq_cat_frac'])
+        Kd = 0.4805 - 0.3733 * cat_frac['Si_Liq_cat_frac']
         Eq_Opx = 1 / ((Kd / Mgno) + (1 - Kd))
         Kd_p_1_s = Kd + 0.06
         Kd_m_1_s = Kd - 0.06
