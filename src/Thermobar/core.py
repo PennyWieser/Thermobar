@@ -4022,7 +4022,7 @@ def calculate_logfo2_from_buffer_pos(*, buffer='QFM', T_K, P_kbar, fo2_offset):
     ------------
     buffer: 'QFM' or 'FMQ', 'NNO', 'C-CO-CO2' or 'CCO', IW', 'WM' or 'MW'
 
-    fo2_offset:
+    fo2_offset: Offset from buffer position (in log units).
 
     """
     if buffer not in Supp_buffers:
@@ -4227,7 +4227,7 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
 
 
 
-            logfo2=logfo2_QFM+logfo2_offset
+            logfo2=logfo2_QFM+fo2_offset
 
 
         fo2=10**logfo2

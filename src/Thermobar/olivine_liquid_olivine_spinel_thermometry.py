@@ -490,9 +490,10 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
     ol_comps_c['ID_Ol'] = ol_comps_c.index
     liq_comps_c['ID_liq'] = liq_comps_c.index.astype('float64')
 
-    if "Sample_ID_Ol" not in ol_comps:
+    if "Sample_ID_Ol" not in ol_comps.columns:
         ol_comps_c['Sample_ID_Ol'] = ol_comps.index.astype('float64')
-    if "Sample_ID_liq" not in liq_comps:
+
+    if 'Sample_ID_liq' not in liq_comps.columns:
         liq_comps_c['Sample_ID_liq'] = liq_comps.index.astype('float64')
 
     # Uses mole fractions, not cation fractions

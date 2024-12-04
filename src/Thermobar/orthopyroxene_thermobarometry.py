@@ -286,9 +286,9 @@ def calculate_opx_liq_press(*, equationP, opx_comps=None, liq_comps=None, meltma
 
         choose from:
 
-        |  P_Put2008_eq28a
-        |  P_Put2008_eq28b
-        |  P_Put2008_eq28c
+        |  P_Put2008_eq29a
+        |  P_Put2008_eq29b
+        |  P_Put2008_eq29c (technically Opx-only, but include for purposes of easy comparison,
         |  P_Put_Global_Opx
         |  P_Put_Felsic_Opx
 
