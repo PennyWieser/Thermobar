@@ -306,7 +306,7 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
         return Kd_out
 
 ## Same for Orhopyroxene
-def calculate_eq_px_content(liq_comps,
+def calculate_eq_px_content(*, liq_comps,
 Fe3Fet_Liq=None, px='Opx'):
     '''calculates equilibrium pyroxene contents based on inputtted liquid compositions using the Si-sensitive expression of Putirka (2008).
 
@@ -458,7 +458,7 @@ def calculate_ol_rhodes_diagram_lines(
 ## Equilibrium things for Pyroxene
 
 def calculate_opx_rhodes_diagram_lines(
-        Min_Mgno, Max_Mgno, T=None, KdMin=None, KdMax=None, liq_comps=None):
+        Min_Mgno, Max_Mgno, KdMin=None, KdMax=None, liq_comps=None):
     '''
     Input minimum and maximum liquid Mg#, calculates lines for equilibrium
     Opx Mg# content using a variety of choices for Kd Fe-Mg.
@@ -483,7 +483,7 @@ def calculate_opx_rhodes_diagram_lines(
 
         liq_comps: pandas.DataFrame. Optional
             Uses average cation fraction of XSi in the liquid to
-            calculate Kd Fe-Mg using the expression = 0.4805 - 0.3733 XSi (Putirka, 2008)
+            calculate Kd Fe-Mg using the expression = 0.4805 - 0.3733 XSi (Putirka, 2008, )
 
    Returns
     -------

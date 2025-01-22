@@ -10,6 +10,11 @@ from Thermobar.core import *
 
 # Liquid-only thermometry functions
 
+## All liquid-only thermometers
+
+
+
+
 def T_Put2008_eq13(P=None, *, MgO_Liq):
     '''
     Liquid-only thermometer for olivine-saturated liquids: Equation 13 of Putirka et al. (2008)
@@ -382,18 +387,7 @@ def T_Put2008_eq24c_kspar_sat(P, *, Al_Liq_cat_frac, Na_Liq_cat_frac,
     - 151 * K_Liq_cat_frac * Si_Liq_cat_frac + 15037 * Ca_Liq_cat_frac**2))
 
 
-def T_Put2008_eq28b_opx_sat(P, *, H2O_Liq, Mg_Liq_cat_frac, Ca_Liq_cat_frac, K_Liq_cat_frac, Mn_Liq_cat_frac,
-                            Fet_Liq_cat_frac, Fet_Opx_cat_6ox, Al_Liq_cat_frac, Ti_Liq_cat_frac, Mg_Number_Liq_NoFe3):
-    '''
-    Equation 28b of Putirka et al. (2008). Orthopyroxene-liquid thermometer- temperature at which a liquid is saturated in orhopyroxene (for a given P).
-    :cite:`putirka2008thermometers`
-    '''
-    Cl_NM = Mg_Liq_cat_frac + Fet_Liq_cat_frac + \
-        Ca_Liq_cat_frac + Mn_Liq_cat_frac
-    NF = (7 / 2) * np.log(1 - Al_Liq_cat_frac.astype(float)) + \
-        7 * np.log(1 - Ti_Liq_cat_frac.astype(float))
-    return (273.15 + (5573.8 + 587.9 * (P / 10) - 61 * (P / 10)**2) / (5.3 - 0.633 * np.log(Mg_Number_Liq_NoFe3.astype(float)) - 3.97 * Cl_NM +
-            0.06 * NF + 24.7 * Ca_Liq_cat_frac**2 + 0.081 * H2O_Liq + 0.156 * (P / 10)))
+
 
 
 ## Listing them all to check for invalid inputs- add new ones into this list so they become recognised.
@@ -404,7 +398,7 @@ T_Beatt93_BeattDMg_HerzCorr, T_Sug2000_eq1, T_Sug2000_eq3_ol, T_Sug2000_eq3_opx,
 T_Sug2000_eq3_cpx, T_Sug2000_eq3_pig,
 T_Sug2000_eq6a, T_Sug2000_eq6a_H7a, T_Sug2000_eq6b, T_Sug2000_eq6b_H7b, T_Put2008_eq19_BeattDMg, T_Put2008_eq21_BeattDMg,
 T_Put2008_eq22_BeattDMg, T_Molina2015_amp_sat, T_Put2016_eq3_amp_sat,
-T_Put2008_eq34_cpx_sat, T_Put2008_eq28b_opx_sat,
+T_Put2008_eq34_cpx_sat,
 T_Put1999_cpx_sat, T_Put2008_eq26_plag_sat, T_Put2005_eqD_plag_sat, T_Put2008_eq24c_kspar_sat, T_Beatt1993_opx, T_Shi_Test, T_Shea2022_MgO} # put on outside
 
 Liquid_only_funcs_by_name = {p.__name__: p for p in Liquid_only_funcs}
@@ -434,7 +428,6 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None, print
             | T_Put2008_eq15
             | T_Put2008_eq16
             | T_Put2008_eq34_cpx_sat
-            | T_Put2008_eq28b_opx_sat
             | T_Put1999_cpx_sat
             * Following 3 thermometers are adaptations of olivine-liquid thermometers with  DMg calculated using Beattie 1993,
             This means you can use them without knowing an olivine composition. ocan be applied when you haven't measured an olivine composiiton.
@@ -466,6 +459,9 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None, print
 
         Equation from Beattie (1993)
            | T_Beatt1993_opx
+
+        Equation from Shea et al. (2022)
+           | T_Shea2022_MgO
 
     P: float, int, pandas.Series, str  ("Solve")
         Pressure in kbar
@@ -568,3 +564,132 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None, print
         T_K=func(P, **kwargs)
 
     return T_K
+
+
+
+def calculate_liq_only_temp_all_eqs(liq_comps, P=None, H2O_Liq=None):
+    """ This function calculates Liq-only temps using a wide range of popular equations in the literature. Happy to add more to this on request!
+
+    Parameters
+    -------
+
+    liq_comps: pandas.DataFrame
+        Liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
+
+    H2O_Liq: float, int, pandas.Series, optional
+        If users don't specify, uses H2O_Liq from liq_comps,
+        if specified overwrites this.
+
+    P: float, int, pandas.Series, optional
+        Pressure in kbar
+
+    Returns
+    -------
+    Pandas dataframe with temperature in kelvin from the following equations as column headings.
+
+
+
+        Equations from Putirka (2008) and older studies:
+
+            | T_Put2008_eq13
+            | T_Put2008_eq14
+            | T_Put2008_eq15
+            | T_Put2008_eq16
+            | T_Put2008_eq34_cpx_sat
+            | T_Put1999_cpx_sat
+            * Following 3 thermometers are adaptations of olivine-liquid thermometers with  DMg calculated using Beattie 1993,
+            This means you can use them without knowing an olivine composition. ocan be applied when you haven't measured an olivine composiiton.
+            | T_Put2008_eq19_BeattDMg
+            | T_Put2008_eq21_BeattDMg
+            | T_Put2008_eq22_BeattDMg
+
+        Equations from Sugawara (2000):
+
+            | T_Sug2000_eq1
+            | T_Sug2000_eq3_ol
+            | T_Sug2000_eq3_opx
+            | T_Sug2000_eq3_cpx
+            | T_Sug2000_eq3_pig
+            | T_Sug2000_eq6a
+            | T_Sug2000_eq6b
+
+        Equations from Helz and Thornber (1987):
+
+            | T_Helz1987_MgO
+            | T_Helz1987_CaO
+
+        Equation from Montrieth 1995
+           | T_Montierth1995_MgO
+
+        Equation from Beattie (1993)
+           | T_Beatt1993_opx
+
+        Equation from Shea et al. (2022)
+           | T_Shea2022_MgO
+
+
+        Equation from Molina et al. (2015)
+
+            | T_Molina2015_amp_sat
+
+        Equations from Putirka et al. (2016).
+            | T_Put2016_eq3_amp_sat (saturation surface of amphibole)
+
+
+
+
+    """
+
+
+
+
+    # List of equation names
+    equation_names = [
+        'T_Put2008_eq13', 'T_Put2008_eq14', 'T_Put2008_eq15', 'T_Put2008_eq16',
+        'T_Put2008_eq34_cpx_sat', 'T_Put1999_cpx_sat',
+        'T_Put2008_eq19_BeattDMg', 'T_Put2008_eq21_BeattDMg', 'T_Put2008_eq22_BeattDMg',
+        'T_Sug2000_eq1', 'T_Sug2000_eq3_ol', 'T_Sug2000_eq3_opx', 'T_Sug2000_eq3_cpx',
+        'T_Sug2000_eq3_pig', 'T_Sug2000_eq6a', 'T_Sug2000_eq6b',
+        'T_Helz1987_MgO', 'T_Helz1987_CaO', 'T_Montierth1995_MgO', 'T_Shea2022_MgO',
+        'T_Molina2015_amp_sat', 'T_Put2016_eq3_amp_sat'
+    ]
+
+
+    # Dictionary to store results
+    results = {}
+
+    # Loop through each equation name, calculate temperature, and store in results
+    for eq_name in equation_names:
+        results[eq_name] = calculate_liq_only_temp(
+            liq_comps=liq_comps, H2O_Liq=H2O_Liq, P=P, equationT=eq_name
+        )
+
+
+
+    return pd.DataFrame(results)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
