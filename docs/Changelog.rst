@@ -4,7 +4,12 @@ Change Log
 
 
 
- '1.0.51'
+Version 1.0.54 - Jan 24th, 2025
+=====================================
+Added functionality for calculating all liquid only temperatures
+Added Mollo et al. (2018) equations upon request from Alberto Caracciolo.
+
+
 
 Version 1.0.51 - Oct 20th 2024
 =====================================

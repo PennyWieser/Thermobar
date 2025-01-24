@@ -112,6 +112,20 @@ def P_Put2003(T, *, lnK_Jd_liq, Ca_Liq_cat_frac,
     + 12.4 * np.log(Ca_Liq_cat_frac.astype(float)) + 7.03 * Mg_Number_Liq_NoFe3)
 
 
+def P_Mollo2018_AMAM(T, *, lnK_Jd_liq, Ca_Liq_cat_frac,
+              Si_Liq_cat_frac, Mg_Number_Liq_NoFe3):
+    '''
+    Clinopyroxene-liquid barometer of Mollo et al. (2018) AMAM (Eq 11 in paper).
+
+
+    SEE (2018) paper = +-1.71 kbar on calibration, 1.16 kbar on test, 1.5 kbar overlal
+
+    '''
+    return (- 88.08 + (3.25/10**4) * T * lnK_Jd_liq + 0.04 * T
+    - 17.17 * np.log(Ca_Liq_cat_frac.astype(float) *
+    Si_Liq_cat_frac.astype(float))
+     +0.46 * Mg_Number_Liq_NoFe3 + 7.75* np.log(Ca_Liq_cat_frac.astype(float)))
+
 def P_Put2008_eq30(T, *, lnK_Jd_liq, Fet_Liq_cat_frac, Mg_Liq_cat_frac,
                    DiHd_2003, Mg_Number_Liq_NoFe3, Na_Liq_cat_frac, K_Liq_cat_frac, H2O_Liq):
     '''
@@ -576,6 +590,7 @@ def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltm
 ## Equations for Cpx-Liquid Thermometry written as functions
 
 
+
 def T_Put1996_eqT1(P=None, *, lnK_Jd_DiHd_liq_1996,
                    Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac):
     '''
@@ -674,6 +689,22 @@ def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_Liq_c
     0.08 * np.log(Ti_Liq_cat_frac.astype(float))
     - 3.62 * (Na_Liq_cat_frac + K_Liq_cat_frac) - 0.18 * np.log(EnFs.astype(float))
     - 0.14 * lnK_Jd_DiHd_liq_2003 - 0.027 * P))
+
+
+def T_Mollo2018_eq33MAM(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_Liq_cat_frac,
+                   Ti_Liq_cat_frac, Na_Liq_cat_frac, K_Liq_cat_frac, EnFs, lnK_Jd_DiHd_liq_2003):
+    '''
+    Clinopyroxene-liquid  thermometer of Mollo et al (2018) Eq33MAM (Eq17 in paper) adapted from Putirka (2008) Eq 33
+
+
+    SEE=+-20°C (all data)
+    '''
+    return (10 ** 4 / (5.63 - 0.15 * lnK_Jd_DiHd_liq_2003 + 4.78 * (Ca_Liq_cat_frac * Si_Liq_cat_frac)
+    -0.21 *np.log(Ti_Liq_cat_frac.astype(float))-0.002* (Na_Liq_cat_frac + K_Liq_cat_frac) - 0.52*Mg_Number_Liq_NoFe3 +0.07* np.log(EnFs.astype(float)) - 0.16*np.log(Ti_Liq_cat_frac.astype(float))))
+
+
+
+
 
 
 def T_Mas2013_eqalk33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_Liq_cat_frac,
@@ -1897,7 +1928,7 @@ P_Jorgenson2022_Cpx_Liq, P_Jorgenson2022_Cpx_Liq_onnx, P_Jorgenson2022_Cpx_Liq_N
  P_Jorgenson2022_Cpx_Liq_onnx,
  P_Petrelli2020_Cpx_Liq_onnx,
 P_Put2008_eq32a, P_Put2008_eq32b, P_Wang2021_eq1,
-P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA} # put on outside
+P_Petrelli2020_Cpx_only, P_Petrelli2020_Cpx_only_withH2O, P_Nimis1999_BA, P_Mollo2018_AMAM} # put on outside
 
 Cpx_Liq_P_funcs_by_name = {p.__name__: p for p in Cpx_Liq_P_funcs}
 
@@ -1935,6 +1966,8 @@ def calculate_cpx_liq_press(*, equationP, cpx_comps=None, liq_comps=None, meltma
         |  P_Jorgenson2022_Cpx_Liq (Returns voting)
         |  P_Petrelli2020_Cpx_Liq_onnx (Uses onnx, so consistent results, no voting)
         |  P_Wang2021_eq1
+        |  P_Mollo2018_AMAM
+
 
     T: float, int, pandas.Series, str
         Temperature in Kelvin to perform calculations at.
@@ -2082,7 +2115,7 @@ T_Jorgenson2022_Cpx_Liq,T_Jorgenson2022_Cpx_Liq_onnx,T_Jorgenson2022_Cpx_Liq_Nor
 T_Petrelli2020_Cpx_Liq_onnx,
 T_Put2008_eq32d, T_Put2008_eq32d_subsol,
 T_Wang2021_eq2, T_Petrelli2020_Cpx_only, T_Petrelli2020_Cpx_only_withH2O,
-T_Put2008_eq32dH_Wang2021adap, T_Put2008_eq34_cpx_sat} # put on outside
+T_Put2008_eq32dH_Wang2021adap, T_Put2008_eq34_cpx_sat, T_Mollo2018_eq33MAM} # put on outside
 
 Cpx_Liq_T_funcs_by_name = {p.__name__: p for p in Cpx_Liq_T_funcs}
 
@@ -2124,6 +2157,7 @@ def calculate_cpx_liq_temp(*, equationT, cpx_comps=None, liq_comps=None, meltmat
         |  T_Petrelli2020_Cpx_Liq (gives voting)
         |  T_Jorgenson2022_Cpx_Liq (gives voting)
         |  T_Petrelli2020_Cpx_Liq_onnx (gives consistent result every time)
+        |  T_Mollo2018_eq33MAM
 
 
     P: float, int, pandas.Series, str  ("Solve")
@@ -2300,6 +2334,9 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         |  P_Put2008_eq31 (T-dep, H2O-dep)
         |  P_Put2008_eq32c (T-dep, H2O-dep)
         |  P_Mas2013_eqalk32c (T-dep, H2O-dep, alk adaption of 32c)
+        |  P_Mollo2018_AMAM
+
+
 
 
     EquationT: str
@@ -2316,6 +2353,7 @@ def calculate_cpx_liq_press_temp(*, liq_comps=None, cpx_comps=None, meltmatch=No
         |  T_Put2008_eq33  (P-dep, H2O-dep)
         |  T_Mas2013_eqalk33  (P-dep, H2O-dep, alk adaption of eq33)
         |  T_Mas2013_Palk2012 (P-indep, H2O_dep)
+        |  T_Mollo2018_eq33MAM
 
     Optional:
 
