@@ -86,7 +86,7 @@ def prezzi(P_kbar):
     return D
 
 
-Profile_funcs={ryan_lerner, mavko_debari, hill_zucca, prezzi, rasmussen}
+Profile_funcs={ryan_lerner, mavko_debari, hill_zucca, prezzi, rasmussen, denlinger_lerner}
 Profile_funcs_by_name= {p.__name__: p for p in Profile_funcs}
 
 
@@ -220,6 +220,9 @@ def convert_pressure_depth_3step(P_kbar=None, d1=5, d2=14,
 
     return depth_km
 
+
+
+
 def loop_pressure_depth_3step(P_kbar=None,  d1=5, d2=14,
                                  rho1=2700, rho2=3000, rho3=3100, g=9.81):
 
@@ -253,20 +256,143 @@ def loop_pressure_depth_3step(P_kbar=None,  d1=5, d2=14,
 
     """
     if type(P_kbar) is int or type(P_kbar) is float:
-        depth_km_loop=convert_pressure_depth_3step(P_kbar,
-            d1=d1, rho1=rho1, rho2=rho2, g=g)
+        depth_km_loop=convert_pressure_depth_3step(P_kbar=P_kbar,
+            d1=d1, d2=d2,rho1=rho1, rho2=rho2, rho3=rho3, g=g)
     else:
 
         depth_km_loop=np.empty(len(P_kbar))
         for i in range(0, len(P_kbar)):
-            depth_km_loop[i]=convert_pressure_depth_3step(P_kbar[i],
+            depth_km_loop[i]=convert_pressure_depth_3step(P_kbar=P_kbar[i],
             d1=d1, d2=d2,rho1=rho1, rho2=rho2, rho3=rho3, g=g)
     return depth_km_loop
 
+########## Same for 4 step
+
+def convert_pressure_depth_4step(*, P_kbar=None, d1=None, d2=None, d3=None,
+                                 rho1=None, rho2=None, rho3=None, rho4=None, g=9.81):
+    """ Converts Pressure to depth using a 3 step profile for int or float
+
+    Parameters
+    --------------
+    P_kbar: int or float
+        Pressure in kbar
+
+    d1: int or float
+        depth in km of 1st step transition in density from the surface
+
+    d2: int or float
+        depth in km of 2nd step transition in density from the surface
+
+    d3: int or float
+        depth in km of 3rd step transition in density from the surface
 
 
-def convert_pressure_to_depth(P_kbar=None, crust_dens_kgm3=None, g=9.81,
-d1=None, d2=None,rho1=None, rho2=None, rho3=None, model=None):
+
+
+    rho1: int or float
+        Density (kg/m3) down to first step transition
+
+    rho2: int or float
+        Density (kg/m3) between first and second step transition
+
+    rho3: int or float
+        Density (kg/m3) below 2nd step transition
+
+    rho4: int or float
+        Density (kg/m3) below 3rd step transition
+
+    Returns
+    -------------
+    float
+        Depth in km
+
+    """
+
+    d1_SI=d1*1000
+    d2_SI=d2*1000
+    d3_SI=d3*1000
+    P_Step1=(g*rho1*d1_SI)/100000000 # Convert to kbar
+    P_Step2=P_Step1+(g*(d2_SI-d1_SI)*rho2)/100000000 # Pressure contribution from step 2
+    P_Step3=P_Step2+(g*(d3_SI-d2_SI)*rho3)/100000000
+
+    # If the pressure is less than Step 1, easy math, just use Rho1
+    if P_kbar<P_Step1:
+        depth_km=10**(-3)*((P_kbar*100000000))/(g*rho1)
+
+    # If the pressure is between step 1 and step 2, First, take away the pressure of step 1, then solve for height in layer 2
+    if P_kbar>=P_Step1 and P_kbar<P_Step2:
+        P_belowStep2=P_kbar-P_Step1
+        # print('P below  Moho')
+        # print(P_belowMoho)
+        depth_km_bm=10**(-3)*((P_belowStep2*100000000)/(g*rho2))
+        depth_km=d1+depth_km_bm
+
+    # If the pressure is between step 2 and 3, take away the pressure of step2, and calculate the height within layer 3
+    if P_kbar>=P_Step2 and P_kbar<P_Step3:
+        P_belowstep2=P_kbar-P_Step2
+        # print('P below  Moho')
+        # print(P_belowMoho)
+        depth_km_bm=10**(-3)*((P_belowstep2*100000000)/(g*rho3))
+        depth_km=d2+depth_km_bm
+
+    # If the pressure is greater than that at the base of layer 3, take away the pressure of step3, and calculate the height within layer 4
+    if P_kbar>=P_Step3:
+        P_belowstep3=P_kbar-P_Step3
+        # print('P below  Moho')
+        # print(P_belowMoho)
+        depth_km_bm=10**(-3)*((P_belowstep3*100000000)/(g*rho4))
+        depth_km=d3+depth_km_bm
+
+    return depth_km
+
+def loop_pressure_depth_4step(*, P_kbar=None,  d1=5, d2=14, d3=20,
+                                 rho1=2700, rho2=3000, rho3=3100, rho4=4000, g=9.81):
+
+    """ Converts Pressure to depth using a 3 step profile for pd.Series
+
+    Parameters
+    --------------
+    P_kbar: pd.Series
+        Pressure in kbar
+
+    d1: int or float
+        depth in km of 1st step transition in density
+
+    d2: int or float
+        depth in km of 2nd step transition in density
+
+    rho1: int or float
+        Density (kg/m3) down to first step transition
+
+    rho2: int or float
+        Density (kg/m3) between first and second step transition
+
+
+    rho3: int or float
+        Density (kg/m3) below 2nd step transition
+
+    Returns
+    -------------
+    pd.Series
+        Depth in km
+
+    """
+    if type(P_kbar) is int or type(P_kbar) is float:
+        depth_km_loop=convert_pressure_depth_4step(P_kbar=P_kbar,
+            d1=d1, d2=d2, d3=d3, rho1=rho1, rho2=rho2, rho3=rho3, rho4=rho4, g=g)
+    else:
+
+        depth_km_loop=np.empty(len(P_kbar))
+        for i in range(0, len(P_kbar)):
+            depth_km_loop[i]=convert_pressure_depth_4step(P_kbar=P_kbar[i],
+            d1=d1, d2=d2, d3=d3, rho1=rho1, rho2=rho2, rho3=rho3, rho4=rho4, g=g)
+    return depth_km_loop
+
+#######3
+
+
+def convert_pressure_to_depth(*, P_kbar=None, crust_dens_kgm3=None, g=9.81,
+d1=None, d2=None, d3=None, rho1=None, rho2=None, rho3=None, rho4=None, model=None):
     """ Converts pressure in kbar to depth in km using a variety of crustal density profiles
 
 
@@ -317,7 +443,9 @@ d1=None, d2=None,rho1=None, rho2=None, rho3=None, model=None):
             rho3 (density after 3rd step) in km and kg/m3 respectively.
 
 
-
+        four-step:
+            If four step, must also define d1 (depth to 1st step from surface), d2 (depth to second step from surface), d3 (depth to 3rd step from surface)  rho1 (density to 1st step), rho2 (density to 2nd step),
+            rho3 (density to 3rd step), and rho4 (density below 3rd step) in km and kg/m3 respectively.
 
     OR
 
@@ -371,7 +499,14 @@ d1=None, d2=None,rho1=None, rho2=None, rho3=None, model=None):
             D=loop_pressure_depth_3step(P_kbar=P_kbar,
             d1=d1, d2=d2, rho1=rho1, rho2=rho2, rho3=rho3, g=g)
 
-        if model !="two-step" and model != "three-step":
+        if model == "four-step":
+            if d1 is None or d2 is None or d3 is None or rho1 is None or rho2 is None or rho3 is None or rho4 is None:
+                raise Exception('You have selected the two-step model, You must enter d1 and d2 (km), rho1, rho2 and rho3 (kg/m3)')
+
+            D=loop_pressure_depth_4step(P_kbar=P_kbar,
+            d1=d1, d2=d2, d3=d3, rho1=rho1, rho2=rho2, rho3=rho3, rho4=rho4, g=g)
+
+        if model !="two-step" and model != "three-step" and model != "four-step":
             try:
 
                 func = Profile_funcs_by_name[model]
