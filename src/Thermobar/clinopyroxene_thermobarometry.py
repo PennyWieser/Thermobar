@@ -692,7 +692,7 @@ def T_Put2008_eq33(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_Liq_c
 
 
 def T_Mollo2018_eq33MAM(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_Liq_cat_frac,
-                   Ti_Liq_cat_frac, Na_Liq_cat_frac, K_Liq_cat_frac, EnFs, lnK_Jd_DiHd_liq_2003):
+                   Ti_Liq_cat_frac, Na_Liq_cat_frac, K_Liq_cat_frac, EnFs, lnK_Jd_DiHd_liq_2003, Ti_Cpx_cat_6ox):
     '''
     Clinopyroxene-liquid  thermometer of Mollo et al (2018) Eq33MAM (Eq17 in paper) adapted from Putirka (2008) Eq 33
 
@@ -700,7 +700,7 @@ def T_Mollo2018_eq33MAM(P, *, H2O_Liq, Mg_Number_Liq_NoFe3, Ca_Liq_cat_frac, Si_
     SEE=+-20°C (all data)
     '''
     return (10 ** 4 / (5.63 - 0.15 * lnK_Jd_DiHd_liq_2003 + 4.78 * (Ca_Liq_cat_frac * Si_Liq_cat_frac)
-    -0.21 *np.log(Ti_Liq_cat_frac.astype(float))-0.002* (Na_Liq_cat_frac + K_Liq_cat_frac) - 0.52*Mg_Number_Liq_NoFe3 +0.07* np.log(EnFs.astype(float)) - 0.16*np.log(Ti_Liq_cat_frac.astype(float))))
+    -0.21 *np.log(Ti_Liq_cat_frac.astype(float))-0.002* (Na_Liq_cat_frac + K_Liq_cat_frac) - 0.52*Mg_Number_Liq_NoFe3 +0.07* np.log(EnFs.astype(float)) - 0.16*np.log(Ti_Cpx_cat_6ox.astype(float))))
 
 
 

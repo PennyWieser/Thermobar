@@ -154,7 +154,7 @@ def loop_pressure_depth_2step(P_kbar=None, d1=14, rho1=2800, rho2=3100, g=9.81):
         Depth in km
 
     """
-    if type(P_kbar) is int or type(P_kbar) is float:
+    if np.isscalar(P_kbar):  # Check if it's a scalar (int, float, or numpy scalar)
         depth_km_loop=convert_pressure_depth_2step(P_kbar,
             d1=d1, rho1=rho1, rho2=rho2, g=g)
     else:
@@ -255,7 +255,7 @@ def loop_pressure_depth_3step(P_kbar=None,  d1=5, d2=14,
         Depth in km
 
     """
-    if type(P_kbar) is int or type(P_kbar) is float:
+    if np.isscalar(P_kbar):  # Check if it's a scalar (int, float, or numpy scalar)
         depth_km_loop=convert_pressure_depth_3step(P_kbar=P_kbar,
             d1=d1, d2=d2,rho1=rho1, rho2=rho2, rho3=rho3, g=g)
     else:
@@ -377,7 +377,7 @@ def loop_pressure_depth_4step(*, P_kbar=None,  d1=5, d2=14, d3=20,
         Depth in km
 
     """
-    if type(P_kbar) is int or type(P_kbar) is float:
+    if np.isscalar(P_kbar):  # Check if it's a scalar (int, float, or numpy scalar)
         depth_km_loop=convert_pressure_depth_4step(P_kbar=P_kbar,
             d1=d1, d2=d2, d3=d3, rho1=rho1, rho2=rho2, rho3=rho3, rho4=rho4, g=g)
     else:
