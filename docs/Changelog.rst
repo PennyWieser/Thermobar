@@ -2,6 +2,10 @@
 Change Log
 ================================================
 
+Version 1.0.56 - Jan 24th, 2025
+=====================================
+Added functionality forcalculating H2O from Pu et al. (2017) equations upon request from Dawn Ruth.
+
 
 
 Version 1.0.54 - Jan 24th, 2025

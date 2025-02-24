@@ -4473,6 +4473,12 @@ def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", 
 
     '''
     liq_comps_c=liq_comps.copy()
+
+    # Make T_K a series if it isnt already.
+
+    T_K = pd.Series(T_K) if isinstance(T_K, float) else T_K
+
+
     # If the input has FeO and Fe2O3 contents already
     if any(liq_comps.columns=="FeO_Liq") and any(liq_comps.columns=="Fe2O3_Liq"):
         print('using inputted FeO and Fe2O3 contents')
@@ -4562,6 +4568,8 @@ def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", 
          (mol_frac_hyd_redox['FeO_Liq_mol_frac_hyd']))
 
     # We've simplified the equatoin down to Z= a ln fo2 + rightside
+
+
 
     rightside=( (11492/T_K)-6.675+((-2.243*mol_frac_hyd_redox['Al2O3_Liq_mol_frac_hyd'])+(-1.828*hyd_mol_frac_test['FeOt_Liq_mol_frac_hyd'])
     +(3.201*mol_frac_hyd_redox['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd_redox['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd_redox['K2O_Liq_mol_frac_hyd']))
