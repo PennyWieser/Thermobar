@@ -12,6 +12,41 @@ from pathlib import Path
 Thermobar_dir=Path(__file__).parent
 np.seterr(divide='ignore', invalid='ignore')
 
+def calculate_Eu_anomaly(*, Eu, Gd, Sm, Tb, Eu_ref=56.3, Gd_ref=199, Sm_ref=148, Tb_ref=36.1):
+    """ Ref values from Mcdonald and Sun, 1995"""
+
+    Sm_norm=Sm/Sm_ref
+    Gd_norm=Gd/Gd_ref
+    Tb_norm=Tb/Tb_ref
+    Eu_norm=Eu/Eu_ref
+    Eu_star_from_Sm_Gd=((Sm_norm * Gd_norm)**0.5)
+    Eu_star_from_Sm_Tb=((Sm_norm**2 * Tb_norm)**(1/3))
+
+
+    Eu_from_Sm_Gd=Eu_norm/Eu_star_from_Sm_Gd
+    Eu_from_Sm_Tb=Eu_norm/Eu_star_from_Sm_Tb
+
+    # Initialize result with NaN
+    result = pd.Series(np.nan, index=Eu.index)
+
+    # If Eu, Gd, and Sm exist, use Eu_from_Sm_Gd
+    mask1 = Eu.notna() & Gd.notna() & Sm.notna()
+    result.loc[mask1] = Eu_from_Sm_Gd[mask1]
+
+    # If Gd is missing but Eu, Sm, and Tb exist, use Eu_from_Sm_Tb
+    mask2 = Eu.notna() & Gd.isna() & Sm.notna() & Tb.notna()
+    result.loc[mask2] = Eu_from_Sm_Tb[mask2]
+
+    return result
+
+
+
+
+
+
+
+
+
 
 
 ## This specifies the default order for each dataframe type used in calculations
