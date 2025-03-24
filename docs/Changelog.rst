@@ -1,6 +1,10 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.57 - March 23, 2025.
+=====================================
+Added functionality for converting element wt% to oxide wt% (anhydrous) following a request from Karlee Finch.
+
 
 Version 1.0.56 - Jan 24th, 2025
 =====================================

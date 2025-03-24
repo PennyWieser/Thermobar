@@ -179,6 +179,12 @@ oxide_mass_liq_anhyd = {'SiO2_Liq': 60.0843, 'MgO_Liq': 40.3044,
 'MnO_Liq': 70.9375, 'FeOt_Liq': 71.8464, 'CaO_Liq': 56.0774,
 'Al2O3_Liq': 101.961, 'Na2O_Liq': 61.9789, 'K2O_Liq': 94.196,
 'TiO2_Liq': 79.8788, 'P2O5_Liq': 141.937, 'Cr2O3_Liq': 151.9982}
+
+
+cation_mass_liq = {'SiO2_Liq': 60.0843, 'MgO_Liq': 40.3044,
+'MnO_Liq': 70.9375, 'FeOt_Liq': 71.8464, 'CaO_Liq': 56.0774,
+'Al2O3_Liq': 101.961, 'Na2O_Liq': 61.9789, 'K2O_Liq': 94.196,
+'TiO2_Liq': 79.8788, 'P2O5_Liq': 141.937, 'Cr2O3_Liq': 151.9982}
 # Turns dictionary into a dataframe so pandas matrix math functions can be used
 oxide_mass_liq_anhyd_df = pd.DataFrame.from_dict(
     oxide_mass_liq_anhyd, orient='index').T
@@ -405,6 +411,73 @@ df_ideal_all2 = pd.DataFrame(columns=['SiO2', 'TiO2', 'Al2O3',
 'FeOt', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O',
 'Cr2O3', 'P2O5', 'F', 'Cl', 'H2O'])
 
+df_ideal_el = pd.DataFrame(columns=['Si_wt', 'Ti_wt', 'Al_wt',
+'Fe_wt', 'Mn_wt', 'Mg_wt', 'Ca_wt', 'Na_wt', 'K_wt',
+'Cr_wt', 'P_wt'])
+
+def convert_element_weight_percent_to_oxide_weight_percent(df, suffix=None):
+    """
+    Converts elemental wt% to oxide wt%. Ignores F, Cl and H2O.
+    Columns in df must
+
+   Parameters
+    -------
+
+    df: pandas.DataFrame
+        Data frame of element wt. Columns msut be of the form Si_wt, Mg_wt
+
+    suffix:str
+        Adds a suffix to your output columns, e.g. if Suffix ='_Liq', returns MgO_Liq
+
+
+    returns: pandas.DataFrame
+    Oxide % of elements
+    """
+    df_c2=df.copy()
+    # Gets it into the ideal format for df_all_2
+    df_c2=df_c2.reindex(df_ideal_el.columns, axis=1).fillna(0)
+
+
+    df_c=pd.DataFrame(data={'SiO2': df_c2['Si_wt'],
+                                'MgO': df_c2['Mg_wt'],
+                                'FeOt':df_c2['Fe_wt'],
+                                'CaO':df_c2['Ca_wt'],
+                                'Al2O3':df_c2['Al_wt'],
+                                'Na2O':df_c2['Na_wt'],
+                                'K2O':df_c2['K_wt'],
+                                'MnO':df_c2['Mn_wt'],
+                                'TiO2':df_c2['Ti_wt'],
+                                'Cr2O3':df_c2['Cr_wt'],
+                                'P2O5':df_c2['P_wt'],
+
+
+                                })
+    if suffix is not None:
+        df_c.columns = df_c.columns.str.rstrip(suffix)
+
+
+
+    # Concats the oxide masses
+    liq_wt_combo = pd.concat([elemental_mass_mult_all, df_c])
+
+    # So if you have Mg, divide by molar mass of Mg, multiply by molar mass of MgO
+    # If you have Al, divide by molar mass of Al, divide by 2, multiply by Al2O3 mass
+
+
+    mol_prop_anhyd = liq_wt_combo.div(
+        liq_wt_combo.loc['ElWt', :], axis='columns').drop(['ElWt'])
+
+    el_combo=pd.concat([oxide_mass_all, mol_prop_anhyd ],)
+    wt_perc = el_combo.multiply(
+        el_combo.loc['MolWt', :], axis='columns').drop(['MolWt'])
+
+
+
+    if suffix is not None:
+        wt_perc.columns = wt_perc.columns + suffix
+
+    return wt_perc
+
 
 
 def convert_oxide_percent_to_element_weight_percent(df, suffix=None,
@@ -433,9 +506,10 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None,
     if anhydrous==True:
         df_c['H2O']=0
 
-
+    # Gets it into the ideal format for df_all_2
     df_oxides=df_c.reindex(df_ideal_all2.columns, axis=1).fillna(0)
 
+    # Concats the oxide masses
     liq_wt_combo = pd.concat([oxide_mass_all, df_oxides],)
 
 
@@ -477,6 +551,8 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None,
     if without_oxygen is False:
         Oxy=100-sum_element
         wt_perc2['O_wt_make_to_100']=Oxy
+
+        wt_perc2=wt_perc2.fillna(0)
         return wt_perc2
 
 
