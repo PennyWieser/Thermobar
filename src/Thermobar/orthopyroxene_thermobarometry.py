@@ -95,6 +95,7 @@ def P_Put2008_eq29c(T, *, Al_Opx_cat_6ox,
     #print(logCr2O3)
     #print(logCr2O3)
 
+    T = np.asarray(T, dtype=float)
 
     return (2064 + 0.321 * (T - 273.15) - 343.4 * np.log((T - 273.15)) + 31.52 * Al_Opx_cat_6ox - 12.28 * Ca_Opx_cat_6ox
             - 290 * Cr_Opx_cat_6ox - 177.2 *
@@ -117,6 +118,8 @@ def P_Put2008_eq29cnoCr(T, *, Al_Opx_cat_6ox,
     '''
     logCr2O3 = np.log(Cr_Opx_cat_6ox.astype(float))
     #print(logCr2O3)
+
+    T = np.asarray(T, dtype=float)
 
 
     return (2064 + 0.321 * (T - 273.15) - 343.4 * np.log((T - 273.15)) + 31.52 * Al_Opx_cat_6ox - 12.28 * Ca_Opx_cat_6ox
@@ -537,11 +540,11 @@ def calculate_opx_liq_press_temp(*, liq_comps=None, opx_comps=None, meltmatch=No
 
     EquationP: str
         Barometer
-        |  P_Put2008_eq28a
-        |  P_Put2008_eq28b
-        |  P_Put2008_eq28c
-        |  P_Put_Global
-        |  P_Put_Felsic
+        |  P_Put2008_eq29a
+        |  P_Put2008_eq29b
+        |  P_Put2008_eq29c
+        |  P_Put_Global_Opx
+        |  P_Put_Felsic_Opx
 
     EquationT: str
         Thermometer
