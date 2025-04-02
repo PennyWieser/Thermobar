@@ -16,12 +16,13 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
     name="Thermobar",
     version=__version__,
-    author="Penny, Maurizio, Jordan, Eric, Sinan",
+    author="Penny Wieser et al. ",
     author_email="penny.wieser@gmail.com",
     description="Thermobar",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/PennyWieser/Thermobar",
+    license="MIT (with GUI use clause, see LICENSE file)",  # <-- Add this line
     package_dir={'': 'src'},  # Optional
     packages=find_packages(where='src'),
     package_data={

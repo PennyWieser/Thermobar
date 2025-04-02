@@ -1,6 +1,14 @@
 ================================================
 Change Log
 ================================================
+
+Version 1.0.58 - April 2nd, 2025.
+=====================================
+Added liscence with GUI clause
+updated machine learning pkls and onnx files for latest sklearn as stopped working on VICTOR 
+
+
+
 Version 1.0.57 - March 23, 2025.
 =====================================
 Added functionality for converting element wt% to oxide wt% (anhydrous) following a request from Karlee Finch.
