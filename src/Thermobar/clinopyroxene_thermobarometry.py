@@ -264,8 +264,8 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -275,10 +275,10 @@ def P_Petrelli2020_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
 
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq_sklearn_1_6_1.pkl', 'rb') as f:
         scaler_P2020_Cpx_Liq=load(f)
 
-    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Liq_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Liq_sklearn_1_6_1.pkl', 'rb') as f:
         ETR_Press_P2020_Cpx_Liq=joblib.load(f)
 
 
@@ -339,8 +339,8 @@ def P_Jorgenson2022_Cpx_Liq_Norm(T=None, *, cpx_comps=None, liq_comps=None, melt
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -410,14 +410,14 @@ def P_Jorgenson2022_Cpx_Liq(T=None, *, cpx_comps=None, liq_comps=None, meltmatch
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_NotNorm_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_Liq_NotNorm_sklearn_1_6_1.pkl', 'rb') as f:
         ETR_Press_J22_Cpx_Liq=joblib.load(f)
 
 
@@ -481,8 +481,8 @@ liq_comps=None, meltmatch=None):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -561,8 +561,8 @@ def P_Petrelli2020_Cpx_Liq_onnx(T=None, *, cpx_comps=None, liq_comps=None, meltm
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -818,18 +818,18 @@ def T_Petrelli2020_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch=
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
     # Old version using pickles
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Liq_sklearn_1_6_1.pkl', 'rb') as f:
         scaler_P2020_Cpx_Liq=load(f)
 
-    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Liq_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Liq_sklearn_1_6_1.pkl', 'rb') as f:
         ETR_Temp_P2020_Cpx_Liq=joblib.load(f)
 
     x_test_scaled=scaler_P2020_Cpx_Liq.transform(x_test)
@@ -892,8 +892,8 @@ def T_Jorgenson2022_Cpx_Liq_Norm(P=None, *, cpx_comps=None, liq_comps=None, melt
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -963,14 +963,14 @@ def T_Jorgenson2022_Cpx_Liq(P=None, *, cpx_comps=None, liq_comps=None, meltmatch
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_Liq_NotNorm_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_Liq_NotNorm_sklearn_1_6_1.pkl', 'rb') as f:
         ETR_Temp_J22_Cpx_Liq=joblib.load(f)
 
 
@@ -1030,8 +1030,8 @@ def T_Jorgenson2022_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, melt
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -1106,8 +1106,8 @@ def T_Petrelli2020_Cpx_Liq_onnx(P=None, *, cpx_comps=None, liq_comps=None, meltm
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -1225,18 +1225,18 @@ def P_Petrelli2020_Cpx_only(T=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
 
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_sklearn_1_6_1.pkl', 'rb') as f:
         scaler_P2020_Cpx_only=load(f)
 
-    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Press_Petrelli2020_Cpx_Only_sklearn_1_6_1.pkl', 'rb') as f:
         ETR_Press_P2020_Cpx_only=joblib.load(f)
 
 
@@ -1275,8 +1275,8 @@ def P_Petrelli2020_Cpx_only_onnx(T=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -1364,14 +1364,14 @@ def P_Jorgenson2022_Cpx_only(T=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_only_NotNorm_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Press_Jorg21_Cpx_only_NotNorm_sklearn_1_6_1.pkl', 'rb') as f:
         ETR_Press_J21_Cpx_only=joblib.load(f)
 
 
@@ -1410,8 +1410,8 @@ def P_Jorgenson2022_Cpx_only_onnx(T=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -1457,8 +1457,8 @@ def P_Petrelli2020_Cpx_only_withH2O(T=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -1656,17 +1656,17 @@ def T_Petrelli2020_Cpx_only(P=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'scaler_Petrelli2020_Cpx_Only_sklearn_1_6_1.pkl', 'rb') as f:
         scaler_P2020_Cpx_only=load(f)
 
-    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Temp_Petrelli2020_Cpx_Only_sklearn_1_6_1.pkl', 'rb') as f:
         ETR_Temp_P2020_Cpx_only=joblib.load(f)
 
     x_test_scaled=scaler_P2020_Cpx_only.transform(x_test)
@@ -1702,8 +1702,8 @@ def T_Jorgenson2022_Cpx_only_Norm(P=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
@@ -1748,14 +1748,14 @@ def T_Jorgenson2022_Cpx_only(P=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
     Thermobar_dir=Path(Thermobar_onnx.__file__).parent
 
-    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_only_NotNorm_sklearn_1_3.pkl', 'rb') as f:
+    with open(Thermobar_dir/'ETR_Temp_Jorg21_Cpx_only_NotNorm_sklearn_1_6_1.pkl', 'rb') as f:
         ETR_Temp_J22_Cpx_only=joblib.load(f)
 
 
@@ -1792,8 +1792,8 @@ def T_Jorgenson2022_Cpx_only_onnx(P=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -1844,8 +1844,8 @@ def T_Petrelli2020_Cpx_only_onnx(P=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')
@@ -1896,8 +1896,8 @@ def T_Petrelli2020_Cpx_only_withH2O(P=None, *, cpx_comps):
     try:
         import Thermobar_onnx
         version=Thermobar_onnx.__version__
-        if version != '0.0.4':
-            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.04. Please grab the new tag from github. Scikitlearn had changed too much, v2 doesnt work well anymore")
+        if version != '0.0.5':
+            raise RuntimeError(f"Thermobar_onnx version is {version}, but you require version 0.0.5. Please grab the new tag from github. This deals with constant changes in sklearn")
 
     except ImportError:
         raise RuntimeError('Thermobar_onnx is not installed - this is required to perform calculations using Petrelli and Jorgenson ML method. See the ReadME for further instructions on how to install this')

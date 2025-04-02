@@ -71,14 +71,11 @@ class test_cpx_only_temp(unittest.TestCase):
        self.assertAlmostEqual(pt.calculate_cpx_only_temp(cpx_comps=CpxT, equationT="T_Put2008_eq32d_subsol",
          P=5)[0], 1252.508521, decimalPlace, "equation 32d not equal to test value")
 
+   # dont work as need onnx - but useful as checks. 
     # def test_temp_Petrelli(self):
     #    self.assertAlmostEqual(pt.calculate_cpx_only_temp(cpx_comps=CpxT, equationT="T_Petrelli2020_Cpx_only").T_K_calc[0],
     #    1377.2655555555673, decimalPlace, "Petrelli 2021 not equal to typed value")
     #
-    # def test_temp_Petrelli_withH2O(self):
-    #    self.assertAlmostEqual(pt.calculate_cpx_only_temp(cpx_comps=CpxT,
-    #    equationT="T_Petrelli2020_Cpx_only_withH2O", H2O_Liq=5).T_K_calc[0],
-    #    1333.0700000000113, decimalPlace, "Petrelli 2021 not equal to typed value")
 
 
 class test_cpx_only_press_temp(unittest.TestCase):
