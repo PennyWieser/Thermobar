@@ -1377,7 +1377,7 @@ def calculate_orthopyroxene_components(opx_comps):
     opx_calc['Ca_Opx_cat_6ox'] +opx_calc['Na_Opx_cat_6ox']
     + opx_calc['K_Opx_cat_6ox'] + opx_calc['Cr_Opx_cat_6ox'])
 
-    opx_calc['Ca_CaMgFe']=opx_calc['Ca_Opx_cat_6ox']/(opx_calc['Ca_Opx_cat_6ox']
+    opx_calc['Ca_CaMgFe_Opx']=opx_calc['Ca_Opx_cat_6ox']/(opx_calc['Ca_Opx_cat_6ox']
     +opx_calc['Fet_Opx_cat_6ox']+opx_calc['Mg_Opx_cat_6ox'])
 
     opx_calc['NaAlSi2O6'] = opx_calc['Na_Opx_cat_6ox']
@@ -1637,7 +1637,7 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['Ca_Cpx_cat_6ox'] + cpx_calc['Na_Cpx_cat_6ox']
     + cpx_calc['K_Cpx_cat_6ox'] + cpx_calc['Cr_Cpx_cat_6ox'])
 
-    cpx_calc['Ca_CaMgFe']=cpx_calc['Ca_Cpx_cat_6ox']/(cpx_calc['Ca_Cpx_cat_6ox']+cpx_calc['Fet_Cpx_cat_6ox']
+    cpx_calc['Ca_CaMgFe_Cpx']=cpx_calc['Ca_Cpx_cat_6ox']/(cpx_calc['Ca_Cpx_cat_6ox']+cpx_calc['Fet_Cpx_cat_6ox']
     +cpx_calc['Mg_Cpx_cat_6ox'])
 
 
@@ -4769,7 +4769,7 @@ def classify_phases(filename=None, sheet_name=None, df=None, return_end_members=
     Oxides_prefix['Na_K_A']=Oxides_amp_sites['Na_A']+Oxides_amp_sites['K_A']
     Oxides_prefix['Sum_Amp_Cat_Sites']=Oxides_amp_sites['cation_sum_All']
     Oxides_prefix['Cation_Sum_Cpx']=Oxides_cpx_sites['Cation_Sum_Cpx']
-    Oxides_prefix['Ca_CaMgFe']=Oxides_cpx_sites['Ca_CaMgFe']
+    Oxides_prefix['Ca_CaMgFe_Cpx']=Oxides_cpx_sites['Ca_CaMgFe_Cpx']
     Oxides_prefix.replace([np.nan, -np.nan], 0, inplace=True)
 
 
@@ -4855,7 +4855,7 @@ def classify_phases(filename=None, sheet_name=None, df=None, return_end_members=
     Oxides_Pyroxenes=Oxides_out.add_suffix('_Opx')
     Px=Oxides_out['Phase_Min_Group_ML']=="Px"
 
-    Px_CaMgFe=Oxides_out['Ca_CaMgFe']
+    Px_CaMgFe=Oxides_out['Ca_CaMgFe_Opx']
     Oxides_out.loc[( (Px) & (Px_CaMgFe<0.05) ), 'Phase_Mineral'] = "Opx"
     Oxides_out.loc[( (Px) & (Px_CaMgFe.between(0.05, 0.2)) ), 'Phase_Mineral'] = "Pig"
     Oxides_out.loc[( (Px) & (Px_CaMgFe>0.2) ), 'Phase_Mineral'] = "Cpx"

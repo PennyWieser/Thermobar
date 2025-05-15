@@ -1,11 +1,14 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.60 - April 15th, 2025.
+=====================================
+Following Matt Loewen's request, removed duplicate Ca_CaMgFe for Opx and Cpx, now called Ca_CaMgFe_Opx and Ca_CaMgFe_Cpx, changed in all calibration files.
 
 Version 1.0.58 - April 2nd, 2025.
 =====================================
 Added liscence with GUI clause
-updated machine learning pkls and onnx files for latest sklearn as stopped working on VICTOR 
+updated machine learning pkls and onnx files for latest sklearn as stopped working on VICTOR
 
 
 
