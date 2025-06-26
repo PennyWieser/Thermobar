@@ -8,7 +8,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 Citing in Main Text
 
-If you use Thermobar in your study, you must cite it in the main text of your paper. This code took me years to write and presumably is saving you a lot of time. Thus, it deserves to actually recieve a citation, vs just describing its use in the supplement. If I do not get credit for my open source work that means something for promotion/tenure, I will not be able to continue working and building these packages. If you only cite it in the supplement, you must pay for your use of PySulfSat, at the rate of $500/study. This will support my spare time to maintain these packages. 
+If you use Thermobar in your study, you must cite it in the main text of your paper. This code took me years to write and presumably is saving you a lot of time. Thus, it deserves to actually recieve a citation, vs just describing its use in the supplement. If I do not get credit for my open source work that means something for promotion/tenure, I will not be able to continue working and building these packages. If you only cite it in the supplement, you must pay for your use of Thermobar, at the rate of $500/study. This will support my spare time to maintain these packages. 
 
 Special Clause on GUI Usage
 
