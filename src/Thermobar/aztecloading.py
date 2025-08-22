@@ -240,6 +240,14 @@ ideal_cols_standards_silicates=['AnalysisDate', 'PersonName', 'SampleID',
 'Standard Name_S','Standardization Date_S', 'Standard Name_Cr','Standardization Date_Cr',
                      ]
 
+
+ideal_cols_standards_sulfides=['AnalysisDate', 'PersonName', 'Sample Name',
+
+'Total_wt%', 'Wt%_Ni', 'Wt%_Cu', 'Wt%_O', 'Wt%_Fe', 'Wt%_S', 'Atomic %_Ni', 'Atomic %_Cu', 'Atomic %_O', 'Atomic %_Fe', 'Atomic %_S',
+ 'Wt% Sigma_Ni', 'Wt% Sigma_Cu', 'Wt% Sigma_O', 'Wt% Sigma_Fe', 'Wt% Sigma_S',
+
+                     ]
+
 def extract_silicate_standard_data(df_final, PersonName, StdName, AnalysisDate, StdString):
     # Set the required fields
     df_final['PersonName'] = PersonName
@@ -259,6 +267,40 @@ def extract_silicate_standard_data(df_final, PersonName, StdName, AnalysisDate, 
     # Display the new DataFrame
     #df_filtered2=df_standard.loc[df_standard['SampleID'].str.contains(StdString)]
     df_filtered2 = df_standard.loc[df_standard['SampleID'].fillna('').str.contains(StdString, na=False)]
+
+
+    # Fill 'Standardization Date' columns with 'Factory' if empty
+    standard_date_cols = [col for col in df_standard.columns if col.startswith('Standardization Date')]
+
+    # Use .copy() to ensure we're working with a copy to avoid chained assignment issues
+    df_filtered2 = df_filtered2.copy()
+
+    # Fill only the 'Standardization Date' columns with 'Factory' where values are empty (NaN)
+    df_filtered2[standard_date_cols] = df_filtered2[standard_date_cols].fillna('Factory')
+    display(df_filtered2.head())
+
+    return df_filtered2
+
+
+def extract_sulfide_standard_data(df_final, PersonName, StdName, AnalysisDate, StdString):
+    # Set the required fields
+    df_final['PersonName'] = PersonName
+    df_final['StdName'] = StdName
+    df_final['AnalysisDate'] = AnalysisDate
+
+    # Create a new DataFrame with all ideal columns, initializing missing columns with empty values
+    df_standard = pd.DataFrame(columns=ideal_cols_standards_sulfides)
+
+    # Fill in values from df_final where the columns match
+    for col in df_final.columns:
+        if col in df_standard.columns:
+            df_standard[col] = df_final[col]
+
+
+
+    # Display the new DataFrame
+    #df_filtered2=df_standard.loc[df_standard['SampleID'].str.contains(StdString)]
+    df_filtered2 = df_standard.loc[df_standard['Sample Name'].fillna('').str.contains(StdString, na=False)]
 
 
     # Fill 'Standardization Date' columns with 'Factory' if empty

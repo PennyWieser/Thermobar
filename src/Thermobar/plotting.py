@@ -69,64 +69,119 @@ def Tukey_calc(x,y): #, name):
     plt.annotate(print(tukey), xy=(1, 1.5), xycoords="axes fraction", fontsize=9)
 
 
+# def calculate_R2(x, y, xy=True, df=False, round=5):
+#     """ Calculates statistics given a set of x and y data
+#     returns:
+#     R2: R2 value
+#     RMSE: Root Mean Square Error (rounded to 2dp)
+#     RMSE_num: Root Mean square (unrounded)
+#     Median: Median bias error (y pred - y true)
+#     Mean: Mean bias error (y pred - y true)
+#     if xy= False doesnt return y and x pred
+#     """
+#     masknan=(~np.isnan(x) & ~np.isnan(y))
+#     regx=x[masknan].values.reshape(-1, 1)
+#     regy=y[masknan].values.reshape(-1, 1)
+#     slope, intercept, r_value, p_value, std_err = stats.linregress(regx[:,0],regy[:,0])
+#     p_value=np.round(p_value, round)
+#     lr=LinearRegression()
+#     lr.fit(regx,regy)
+#     Y_pred=lr.predict(regx)
+#     Int=lr.intercept_
+#     Grad=lr.coef_
+#     #R="R\N{SUPERSCRIPT TWO} = " +  str(np.round(r2_score(regy, Y_pred), 2))
+#     R=(np.round(r2_score(regy, Y_pred), round))
+#     RMSE=RMSE_func(regx, regy)
+#
+#     RMSEp=np.round(RMSE, round)
+#     Median=np.nanmedian(regy-regx)#
+#     Medianp=np.round(Median, round)
+#     Mean=np.nanmean(regy-regx)
+#     Meanp=np.round(Mean, round)
+#     print(Mean)
+#     if round is False:
+#         return {'R2': '{0:.5f}'.format(R), 'RMSE':'{0:.5f}'.format(RMSEp), 'RMSE_num':RMSEp,
+#         'P_val':'{0:.5f}'.format(p_value), 'Median':'{0:.5f}'.format(Medianp), 'Mean':'{0:.5f}'.format(Meanp),
+#         'Int': Int, 'Grad':Grad[0]}
+#
+#     if xy is True:
+#
+#         return {'R2': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp,
+#         'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
+#         'Int': Int, 'Grad':Grad[0],
+#     'x_pred': regx, 'y_pred': Y_pred}
+#
+#     if xy is False and df is False:
+#         return {'R2': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp,
+#         'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
+#         'Int': Int, 'Grad':Grad[0]}
+#
+#     if xy is False and df is True:
+#         df=pd.DataFrame(data={'R2': R,
+#                                 'RMSE': RMSEp,
+#                                 'P_val': p_value,
+#                                 'Median': Medianp,
+#                                 'Mean': Meanp,
+#                                 'Int': Int,
+#                                 'Grad': Grad[0]
+#         })
+#         df=df.round(decimals=round)
+#         return df
+
 def calculate_R2(x, y, xy=True, df=False, round=5):
-    """ Calculates statistics given a set of x and y data
-    returns:
-    R2: R2 value
-    RMSE: Root Mean Square Error (rounded to 2dp)
-    RMSE_num: Root Mean square (unrounded)
-    Median: Median bias error (y pred - y true)
-    Mean: Mean bias error (y pred - y true)
-    if xy= False doesnt return y and x pred
     """
-    masknan=(~np.isnan(x) & ~np.isnan(y))
-    regx=x[masknan].values.reshape(-1, 1)
-    regy=y[masknan].values.reshape(-1, 1)
-    slope, intercept, r_value, p_value, std_err = stats.linregress(regx[:,0],regy[:,0])
-    p_value=np.round(p_value, round)
-    lr=LinearRegression()
-    lr.fit(regx,regy)
-    Y_pred=lr.predict(regx)
-    Int=lr.intercept_
-    Grad=lr.coef_
-    #R="R\N{SUPERSCRIPT TWO} = " +  str(np.round(r2_score(regy, Y_pred), 2))
-    R=(np.round(r2_score(regy, Y_pred), round))
-    RMSE=RMSE_func(regx, regy)
+    Calculates regression statistics between x and y.
 
-    RMSEp=np.round(RMSE, round)
-    Median=np.nanmedian(regy-regx)#
-    Medianp=np.round(Median, round)
-    Mean=np.nanmean(regy-regx)
-    Meanp=np.round(Mean, round)
-    print(Mean)
-    if round is False:
-        return {'R2': '{0:.5f}'.format(R), 'RMSE':'{0:.5f}'.format(RMSEp), 'RMSE_num':RMSEp,
-        'P_val':'{0:.5f}'.format(p_value), 'Median':'{0:.5f}'.format(Medianp), 'Mean':'{0:.5f}'.format(Meanp),
-        'Int': Int, 'Grad':Grad[0]}
+    Parameters:
+        x, y: Input arrays or Series.
+        xy: Whether to return predicted x and y values.
+        df: Whether to return a DataFrame.
+        round: Number of decimal places to round outputs to.
 
-    if xy is True:
+    Returns:
+        Dictionary or DataFrame with R2, RMSE, Mean/Median bias, p-value, etc.
+    """
+    masknan = (~np.isnan(x) & ~np.isnan(y))
+    regx = x[masknan].values.reshape(-1, 1)
+    regy = y[masknan].values.reshape(-1, 1)
 
-        return {'R2': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp,
-        'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
-        'Int': Int, 'Grad':Grad[0],
-    'x_pred': regx, 'y_pred': Y_pred}
+    # Linear regression
+    slope, intercept, r_value, p_value, std_err = stats.linregress(regx[:, 0], regy[:, 0])
+    lr = LinearRegression()
+    lr.fit(regx, regy)
+    Y_pred = lr.predict(regx)
 
-    if xy is False and df is False:
-        return {'R2': '{0:.2f}'.format(R), 'RMSE':'{0:.2f}'.format(RMSEp), 'RMSE_num':RMSEp,
-        'P_val':'{0:.3f}'.format(p_value), 'Median':'{0:.2f}'.format(Medianp), 'Mean':'{0:.2f}'.format(Meanp),
-        'Int': Int, 'Grad':Grad[0]}
+    # Metrics
+    R = r2_score(regy, Y_pred)
+    RMSE = RMSE_func(regx, regy)
+    Median = np.nanmedian(regy - regx)
+    Mean = np.nanmean(regy - regx)
 
-    if xy is False and df is True:
-        df=pd.DataFrame(data={'R2': R,
-                                'RMSE': RMSEp,
-                                'P_val': p_value,
-                                'Median': Medianp,
-                                'Mean': Meanp,
-                                'Int': Int,
-                                'Grad': Grad[0]
-        })
-        df=df.round(decimals=2)
-        return df
+    # Round helper
+    def r(x): return np.round(x, round) if round is not None else x
+
+    results = {
+        'R2': r(R),
+        'RMSE': r(RMSE),
+        'RMSE_num': RMSE,
+        'P_val': r(p_value),
+        'Median': r(Median),
+        'Mean': r(Mean),
+        'Int': lr.intercept_,
+        'Grad': lr.coef_[0],
+        'Grad_err': r(std_err)  # <<<< ADDED standard error on the slope
+    }
+
+    if xy:
+        results['x_pred'] = regx
+        results['y_pred'] = Y_pred
+
+    if df:
+        return pd.DataFrame([results]).round(round)
+
+    return results
+
+
 
 def calculate_R2_devitre(x, y, xy=True, df=False, round=5,pval_format='decimal'):
     """ Calculates statistics

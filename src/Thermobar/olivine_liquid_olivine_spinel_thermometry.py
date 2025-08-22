@@ -881,7 +881,7 @@ def T_Wan2008(P=None, *, Cr_No_sp, Al2O3_Ol, Al2O3_Sp):
 
 ##  Olivine-spinel thermometry function
 
-def calculate_ol_sp_temp(ol_comps, sp_comps, equationT):
+def calculate_ol_sp_temp(ol_comps, sp_comps, equationT, P=None):
     ''' calculates temperatures from olivine-spinel pairs.
 
 

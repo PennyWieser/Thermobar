@@ -908,7 +908,7 @@ def calculate_amp_only_temp(amp_comps, equationT, P=None):
             raise Exception(
                 'You have selected a P-dependent thermometer, please enter an option for P')
         cat13 = calculate_13cations_amphibole_ridolfi(amp_comps)
-        myAmps1_label = amp_comps.drop(['Sample_ID_Amp'], axis='columns')
+        myAmps1_label = amp_comps.drop(columns=['Sample_ID_Amp'], errors='ignore')
         Sum_input = myAmps1_label.sum(axis='columns')
 
         kwargs = {name: cat13[name] for name, p in inspect.signature(
