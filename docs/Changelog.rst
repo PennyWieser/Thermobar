@@ -1,6 +1,12 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.64 - Oct 23th, 2025.
+=====================================
+Normalization function for Giordano was looking for other columns, so if someone gave it wrong input (not Liqs input, but all input) it returned wrong viscosities, as was dividing through by other columns. Remind users - please use the Thermobar inputp['Liqs'], not your own dataframe, to avoid such issues.
+
+
+================================================
 Version 1.0.60 - April 15th, 2025.
 =====================================
 Following Matt Loewen's request, removed duplicate Ca_CaMgFe for Opx and Cpx, now called Ca_CaMgFe_Opx and Ca_CaMgFe_Cpx, changed in all calibration files.
