@@ -26,64 +26,111 @@ def convert_F_to_F2O(F_ppm=None):
     return F2O_calc
 
 
+# def normalize_anhydrous_to_100_incF_mol_prop(liq_comps, F2O_content=0):
+#     '''
+#     Calculates normalized hydrous molar proportions following the normalization scheme
+#     of Giordano et al. (2008) in their excel spreadsheet.
+#
+#     Parameters
+#     -------
+#
+#     liq_comps: pandas.DataFrame
+#         liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
+#
+#     F2O_content: int, pd.series
+#         F2O content of the liquid (wt%), by default is set at zero.
+#
+#     Returns
+#     -------
+#     pd.DataFrame
+#         column headings of the form Liq_mol_frac_hyd, ...
+#     '''
+#
+#
+#     if isinstance(F2O_content, pd.Series):
+#         F2O_content.fillna(0, inplace=True)
+#     liq_comps_C=liq_comps.copy()
+#     liq_comps_C['NiO_Liq']=0
+#     liq_comps_C['Cr2O3_Liq']=0
+#     liq_comps_C['CoO_Liq']=0
+#     liq_comps_C['CO2_Liq']=0
+#
+#     liq_comps_sum=(liq_comps_C['SiO2_Liq']+liq_comps_C['TiO2_Liq']+
+#     liq_comps_C['Al2O3_Liq']+liq_comps_C['FeOt_Liq']+liq_comps_C['MnO_Liq']+liq_comps_C['MgO_Liq']+
+#     liq_comps_C['CaO_Liq']+liq_comps_C['Na2O_Liq']+liq_comps_C['K2O_Liq']+
+#     liq_comps_C['P2O5_Liq']+F2O_content)
+#     Norm_Factor=(100-liq_comps_C['H2O_Liq'])/(liq_comps_sum)
+#
+#
+#     if 'Sample_ID_Liq' in liq_comps_C.columns:
+#         liq_comps_C_nolabel= liq_comps_C.drop('Sample_ID_Liq', axis=1)
+#     else:
+#         liq_comps_C_nolabel=liq_comps_C
+#     liq_comps_c_N=liq_comps_C_nolabel.multiply(Norm_Factor, axis=0)
+#
+#     liq_comps_c_N=liq_comps_C_nolabel.multiply(Norm_Factor, axis=0)
+#     # Don't normalize water
+#     liq_comps_c_N['H2O_Liq']=liq_comps_C['H2O_Liq']
+#     liq_comps_N_mol=calculate_hydrous_mol_proportions_liquid(liq_comps=liq_comps_c_N)
+#
+#     liq_comps_N_mol['F2O_Liq_mol_prop_hyd']=F2O_content*Norm_Factor/37.9968
+#     liq_comps_N_mol['F2O_Liq_mol_prop_hyd'].fillna(0, inplace=True)
+#     mols_sum = 100/(liq_comps_N_mol.sum(axis='columns'))
+#     cat_frac_anhyd = liq_comps_N_mol.multiply(mols_sum, axis='rows')
+#     cat_frac_anhyd.columns = [str(col).replace('mol_prop', 'mol_frac')
+#                               for col in cat_frac_anhyd.columns]
+#
+#     #print(cat_frac_anhyd)
+#
+#
+#     return cat_frac_anhyd  #mols_sum #liq_comps_N_mol['sum']
+
 def normalize_anhydrous_to_100_incF_mol_prop(liq_comps, F2O_content=0):
-    '''
-    Calculates normalized hydrous molar proportions following the normalization scheme
-    of Giordano et al. (2008) in their excel spreadsheet.
+    """
+    Simple normalization to 100 wt% anhydrous (Giordano-style).
+    Only sums specified oxide columns; leaves H2O unscaled.
+    """
 
-    Parameters
-    -------
+    # List of oxide wt% columns to include in normalization
+    cols_to_sum = [
+        'SiO2_Liq','TiO2_Liq','Al2O3_Liq','FeOt_Liq','MnO_Liq','MgO_Liq',
+        'CaO_Liq','Na2O_Liq','K2O_Liq','Cr2O3_Liq','P2O5_Liq',
+        'NiO_Liq','CoO_Liq','CO2_Liq'
+    ]
 
-    liq_comps: pandas.DataFrame
-        liquid compositions with column headings SiO2_Liq, MgO_Liq etc.
+    df = liq_comps.copy()
+    for c in cols_to_sum + ['H2O_Liq']:
+        if c not in df:
+            df[c] = 0.0
 
-    F2O_content: int, pd.series
-        F2O content of the liquid (wt%), by default is set at zero.
-
-    Returns
-    -------
-    pd.DataFrame
-        column headings of the form Liq_mol_frac_hyd, ...
-    '''
-
-
+    # Allow F2O as scalar or Series
     if isinstance(F2O_content, pd.Series):
-        F2O_content.fillna(0, inplace=True)
-    liq_comps_C=liq_comps.copy()
-    liq_comps_C['NiO_Liq']=0
-    liq_comps_C['Cr2O3_Liq']=0
-    liq_comps_C['CoO_Liq']=0
-    liq_comps_C['CO2_Liq']=0
-
-    liq_comps_sum=(liq_comps_C['SiO2_Liq']+liq_comps_C['TiO2_Liq']+
-    liq_comps_C['Al2O3_Liq']+liq_comps_C['FeOt_Liq']+liq_comps_C['MnO_Liq']+liq_comps_C['MgO_Liq']+
-    liq_comps_C['CaO_Liq']+liq_comps_C['Na2O_Liq']+liq_comps_C['K2O_Liq']+
-    liq_comps_C['P2O5_Liq']+F2O_content)
-    Norm_Factor=(100-liq_comps_C['H2O_Liq'])/(liq_comps_sum)
-
-
-    if 'Sample_ID_Liq' in liq_comps_C.columns:
-        liq_comps_C_nolabel= liq_comps_C.drop('Sample_ID_Liq', axis=1)
+        F2O = F2O_content.reindex(df.index).fillna(0)
     else:
-        liq_comps_C_nolabel=liq_comps_C
-    liq_comps_c_N=liq_comps_C_nolabel.multiply(Norm_Factor, axis=0)
+        F2O = float(F2O_content)
 
-    liq_comps_c_N=liq_comps_C_nolabel.multiply(Norm_Factor, axis=0)
-    # Don't normalize water
-    liq_comps_c_N['H2O_Liq']=liq_comps_C['H2O_Liq']
-    liq_comps_N_mol=calculate_hydrous_mol_proportions_liquid(liq_comps=liq_comps_c_N)
+    # --- Compute normalization factor ---
+    sum_anhydrous = df[cols_to_sum].sum(axis=1) + F2O
+    norm_factor = (100 - df['H2O_Liq']) / sum_anhydrous
 
-    liq_comps_N_mol['F2O_Liq_mol_prop_hyd']=F2O_content*Norm_Factor/37.9968
-    liq_comps_N_mol['F2O_Liq_mol_prop_hyd'].fillna(0, inplace=True)
-    mols_sum = 100/(liq_comps_N_mol.sum(axis='columns'))
-    cat_frac_anhyd = liq_comps_N_mol.multiply(mols_sum, axis='rows')
-    cat_frac_anhyd.columns = [str(col).replace('mol_prop', 'mol_frac')
-                              for col in cat_frac_anhyd.columns]
+    # --- Apply normalization only to the oxide columns ---
+    df_norm = df.copy()
+    df_norm[cols_to_sum] = df[cols_to_sum].multiply(norm_factor, axis=0)
+    df_norm['H2O_Liq'] = df['H2O_Liq']  # leave water unscaled
 
-    #print(cat_frac_anhyd)
+    # --- Convert to molar proportions and then mol fractions ---
+    liq_mol = calculate_hydrous_mol_proportions_liquid(df_norm)
+    liq_mol['F2O_Liq_mol_prop_hyd'] = (F2O * norm_factor) / 37.9968
+
+    mol_sum = liq_mol.sum(axis=1)
+    cat_frac_anhyd = liq_mol.multiply(100 / mol_sum, axis=0)
+    cat_frac_anhyd.columns = [
+        c.replace('mol_prop', 'mol_frac') for c in cat_frac_anhyd.columns
+    ]
+
+    return cat_frac_anhyd
 
 
-    return cat_frac_anhyd  #mols_sum #liq_comps_N_mol['sum']
 
 
 

@@ -24,7 +24,7 @@ def calculate_cpx_mgno(cpx_comps):
     return Mgno
 
 def calculate_opx_mgno(opx_comps):
-    Mgno=(cpx_comps['MgO_Opx']/40.3044)/((cpx_comps['MgO_Opx']/40.3044)+(cpx_comps['FeOt_Opx']/71.844))
+    Mgno=(opx_comps['MgO_Opx']/40.3044)/((opx_comps['MgO_Opx']/40.3044)+(opx_comps['FeOt_Opx']/71.844))
     return Mgno
 
 def calculate_liq_mgno(liq_comps, Fe3Fet_Liq=None):

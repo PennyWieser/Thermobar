@@ -553,17 +553,17 @@ variable_err=variable_err)
 
             if elx == 'Cpx' or elx == "Opx" or elx == "Plag" or elx == "Kspar":
                 mynoisedDataframe = pd.DataFrame(data={'SiO2_{}'.format(elx): SiO2_Err, 'TiO2_{}'.format(elx): TiO2_Err, 'Al2O3_{}'.format(elx): Al2O3_Err, 'FeOt_{}'.format(elx): FeOt_Err, 'MnO_{}'.format(
-                    elx): MnO_Err, 'MgO_{}'.format(elx): MgO_Err, 'CaO_{}'.format(elx): CaO_Err, 'Na2O_{}'.format(elx): Na2O_Err, 'K2O_{}'.format(elx): K2O_Err, 'Cr2O3_{}'.format(elx): Cr2O3_Err})
+                    elx): MnO_Err, 'MgO_{}'.format(elx): MgO_Err, 'CaO_{}'.format(elx): CaO_Err, 'Na2O_{}'.format(elx): Na2O_Err, 'K2O_{}'.format(elx): K2O_Err, 'Cr2O3_{}'.format(elx): Cr2O3_Err},  index=pd.RangeIndex(len(SiO2_Err)))
 
             if elx == 'Ol' or elx == "Sp":
                 mynoisedDataframe = pd.DataFrame(data={'SiO2_{}'.format(elx): SiO2_Err, 'TiO2_{}'.format(elx): TiO2_Err, 'Al2O3_{}'.format(elx): Al2O3_Err, 'FeOt_{}'.format(elx): FeOt_Err, 'MnO_{}'.format(elx): MnO_Err, 'MgO_{}'.format(elx): MgO_Err, 'CaO_{}'.format(elx): CaO_Err, 'Na2O_{}'.format(elx): Na2O_Err, 'K2O_{}'.format(elx): K2O_Err, 'Cr2O3_{}'.format(elx): Cr2O3_Err,
-                                                       'NiO_{}'.format(elx): NiO_Err})
+                                                       'NiO_{}'.format(elx): NiO_Err},  index=pd.RangeIndex(len(SiO2_Err)))
             if elx == "Amp":
                 mynoisedDataframe = pd.DataFrame(data={'SiO2_{}'.format(elx): SiO2_Err, 'TiO2_{}'.format(elx): TiO2_Err, 'Al2O3_{}'.format(elx): Al2O3_Err, 'FeOt_{}'.format(elx): FeOt_Err, 'MnO_{}'.format(elx): MnO_Err, 'MgO_{}'.format(elx): MgO_Err, 'CaO_{}'.format(elx): CaO_Err, 'Na2O_{}'.format(elx): Na2O_Err, 'K2O_{}'.format(elx): K2O_Err, 'Cr2O3_{}'.format(elx): Cr2O3_Err,
-                                                       'F_{}'.format(elx): F_Err, 'Cl_{}'.format(elx): Cl_Err})
+                                                       'F_{}'.format(elx): F_Err, 'Cl_{}'.format(elx): Cl_Err},  index=pd.RangeIndex(len(SiO2_Err)))
             if elx == "Liq":
                 mynoisedDataframe = pd.DataFrame(data={'SiO2_{}'.format(elx): SiO2_Err, 'TiO2_{}'.format(elx): TiO2_Err, 'Al2O3_{}'.format(elx): Al2O3_Err, 'FeOt_{}'.format(elx): FeOt_Err, 'MnO_{}'.format(elx): MnO_Err, 'MgO_{}'.format(elx): MgO_Err, 'CaO_{}'.format(elx): CaO_Err, 'Na2O_{}'.format(elx): Na2O_Err, 'K2O_{}'.format(elx): K2O_Err, 'Cr2O3_{}'.format(elx): Cr2O3_Err,
-                                                       'P2O5_{}'.format(elx): P2O5_Err, 'H2O_{}'.format(elx): H2O_Err})
+                                                       'P2O5_{}'.format(elx): P2O5_Err, 'H2O_{}'.format(elx): H2O_Err},  index=pd.RangeIndex(len(SiO2_Err)))
                 mynoisedDataframe = mynoisedDataframe.reindex(
                     df_ideal_liq.columns, axis=1).fillna(0)
                 mynoisedDataframe = mynoisedDataframe.apply(
