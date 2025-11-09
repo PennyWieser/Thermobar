@@ -1,6 +1,10 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.65 - Nov 11th, 2025.
+=====================================
+Removed support for python 3.8 as EOL a year ago now. 
+
 Version 1.0.64 - Oct 23th, 2025.
 =====================================
 Normalization function for Giordano was looking for other columns, so if someone gave it wrong input (not Liqs input, but all input) it returned wrong viscosities, as was dividing through by other columns. Remind users - please use the Thermobar inputp['Liqs'], not your own dataframe, to avoid such issues.
