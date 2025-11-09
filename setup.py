@@ -14,7 +14,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 
 setup(
-    name="Thermobar",
+    name="thermobar",
     version=__version__,
     author="Penny Wieser et al. ",
     author_email="penny.wieser@gmail.com",
