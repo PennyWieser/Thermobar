@@ -1,24 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
-#
-# This file does only contain a selection of the most common options. For a
-# full list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
 
 # -- Path setup --------------------------------------------------------------
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
 import os
 import sys
 import sphinx_rtd_theme
-
-
-
-
 
 # -- Project information -----------------------------------------------------
 
@@ -31,76 +19,87 @@ version = ''
 # The full version, including alpha/beta/rc tags
 release = 'v.0'
 
-
 # If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
+# add these directories to sys.path here.
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ---------------------------------------------------
 
-# If your documentation needs a minimal Sphinx version, state it here.
-#
-# needs_sphinx = '1.0'
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
-extensions = ["sphinx_rtd_theme",
+extensions = [
+    "sphinx_rtd_theme",
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
-    #'sphinx.ext.pngmath',\
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'IPython.sphinxext.ipython_directive',
     'IPython.sphinxext.ipython_console_highlighting',
-    #'numpydoc',
     'nbsphinx',
     'sphinx.ext.viewcode',
     'sphinxcontrib.bibtex',
 ]
-bibtex_bibfiles=['references.bib']
+
+bibtex_bibfiles = ['references.bib']
 bibtex_reference_style = 'author_year'
 
+# --- RTD / GitHub context for nbsphinx links --------------------------------
 
+on_rtd = os.environ.get('READTHEDOCS', '') == 'True'
 
-## Erics nb sphinx
+# Use the actual ref RTD is building (branch/tag/commit),
+# fall back to 'main' when building locally.
+github_ref = os.environ.get('READTHEDOCS_GIT_IDENTIFIER', 'main') if on_rtd else 'main'
 
-# This is processed by Jinja2 and inserted before each notebook
-# Some change in dependencies made us need to replace `var` with
-# `env.config.html_context['var']`.
+html_context = {
+    'READTHEDOCS': on_rtd,
+    'github_version': github_ref,
+}
 
+# --- nbsphinx prolog (adds the banner + buttons) ----------------------------
 
 nbsphinx_prolog = r"""
-{% set docname = 'docs' / env.doc2path(env.docname, base=None) %}
-{% set git_ref = 'main' if not env.config.html_context['READTHEDOCS'] else
-                 env.config.html_context['github_version']
-                 if '.' not in env.config.html_context['current_version'] else
-                 'v' + env.config.release %}
+{% set docname = 'docs/' + env.doc2path(env.docname, base=None) %}
+{% set git_ref = env.config.html_context.get('github_version', 'main') %}
 
 .. raw:: html
 
     <div class="admonition note">
-      <p>This page was generated from
-        <a class="reference external" href="https://github.com/PennyWieser/Thermobar/blob/{{ git_ref|e }}/{{ docname|e }}">{{ docname|e }}</a>.
-
-            Interactive online version:
-            <a href="https://mybinder.org/v2/gh/PennyWieser/Thermobar/{{ git_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.
-    </p>
-    <p>
-    <a class="reference download internal" download="" href="https://github.com/PennyWieser/Thermobar/blob/{{ git_ref|e }}/{{ docname|e }}"><code class="xref download docutils literal notranslate"><span class="pre">Python</span> <span class="pre">Notebook</span> <span class="pre">Download</span></code></a>
+      <p>
+        This page was generated from
+        <a class="reference external"
+           href="https://github.com/PennyWieser/Thermobar/blob/{{ git_ref|e }}/{{ docname|e }}">
+           {{ docname|e }}
+        </a>.
+      </p>
+      <p>
+        Interactive online version:
+        <a class="reference external"
+           href="https://mybinder.org/v2/gh/PennyWieser/Thermobar/{{ git_ref|e }}?filepath={{ docname|e }}">
+           <img alt="Binder badge"
+                src="https://mybinder.org/badge_logo.svg"
+                style="vertical-align:text-bottom">
+        </a>
+      </p>
+      <p>
+        <a class="reference download internal" download=""
+           href="https://github.com/PennyWieser/Thermobar/raw/{{ git_ref|e }}/{{ docname|e }}">
+          <code class="xref download docutils literal notranslate">
+            <span class="pre">Python</span>
+            <span class="pre">Notebook</span>
+            <span class="pre">Download</span>
+          </code>
+        </a>
       </p>
       <script>
         if (document.location.host) {
           var p = document.currentScript.previousSibling.previousSibling;
           var a = document.createElement('a');
           a.innerHTML = 'View in <em>nbviewer</em>';
-          a.href = `https://nbviewer.jupyter.org/url${
-            (window.location.protocol == 'https:' ? 's/' : '/') +
-            window.location.host +
-            window.location.pathname.slice(0, -4) }ipynb`;
+          a.href = 'https://nbviewer.jupyter.org/url' +
+                   (window.location.protocol === 'https:' ? 's/' : '/') +
+                   window.location.host +
+                   window.location.pathname.slice(0, -5) + 'ipynb';
           a.classList.add('reference');
           a.classList.add('external');
           p.appendChild(a);
@@ -108,6 +107,7 @@ nbsphinx_prolog = r"""
         }
       </script>
     </div>
+
 .. raw:: latex
 
     \nbsphinxstartnotebook{\scriptsize\noindent\strut
@@ -115,134 +115,64 @@ nbsphinx_prolog = r"""
     \sphinxcode{\sphinxupquote{\strut {{ docname | escape_latex }}}} \dotfill}}
 """
 
-# Add any paths that contain templates here, relative to this directory.
+# -- Templates ----------------------------------------------------------------
+
 templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-# source_suffix = ['.rst', '.md']
 source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
 
-# The language for content autogenerated by Sphinx. Refer to documentation
-# for a list of supported languages.
-#
-# This is also used if you do content translation via gettext catalogs.
-# Usually you set "language" from the command line for these cases.
+# The language for content autogenerated by Sphinx.
 language = 'en'
 
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path .
+# List of patterns, relative to source directory, to ignore.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme =  "sphinx_rtd_theme" #'alabaster'
-
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#
-# html_theme_options = {}
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
-
-# Custom sidebar templates, must be a dictionary that maps document names
-# to template names.
-#
-# The default sidebars (for documents that don't match any pattern) are
-# defined by theme itself.  Builtin themes are using these templates by
-# default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
-# 'searchbox.html']``.
-#
-# html_sidebars = {}
-
+html_theme = "sphinx_rtd_theme"
+# html_static_path = ['_static']  # (left commented as in your original)
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
-# Output file base name for HTML help builder.
 htmlhelp_basename = 'Thermobardoc'
-
 
 # -- Options for LaTeX output ------------------------------------------------
 
 latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
+    # Keep your defaults
 }
 
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Thermobar.tex', 'Thermobar Documentation',
      'Penny Wieser', 'manual'),
 ]
 
-
 # -- Options for manual page output ------------------------------------------
 
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc, 'Thermobar', 'Thermobar Documentation',
      [author], 1)
 ]
 
-
 # -- Options for Texinfo output ----------------------------------------------
 
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Thermobar', 'Thermobar Documentation',
      author, 'Thermobar', 'One line description of project.',
      'Miscellaneous'),
 ]
 
+# -- Intersphinx -------------------------------------------------------------
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'pandas': ('https://pandas.pydata.org/en/latest', None),
     'numpy': ('https://docs.scipy.org/doc/numpy', None),
 }
-
-
-
-html_context = {
-    'READTHEDOCS': os.environ.get('READTHEDOCS', '') == 'True',
-    'github_version': os.environ.get('READTHEDOCS_VERSION', 'main'),  # Pull correct version info
-    'current_version': release,  # Use release variable defined earlier
-}
-
-
-
-
