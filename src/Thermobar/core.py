@@ -1637,6 +1637,8 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['Ca_Cpx_cat_6ox'] + cpx_calc['Na_Cpx_cat_6ox']
     + cpx_calc['K_Cpx_cat_6ox'] + cpx_calc['Cr_Cpx_cat_6ox'])
 
+
+
     cpx_calc['Ca_CaMgFe_Cpx']=cpx_calc['Ca_Cpx_cat_6ox']/(cpx_calc['Ca_Cpx_cat_6ox']+cpx_calc['Fet_Cpx_cat_6ox']
     +cpx_calc['Mg_Cpx_cat_6ox'])
 
@@ -1644,10 +1646,13 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc['Lindley_Fe3_Cpx'] = (cpx_calc['Na_Cpx_cat_6ox'] + cpx_calc['Al_IV_cat_6ox'] - cpx_calc['Al_VI_cat_6ox'] -
         2 * cpx_calc['Ti_Cpx_cat_6ox'] - cpx_calc['Cr_Cpx_cat_6ox'])  # This is cell FR
 
+    # Had to edit this for pandas3
+    # Use .clip to handle the zero floor and np.where for the ceiling
+    cpx_calc['Lindley_Fe3_Cpx'] = cpx_calc['Lindley_Fe3_Cpx'].clip(lower=0)
+    cpx_calc['Lindley_Fe3_Cpx'] = np.where(cpx_calc['Lindley_Fe3_Cpx'] >= cpx_calc['Fet_Cpx_cat_6ox'],
+                                        cpx_calc['Fet_Cpx_cat_6ox'],
+                                        cpx_calc['Lindley_Fe3_Cpx'])
 
-    cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] < 0.0000000001),  'Lindley_Fe3_Cpx'] = 0
-    cpx_calc.loc[(cpx_calc['Lindley_Fe3_Cpx'] >= cpx_calc['Fet_Cpx_cat_6ox'] ),  'Lindley_Fe3_Cpx'] = (
-    cpx_calc['Fet_Cpx_cat_6ox'])
 
 
 
@@ -1671,9 +1676,14 @@ def calculate_clinopyroxene_components(cpx_comps):
 
 
     AlVI_minus_Na=cpx_calc['Al_VI_cat_6ox']-cpx_calc['Na_Cpx_cat_6ox']
-    cpx_calc['Jd']=cpx_calc['Na_Cpx_cat_6ox']
-    cpx_calc['Jd_from 0=Na, 1=Al']=0
-    cpx_calc['CaTs'] = cpx_calc['Al_VI_cat_6ox'] -cpx_calc['Na_Cpx_cat_6ox']
+
+    # HAd to fix this for pandas 3
+    # np.where ensures the entire column is created as float64/int64 immediately
+    cpx_calc['Jd_from 0=Na, 1=Al'] = np.where(AlVI_minus_Na < 0, 1, 0)
+    cpx_calc['Jd'] = np.where(AlVI_minus_Na < 0, cpx_calc['Al_VI_cat_6ox'], cpx_calc['Na_Cpx_cat_6ox'])
+    cpx_calc['CaTs'] = np.where(AlVI_minus_Na < 0, 0, AlVI_minus_Na)
+
+
 
     # If value of AlVI<Na cat frac
     cpx_calc.loc[(AlVI_minus_Na<0), 'Jd_from 0=Na, 1=Al']=1
@@ -1681,40 +1691,65 @@ def calculate_clinopyroxene_components(cpx_comps):
     cpx_calc.loc[(AlVI_minus_Na<0), 'CaTs']=0
 
     # If value of AlIV>CaTs
-    AlVI_minus_CaTs=cpx_calc['Al_IV_cat_6ox']-cpx_calc['CaTs']
-    #default, if is bigger
-    cpx_calc['CaTi']= (cpx_calc['Al_IV_cat_6ox'] - cpx_calc['CaTs']) / 2
-    cpx_calc.loc[(AlVI_minus_CaTs<0), 'CaTi']=0
+    # 1. Define the difference between AlIV and CaTs
+    AlVI_minus_CaTs = cpx_calc['Al_IV_cat_6ox'] - cpx_calc['CaTs']
+
+    # 2. Set CaTi: If the difference is negative, set to 0.
+    # Otherwise, do the math: (AlIV - CaTs) / 2
+    cpx_calc['CaTi'] = np.where(AlVI_minus_CaTs < 0, 0, (cpx_calc['Al_IV_cat_6ox'] - cpx_calc['CaTs']) / 2)
+
+    # 3. Define your original variable for the CaO check
+    Ca_CaTs_CaTi_CrCaTs = (cpx_calc['Ca_Cpx_cat_6ox'] - cpx_calc['CaTs'] -
+                        cpx_calc['CaTi'] - cpx_calc['CrCaTs'])
+
+    # 4. Set DiHd_1996: If that variable is negative, set to 0.
+    # Otherwise, keep the variable's value.
+    cpx_calc['DiHd_1996'] = np.where(Ca_CaTs_CaTi_CrCaTs < 0, 0, Ca_CaTs_CaTi_CrCaTs)
 
 
-    #  If CaO-CaTs-CaTi-CrCaTs is >0
-    Ca_CaTs_CaTi_CrCaTs=(cpx_calc['Ca_Cpx_cat_6ox'] - cpx_calc['CaTs'] -
-                cpx_calc['CaTi'] - cpx_calc['CrCaTs'])
 
-    cpx_calc['DiHd_1996']= (cpx_calc['Ca_Cpx_cat_6ox'] - cpx_calc['CaTs']
-- cpx_calc['CaTi'] - cpx_calc['CrCaTs'] )
-
-    cpx_calc.loc[(Ca_CaTs_CaTi_CrCaTs<0), 'DiHd_1996']=0
+    # 1. EnFs Calculation: Simple math works now because DiHd_1996 is a float64
+    cpx_calc['EnFs'] = (
+        (cpx_calc['Fet_Cpx_cat_6ox'] + cpx_calc['Mg_Cpx_cat_6ox']) - cpx_calc['DiHd_1996']
+    ) / 2
 
 
+    # 2. DiHd 2003: Calculate and clip to zero in one go
+    cpx_calc['DiHd_2003'] = (
+        cpx_calc['Ca_Cpx_cat_6ox'] - cpx_calc['CaTs'] - cpx_calc['CaTi'] - cpx_calc['CrCaTs']
+    ).clip(lower=0)
 
-    cpx_calc['EnFs'] = ((cpx_calc['Fet_Cpx_cat_6ox'] +
-                        cpx_calc['Mg_Cpx_cat_6ox']) - cpx_calc['DiHd_1996']) / 2
-    cpx_calc['DiHd_2003'] = (cpx_calc['Ca_Cpx_cat_6ox'] -
-                             cpx_calc['CaTs'] - cpx_calc['CaTi'] - cpx_calc['CrCaTs'])
-    cpx_calc['Di_Cpx'] = cpx_calc['DiHd_2003'] * (cpx_calc['Mg_Cpx_cat_6ox'] / (
-        cpx_calc['Mg_Cpx_cat_6ox'] + cpx_calc['Mn_Cpx_cat_6ox'] + cpx_calc['Fet_Cpx_cat_6ox']))
+    # 3. Di_Cpx: Standard math
+    cpx_calc['Di_Cpx'] = cpx_calc['DiHd_2003'] * (
+        cpx_calc['Mg_Cpx_cat_6ox'] / (
+            cpx_calc['Mg_Cpx_cat_6ox'] + cpx_calc['Mn_Cpx_cat_6ox'] + cpx_calc['Fet_Cpx_cat_6ox']
+        )
+    )
+
+    # 4. Final Cleanup: Ensure these are clipped (though our previous fixes mostly handle this)
     cpx_calc['DiHd_1996'] = cpx_calc['DiHd_1996'].clip(lower=0)
-    cpx_calc['DiHd_2003'] = cpx_calc['DiHd_2003'].clip(lower=0)
     cpx_calc['Jd'] = cpx_calc['Jd'].clip(lower=0)
 
-    cpx_calc['FeIII_Wang21']=(cpx_calc['Na_Cpx_cat_6ox']+cpx_calc['Al_IV_cat_6ox']
-    -cpx_calc['Al_VI_cat_6ox']-2*cpx_calc['Ti_Cpx_cat_6ox']-cpx_calc['Cr_Cpx_cat_6ox'])
-    cpx_calc['FeII_Wang21']=cpx_calc['Fet_Cpx_cat_6ox']-cpx_calc['FeIII_Wang21']
+    # 5. Wang (2021) Calculations
+    cpx_calc['FeIII_Wang21'] = (
+        cpx_calc['Na_Cpx_cat_6ox'] + cpx_calc['Al_IV_cat_6ox'] -
+        cpx_calc['Al_VI_cat_6ox'] - 2 * cpx_calc['Ti_Cpx_cat_6ox'] -
+        cpx_calc['Cr_Cpx_cat_6ox']
+    )
+    cpx_calc['FeII_Wang21'] = cpx_calc['Fet_Cpx_cat_6ox'] - cpx_calc['FeIII_Wang21']
 
 
-    # Merging new Cpx compnoents with inputted cpx composition
+    # 1. Merge the data
     cpx_combined = pd.concat([cpx_comps, cpx_calc], axis='columns')
+
+    # 2. THE CRITICAL FIX: Ensure the DataFrame isn't "fragmented"
+    # and force everything to a standard NumPy-compatible format.
+    cpx_combined = cpx_combined.copy()
+
+    # 3. Double-check that Jd and EnFs haven't been "squeezed" to objects
+    # This forces the internal storage to be exactly what NumPy 2.0 expects
+    for col in cpx_combined.columns:
+        cpx_combined[col] = pd.to_numeric(cpx_combined[col], errors='coerce')
 
     return cpx_combined
 
@@ -1746,96 +1781,94 @@ def calculate_clinopyroxene_liquid_components(
        inputted cpx compositions, cpx cations on 6 oxygen basis, cpx components and cpx-liquid components.
 
     '''
-    # For when users enter a combined dataframe meltmatch=""
+
+# --- 1. INITIALIZATION ---
+    # We explicitly handle the three ways this function can be called
     if meltmatch is not None:
-        combo_liq_cpxs = meltmatch
+        # User provided a combined dataframe
+        combo_liq_cpxs = meltmatch.copy()
         if "Sample_ID_Cpx" in combo_liq_cpxs:
-            combo_liq_cpxs = combo_liq_cpxs.drop(
-                ['Sample_ID_Cpx'], axis=1) #.astype('float64')
-        if  "Sample_ID_Liq" in combo_liq_cpxs:
-            combo_liq_cpxs = combo_liq_cpxs.drop(
-                ['Sample_ID_Liq'], axis=1)#.astype('float64')
+            combo_liq_cpxs = combo_liq_cpxs.drop(['Sample_ID_Cpx'], axis=1)
+        if "Sample_ID_Liq" in combo_liq_cpxs:
+            combo_liq_cpxs = combo_liq_cpxs.drop(['Sample_ID_Liq'], axis=1)
 
-
-    if liq_comps is not None and cpx_comps is not None:
-        liq_comps_c=liq_comps.copy()
+    elif liq_comps is not None and cpx_comps is not None:
+        # User provided separate Liq and Cpx dataframes
+        liq_comps_c = liq_comps.copy()
         if Fe3Fet_Liq is not None:
-            liq_comps_c['Fe3Fet_Liq']=Fe3Fet_Liq
-
-
+            liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
         if len(liq_comps) != len(cpx_comps):
-            raise Exception(
-                "inputted dataframes for liq_comps and cpx_comps need to have the same number of rows")
-        else:
-            myCPXs1_comp = calculate_clinopyroxene_components(
-                cpx_comps=cpx_comps).reset_index(drop=True)
-            myLiquids1_comps = calculate_anhydrous_cat_fractions_liquid(
-                liq_comps=liq_comps_c).reset_index(drop=True)
-            combo_liq_cpxs = pd.concat(
-                [myLiquids1_comps, myCPXs1_comp], axis=1)
-            if "Sample_ID_Cpx" in combo_liq_cpxs:
-                combo_liq_cpxs=combo_liq_cpxs.drop(['Sample_ID_Cpx'], axis=1)
-            if "Sample_ID_Liq" in combo_liq_cpxs:
-                combo_liq_cpxs=combo_liq_cpxs.drop(['Sample_ID_Liq'], axis=1)
+            raise Exception("inputted dataframes for liq_comps and cpx_comps need to have the same number of rows")
 
+        # Calculate components
+        myCPXs1_comp = calculate_clinopyroxene_components(cpx_comps=cpx_comps).reset_index(drop=True)
+        myLiquids1_comps = calculate_anhydrous_cat_fractions_liquid(liq_comps=liq_comps_c).reset_index(drop=True)
 
+        # Merge and immediately DEFRAGMENT memory for NumPy 2.0
+        combo_liq_cpxs = pd.concat([myLiquids1_comps, myCPXs1_comp], axis=1).copy()
 
-# Measured Kd Fe-Mg (using 2+)
+        if "Sample_ID_Cpx" in combo_liq_cpxs:
+            combo_liq_cpxs = combo_liq_cpxs.drop(['Sample_ID_Cpx'], axis=1)
+        if "Sample_ID_Liq" in combo_liq_cpxs:
+            combo_liq_cpxs = combo_liq_cpxs.drop(['Sample_ID_Liq'], axis=1)
+
+    else:
+        # Safety net: If no data was provided at all
+        raise Exception("No data found! Provide 'meltmatch' or 'liq_comps' + 'cpx_comps'.")
+
+    # --- 2. DATATYPE HARDENING ---
+    # Force everything to float64 to prevent 'Object' infections
+    combo_liq_cpxs = combo_liq_cpxs.apply(pd.to_numeric, errors='coerce').astype(float)
+
+    # --- 3. MEASURED Kd CALCULATIONS ---
     combo_liq_cpxs['Kd_Fe_Mg_Fe2'] = ((combo_liq_cpxs['Fet_Cpx_cat_6ox'] / combo_liq_cpxs['Mg_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['Fet_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['Mg_Liq_cat_frac'])))
 
-# Measured Kd Fe-Mg using 2+ in the liquid and Cpx based on Lindley
     combo_liq_cpxs['Kd_Fe_Mg_Fe2_Lind'] = ((combo_liq_cpxs['Lindley_Fe2_Cpx'] / combo_liq_cpxs['Mg_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['Fet_Liq_cat_frac'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / combo_liq_cpxs['Mg_Liq_cat_frac'])))
 
-
-# Measured Kd Fe-Mg using Fet
     combo_liq_cpxs['Kd_Fe_Mg_Fet'] = ((combo_liq_cpxs['Fet_Cpx_cat_6ox'] / combo_liq_cpxs['Mg_Cpx_cat_6ox']) / (
         (combo_liq_cpxs['Fet_Liq_cat_frac'] / combo_liq_cpxs['Mg_Liq_cat_frac'])))
 
-    combo_liq_cpxs['lnK_Jd_liq'] = np.log((combo_liq_cpxs['Jd'].astype(float)) / ((combo_liq_cpxs['Na_Liq_cat_frac']) * (
-        combo_liq_cpxs['Al_Liq_cat_frac']) * ((combo_liq_cpxs['Si_Liq_cat_frac'])**2)))
+    # --- 4. LOG CALCULATIONS (SCALAR PROTECTION) ---
+    # Using .values ensures NumPy 2.0 returns an Array, not a 'float' object
+    combo_liq_cpxs['lnK_Jd_liq'] = np.log(
+        combo_liq_cpxs['Jd'].values /
+        (combo_liq_cpxs['Na_Liq_cat_frac'].values * combo_liq_cpxs['Al_Liq_cat_frac'].values * (combo_liq_cpxs['Si_Liq_cat_frac'].values**2))
+    )
 
-    combo_liq_cpxs['lnK_Jd_DiHd_liq_1996'] = np.log((combo_liq_cpxs['Jd'].astype(float))
-    * (combo_liq_cpxs['Ca_Liq_cat_frac'].astype(float)) * ((combo_liq_cpxs['Fet_Liq_cat_frac'].astype(float)) + (
-        combo_liq_cpxs['Mg_Liq_cat_frac'].astype(float))) / ((combo_liq_cpxs['DiHd_1996'].astype(float)) * (combo_liq_cpxs['Na_Liq_cat_frac'].astype(float)) * (combo_liq_cpxs['Al_Liq_cat_frac'].astype(float))))
+    combo_liq_cpxs['lnK_Jd_DiHd_liq_1996'] = np.log(
+        (combo_liq_cpxs['Jd'].values * combo_liq_cpxs['Ca_Liq_cat_frac'].values * (combo_liq_cpxs['Fet_Liq_cat_frac'].values + combo_liq_cpxs['Mg_Liq_cat_frac'].values)) /
+        (combo_liq_cpxs['DiHd_1996'].values * combo_liq_cpxs['Na_Liq_cat_frac'].values * combo_liq_cpxs['Al_Liq_cat_frac'].values)
+    )
 
-    combo_liq_cpxs['lnK_Jd_DiHd_liq_2003'] = np.log((combo_liq_cpxs['Jd'].astype(float)) * (combo_liq_cpxs['Ca_Liq_cat_frac'].astype(float)) * ((combo_liq_cpxs['Fet_Liq_cat_frac'].astype(float)) + (
-        combo_liq_cpxs['Mg_Liq_cat_frac'].astype(float))) / ((combo_liq_cpxs['DiHd_2003'].astype(float)) * (combo_liq_cpxs['Na_Liq_cat_frac'].astype(float)) * (combo_liq_cpxs['Al_Liq_cat_frac'].astype(float))))
+    combo_liq_cpxs['lnK_Jd_DiHd_liq_2003'] = np.log(
+        (combo_liq_cpxs['Jd'].values * combo_liq_cpxs['Ca_Liq_cat_frac'].values * (combo_liq_cpxs['Fet_Liq_cat_frac'].values + combo_liq_cpxs['Mg_Liq_cat_frac'].values)) /
+        (combo_liq_cpxs['DiHd_2003'].values * combo_liq_cpxs['Na_Liq_cat_frac'].values * combo_liq_cpxs['Al_Liq_cat_frac'].values)
+    )
 
-    combo_liq_cpxs['Kd_Fe_Mg_IdealWB'] = 0.109 + 0.186 * \
-        combo_liq_cpxs['Mgno_Cpx']  # equation 35 of wood and blundy
+    # --- 5. ADDITIONAL CALCULATIONS ---
+    combo_liq_cpxs['Kd_Fe_Mg_IdealWB'] = 0.109 + 0.186 * combo_liq_cpxs['Mgno_Cpx']
 
-    combo_liq_cpxs['Mgno_Liq_noFe3']= (combo_liq_cpxs['MgO_Liq'] / 40.3044) / ((combo_liq_cpxs['MgO_Liq'] / 40.3044) +
-            (combo_liq_cpxs['FeOt_Liq']) / 71.844)
+    combo_liq_cpxs['Mgno_Liq_noFe3'] = (combo_liq_cpxs['MgO_Liq'] / 40.3044) / (
+        (combo_liq_cpxs['MgO_Liq'] / 40.3044) + (combo_liq_cpxs['FeOt_Liq']) / 71.844)
 
+    combo_liq_cpxs['Mgno_Liq_Fe2'] = (combo_liq_cpxs['MgO_Liq'] / 40.3044) / (
+        (combo_liq_cpxs['MgO_Liq'] / 40.3044) + (combo_liq_cpxs['FeOt_Liq'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / 71.844))
 
-    combo_liq_cpxs['Mgno_Liq_Fe2']=(combo_liq_cpxs['MgO_Liq'] / 40.3044) / ((combo_liq_cpxs['MgO_Liq'] / 40.3044) +
-            (combo_liq_cpxs['FeOt_Liq'] * (1 - combo_liq_cpxs['Fe3Fet_Liq']) / 71.844))
+    combo_liq_cpxs['DeltaFeMg_WB'] = abs(combo_liq_cpxs['Kd_Fe_Mg_Fe2'] - combo_liq_cpxs['Kd_Fe_Mg_IdealWB'])
 
+    # --- 6. SAMPLE ID MANAGEMENT ---
+    if meltmatch is not None:
+        combo_liq_cpxs['Sample_ID_Cpx'] = meltmatch['Sample_ID_Cpx'].values if "Sample_ID_Cpx" in meltmatch else meltmatch.index
+        combo_liq_cpxs['Sample_ID_Liq'] = meltmatch['Sample_ID_Liq'].values if "Sample_ID_Liq" in meltmatch else meltmatch.index
+    else:
+        combo_liq_cpxs['Sample_ID_Liq'] = liq_comps['Sample_ID_Liq'].values if "Sample_ID_Liq" in liq_comps else liq_comps.index
+        combo_liq_cpxs['Sample_ID_Cpx'] = cpx_comps['Sample_ID_Cpx'].values if "Sample_ID_Cpx" in cpx_comps else cpx_comps.index
 
-# Different ways to calculate DeltaFeMg
-
-    combo_liq_cpxs['DeltaFeMg_WB'] = abs(
-        combo_liq_cpxs['Kd_Fe_Mg_Fe2'] - combo_liq_cpxs['Kd_Fe_Mg_IdealWB'])
-    # Adding back in sample names
-    if meltmatch is not None and "Sample_ID_Cpx" in meltmatch:
-        combo_liq_cpxs['Sample_ID_Cpx'] = meltmatch['Sample_ID_Cpx']
-        combo_liq_cpxs['Sample_ID_Liq'] = meltmatch['Sample_ID_Liq']
-    if meltmatch is not None and "Sample_ID_Cpx" not in meltmatch:
-        combo_liq_cpxs['Sample_ID_Cpx'] = meltmatch.index
-        combo_liq_cpxs['Sample_ID_Liq'] = meltmatch.index
-    if liq_comps is not None and "Sample_ID_Liq" in liq_comps:
-        combo_liq_cpxs['Sample_ID_Liq'] = liq_comps['Sample_ID_Liq']
-    if liq_comps is not None and "Sample_ID_Liq" not in liq_comps:
-        combo_liq_cpxs['Sample_ID_Liq'] = liq_comps.index
-    if cpx_comps is not None and "Sample_ID_Cpx" not in cpx_comps:
-        combo_liq_cpxs['Sample_ID_Cpx'] = cpx_comps.index
-    if cpx_comps is not None and "Sample_ID_Cpx" in cpx_comps:
-        combo_liq_cpxs['Sample_ID_Cpx'] = cpx_comps['Sample_ID_Cpx']
-
-    combo_liq_cpxs.replace([np.inf, -np.inf], np.nan, inplace=True)
+    # Final cleanup of Infinities
+    combo_liq_cpxs = combo_liq_cpxs.replace([np.inf, -np.inf], np.nan)
 
     return combo_liq_cpxs
 
@@ -3694,7 +3727,6 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     Combo_liq_cpxs['Delta_Kd_Mas2013'] = abs(
         Combo_liq_cpxs['Kd_Ideal_Masotta'] - Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
 
-    # Di Hd equilibrium
 
     # Putirka (1999) DiHd Eq3.1a
     Combo_liq_cpxs['DiHd_Pred_Put1999']=(np.exp(-9.8
@@ -4660,7 +4692,7 @@ def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", 
         # print(sum(lowT))
         # print(lowT)
 
-        print(np.shape(logfo2_QFM))
+
         if sum(lowT)>0:
 
             logfo2_QFM.loc[lowT]=logfo2_QFM_lowT
