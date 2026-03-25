@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import mineralML as mm
 
 
 def process_excel_file(file_path, sheet_name=0):
@@ -50,9 +51,17 @@ def process_excel_file(file_path, sheet_name=0):
 
             for col in row.index[1:]:  # Skip the 'Element' column for key names
                 # Only proceed if the column exists in the current row and value is not NaN
-                if col and pd.notna(row.get(col, None)):  # Use .get() to handle missing columns gracefully
-                    col_name = f"{col}_{element}"  # Use header from 'Element' row for column names
-                    row_dict[col_name] = row[col]
+                val = row.get(col, None)
+
+                # Check if val is a Series (multiple values) or a single item
+                if isinstance(val, pd.Series):
+                    is_valid = pd.notna(val.iloc[0])
+                else:
+                    is_valid = pd.notna(val)
+
+                if col is not None and is_valid:
+                    col_name = f"{col}_{element}"
+                    row_dict[col_name] = val
 
         # Capture 'Total_wt%' and 'Total_Oxide %' from the 'Total' row if they exist
         total_row = data.iloc[total_index, :]  # Correctly access the 'Total' row
@@ -61,7 +70,43 @@ def process_excel_file(file_path, sheet_name=0):
 
         processed_data.append(row_dict)
 
-    return pd.DataFrame(processed_data)
+    df_to_sort=pd.DataFrame(processed_data)
+
+
+
+
+    processed_data_sort=sort_columns(df_to_sort)
+    #
+    # Now prep for mineralML
+    df_nn = mm.prep_df_nn(processed_data_sort)
+    df_pred_nn, probability_matrix = mm.predict_class_prob_nnwr(df_nn)
+
+    # List of columns you want to bring over
+    cols_to_copy = [
+        'Predict_Mineral', 'Submineral', 'Prediction_Score',
+        'Prediction_Score_Sigma', 'Second_Predict_Mineral', 'Second_Prediction_Score'
+    ]
+
+    # Assign them all at once
+    processed_data_sort[cols_to_copy] = df_pred_nn[cols_to_copy]
+
+
+
+    # 1. Define your "front-loaded" columns
+    cols_to_move = [
+        'Sample Name', 'Predict_Mineral', 'Submineral', 'Prediction_Score',
+        'Prediction_Score_Sigma', 'Second_Predict_Mineral', 'Second_Prediction_Score'
+    ]
+
+    # 2. Grab everything else automatically
+    # .difference(sort=False) keeps the original order of the remaining chemistry/data columns
+    remaining_cols = processed_data_sort.columns.difference(cols_to_move, sort=False)
+
+    # 3. Reorder in one shot
+    df_out = processed_data_sort[list(cols_to_move) + list(remaining_cols)]
+
+    return df_out
+    #
 
 
 

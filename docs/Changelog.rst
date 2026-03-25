@@ -1,9 +1,16 @@
 ================================================
 Change Log
 ================================================
+
+Version 1.0.68- Nov 11th, 2025.
+=====================================
+Fixed bug meaning that viscosity function returned two identical columns called logn_melt
+
+
+
 Version 1.0.65 - Nov 11th, 2025.
 =====================================
-Removed support for python 3.8 as EOL a year ago now. 
+Removed support for python 3.8 as EOL a year ago now.
 
 Version 1.0.64 - Oct 23th, 2025.
 =====================================

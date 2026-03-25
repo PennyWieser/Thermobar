@@ -227,7 +227,7 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, T_K=None, H2O_Liq=None,
         df_params['T_K'] = T
         logn_melt = A + (B / (df_params['T_K'] - C))
         n_melt=10**(logn_melt)
-        df_params['logn_melt'] = logn_melt
+        #df_params['logn_melt'] = logn_melt
         liq_comps_c.insert(0, 'T_K', T)
         liq_comps_c.insert(0, 'logn_melt', logn_melt.values)
         liq_comps_c.insert(0, 'n_melt', n_melt.values)
