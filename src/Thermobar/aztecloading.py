@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import mineralML as mm
 
 
 def process_excel_file(file_path, sheet_name=0):
@@ -76,6 +75,15 @@ def process_excel_file(file_path, sheet_name=0):
 
 
     processed_data_sort=sort_columns(df_to_sort)
+
+    try:
+        import mineralML as mm
+    except ImportError as e:
+        raise ImportError(
+            "This function requires the optional dependency 'mineralML'. "
+            "Install it with `pip install mineralML`."
+        ) from e
+
     #
     # Now prep for mineralML
     df_nn = mm.prep_df_nn(processed_data_sort)
