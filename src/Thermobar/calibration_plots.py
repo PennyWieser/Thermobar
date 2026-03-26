@@ -54,7 +54,7 @@ def return_cali_dataset(model=None):
         HelzThornber87: Helz and Thornber (1987).
 
     """
-    import pkg_resources
+
 
     # Check model is supported
     sup_models = ['Ridolfi2021', 'Zhang2017', 'Putirka2016', 'Mutch2016', 'Shea2022', 'Wang2021',
@@ -100,7 +100,12 @@ def return_cali_dataset(model=None):
         csv_file_relative_path = file_name
 
         # Get the absolute path to the CSV file within the package
-        csv_file_path = pkg_resources.resource_filename('Thermobar', csv_file_relative_path)
+        from importlib import resources
+
+        # 1. Get a reference to the package
+        # 2. Open the resource as a path
+        with resources.path('Thermobar', csv_file_relative_path) as p:
+            csv_file_path = str(p)
 
         # Debugging: Print the resolved file path
         print(f"Resolved CSV file path: {csv_file_path}")

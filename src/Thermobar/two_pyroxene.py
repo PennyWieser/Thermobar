@@ -675,16 +675,26 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     # Adding an ID label to help with melt-cpx rematching later
     myCPXs1_concat['ID_CPX'] = myCPXs1_concat.index
     myOPXs1_concat['ID_OPX'] = myOPXs1_concat.index
-    if "Sample_ID_Cpx" not in myCPXs1_concat:
+
+    # Carry Sample_ID from input if present, otherwise use index
+    if "Sample_ID_Cpx" in cpx_comps.columns:
+        myCPXs1_concat['Sample_ID_Cpx'] = cpx_comps['Sample_ID_Cpx'].values
+    elif "Sample_ID_Cpx" not in myCPXs1_concat.columns:
         myCPXs1_concat['Sample_ID_Cpx'] = myCPXs1_concat.index
-    if "Sample_ID_Opx" not in myOPXs1_concat:
+
+    if "Sample_ID_Opx" in opx_comps.columns:
+        myOPXs1_concat['Sample_ID_Opx'] = opx_comps['Sample_ID_Opx'].values
+    elif "Sample_ID_Opx" not in myOPXs1_concat.columns:
         myOPXs1_concat['Sample_ID_Opx'] = myOPXs1_concat.index
     # Duplicate cpxs and opxs so end up with panda of all possible opx-cpx
     # matches
 
     # This duplicates CPXs, repeats cpx1-cpx1*N, cpx2-cpx2*N etc.
-    DupCPXs = pd.DataFrame(np.repeat(myCPXs1_concat.values, np.shape(
-        myOPXs1_concat)[0], axis=0))  # .astype('float64')
+    # DupCPXs = pd.DataFrame(np.repeat(myCPXs1_concat.values, np.shape(
+    #     myOPXs1_concat)[0], axis=0))  # .astype('float64')
+    # causes an issue in pandas3:
+    # This duplicates CPXs properly without stripping types or repeating the wrong rows
+    DupCPXs = myCPXs1_concat.loc[myCPXs1_concat.index.repeat(len(myOPXs1_concat))].reset_index(drop=True)
     DupCPXs.columns = myCPXs1_concat.columns
 
     # This duplicates opxs like opx1-opx2-opx3 for cpx1, opx1-opx2-opx3 for
@@ -711,14 +721,19 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     / Combo_opxs_cpxs['Mg_Cpx_cat_6ox'])) / (Combo_opxs_cpxs['Fet_Opx_cat_6ox']
      / Combo_opxs_cpxs['Mg_Opx_cat_6ox'])
 
+    Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'] = Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'].astype(float)
+
     if Kd_Match == "Subsolidus":
         #print('made it here')
+        Combo_opxs_cpxs = Combo_opxs_cpxs.copy()
+
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
             0.7 - Combo_opxs_cpxs['Kd_Fe_Mg_Cpx_Opx'])
-        print(len(Combo_opxs_cpxs))
+
 
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.loc[np.abs(
-            Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < 0.2]  # +- 0.2 suggested by Putirka spreadsheet
+            Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < 0.2].copy()  # +- 0.2 suggested by Putirka spreadsheet
+
         #print(len(Combo_opxs_cpxs_1))
     if Kd_Match == "HighTemp":
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
@@ -726,6 +741,7 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         # +- 0.14 suggested by Putirka spreadsheet
         Combo_opxs_cpxs_1 = Combo_opxs_cpxs.loc[np.abs(
             Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx']) < 0.14]
+
     if isinstance(Kd_Match, int) or isinstance(
             Kd_Match, float) and Kd_Err is not None:
         Combo_opxs_cpxs['Delta_Kd_Fe_Mg_Cpx_Opx'] = np.abs(
@@ -807,129 +823,121 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
     Combo_opxs_cpxs_2 = Combo_opxs_cpxs_2[cols_to_move + [
         col for col in Combo_opxs_cpxs_2.columns if col not in cols_to_move]]
 
+
+
+
     Combo_opxs_cpxs_2.insert(
         0, "Sample_ID_Opx", Combo_opxs_cpxs_2_names['Sample_ID_Opx'])
     Combo_opxs_cpxs_2.insert(
         1, "Sample_ID_Cpx", Combo_opxs_cpxs_2_names['Sample_ID_Cpx'])
 
 
-# --- Final step: Calculate average and standard deviation for each CPx ---
+        # Final step, calcuate a 3rd output which is the average and standard
+        # deviation for each CPx (e.g., CPx1-Melt1, CPx1-melt3 etc. )
     CpxNumbers = Combo_opxs_cpxs_2['ID_CPX'].unique()
-    Opx_sample_ID = Combo_opxs_cpxs_2["Sample_ID_Opx"].copy()
+    Opx_sample_ID=Combo_opxs_cpxs_2["Sample_ID_Opx"]
+    Combo_opxs_cpxs_2.drop(["Sample_ID_Opx"], axis=1, inplace=True)
 
-    # Avoid inplace=True for Pandas 3 safety
-    Combo_opxs_cpxs_2_tmp = Combo_opxs_cpxs_2.drop(["Sample_ID_Opx"], axis=1)
 
     if len(CpxNumbers) > 0:
-        # Group once to ensure Mean and Std are perfectly aligned
-        gp_cpx = Combo_opxs_cpxs_2_tmp.groupby(['ID_CPX', 'Sample_ID_Cpx'])
+        groupby_keys = ['ID_CPX', 'Sample_ID_Cpx']
+        numeric_cols = Combo_opxs_cpxs_2.select_dtypes(include='number').columns.tolist()
+        agg_cols = [c for c in numeric_cols if c not in groupby_keys]
 
-        df1_Mean = gp_cpx.mean().add_prefix('Mean_')
-        df1_Std = gp_cpx.std().add_prefix('Std_')
+        df1_Mean_nopref = Combo_opxs_cpxs_2.groupby(
+            groupby_keys, as_index=False)[agg_cols].mean()
 
-        # Concat is safer than Merge in NumPy 2.0; it aligns by Index automatically
-        df1_M = pd.concat([df1_Mean, df1_Std], axis=1).reset_index()
+        df1_Std_nopref = Combo_opxs_cpxs_2.groupby(
+            groupby_keys, as_index=False)[agg_cols].std()
 
-        # Clean up naming
-        if 'Mean_Sample_ID_Cpx' in df1_M.columns:
-            df1_M = df1_M.drop(['Mean_Sample_ID_Cpx'], axis=1)
+        count = Combo_opxs_cpxs_2.groupby('ID_CPX').count()
+        Sample_ID_Cpx_Mean = df1_Mean_nopref['Sample_ID_Cpx']
+        Sample_ID_Cpx_Std  = df1_Std_nopref['Sample_ID_Cpx']
 
-        # Logic for column ordering based on equations
+        df1_Mean = df1_Mean_nopref.add_prefix('Mean_')
+        df1_Std  = df1_Std_nopref.add_prefix('Std_')
+
+        df1_Mean = df1_Mean.drop(['Mean_Sample_ID_Cpx'], axis=1)
+        df1_Std  = df1_Std.drop(['Std_Sample_ID_Cpx'], axis=1)
+
+        df1_Mean.rename(columns={"Mean_ID_CPX": "ID_CPX"}, inplace=True)
+        df1_Std.rename(columns={"Std_ID_CPX": "ID_CPX"}, inplace=True)
+
+        df1_M = pd.merge(df1_Mean, df1_Std, on=['ID_CPX'])
+        df1_M['Sample_ID_Cpx'] = Sample_ID_Cpx_Mean.values
+
         if equationT is not None and equationP is not None:
-            cols_to_move = ['Sample_ID_Cpx', 'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc', 'Std_P_kbar_calc']
-        elif equationT is not None:
-            cols_to_move = ['Sample_ID_Cpx', 'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_input', 'Std_P_kbar_input']
-        else:
-            cols_to_move = ['Sample_ID_Cpx', 'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc', 'Std_P_kbar_calc']
+            cols_to_move = ['Sample_ID_Cpx',
+                            'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+                            'Std_P_kbar_calc']
+        if equationT is not None and equationP is None:
+            cols_to_move = ['Sample_ID_Cpx',
+                            'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_input',
+                            'Std_P_kbar_input']
+        if equationT is None and equationP is not None:
+            cols_to_move = ['Sample_ID_Cpx',
+                            'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
+                            'Std_P_kbar_calc']
 
-        # Safe reindexing
-        existing_cols = [c for c in cols_to_move if c in df1_M.columns]
-        other_cols = [c for c in df1_M.columns if c not in existing_cols]
-        df1_M = df1_M[existing_cols + other_cols]
+        df1_M = df1_M[cols_to_move +
+                    [col for col in df1_M.columns if col not in cols_to_move]]
 
-    # --- Repeat for OPX ---
-    opxNumbers = Combo_opxs_cpxs_2['ID_OPX'].unique()
-    Combo_opxs_cpxs_2_tmp2 = Combo_opxs_cpxs_2.copy()
-    Combo_opxs_cpxs_2_tmp2['Sample_ID_Opx'] = Opx_sample_ID
-    if "Sample_ID_Cpx" in Combo_opxs_cpxs_2_tmp2.columns:
-        Combo_opxs_cpxs_2_tmp2 = Combo_opxs_cpxs_2_tmp2.drop(["Sample_ID_Cpx"], axis=1)
+
+
+        opxNumbers = Combo_opxs_cpxs_2['ID_OPX'].unique()
+        Combo_opxs_cpxs_2['Sample_ID_Opx'] = Opx_sample_ID
+        Combo_opxs_cpxs_2.drop(["Sample_ID_Cpx"], axis=1, inplace=True)
 
     if len(opxNumbers) > 0:
-        gp_opx = Combo_opxs_cpxs_2_tmp2.groupby(['ID_OPX', 'Sample_ID_Opx'])
-        df1_2Mean = gp_opx.mean().add_prefix('Mean_')
-        df1_2Std = gp_opx.std().add_prefix('Std_')
+        groupby_keys_opx = ['ID_OPX', 'Sample_ID_Opx']
+        numeric_cols_opx = Combo_opxs_cpxs_2.select_dtypes(include='number').columns.tolist()
+        agg_cols_opx = [c for c in numeric_cols_opx if c not in groupby_keys_opx]
 
-        df1_2M = pd.concat([df1_2Mean, df1_2Std], axis=1).reset_index()
+        df1_2Mean_nopref = Combo_opxs_cpxs_2.groupby(
+            groupby_keys_opx, as_index=False)[agg_cols_opx].mean()
+        df1_2Std_nopref = Combo_opxs_cpxs_2.groupby(
+            groupby_keys_opx, as_index=False)[agg_cols_opx].std()
 
-        if equationT is not None and equationP is not None:
-            cols_to_move = ['Sample_ID_Opx', 'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc', 'Std_P_kbar_calc']
-        elif equationT is not None:
-            cols_to_move = ['Sample_ID_Opx', 'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_input', 'Std_P_kbar_input']
-        else:
-            cols_to_move = ['Sample_ID_Opx', 'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc', 'Std_P_kbar_calc']
+        count = Combo_opxs_cpxs_2.groupby('ID_OPX').count()
+        Sample_ID_Opx_Mean = df1_2Mean_nopref['Sample_ID_Opx']
+        Sample_ID_Opx_Std  = df1_2Std_nopref['Sample_ID_Opx']
 
-        existing_cols2 = [c for c in cols_to_move if c in df1_2M.columns]
-        other_cols2 = [c for c in df1_2M.columns if c not in existing_cols2]
-        df1_2M = df1_2M[existing_cols2 + other_cols2]
-    else:
-        # Prevent the KeyError: 0 in the unit tests by returning an empty row of NaNs
-        df1_2M = pd.DataFrame(columns=['Sample_ID_Opx', 'Mean_T_K_calc'])
-        df1_2M.loc[0] = np.nan
-        import warnings
-        warnings.warn("No Matches Found.")
+        df1_2Mean = df1_2Mean_nopref.add_prefix('Mean_')
+        df1_2Std  = df1_2Std_nopref.add_prefix('Std_')
 
-    # --- Repeat similar logic for OPX ---
-    opxNumbers = Combo_opxs_cpxs_2['ID_OPX'].unique()
-    # Note: Using assignment instead of inplace=True for Pandas 3 safety
-    Combo_opxs_cpxs_2['Sample_ID_Opx'] = Opx_sample_ID
-    if "Sample_ID_Cpx" in Combo_opxs_cpxs_2.columns:
-        Combo_opxs_cpxs_2 = Combo_opxs_cpxs_2.drop(["Sample_ID_Cpx"], axis=1)
+        df1_2Mean = df1_2Mean.drop(['Mean_Sample_ID_Opx'], axis=1)
+        df1_2Std  = df1_2Std.drop(['Std_Sample_ID_Opx'], axis=1)
 
-    if len(opxNumbers) > 0:
-        grouped_opx = Combo_opxs_cpxs_2.groupby(['ID_OPX', 'Sample_ID_Opx'])
-        df1_2Mean = grouped_opx.mean().add_prefix('Mean_')
-        df1_2Std = grouped_opx.std().add_prefix('Std_')
+        df1_2Mean.rename(columns={"Mean_ID_OPX": "ID_OPX"}, inplace=True)
+        df1_2Std.rename(columns={"Std_ID_OPX": "ID_OPX"}, inplace=True)
 
-        df1_2M = pd.concat([df1_2Mean, df1_2Std], axis=1).reset_index()
-
-        if equationT is not None and equationP is not None:
-            cols_to_move = ['Sample_ID_Opx', 'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc', 'Std_P_kbar_calc']
-        elif equationT is not None and equationP is None:
-            cols_to_move = ['Sample_ID_Opx', 'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_input', 'Std_P_kbar_input']
-        else:
-            cols_to_move = ['Sample_ID_Opx', 'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc', 'Std_P_kbar_calc']
-
-        df1_2M = df1_2M[cols_to_move + [col for col in df1_2M.columns if col not in cols_to_move]]
-
+        df1_2M = pd.merge(df1_2Mean, df1_2Std, on=['ID_OPX'])
+        df1_2M['Sample_ID_Opx'] = Sample_ID_Opx_Mean.values
 
         if equationT is not None and equationP is not None:
             cols_to_move = ['Sample_ID_Opx',
-                        'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
-                        'Std_P_kbar_calc']
+                            'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_calc',
+                            'Std_P_kbar_calc']
         if equationT is not None and equationP is None:
             cols_to_move = ['Sample_ID_Opx',
-                        'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_input',
-                        'Std_P_kbar_input']
+                            'Mean_T_K_calc', 'Std_T_K_calc', 'Mean_P_kbar_input',
+                            'Std_P_kbar_input']
         if equationT is None and equationP is not None:
             cols_to_move = ['Sample_ID_Opx',
-                        'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
-                        'Std_P_kbar_calc']
-
-
+                            'Mean_T_K_input', 'Std_T_K_input', 'Mean_P_kbar_calc',
+                            'Std_P_kbar_calc']
 
         df1_2M = df1_2M[cols_to_move +
-                    [col for col in df1_2M.columns if col not in cols_to_move]]
+                        [col for col in df1_2M.columns if col not in cols_to_move]]
 
     else:
         raise Exception(
             'No Matches - you may need to set less strict filters, e.g.,'
             'you could edit Kd_Match is None and Kd_Err to get more matches')
 
-
-
-    print('Done!!! I found a total of N='+str(len(Combo_opxs_cpxs_2)) + ' Cpx-Opx matches using the specified filter. ')
-    print('N=' + str(len(df1_M)) + ' Cpx out of the N='+str(LenCpx)+' Cpx that you input matched to 1 or more Opx')
-    print( 'N=' + str(len(df1_2M)) + ' Opx out of the N='+str(LenOpx)+' Opx that you input matched to 1 or more Cpx')
+    print('Done!!! I found a total of N=' + str(len(Combo_opxs_cpxs_2)) + ' Cpx-Opx matches using the specified filter. ')
+    print('N=' + str(len(df1_M)) + ' Cpx out of the N=' + str(LenCpx) + ' Cpx that you input matched to 1 or more Opx')
+    print('N=' + str(len(df1_2M)) + ' Opx out of the N=' + str(LenOpx) + ' Opx that you input matched to 1 or more Cpx')
     print('Done!')
 
     if equationT is not None:
@@ -937,23 +945,14 @@ def calculate_cpx_opx_press_temp_matching(*, opx_comps, cpx_comps, equationT=Non
         df1_2M.insert(4, "Equation Choice (T)", str(equationT))
         Combo_opxs_cpxs_2.insert(4, "Equation Choice (T)", str(equationT))
 
-
     if equationP is not None:
         df1_M.insert(5, "Equation Choice (P)", str(equationP))
         df1_2M.insert(5, "Equation Choice (P)", str(equationP))
         Combo_opxs_cpxs_2.insert(5, "Equation Choice (P)", str(equationP))
 
-    Combo_opxs_cpxs_2['Sample_ID_Opx']=Opx_sample_ID
+    Combo_opxs_cpxs_2['Sample_ID_Opx'] = Opx_sample_ID
 
-
-
-
-
-    return {
-    'Av_PTs_perCPX': df1_M.reset_index(drop=True),
-    'Av_PTs_perOPX': df1_2M.reset_index(drop=True),
-    'All_PTs': Combo_opxs_cpxs_2.copy().reset_index(drop=True)
-}
+    return {'Av_PTs_perCPX': df1_M, 'Av_PTs_perOPX': df1_2M, 'All_PTs': Combo_opxs_cpxs_2}
 
 
 
