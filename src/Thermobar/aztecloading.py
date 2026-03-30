@@ -86,8 +86,8 @@ def process_excel_file(file_path, sheet_name=0):
 
     #
     # Now prep for mineralML
-    df_nn = mm.prep_df_nn(processed_data_sort)
-    df_pred_nn, probability_matrix = mm.predict_class_prob_nnwr(df_nn)
+    df_nn = mm.prep_df(processed_data_sort)
+    df_pred_nn = mm.predict_class_prob(df_nn)
 
     # List of columns you want to bring over
     cols_to_copy = [
