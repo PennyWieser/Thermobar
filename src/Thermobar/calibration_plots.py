@@ -132,13 +132,13 @@ def return_cali_dataset(model=None):
 
     if model=="Zhang2017":
 
-        Cali_input['F_Amp']=0
-        Cali_input['Cl_Amp']=0
+        Cali_input['F_Amp']=0.0
+        Cali_input['Cl_Amp']=0.0
 
     if model=="Putirka2016":
 
-        Cali_input['F_Amp']=0
-        Cali_input['Cl_Amp']=0
+        Cali_input['F_Amp']=0.0
+        Cali_input['Cl_Amp']=0.0
 
 
 

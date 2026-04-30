@@ -2,6 +2,12 @@
 Change Log
 ================================================
 
+Version 1.0.71 - April 30th, 2026
+=====================================
+Fixed pandas3 bug, where was setting Thing =0, now needs to be Thing =0.0. Thanks William!
+
+
+
 Version 1.0.68- Nov 11th, 2025.
 =====================================
 Fixed bug meaning that viscosity function returned two identical columns called logn_melt

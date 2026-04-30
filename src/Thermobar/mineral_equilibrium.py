@@ -896,9 +896,11 @@ plots="Ca_Amphiboles", marker='.k', dpi=300):
         add_Leake_Amp_Fields_Fig3bot(ax1, fontsize=fontsize, color=color,
         linewidth=linewidth, lower_text=lower_text, upper_text=upper_text,
         text_labels=text_labels)
-        ax1.invert_xaxis()
+
         ax1.set_xlabel('Si (apfu)')
         ax1.set_ylabel('Mg# Amphibole')
+        ax1.set_xlim([8, 5.5])
+        ax1.set_ylim([0 ,1])
         #     ax2.plot(Leake_Sites['Ca_B'], Leake_Sites['Na_A']+Leake_Sites['K_A'],
         #     'ok')
         #     ax2.plot([1.5, 1.5], [0, 0.5], '-r')
@@ -937,6 +939,8 @@ plots="Ca_Amphiboles", marker='.k', dpi=300):
             ax1.invert_xaxis()
             ax1.set_xlabel('Si (apfu)')
             ax1.set_ylabel('Mg# Amphibole')
+            ax1.set_xlim([8, 5.5])
+            ax1.set_ylim([0 ,1])
 
 
 
@@ -1039,8 +1043,8 @@ def calculate_An_Namur2011(liq_comps, T=None):
   '''
 
     Liqs_c=liq_comps.copy()
-    Liqs_c['MnO_Liq']=0
-    Liqs_c['Cr2O3_Liq']=0
+    Liqs_c['MnO_Liq']=0.0
+    Liqs_c['Cr2O3_Liq']=0.0
     mol_props=calculate_anhydrous_mol_fractions_liquid(liq_comps=Liqs_c)
     ox_cat_8_den=(2*mol_props['SiO2_Liq_mol_frac'] + mol_props['MgO_Liq_mol_frac']+
                  mol_props['FeOt_Liq_mol_frac']+mol_props['CaO_Liq_mol_frac']

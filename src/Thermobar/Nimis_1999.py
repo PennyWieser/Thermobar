@@ -56,7 +56,7 @@ def first_step_Nimis_reclassification(cpx_comps):
         #  Now lets allocate Al
     # If Si cations >2, Al4 is 0. Set as default
     HighSi=ox6_Alpt['Si']>2
-    ox6_Alpt['Al4']=0
+    ox6_Alpt['Al4']=0.0
     # Else
     # If 2-Si cat > Al cations, equatil to Al cations
     HighSivsAl=(2-ox6_Alpt['Si'])>ox6_Alpt['Al']
@@ -67,7 +67,7 @@ def first_step_Nimis_reclassification(cpx_comps):
     # Al6, if if Al> Al4, Else, zero.
     ox6_Alpt['Al6']=ox6_Alpt['Al']-ox6_Alpt['Al4']
     Al4Grater=ox6_Alpt['Al4']>ox6_Alpt['Al']
-    ox6_Alpt.loc[Al4Grater, 'Al6']=0
+    ox6_Alpt.loc[Al4Grater, 'Al6']=0.0
 
     # Fe 3
     Sum_1=(ox6_Alpt['Al4']+ox6_Alpt['Na']-ox6_Alpt['Al6']-ox6_Alpt['Cr']
@@ -76,7 +76,7 @@ def first_step_Nimis_reclassification(cpx_comps):
 
     # If Sum_1 is greater than 0, if Sum 1 is greater than Fe total, equal to AE total. Else set to sum 1.
     # So set default as zero
-    ox6_Alpt['Fe3']=0
+    ox6_Alpt['Fe3']=0.0
     Sum_1_gr0=Sum_1>0
     Sum1_grFe=Sum_1>ox6_Alpt['Fet']
     ox6_Alpt.loc[((Sum_1_gr0)&(Sum1_grFe)), 'Fe3']=ox6_Alpt['Fet']
@@ -86,7 +86,7 @@ def first_step_Nimis_reclassification(cpx_comps):
 
     ox6_Alpt['Fe2']=ox6_Alpt['Fet']-ox6_Alpt['Fe3']
     Fe3gr0=ox6_Alpt['Fe3']>ox6_Alpt['Fet']
-    ox6_Alpt.loc[(Fe3gr0), 'Fe2']=0
+    ox6_Alpt.loc[(Fe3gr0), 'Fe2']=0.0
 
     # Then for some bizzare reason, they calculate Fe2O3 again
     SumB=(ox6_Alpt['Si']+ox6_Alpt['Ti']+ox6_Alpt['Al']+ox6_Alpt['Cr']
@@ -141,7 +141,7 @@ def later_step_Nimis_reclassification(cpx_comps_withFeO):
         #  Now lets allocate Al
     # If Si cations >2, Al4 is 0. Set as default
     HighSi=ox6_Alpt['Si']>2
-    ox6_Alpt['Al4']=0
+    ox6_Alpt['Al4']=0.0
     # Else
     # If 2-Si cat > Al cations, equatil to Al cations
     HighSivsAl=(2-ox6_Alpt['Si'])>ox6_Alpt['Al']
@@ -152,7 +152,7 @@ def later_step_Nimis_reclassification(cpx_comps_withFeO):
     # Al6, if if Al> Al4, Else, zero.
     ox6_Alpt['Al6']=ox6_Alpt['Al']-ox6_Alpt['Al4']
     Al4Grater=ox6_Alpt['Al4']>ox6_Alpt['Al']
-    ox6_Alpt.loc[Al4Grater, 'Al6']=0
+    ox6_Alpt.loc[Al4Grater, 'Al6']=0.0
 
     # Fe 3
     Sum_1=(ox6_Alpt['Al4']+ox6_Alpt['Na']-ox6_Alpt['Al6']-ox6_Alpt['Cr']
@@ -161,7 +161,7 @@ def later_step_Nimis_reclassification(cpx_comps_withFeO):
 
     # If Sum_1 is greater than 0, if Sum 1 is greater than Fe total, equal to AE total. Else set to sum 1.
     # So set default as zero
-    ox6_Alpt['Fe3_recalc']=0
+    ox6_Alpt['Fe3_recalc']=0.0
     Sum_1_gr0=Sum_1>0
     Sum1_grFe=Sum_1>(ox6_Alpt['Fe2']+ ox6_Alpt['Fe3'])
     ox6_Alpt.loc[((Sum_1_gr0)&(Sum1_grFe)), 'Fe3_recalc']=(ox6_Alpt['Fe2']+ ox6_Alpt['Fe3'])
@@ -171,7 +171,7 @@ def later_step_Nimis_reclassification(cpx_comps_withFeO):
 
     ox6_Alpt['Fe2_recalc']=(ox6_Alpt['Fe2']+ox6_Alpt['Fe3'])-ox6_Alpt['Fe3_recalc']
     Fe3gr0=ox6_Alpt['Fe3_recalc']>(ox6_Alpt['Fe2']+ox6_Alpt['Fe3'])
-    ox6_Alpt.loc[(Fe3gr0), 'Fe2_recalc']=0
+    ox6_Alpt.loc[(Fe3gr0), 'Fe2_recalc']=0.0
 
     # Then for some bizzare reason, they calculate Fe2O3 again
     SumB=(ox6_Alpt['Si']+ox6_Alpt['Ti']+ox6_Alpt['Al']+ox6_Alpt['Cr']
@@ -225,7 +225,7 @@ def combine_Nimis_Class_Steps(cpx_comps, iterations=7):
                                    })
         # If Si cations >2, Al4 is 0. Set as default
     HighSi=cpx_comps_c3['Si']>2
-    cpx_comps_c3['Al4']=0
+    cpx_comps_c3['Al4']=0.0
     # Else
     # If 2-Si cat > Al cations, equatil to Al cations
     HighSivsAl=(2-cpx_comps_c3['Si'])>cpx_comps_c3['Al']
@@ -236,7 +236,7 @@ def combine_Nimis_Class_Steps(cpx_comps, iterations=7):
     # Al6, if if Al> Al4, Else, zero.
     cpx_comps_c3['Al6']=cpx_comps_c3['Al']-cpx_comps_c3['Al4']
     Al4Grater=cpx_comps_c3['Al4']>cpx_comps_c3['Al']
-    cpx_comps_c3.loc[Al4Grater, 'Al6']=0
+    cpx_comps_c3.loc[Al4Grater, 'Al6']=0.0
 
 
 
@@ -254,7 +254,7 @@ def calculate_P_Nimmis_BA(cpx_comps, iterations=7):
     Iter_final.loc[((~Si_gr2)&(~SiAl_l2)), 'Si_recalc']=Iter_final['Si']
 
     # Equals zero if 2-First Si<0
-    Iter_final['Al_IV']=0
+    Iter_final['Al_IV']=0.0
     two_minsSi_l0=(2-Iter_final['Si'])<0
     Iter_final.loc[((~two_minsSi_l0)&(SiAl_l2)), 'Al_IV']=Iter_final['Al']*2/(Iter_final['Si']+Iter_final['Al'])
     Iter_final.loc[((~two_minsSi_l0)&(~SiAl_l2)), 'Al_IV']=2-Iter_final['Si']
@@ -314,14 +314,14 @@ def calculate_P_Nimmis_BA(cpx_comps, iterations=7):
     #cant ever be true, so move on, if Fe2>0 and Mg=0, set as 1-CNM, else set as zero
     Fe2_g0_Mg_ez=(Iter_final['Fe2_recalc_Acells']>0)&(Iter_final['Mg_recalc_Acells']==0)
     Iter_final.loc[((~Fe2Mg_g0)&(Fe2_g0_Mg_ez)), 'FeM2']=1-Iter_final['CNM']
-    Iter_final.loc[((~Fe2Mg_g0)&(~Fe2_g0_Mg_ez)), 'FeM2']=0
+    Iter_final.loc[((~Fe2Mg_g0)&(~Fe2_g0_Mg_ez)), 'FeM2']=0.0
 
 
     # Then need to allocate Mg M2. If the Fe2Mg_g0 if statement is true:
     Iter_final['MgM2']=1-Iter_final['CNM']-Iter_final['FeM2']
     # Also then has impossible zero statement, so comes down to same if as above
     Iter_final.loc[((~Fe2Mg_g0)&(Fe2_g0_Mg_ez)), 'MgM2']=1-Iter_final['CNM']
-    Iter_final.loc[((~Fe2Mg_g0)&(~Fe2_g0_Mg_ez)), 'MgM2']=0
+    Iter_final.loc[((~Fe2Mg_g0)&(~Fe2_g0_Mg_ez)), 'MgM2']=0.0
 
 
     # Need to allocate Ca M2. If (1-CNM)>0, Ca content.

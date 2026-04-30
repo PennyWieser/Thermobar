@@ -505,8 +505,8 @@ def calculate_liq_only_temp(*, liq_comps, equationT, P=None, H2O_Liq=None, print
 # Keiths Liq-only spreadsheet doesn't use Cr2O3 and P2O5 to calc cat. frac. So have set this to zero.
     if equationT != "T_Put2008_eq26_plag_sat" and equationT != "T_Put2008_eq24c_kspar_sat" \
     and equationT !="T_Put2005_eqD_plag_sat" and equationT != "T_Molina2015_amp_sat" and equationT != "T_Put2016_eq3_amp_sat":
-        liq_comps_c['Cr2O3_Liq']=0
-        liq_comps_c['P2O5_Liq']=0
+        liq_comps_c['Cr2O3_Liq']=0.0
+        liq_comps_c['P2O5_Liq']=0.0
 
 
 

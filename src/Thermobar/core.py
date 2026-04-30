@@ -504,7 +504,7 @@ def convert_oxide_percent_to_element_weight_percent(df, suffix=None,
         df_c.columns = df_c.columns.str.rstrip(suffix)
 
     if anhydrous==True:
-        df_c['H2O']=0
+        df_c['H2O']=0.0
 
     # Gets it into the ideal format for df_all_2
     df_oxides=df_c.reindex(df_ideal_all2.columns, axis=1).fillna(0)
@@ -1688,7 +1688,7 @@ def calculate_clinopyroxene_components(cpx_comps):
     # If value of AlVI<Na cat frac
     cpx_calc.loc[(AlVI_minus_Na<0), 'Jd_from 0=Na, 1=Al']=1
     cpx_calc.loc[(AlVI_minus_Na<0), 'Jd']=cpx_calc['Al_VI_cat_6ox']
-    cpx_calc.loc[(AlVI_minus_Na<0), 'CaTs']=0
+    cpx_calc.loc[(AlVI_minus_Na<0), 'CaTs']=0.0
 
     # If value of AlIV>CaTs
     # 1. Define the difference between AlIV and CaTs
@@ -2480,21 +2480,21 @@ def calculate_sites_ridolfi(amp_comps):
 
     # Ridolfi T sites
     norm_cations['Si_T']=norm_cations['Si_Amp_13_cat']
-    norm_cations['Al_IV_T']=0
-    norm_cations['Ti_T']=0
+    norm_cations['Al_IV_T']=0.0
+    norm_cations['Ti_T']=0.0
     # Ridolfi C Sites
 
 
-    norm_cations['Cr_C']=0
-    norm_cations['Fe3_C']=0
-    norm_cations['Mg_C']=0
-    norm_cations['Fe2_C']=0
-    norm_cations['Mn_C']=0
+    norm_cations['Cr_C']=0.0
+    norm_cations['Fe3_C']=0.0
+    norm_cations['Mg_C']=0.0
+    norm_cations['Fe2_C']=0.0
+    norm_cations['Mn_C']=0.0
     # Ridolfi B sites
     norm_cations['Ca_B']=norm_cations['Ca_Amp_13_cat']
-    norm_cations['Na_B']=0
+    norm_cations['Na_B']=0.0
     # Ridolfi A sites
-    norm_cations['Na_A']=0
+    norm_cations['Na_A']=0.0
     norm_cations['K_A']=norm_cations['K_Amp_13_cat']
 
     # if sum greater than 8, equal to difference
@@ -2524,7 +2524,7 @@ def calculate_sites_ridolfi(amp_comps):
     # If DG2 (charge)>46, set Fe3 to zero, else set to 46-charge
     norm_cations['Fe3_C']=46-norm_cations['Charge']
     High_Charge=norm_cations['Charge']>46
-    norm_cations.loc[(High_Charge), 'Fe3_C']=0
+    norm_cations.loc[(High_Charge), 'Fe3_C']=0.0
 
     norm_cations['Fe2_C']=norm_cations['Fet_Amp_13_cat']-norm_cations['Fe3_C']
 
@@ -2552,7 +2552,7 @@ def calculate_sites_ridolfi(amp_comps):
 
    # Other checks in Ridolfi's spreadsheet
     norm_cations['H2O_calc']=(2-norm_cations['F_Amp_13_cat']-norm_cations['Cl_Amp_13_cat'])*norm_cations['cation_sum_Si_Mg']*17/13/2
-    norm_cations.loc[(Low_sum), 'H2O_calc']=0
+    norm_cations.loc[(Low_sum), 'H2O_calc']=0.0
 
     norm_cations['Charge']=(norm_cations['Si_Amp_13_cat']*4+norm_cations['Ti_Amp_13_cat']*4+norm_cations['Al_Amp_13_cat']*3+
     norm_cations['Cr_Amp_13_cat']*3+norm_cations['Fet_Amp_13_cat']*2+norm_cations['Mn_Amp_13_cat']*2+norm_cations['Mg_Amp_13_cat']*2
@@ -2560,23 +2560,23 @@ def calculate_sites_ridolfi(amp_comps):
 
     norm_cations['Fe3_calc']=46-norm_cations['Charge']
     High_Charge=norm_cations['Charge']>46
-    norm_cations.loc[(High_Charge), 'Fe3_calc']=0
+    norm_cations.loc[(High_Charge), 'Fe3_calc']=0.0
 
     norm_cations['Fe2_calc']=norm_cations['Fet_Amp_13_cat']-norm_cations['Fe3_calc']
 
 
     norm_cations['Fe2O3_calc']=norm_cations['Fe3_calc']*norm_cations['cation_sum_Si_Mg']*159.691/13/2
-    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=0
+    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=0.0
 
     norm_cations['FeO_calc']=norm_cations['Fe2_calc']*norm_cations['cation_sum_Si_Mg']*71.846/13
-    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=0
+    norm_cations.loc[(Low_sum), 'Fe2O3_calc']=0.0
 
     norm_cations['O=F,Cl']=-(amp_comps_c['F_Amp']*0.421070639014633+amp_comps_c['Cl_Amp']*0.225636758525372)
-    norm_cations.loc[(Low_sum), 'O=F,Cl']=0
+    norm_cations.loc[(Low_sum), 'O=F,Cl']=0.0
 
     norm_cations['Total_recalc']=(Sum_input-amp_comps_c['FeOt_Amp']+norm_cations['H2O_calc']+norm_cations['Fe2O3_calc']
     +norm_cations['FeO_calc']+norm_cations['O=F,Cl'])
-    norm_cations.loc[(Low_sum), 'Total']=0
+    norm_cations.loc[(Low_sum), 'Total']=0.0
 
     # Set up a column for a fail message
     norm_cations['Fail Msg']=""
@@ -2765,21 +2765,21 @@ def get_amp_sites_leake(amp_apfu_df):
 
 
     norm_cations['Si_T']=norm_cations['Si_Amp_cat_23ox']
-    norm_cations['Al_T']=0
-    norm_cations['Al_C']=0
+    norm_cations['Al_T']=0.0
+    norm_cations['Al_C']=0.0
     norm_cations['Ti_C']=norm_cations['Ti_Amp_cat_23ox']
-    norm_cations['Mg_C']=0
-    norm_cations['Fe_C']=0
-    norm_cations['Mn_C']=0
+    norm_cations['Mg_C']=0.0
+    norm_cations['Fe_C']=0.0
+    norm_cations['Mn_C']=0.0
     norm_cations['Cr_C']=norm_cations['Cr_Amp_cat_23ox']
-    norm_cations['Mg_B']=0
-    norm_cations['Fe_B']=0
-    norm_cations['Mn_B']=0
-    norm_cations['Na_B']=0
+    norm_cations['Mg_B']=0.0
+    norm_cations['Fe_B']=0.0
+    norm_cations['Mn_B']=0.0
+    norm_cations['Na_B']=0.0
     norm_cations['Ca_B']=norm_cations['Ca_Amp_cat_23ox']
-    norm_cations['Na_A']=0
+    norm_cations['Na_A']=0.0
     norm_cations['K_A']=norm_cations['K_Amp_cat_23ox']
-    norm_cations['Ca_A']=0 # This is very ambigous, Leake have Ca A in some of their plots, but no way to put it in A based on workflow of site allocation.
+    norm_cations['Ca_A']=0.0# This is very ambigous, Leake have Ca A in some of their plots, but no way to put it in A based on workflow of site allocation.
 
 
 
@@ -2795,7 +2795,7 @@ def get_amp_sites_leake(amp_apfu_df):
     # If Si is less than 8 already, set Ti to the difference
     norm_cations.loc[(Si_Ti_sum_gr8&Si_l_8), 'Al_T']=Al_T_Si_Ti_sum_gr8
     # If Si is greater than 8, set Al_T to zero
-    norm_cations.loc[(Si_Ti_sum_gr8&(~Si_l_8)), 'Al_T']=0
+    norm_cations.loc[(Si_Ti_sum_gr8&(~Si_l_8)), 'Al_T']=0.0
 
 
     # Put remaining Al
@@ -2804,7 +2804,7 @@ def get_amp_sites_leake(amp_apfu_df):
     #If Si+Al<8, put all Al in tetrahedlra sites
     Si_Ti_sum_less8=(norm_cations['Si_Amp_cat_23ox']+norm_cations['Al_Amp_cat_23ox'])<8
     norm_cations.loc[(Si_Ti_sum_less8), 'Al_T']=norm_cations['Al_Amp_cat_23ox']
-    norm_cations.loc[(Si_Ti_sum_less8), 'Al_C']=0
+    norm_cations.loc[(Si_Ti_sum_less8), 'Al_C']=0.0
 
     # 5b) Leake Octaherdal C sites.
     #already filled some with Al in lines above. Place Ti (unambg), Cr (unamb).
@@ -2972,10 +2972,10 @@ def get_amp_sites_avferric_zhang(amp_comps):
     norm_cations.loc[ eight_m_siT_g, 'Al_IV_T_ideal']=Al_factor
     # And if SiT>8, allocate to zero
     Si_T_g_8= norm_cations['Si_T_ideal']>8
-    norm_cations.loc[Si_T_g_8, 'Al_IV_T_ideal']=0
+    norm_cations.loc[Si_T_g_8, 'Al_IV_T_ideal']=0.0
 
     # Ti sites, if Si + Al>8, allocate 0 (as all filled up)
-    norm_cations['Ti_T_ideal']=0
+    norm_cations['Ti_T_ideal']=0.0
     # If Si and Al<8, if 8-Si-Al is > Ti_factor, Ti Factor (as all Ti can go in site)
     Si_Al_l8=(norm_cations['Si_T_ideal']+norm_cations['Al_IV_T_ideal'])<8
     eight_Si_Ti_gTiFactor=(8-norm_cations['Si_T_ideal']-norm_cations['Al_IV_T_ideal'])>Ti_factor
@@ -2986,7 +2986,7 @@ def get_amp_sites_avferric_zhang(amp_comps):
     norm_cations['Al_VI_C_ideal']=Al_factor-norm_cations['Al_IV_T_ideal']
     # Unless Alfactor-Al_VI equal to or less than zero, in which case none left
     Alfactor_Al_l0=(Al_factor-norm_cations['Al_IV_T_ideal'])<=0
-    norm_cations.loc[(Alfactor_Al_l0), 'Al_VI_C_ideal']=0
+    norm_cations.loc[(Alfactor_Al_l0), 'Al_VI_C_ideal']=0.0
 
     # Ti C site. If Ti Factor + Al_VI_C_ideal<5, equal to Ti Factor
     norm_cations['Ti_C_ideal']=Ti_factor
@@ -3005,7 +3005,7 @@ def get_amp_sites_avferric_zhang(amp_comps):
     norm_cations['Fe3_C_ideal']=(23-NewSum)*2
 
     # Mg C site - If Al, Ti, Fe3, Cr already 5, set to zero
-    norm_cations['Mg_C_ideal']=0
+    norm_cations['Mg_C_ideal']=0.0
 
     # If sum not 5, if sum + Mg<5, allocate Mg factor, else do 5- sum
     Sum_beforeMgC=(norm_cations['Ti_C_ideal']+ norm_cations['Al_VI_C_ideal']
@@ -3016,7 +3016,7 @@ def get_amp_sites_avferric_zhang(amp_comps):
     norm_cations.loc[((Sum_beforeMgC_l5)&(~Sum_beforeMgC_Mg_l5)), 'Mg_C_ideal']=5-Sum_beforeMgC_l5
 
     # Fe2_C site. If revious sum>5, alocate zero
-    norm_cations['Fe2_C_ideal']=0
+    norm_cations['Fe2_C_ideal']=0.0
     # If previous sum<5
     Sum_beforeFeC=(norm_cations['Ti_C_ideal']+ norm_cations['Al_VI_C_ideal']
     +norm_cations['Cr_C_ideal']+norm_cations['Fe3_C_ideal']+norm_cations['Mg_C_ideal'])
@@ -3026,7 +3026,7 @@ def get_amp_sites_avferric_zhang(amp_comps):
     norm_cations.loc[((Sum_beforeFeC_l5)&(~Sum_beforeFeC_Fe_l5)), 'Fe2_C_ideal']=5- Sum_beforeFeC
 
     # Mn Site, if sum>=5, set to zero
-    norm_cations['Mn_C_ideal']=0
+    norm_cations['Mn_C_ideal']=0.0
     # IF previous sum <5
     Sum_beforeMnC=(norm_cations['Ti_C_ideal']+ norm_cations['Al_VI_C_ideal']
     +norm_cations['Cr_C_ideal']+norm_cations['Fe3_C_ideal']+norm_cations['Mg_C_ideal']+norm_cations['Fe2_C_ideal'])
@@ -3036,18 +3036,18 @@ def get_amp_sites_avferric_zhang(amp_comps):
     norm_cations.loc[((Sum_beforeMnC_l5)&(~Sum_beforeMnC_Mn_l5)), 'Mn_C_ideal']=5-Sum_beforeMnC
 
     # Mg B site, if any Mg left, put here.
-    norm_cations['Mg_B_ideal']=0
+    norm_cations['Mg_B_ideal']=0.0
     Mg_left_B=(Mg_factor-norm_cations['Mg_C_ideal'])>0
     norm_cations.loc[(Mg_left_B), 'Mg_B_ideal']=Mg_factor-norm_cations['Mg_C_ideal']
 
     # Fe B site, if any Fe2 left, but here
-    norm_cations['Fe2_B_ideal']=0
+    norm_cations['Fe2_B_ideal']=0.0
     Fe2_left_B=(Fe_factor-norm_cations['Fe2_C_ideal']-norm_cations['Fe3_C_ideal'])>0
     norm_cations.loc[(Fe2_left_B), 'Fe2_B_ideal']=Fe_factor-norm_cations['Fe2_C_ideal']-norm_cations['Fe3_C_ideal']
 
 
     # Mn B site, if any Mn left, put here.
-    norm_cations['Mn_B_ideal']=0
+    norm_cations['Mn_B_ideal']=0.0
     Mn_left_B=(Mn_factor-norm_cations['Mn_C_ideal'])>0
     norm_cations.loc[(Mn_left_B), 'Mn_B_ideal']=Mn_factor-norm_cations['Mn_C_ideal']
 
@@ -3055,7 +3055,7 @@ def get_amp_sites_avferric_zhang(amp_comps):
     norm_cations['Ca_B_ideal']=Ca_factor
 
     # Na, if Mg+Fe+Mn+Ca B >2, 0
-    norm_cations['Na_B_ideal']=0
+    norm_cations['Na_B_ideal']=0.0
     Sum_beforeNa=(norm_cations['Mn_B_ideal']+norm_cations['Fe2_B_ideal']+norm_cations['Mg_B_ideal']+norm_cations['Ca_B_ideal'])
     Sum_beforeNa_l2=Sum_beforeNa<2
     Sum_before_Na_Na_l2=(Sum_beforeNa+Na_factor)<2

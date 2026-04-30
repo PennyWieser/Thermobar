@@ -749,10 +749,10 @@ def calculate_ol_liq_temp(*, equationT, liq_comps=None, ol_comps=None, meltmatch
 
         else:
         # Keiths spreadsheets dont use Cr2O3 and P2O5. So have set this to zero.
-            liq_comps_c['Cr2O3_Liq']=0
-            liq_comps_c['P2O5_Liq']=0
-            ol_comps_c['Cr2O3_Ol']=0
-            ol_comps_c['P2O5_Ol']=0
+            liq_comps_c['Cr2O3_Liq']=0.0
+            liq_comps_c['P2O5_Liq']=0.0
+            ol_comps_c['Cr2O3_Ol']=0.0
+            ol_comps_c['P2O5_Ol']=0.0
     # Now calculate cation fractions
 
 
