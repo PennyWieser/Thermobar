@@ -2,6 +2,12 @@
 Change Log
 ================================================
 
+Version 1.0.72 - June 10th, 2026
+=====================================
+Fixed bug in Plag-Liq melt matching from newer pandas versions. Thanks Dawn!
+
+
+
 Version 1.0.71 - April 30th, 2026
 =====================================
 Fixed pandas3 bug, where was setting Thing =0, now needs to be Thing =0.0. Thanks William!

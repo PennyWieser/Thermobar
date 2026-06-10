@@ -307,7 +307,7 @@ def import_lepr_file(file_name):
 
 
 # Loading Excel, returns a dictionary
-def import_excel(file_name, sheet_name,  path=None, sample_label=None, GEOROC=False, suffix=None, df=None):
+def import_excel(file_name=None, sheet_name=None,  path=None, sample_label=None, GEOROC=False, suffix=None, df=None):
     '''
     Import excel sheet of oxides in wt%, headings should be of the form SiO2_Liq (for the melt/liquid), SiO2_Ol (for olivine comps), SiO2_Cpx (for clinopyroxene compositions). Order doesn't matter
 

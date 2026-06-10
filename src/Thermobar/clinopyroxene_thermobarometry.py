@@ -2826,6 +2826,7 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
         OR
         specify Kd_Match=Masotta to use the Kd model fo Masotta et al. (2013),
         which is also a function of Na and K, for trachytic and phonolitic magmas.
+        Or specify Kd_Match=Thorn2026 to use the KD model of Thorn et al. (2026) for alkaline magmas
 
 
     Kd_Err: int or float, Default=0.03
@@ -3105,7 +3106,8 @@ H2O_Liq=None, return_all_pairs=False, iterations=30):
                 filtKd = (Combo_liq_cpxs_eq_comp['Delta_Kd_Put2008'] < Kd_Err)
             if Kd_Match == "Masotta":
                 filtKd = (Combo_liq_cpxs_eq_comp['Delta_Kd_Mas2013'] < Kd_Err)
-
+            if Kd_Match == "Thorn2026":
+                filtKd = (Combo_liq_cpxs_eq_comp['Delta_Kd_Thorn2026'] < Kd_Err)
         # Then filter other components based on user-selected errors
         # (default values from NEave et al. 2009)
 

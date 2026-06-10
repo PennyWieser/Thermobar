@@ -1467,8 +1467,8 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
     Combo_fspar_liqs3['T_K_calc']=Combo_fspar_liqs2['T_K_calc'].astype(float)
     if len(FsparNumbers) > 0:
         if plag_comps is not None:
-            df1_Mean_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Plag'], as_index=False).mean()
-            df1_Std_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Plag'], as_index=False).std()
+            df1_Mean_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Plag'], as_index=False).mean(numeric_only=True)
+            df1_Std_nopref=Combo_fspar_liqs3.groupby(['ID_Fspar', 'Sample_ID_Plag'], as_index=False).std(numeric_only=True)
             count=Combo_fspar_liqs2.groupby('ID_Fspar',as_index=False).count().iloc[:, 1]
             df1_Mean_nopref['# of Liqs Averaged']=count
 

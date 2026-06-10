@@ -1893,8 +1893,12 @@ def calculate_mol_proportions_plagioclase(*, plag_comps=None):
     if plag_comps is not None:
         plag_comps = plag_comps
         # This makes it match the columns in the oxide mass dataframe
-        plag_wt = plag_comps.reindex(
-            oxide_mass_plag_df.columns, axis=1).fillna(0)
+        plag_wt = (
+            plag_comps
+            .reindex(oxide_mass_plag_df.columns, axis=1)
+            .astype(float)
+            .fillna(0)
+        )
         # Combine the molecular weight and weight percent dataframes
         plag_wt_combo = pd.concat([oxide_mass_plag_df, plag_wt],)
         # Drop the calculation column
@@ -3718,6 +3722,12 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     ratioMasotta = Combo_liq_cpxs['Na_Liq_cat_frac'] / (
         Combo_liq_cpxs['Na_Liq_cat_frac'] + Combo_liq_cpxs['K_Liq_cat_frac'])
 
+    # Saffy Thorns 2026 model for FeT
+    Combo_liq_cpxs['Kd_Ideal_FeT_Thorn2026']=(-1
+    +2.129* (T-273.15)/1000
+    -1.675 *((Combo_liq_cpxs['Mgno_Cpx']))
+    +0.144* (1/(1-Combo_liq_cpxs['Fe3Fet_Liq'])))
+
     # Masotta et al. For Alkali basalts
     Combo_liq_cpxs['Kd_Ideal_Masotta'] = np.exp(
         1.735 - 3056 / T - 1.668 * ratioMasotta)  # eq35 alk, for trachytes and phonolites
@@ -3726,7 +3736,8 @@ def calculate_cpx_liq_eq_tests(*, meltmatch=None, liq_comps=None, cpx_comps=None
     Combo_liq_cpxs['Delta_Kd_Put2008_I_M'] = Combo_liq_cpxs['Kd_Ideal_Put'] - Combo_liq_cpxs['Kd_Fe_Mg_Fe2']
     Combo_liq_cpxs['Delta_Kd_Mas2013'] = abs(
         Combo_liq_cpxs['Kd_Ideal_Masotta'] - Combo_liq_cpxs['Kd_Fe_Mg_Fe2'])
-
+    Combo_liq_cpxs['Delta_Kd_Thorn2026'] = abs(
+        Combo_liq_cpxs['Kd_Ideal_FeT_Thorn2026'] - Combo_liq_cpxs['Kd_Fe_Mg_Fet'])
 
     # Putirka (1999) DiHd Eq3.1a
     Combo_liq_cpxs['DiHd_Pred_Put1999']=(np.exp(-9.8
@@ -4383,10 +4394,11 @@ def convert_fo2_to_fe_partition(*, liq_comps, T_K, P_kbar,  model="Kress1991", f
     To=1673.15
 
     if model=="Kress1991":
+
         ln_XFe2FeO3_XFeO=((0.196*np.log(fo2))+(11492/T_K)-6.675+((-2.243*mol_frac_hyd['Al2O3_Liq_mol_frac_hyd'])+(-1.828*mol_frac_hyd['FeOt_Liq_mol_frac_hyd'])
         +(3.201*mol_frac_hyd['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd['K2O_Liq_mol_frac_hyd']))
         -3.36*(1-(To/T_K) - np.log(T_K/To)) -0.000000701*((P_kbar*100000000)/T_K)
-         + -0.000000000154*(((T_K-1673)*(P_kbar*100000000))/T_K) + 0.0000000000000000385*((P_kbar*100000000)**2/T_K))
+         + -0.000000000154*(((T_K-To)*(P_kbar*100000000))/T_K) + 0.0000000000000000385*((P_kbar*100000000)**2/T_K))
         #print(ln_XFe2FeO3_XFeO)
         #print(fo2)
 
