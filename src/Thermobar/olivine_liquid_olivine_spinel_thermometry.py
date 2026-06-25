@@ -264,6 +264,7 @@ T=None, equationT=None, P=None,  Fe3Fet_Liq=None, iterations=30):
         Choose from:
 
             |   H_Gavr2016 (P-independent, T-independent)
+            |   H_Pu2017 (P-independent, T-independent)
 
 
     iterations: int
