@@ -2,6 +2,13 @@
 Change Log
 ================================================
 
+Version 1.0.73 - June 10th, 2026
+=====================================
+Fixed bug in Ol-Liq hygrometery melt matching from newer pandas versions. Thanks Dawn!
+
+
+
+
 Version 1.0.72 - June 10th, 2026
 =====================================
 Fixed bug in Plag-Liq melt matching from newer pandas versions. Thanks Dawn!

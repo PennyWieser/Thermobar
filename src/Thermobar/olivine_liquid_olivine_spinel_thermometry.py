@@ -214,16 +214,21 @@ P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
             #     T=calculate_ol_liq_temp(ol_comps=ol_comps, liq_comps=liq_comps,
             # equationT=equationT, H2O_Liq=H2O_Calc, P=P).T_K_calc
 
+
+
         ol_fo = (Liq_Ols['MgO_Ol'] / 40.3044) / \
             ((Liq_Ols['MgO_Ol'] / 40.3044) + Liq_Ols['FeOt_Ol'] / 71.844)
         KdFeMg_Meas = (
             ((Liq_Ols['FeOt_Ol'] / 71.844) / (Liq_Ols['MgO_Ol'] / 40.3044)) /
             ((Liq_Ols['FeOt_Liq'] * (1 - Liq_Ols['Fe3Fet_Liq']
                                          ) / 71.844) / (Liq_Ols['MgO_Liq'] / 40.3044))
+
+
         )
         Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'],
         Na2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['Na2O_Liq_mol_frac'],
         P=P, H2O=Liq_Ols['H2O_Liq'], T=T)
+
         Kd_Toplis_calc = Kd_func(ol_fo)
 
         DeltaKd_Toplis = KdFeMg_Meas - Kd_Toplis_calc
@@ -308,7 +313,7 @@ T=None, equationT=None, P=None,  Fe3Fet_Liq=None, iterations=30):
                     ol_comps=ol_comps_c)
 
             ol_cat_frac = pd.concat([ ol_mol_frac_Ni, ol_comps_c], axis=1)
-            anhyd_liq_frac=pd.concat([anhyd_mol_frac_Ni, liq_comps_c])
+            anhyd_liq_frac=pd.concat([anhyd_mol_frac_Ni, liq_comps_c], axis=1)
 
 
 
@@ -340,7 +345,7 @@ T=None, equationT=None, P=None,  Fe3Fet_Liq=None, iterations=30):
 
 
     CalcH2O=calculate_ol_liq_hygr(meltmatch=Combo_Ol_liqs_1,
-    equationH=equationH, T=T, P=P, eq_tests=eq_tests,
+    equationH=equationH, equationT=equationT, T=T, P=P, eq_tests=eq_tests,
     Fe3Fet_Liq=Fe3Fet_Liq)
 
 
@@ -651,13 +656,15 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
     H2O_Liq=H2O_Liq, eq_tests=eq_tests, P=P)
 
 
+
+
     Fo=calculate_ol_fo(ol_comps=DupOls)
 
-    CalcT.insert(1, 'Ol_Fo_Meas', Fo, )
+    CalcT.insert(1, 'Ol_Fo_Meas', Fo)
 
     df_out=pd.concat([CalcT, Combo_Ol_liqs_1], axis=1)
 
-    return df_out
+    return Combo_Ol_liqs
 
 
 
