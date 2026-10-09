@@ -1,0 +1,7 @@
+Thermobar==1.0.73
+streamlit>=1.64
+openpyxl
+xlrd  # .xls uploads
+# Machine-learning cpx models (Petrelli 2020, Jorgenson 2022); ~330 MB, GitHub only. The app hides them if absent.
+onnxruntime
+Thermobar_onnx @ https://github.com/PennyWieser/Thermobar_onnx/archive/refs/tags/v.0.05.zip

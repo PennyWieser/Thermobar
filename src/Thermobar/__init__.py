@@ -56,6 +56,8 @@ from Thermobar.density_profiles import *
 from Thermobar.chompi import *
 # This deals with importing Aztec mineral and melt data
 from Thermobar.aztecloading import *
+# This does spider diagram plotting
+from Thermobar.spiderdiagrams import *
 
 # version
 from ._version import __version__

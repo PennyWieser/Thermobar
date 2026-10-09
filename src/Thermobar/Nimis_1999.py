@@ -55,7 +55,7 @@ def first_step_Nimis_reclassification(cpx_comps):
 
         #  Now lets allocate Al
     # If Si cations >2, Al4 is 0. Set as default
-    HighSi=ox6_Alpt['Si']>2
+    HighSi=ox6_Alpt['Si']>2.0
     ox6_Alpt['Al4']=0.0
     # Else
     # If 2-Si cat > Al cations, equatil to Al cations
@@ -224,7 +224,7 @@ def combine_Nimis_Class_Steps(cpx_comps, iterations=7):
                                     'K': cpx_comps_c2['K']*4/cpx_comps_c2['Final_sum'],
                                    })
         # If Si cations >2, Al4 is 0. Set as default
-    HighSi=cpx_comps_c3['Si']>2
+    HighSi=cpx_comps_c3['Si']>2.0
     cpx_comps_c3['Al4']=0.0
     # Else
     # If 2-Si cat > Al cations, equatil to Al cations
@@ -246,8 +246,8 @@ def calculate_P_Nimmis_BA(cpx_comps, iterations=7):
     Iter_final_nodiv, Iter_final=combine_Nimis_Class_Steps(cpx_comps, iterations)
 
     # Equals 2 if Si>2
-    Iter_final['Si_recalc']=2
-    Si_gr2=Iter_final['Si']>2
+    Iter_final['Si_recalc']=2.0
+    Si_gr2=Iter_final['Si']>2.0
     # If less than 2, if Si+ Al <2, Si*2/(Si_Al), otherwise Si
     SiAl_l2=(Iter_final['Si']+Iter_final['Al'])<2
     Iter_final.loc[((~Si_gr2)&(SiAl_l2)), 'Si_recalc']=Iter_final['Si']*2/(Iter_final['Si']+Iter_final['Al'])
@@ -265,7 +265,7 @@ def calculate_P_Nimmis_BA(cpx_comps, iterations=7):
     Iter_final['Sum_T']=Iter_final_nodiv['Si']+Iter_final_nodiv['Al']
     Si_Above2=Iter_final_nodiv['Si']>2
     Iter_final.loc[((~Sum_nodiv_Si_Al_l2)&(Si_Above2)), 'Sum_T']=Iter_final_nodiv['Si']
-    Iter_final.loc[((~Sum_nodiv_Si_Al_l2)&(~Si_Above2)), 'Sum_T']=2
+    Iter_final.loc[((~Sum_nodiv_Si_Al_l2)&(~Si_Above2)), 'Sum_T']=2.0
 
 
     # Sum M -

@@ -224,13 +224,15 @@ def calculate_viscosity_giordano_2008(liq_comps, T=None, T_K=None, H2O_Liq=None,
     liq_comps_c.insert(2, 'C', C.values)
 
     if T is not None:
-        df_params['T_K'] = T
-        logn_melt = A + (B / (df_params['T_K'] - C))
+        T_arr = np.broadcast_to(np.asarray(T, dtype=float), len(liq_comps_c))
+        logn_melt = A + (B / (T_arr - C))
         n_melt=10**(logn_melt)
         #df_params['logn_melt'] = logn_melt
-        liq_comps_c.insert(0, 'T_K', T)
+        liq_comps_c.insert(0, 'T_K', T_arr)
         liq_comps_c.insert(0, 'logn_melt', logn_melt.values)
         liq_comps_c.insert(0, 'n_melt', n_melt.values)
+
+    df_params.index = liq_comps_c.index
     combo=pd.concat([liq_comps_c, df_params], axis=1)
 
     return combo

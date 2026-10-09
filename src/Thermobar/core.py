@@ -4554,7 +4554,7 @@ def convert_fo2_to_buffer(fo2=None, T_K=None, P_kbar=None):
     fo2_QFM_lowT=10**logfo2_QFM_lowT
 
     Delta_QFM_highT=logfo2-logfo2_QFM_highT
-    Delta_QFM_lowT=logfo2-logfo2_QFM_highT
+    Delta_QFM_lowT=logfo2-logfo2_QFM_lowT
 
     if isinstance(fo2, float) or isinstance(fo2, int):
         if T_K<Cut_off_T:
@@ -4631,8 +4631,10 @@ def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", 
 
     # Make T_K a series if it isnt already.
 
-    T_K = pd.Series(T_K) if isinstance(T_K, float) else T_K
-
+    #T_K = pd.Series(T_K) if isinstance(T_K, float) else T_K
+    n = len(liq_comps_c)
+    T_K = pd.Series(np.broadcast_to(np.asarray(T_K, dtype=float), n), index=liq_comps_c.index)
+    P_kbar = pd.Series(np.broadcast_to(np.asarray(P_kbar, dtype=float), n), index=liq_comps_c.index)
 
     # If the input has FeO and Fe2O3 contents already
     if any(liq_comps.columns=="FeO_Liq") and any(liq_comps.columns=="Fe2O3_Liq"):
@@ -4726,13 +4728,26 @@ def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", 
 
 
 
-    rightside=( (11492/T_K)-6.675+((-2.243*mol_frac_hyd_redox['Al2O3_Liq_mol_frac_hyd'])+(-1.828*hyd_mol_frac_test['FeOt_Liq_mol_frac_hyd'])
-    +(3.201*mol_frac_hyd_redox['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd_redox['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd_redox['K2O_Liq_mol_frac_hyd']))
+    rightside=( (11492/T_K)-6.675+((-2.243*mol_frac_hyd_test['Al2O3_Liq_mol_frac_hyd'])+(-1.828*hyd_mol_frac_test['FeOt_Liq_mol_frac_hyd'])
+    +(3.201*mol_frac_hyd_test['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd_test['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd_test['K2O_Liq_mol_frac_hyd']))
     -3.36*(1-(To/T_K) - np.log(T_K.astype(float)/To)) -0.000000701*((P_kbar*100000000)/T_K)
     + -0.000000000154*(((T_K-1673)*(P_kbar*100000000))/T_K) + 0.0000000000000000385*((P_kbar*100000000)**2/T_K)
     )
 
-    ln_fo2_calc=(Z-rightside)/0.196
+    #ln_fo2_calc=(Z-rightside)/0.196
+
+    if model=="Kress1991":
+        ln_fo2_calc=(Z-rightside)/0.196
+    elif model=="Put2016_eq6b":
+        m=hyd_mol_frac_test
+        rightside_Put=(-6.53+10813.8/T_K + 12.4*(m['Na2O_Liq_mol_frac_hyd']+m['K2O_Liq_mol_frac_hyd'])
+        -3.44*(m['Al2O3_Liq_mol_frac_hyd']/(m['Al2O3_Liq_mol_frac_hyd']+m['SiO2_Liq_mol_frac_hyd']))
+        +4.15*m['CaO_Liq_mol_frac_hyd'])
+        ln_fo2_calc=(Z-rightside_Put)/0.19
+    else:
+        raise ValueError(f"model must be 'Kress1991' or 'Put2016_eq6b', not {model!r}")
+
+
     fo2_calc=np.exp(ln_fo2_calc.astype(float))
 
     # and back to log base 10
