@@ -1,5 +1,6 @@
 __pycache__/
 .ipynb_checkpoints/
+.DS_Store
 *.egg-info/
 ipynb_checkpoints
 /.ipynb_checkpoints/

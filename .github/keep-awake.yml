@@ -1,0 +1,74 @@
+name: Keep web app awake
+
+# Streamlit Community Cloud sleeps apps after 12 h without visitors, and a plain HTTP request does not
+# count as a visit. This opens the app in a headless browser, clicks the wake-up button if the app is
+# asleep, and fails if the app does not render.
+
+on:
+  schedule:
+    - cron: "17 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write  # for the last step, which re-enables this workflow
+
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APP_URL: https://thermobar.streamlit.app
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install playwright && playwright install --with-deps chromium
+      - name: Visit app
+        shell: python
+        run: |
+          import os, re, sys, time
+          from playwright.sync_api import sync_playwright
+
+          url = os.environ["APP_URL"]
+
+          def app_rendered(page):
+              # The app renders inside an iframe, so look for Streamlit's root element in every frame.
+              for frame in page.frames:
+                  try:
+                      if frame.locator('[data-testid="stApp"]').count():
+                          return True
+                  except Exception:
+                      pass
+              return False
+
+          with sync_playwright() as p:
+              page = p.chromium.launch().new_page()
+              page.goto(url, wait_until="domcontentloaded", timeout=120_000)
+              page.wait_for_timeout(10_000)
+
+              button = page.get_by_role("button", name=re.compile(r"get this app back up", re.I))
+              if button.count():
+                  print("App was asleep, waking it")
+                  button.first.click()
+
+              # A sleeping app can take a few minutes to boot, so keep checking until it renders.
+              deadline = time.time() + 300
+              while time.time() < deadline:
+                  if app_rendered(page):
+                      print("App rendered")
+                      page.wait_for_timeout(15_000)  # stay connected long enough to count as a visit
+                      sys.exit(0)
+                  page.wait_for_timeout(5_000)
+              page.screenshot(path="app.png", full_page=True)
+              sys.exit("App did not render within 5 minutes")
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshot
+          path: app.png
+      # GitHub disables scheduled workflows in public repos after 60 days without commits.
+      # Re-enabling it on every run keeps the schedule alive while the repo is quiet.
+      - if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/keep-awake.yml/enable"
