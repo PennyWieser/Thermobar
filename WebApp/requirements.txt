@@ -1,4 +1,4 @@
-Thermobar==1.0.73
+Thermobar==1.0.74
 streamlit>=1.64
 openpyxl
 xlrd  # .xls uploads
