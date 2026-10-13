@@ -149,7 +149,6 @@ P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
 
             Liq_Ols = pd.concat([anhyd_mol_frac_Ni, ol_mol_frac_Ni, ol_comps_c, liq_comps_c], axis=1)
 
-            Liq_Ols = pd.concat([anhyd_mol_frac_Ni, ol_mol_frac_Ni, ol_comps_c, liq_comps_c], axis=1)
 
 
 
@@ -204,11 +203,18 @@ P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
              'Either enter T, or specify equationT=""')
 
         if equationT is not None:
-            # If not melt match, do separatly
-            #if meltmatch is None:
 
-            T=calculate_ol_liq_temp(meltmatch=Liq_Ols,
-            equationT=equationT, H2O_Liq=H2O_Calc, P=P, eq_tests=eq_tests).T_K_calc
+            if meltmatch is None:
+                # Pass the compositions, not Liq_Ols: calculate_ol_liq_temp only applies H2O_Liq when it
+                # builds the table itself, and the H_Pu2017 table has no cation fractions
+                T=calculate_ol_liq_temp(liq_comps=liq_comps_c, ol_comps=ol_comps_c,
+                equationT=equationT, H2O_Liq=H2O_Calc, P=P, eq_tests=eq_tests).T_K_calc
+            else:
+                T=calculate_ol_liq_temp(meltmatch=Liq_Ols,
+                equationT=equationT, H2O_Liq=H2O_Calc, P=P, eq_tests=eq_tests).T_K_calc
+
+
+
             # If melt match do on combined dataframe
             # if meltmatch is not None:
             #     T=calculate_ol_liq_temp(ol_comps=ol_comps, liq_comps=liq_comps,
@@ -241,6 +247,8 @@ P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
 
 
         df_out = pd.concat([df, Liq_Ols], axis=1)
+        # Add model
+
 
         return df_out
 

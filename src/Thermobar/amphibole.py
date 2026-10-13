@@ -242,7 +242,7 @@ def calculate_amp_only_hygr(amp_comps=None, T=None):
     '''
     raise Exception('Please use calculate_amp_only_melt_comps, which will calculate H2O along with other melt composition parameters ')
 
-def calculate_amp_only_melt_comps(amp_comps=None, T=None):
+def calculate_amp_only_melt_comps(amp_comps=None, T=None, equationT=None, P=None):
     '''
     Calculates melt compositions from Amphibole compositions using Zhang et al. (2017),
     Ridolfi et al. 2021 and Putirka (2016).
@@ -255,13 +255,17 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
 
     T: optional, float, int
         Temperature in Kelvin, needed for equation3 and 5 of Zhang et al. (2017), and
-        SiO2 from Putirka (2017)
+        SiO2 from Putirka (2017). Can also supply an equation T
+
+    P: optional, float, int
+
 
     Returns
     -------
     DataFrame:
         Contains calculated melt compositions, and all amphibole components used
         in the calculation.
+
 
     '''
 
@@ -293,8 +297,10 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
     amp_sites.insert(0, "H2O_Ridolfi21", H2O_calc)
 
 
-    if T is None:
+    if T is None and equationT is None:
         w.warn('You must enter a value for T in Kelvin to get results from equation3 and 5 from Zhang, and SiO2 from Putrka (2016)')
+
+
 
     amp_sites['SiO2_Eq1_Zhang17']=(-736.7170+288.733*np.log(amp_sites['Si_T_ideal'].astype(float))+56.536*amp_sites['Al_VI_C_ideal']
     +27.169*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal'])
@@ -348,7 +354,11 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
                                     [col for col in amp_sites.columns if col not in cols_to_move]]
 
 
-    if T is not None:
+    if T is not None or equationT is not None:
+        if equationT is not None:
+            T=calculate_amp_only_temp(amp_comps, equationT, P=P)
+
+
         SiO2_Eq3=(-228 + 0.01065*(T-273.15) + 165*np.log(amp_sites['Si_T_ideal'].astype(float))
         -7.219*(amp_sites['Mg_C_ideal']+amp_sites['Mg_B_ideal']))
         amp_sites.insert(4, "SiO2_Eq3_Zhang17", SiO2_Eq3)
@@ -361,6 +371,8 @@ def calculate_amp_only_melt_comps(amp_comps=None, T=None):
         # Putirka 2016 equation 10
         SiO2_Put2016=751.95-0.4*(T-273.15)-278000/(T-273.15)-9.184*amp_23ox['Al_Amp_cat_23ox']
         amp_sites.insert(0, 'SiO2_Eq10_Put2016', SiO2_Put2016)
+
+        amp_sites['T_K_used']=T
 
 
 
@@ -849,7 +861,7 @@ K_Amp_cat_23ox, Ca_Amp_cat_23ox, Na2O_Liq_mol_frac_hyd, K2O_Liq_mol_frac_hyd):
 ## Function: Amphibole-only temperature
 
 Amp_only_T_funcs = {T_Put2016_eq5, T_Put2016_eq6, T_Put2016_SiHbl, T_Put2016_eq8,
- T_Ridolfi2012, T_Put2016_eq4a_amp_sat, T_Put2016_eq8} # put on outside
+ T_Ridolfi2012, T_Put2016_eq8} # put on outside
 
 Amp_only_T_funcs_by_name= {p.__name__: p for p in Amp_only_T_funcs}
 

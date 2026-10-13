@@ -190,7 +190,7 @@ def call(fn, **kw):
     params = inspect.signature(fn).parameters
     kw = {k: v for k, v in kw.items() if k in params and v is not None}
     if "eq_tests" in params:
-        kw["eq_tests"] = True
+        kw.setdefault("eq_tests", True)  # on unless a form turns it off
     printed = io.StringIO()
     with warnings.catch_warnings(record=True) as caught, contextlib.redirect_stdout(printed):
         warnings.simplefilter("always")
@@ -325,14 +325,15 @@ def show_results(res, msgs, printed, df_in):
 def fixed_input(kind, columns, key, prefer_column=False):
     """A single value or a column from the file for a set P (kbar) or T (returned in K)."""
     label = "Pressure" if kind == "P" else "Temperature"
+    guess = {"P": ["P_kbar", "P_kbar_calc", "P_GPa"], "T": ["T_K", "T_K_calc", "Temperature_C", "T_C"]}[kind]
+    found = any(c in columns for c in guess)  # only start on a column when there is a likely one
     src = st.radio(f"{label} source", ["Single value", "Column in file"], horizontal=True, key=f"{key}_src",
-                   index=1 if prefer_column and columns else 0,
+                   index=1 if prefer_column and found else 0,
                    disabled=not columns, help=None if columns else "Your file has no numeric columns to use.")
     if src == "Single value" or not columns:
         if kind == "P":
             return st.number_input("Pressure (kbar)", 0.0, 100.0, 5.0, step=0.5, key=f"{key}_val")
         return st.number_input("Temperature (°C)", 500.0, 2000.0, 1100.0, step=10.0, key=f"{key}_val") + 273.15
-    guess = {"P": ["P_kbar"], "T": ["T_K", "Temperature_C", "T_C"]}[kind]
     col = st.selectbox("Column", columns, key=f"{key}_col",
                        index=next((columns.index(c) for c in guess if c in columns), 0))
     if kind == "P":
@@ -392,8 +393,9 @@ def hist_chart(res, col, title):
 # %% ----------------------------------------------------------------
 # other functions: melt viscosity, redox conversions, pressure to depth, oxide to element wt%
 
-TOOLS = ("Thermobarometry (no melt matching)", "Other functions")
-OTHER_TOOL = TOOLS[1]
+TOOLS = ("Thermobarometry (no melt matching)", "Chemometry", "Hygrometry", "Other functions")
+CHEM_TOOL, HYGR_TOOL, OTHER_TOOL = TOOLS[1:]
+EX_DOCS = "https://thermobar.readthedocs.io/en/latest/Examples/"
 OTHER_DOCS = "https://thermobar.readthedocs.io/en/latest/Examples/Other_features/"
 FEO_PER_FE2O3 = 2 * 71.844 / 159.688  # wt% FeO equivalent of 1 wt% Fe2O3
 
@@ -886,24 +888,21 @@ def show_other(name, res, msgs, printed, key, chart, df_in):
             st.code("\n".join(printed), language=None)
 
 
-def other_functions():
-    """The Other functions page: draws its own sidebar and results."""
+def function_page(catalog, forms, label, intro):
+    """A page of separate calculations (Chemometry, Hygrometry, Other functions): draws its own sidebar and results."""
     with st.sidebar:
-        name = st.selectbox("Function", list(OTHER))
-        spec = OTHER[name]
+        name = st.selectbox(label, list(catalog))
+        spec = catalog[name]
         if name == CALI:  # the dataset decides the phase, and so the example file
             cali_label = st.selectbox("Calibration dataset", list(CALI_MODELS))
             spec = dict(spec, cali_model=cali_label, example=CALI_MODELS[cali_label][2])
-    page_header(
-        "Other calculations in Thermobar: melt viscosity, redox conversions between fO₂, buffer position and "
-        "Fe³⁺/ΣFe, pressure to depth, oxide to element wt%, and comparing your data with model calibration datasets. Choose the function and its inputs in the menu at left.",
-        "Also cite the original paper for each model you use; see **About this function**.",
-    )
-    with st.expander("About this function", expanded=True):
+    page_header(intro, "Also cite the original paper for each model you use; see **About this calculation**.")
+    with st.expander("About this calculation", expanded=True):
         st.markdown(spec["about"])
         if spec["cite"]:
             st.markdown("Please also cite:\n" + "".join(f"\n* {c}" for c in spec["cite"]))
-        st.markdown(f"Worked example in the documentation: [{spec['notebook']}]({OTHER_DOCS}{spec['notebook']}.html)")
+        doc = (OTHER_DOCS + spec["notebook"]) if "notebook" in spec else EX_DOCS + spec["doc"]
+        st.markdown(f"Worked example in the documentation: [{doc.rsplit('/', 1)[-1]}]({doc}.html)")
 
     with st.sidebar:
         df_in, note = other_input(spec, name)
@@ -917,7 +916,7 @@ def other_functions():
 
     with st.sidebar:
         st.header("Settings")
-        job = OTHER_FORMS[name](df_in, cols, spec)
+        job = forms[name](df_in, cols, spec)
         sidebar_about()
 
     if df_in is None:
@@ -943,13 +942,254 @@ def other_functions():
 
 
 # %% ----------------------------------------------------------------
+# chemometry and hygrometry
+
+AMP_EX = ("Amphibole/Amphibole_Liquids.xlsx", "Amp-Liq")
+PLAG_EX = ("Feldspar_Thermobarometry/Feldspar_Liquid.xlsx", "Plag_Liquid")
+OL_EX = ("Liquid_Ol_Liq_Themometry/Liquid_only_Thermometry.xlsx", "Liq_Ol_withNi")
+AMP_MELT, AMP_H, PLAG_H, OL_H = ("Amphibole only: melt composition", "Amphibole only (Ridolfi 2021)",
+                                 "Plagioclase-liquid", "Olivine-liquid")
+CHEM = {
+    AMP_MELT: dict(
+        doc="Amphibole/Amphibole_Thermobarometry_Chemometry", example=AMP_EX,
+        about="The composition of the melt an amphibole grew from: SiO₂, TiO₂, FeO, MgO, CaO, K₂O and Al₂O₃ "
+              "(Zhang et al. 2017), SiO₂ (Putirka 2016), and H₂O and ΔNNO (Ridolfi 2021). Several oxides have more "
+              "than one equation; the column names give the equation.\n\n"
+              "Needs a temperature, as a single value or a column (e.g. from an amphibole thermometer): Zhang et "
+              "al. eq. 3 and 5 and Putirka's SiO₂ depend on it.\n\n"
+              "Input: one amphibole per row, oxides in wt% as `SiO2_Amp`, `MgO_Amp`...",
+        cite=["Zhang et al. (2017)", "Ridolfi (2021)", "Putirka (2016)"]),
+}
+HYGR = {
+    AMP_H: dict(
+        doc="Amphibole/Amphibole_Thermobarometry_Chemometry", example=AMP_EX,
+        about="H₂O content of the melt from amphibole composition alone, with the Ridolfi (2021) equation, which "
+              "also gives ΔNNO. No temperature or pressure needed. The full set of melt-composition equations is "
+              "under **Chemometry**.\n\nInput: one amphibole per row, oxides in wt% as `SiO2_Amp`, `MgO_Amp`...",
+        cite=["Ridolfi (2021)"]),
+    PLAG_H: dict(
+        doc="Feldspar_Thermobarometry/Plag_Liquid_Hygrometry", example=PLAG_EX,
+        about="H₂O content of the melt from plagioclase-liquid equilibrium, at a temperature you set or solving "
+              "temperature and H₂O together with a plagioclase-liquid thermometer. Returns the Putirka (2008) "
+              "An-Ab equilibrium test.\n\n"
+              "Input: one plagioclase-liquid pair per row, oxides as `SiO2_Plag`, `SiO2_Liq`... Or, at a set "
+              "temperature, liquid compositions plus columns of XAn and XAb (mole fractions) for the plagioclase.",
+        cite=["Waters and Lange (2015), H_Waters2015", "Putirka (2005), H_Put2005_eqH",
+              "Putirka (2008), H_Put2008_eq25b and the thermometers", "Masotta et al. (2019), H_Masotta2019"]),
+    OL_H: dict(
+        doc="Liquid_Ol_Liq_Themometry/Olivine_Liquid_hygrometry", example=OL_EX,
+        about="H₂O content of the melt from olivine-liquid pairs: Gavrilenko et al. (2016), from Ca partitioning, "
+              "or Pu et al. (2017), from the difference between Mg and Ni thermometers, which needs `NiO_Ol` and "
+              "`NiO_Liq` and gives a minimum H₂O. Optional Fe-Mg Kd equilibrium tests (Toplis 2005, Roeder and "
+              "Emslie 1970, Matzen et al. 2011), at a set temperature or one from an olivine-liquid thermometer "
+              "using the calculated H₂O.\n\n"
+              "Input: one olivine-liquid pair per row, oxides as `SiO2_Ol`, `SiO2_Liq`...",
+        cite=["Gavrilenko et al. (2016), H_Gavr2016", "Pu et al. (2017), H_Pu2017", "Toplis (2005) for the Kd test"]),
+}
+
+
+def import_phases(df, *phases):
+    """Thermobar's import_excel on the uploaded table, checking the phases needed are there."""
+    for p in phases:
+        if not any(f"{ox}_{p}" in df.columns for ox in OXIDES):
+            raise ValueError(f"No {PHASE_NAMES[p]} columns found (e.g. SiO2_{p}). Columns in your file: {list(df.columns)}")
+    with warnings.catch_warnings(), contextlib.redirect_stdout(io.StringIO()):
+        warnings.simplefilter("ignore")
+        return pt.import_excel(df=df)
+
+
+def finish_hygr(out):
+    """Common tidying of hygrometer outputs: H2O_Liq_calc, and T in °C next to T in K."""
+    out = out.rename(columns={"H2O_calc": "H2O_Liq_calc"})
+    return add_T_C(out, "T_K_calc").rename(columns={"T_C": "T_C_calc"})
+
+
+AMP_ONLY_T = sorted(n for n, f in pt.Amp_only_T_funcs_by_name.items()
+                    if not any(p.endswith("_Liq_mol_frac_hyd") for p in inspect.signature(f).parameters))
+
+
+def form_amp_melt(df, cols, spec):
+    how = st.radio("Temperature", ["Set temperature", "Amphibole-only thermometer"], key="chem_T_how",
+                   help="Zhang et al. (2017) eq. 3 and 5 and Putirka (2016) SiO2 depend strongly on temperature. "
+                        "A thermometer gives each amphibole its own temperature.")
+    eqT = P = T = None
+    if how == "Set temperature":
+        T = fixed_input("T", cols, "chem_T", prefer_column=True)
+    else:
+        eqT = st.selectbox("Thermometer", AMP_ONLY_T,
+                           index=AMP_ONLY_T.index("T_Put2016_SiHbl") if "T_Put2016_SiHbl" in AMP_ONLY_T else 0,
+                           key="chem_eqT")
+        if inspect.signature(pt.Amp_only_T_funcs_by_name[eqT]).parameters["P"].default is inspect.Parameter.empty:
+            st.caption(f"{eqT} uses pressure.")
+            P = fixed_input("P", cols, "chem_P")
+        else:
+            st.caption(f"{eqT} does not use pressure.")
+
+    def job():
+        amps = import_phases(df, "Amp")["Amps"]
+        if eqT is None:
+            t = resolve(T, df)
+            out, msgs, printed = call(pt.calculate_amp_only_melt_comps, amp_comps=amps, T=t)
+        else:
+            p = resolve(P, df)
+            if "equationT" in inspect.signature(pt.calculate_amp_only_melt_comps).parameters:
+                out, msgs, printed = call(pt.calculate_amp_only_melt_comps, amp_comps=amps, equationT=eqT, P=p)
+                t = out["T_K_used"] if "T_K_used" in out else None
+            else:  # older Thermobar without equationT: run the thermometer here
+                t, msgs0, printed0 = call(pt.calculate_amp_only_temp, amp_comps=amps, equationT=eqT, P=p)
+                out, msgs, printed = call(pt.calculate_amp_only_melt_comps, amp_comps=amps, T=t)
+                msgs, printed = msgs0 + msgs, printed0 + printed
+        out = out.reset_index(drop=True).drop(columns=["T_K_used"], errors="ignore")
+        out.insert(0, "T_K_input" if eqT is None else f"T_K_calc_{eqT}",
+                   t.values if isinstance(t, pd.Series) else t)
+        if eqT is not None and P is not None:
+            out.insert(1, "P_kbar_input", p.values if isinstance(p, pd.Series) else p)
+        tcol = out.columns[0]
+        key = [c for c in out.columns if c.endswith(("_Zhang17", "_Put2016", "_Ridolfi21"))]
+        key = sorted(key, key=lambda c: (OXIDES.index(c.split("_")[0]) if c.split("_")[0] in OXIDES else 99, c)) + [tcol]
+        return out, msgs, printed, key, ("SiO2_Eq1_Zhang17", "SiO2 (wt%, Zhang et al. 2017 eq. 1)")
+    return job
+
+
+def form_amp_hygr(df, cols, spec):
+    st.caption("Ridolfi (2021) needs no temperature or pressure.")
+
+    def job():
+        amps = import_phases(df, "Amp")["Amps"]
+        out, msgs, printed = call(pt.calculate_amp_only_melt_comps, amp_comps=amps)
+        msgs = [m for m in msgs if "enter a value for T" not in m]  # only the T-dependent equations need T
+        out = out.reset_index(drop=True).rename(columns={"H2O_Ridolfi21": "H2O_Liq_calc_Ridolfi21"})
+        return out, msgs, printed, ["H2O_Liq_calc_Ridolfi21", "deltaNNO_Ridolfi21"], \
+            ("H2O_Liq_calc_Ridolfi21", "H₂O in the melt (wt%)")
+    return job
+
+
+def form_plag_hygr(df, cols, spec):
+    hyg = sorted(pt.plag_liq_H_funcs_by_name)
+    eqH = st.selectbox("Equation", hyg, index=hyg.index("H_Waters2015"), key="hyg_plag_eqH",
+                       help="H_Masotta2019 is calibrated on trachytes.")
+    src = st.radio("Plagioclase given as", ["Compositions (SiO2_Plag...)", "XAn and XAb columns"],
+                   disabled=not cols, key="hyg_plag_src", help="XAn and XAb: mole fractions, e.g. from your own recalculation.")
+    xan = xab = xor = None
+    if src.startswith("XAn"):
+        opts = cols
+        xan = st.selectbox("XAn column", opts, index=guess_index(opts, ["XAn", "An_Plag", "An", "XAn_Plag"]),
+                           key="hyg_plag_xan")
+        xab = st.selectbox("XAb column", opts, index=guess_index(opts, ["XAb", "Ab_Plag", "Ab", "XAb_Plag"]),
+                           key="hyg_plag_xab")
+        xor = st.selectbox("XOr column", ["None (XOr = 0)"] + opts, index=0, key="hyg_plag_xor",
+                           help="Only used in the equilibrium tests.")
+    how = st.radio("Temperature", ["Set temperature", "Solve temperature and H₂O together"],
+                   disabled=src.startswith("XAn"), key="hyg_plag_how",
+                   help="Solving together iterates a plagioclase-liquid thermometer and the hygrometer; it needs "
+                        "plagioclase compositions.")
+    if src.startswith("XAn"):
+        how = "Set temperature"
+    T = eqT = None
+    if how == "Set temperature":
+        T = fixed_input("T", cols, "hyg_plag_T")
+    else:
+        th = sorted(pt.plag_liq_T_funcs_by_name)
+        eqT = st.selectbox("Thermometer", th, index=th.index("T_Put2008_eq23") if "T_Put2008_eq23" in th else 0,
+                           key="hyg_plag_eqT")
+        c1, c2 = st.columns(2)
+        iterations = int(c1.number_input("Iterations", 5, 100, 20, step=5, key="hyg_plag_iter"))
+        h2o_start = c2.number_input("Starting H₂O (wt%)", 0.0, 15.0, 1.0, step=0.5, key="hyg_plag_h0")
+    P = fixed_input("P", cols, "hyg_plag_P", prefer_column=True)
+    uses_P = "P" in inspect.signature(pt.plag_liq_H_funcs_by_name[eqH]).parameters
+    st.caption(f"{eqH} uses pressure." if uses_P else
+               f"{eqH} does not use pressure; Thermobar needs it only for the An-Ab equilibrium test.")
+
+    def job():
+        data = import_phases(df, "Liq", *([] if xan else ["Plag"]))
+        kw = dict(liq_comps=data["Liqs"], equationH=eqH, P=resolve(P, df))
+        if xan:
+            num = lambda c: pd.to_numeric(df[c], errors="coerce").reset_index(drop=True)
+            kw.update(XAn=num(xan), XAb=num(xab), XOr=0 if xor.startswith("None") else num(xor))
+        else:
+            kw["plag_comps"] = data["Plags"]
+        if eqT:
+            out, msgs, printed = call(pt.calculate_fspar_liq_temp_hygr, equationT=eqT, iterations=iterations,
+                                      H2O_estimate=h2o_start, **kw)
+            out = out["T_H_calc"]
+            printed = ""  # the solver prints its iteration arrays
+        else:
+            out, msgs, printed = call(pt.calculate_fspar_liq_hygr, T=resolve(T, df), **kw)
+        out = finish_hygr(out.reset_index(drop=True))
+        key = [c for c in ("H2O_Liq_calc", "T_K_calc", "T_C_calc", "Delta T (last 2 iters)", "Delta H (last 2 iters)",
+                           "Pass An-Ab Eq Test Put2008?", "Delta_An", "Delta_Ab", "Delta_Or", "Obs_Kd_Ab_An") if c in out]
+        return out, msgs, printed, key, ("H2O_Liq_calc", "H₂O in the melt (wt%)")
+    return job
+
+
+def form_ol_hygr(df, cols, spec):
+    hyg = sorted(pt.Liquid_olivine_hygr_funcs_by_name)
+    eqH = st.selectbox("Equation", hyg, key="hyg_ol_eqH",
+                       help="H_Pu2017 needs NiO_Ol and NiO_Liq, and gives a minimum H₂O.")
+    st.caption("Neither olivine hygrometer uses temperature or pressure. They are only needed for the optional "
+               "Fe-Mg Kd equilibrium tests.")
+    tests = st.checkbox("Equilibrium tests (Fe-Mg Kd)", value=False, key="hyg_ol_tests",
+                        help="Measured Kd against Toplis (2005), which needs T and P, and against fixed values of "
+                             "Roeder and Emslie (1970) and Matzen et al. (2011).")
+    T = eqT = P = fe3 = None
+    if tests:
+        src = st.radio("Temperature for the tests", ["Set temperature", "Olivine-liquid thermometer"],
+                       disabled=eqH == "H_Pu2017", key="hyg_ol_tsrc",
+                       help="The thermometer uses the calculated H₂O. Not available with H_Pu2017 in Thermobar "
+                            "1.0.73 (it fails inside Thermobar).")
+        if src == "Set temperature" or eqH == "H_Pu2017":
+            T = fixed_input("T", cols, "hyg_ol_T")
+        else:
+            th = sorted(pt.Liquid_olivine_funcs_by_name)
+            eqT = st.selectbox("Thermometer", th, index=th.index("T_Put2008_eq22") if "T_Put2008_eq22" in th else 0,
+                               key="hyg_ol_eqT")
+        P = fixed_input("P", cols, "hyg_ol_P")
+        if st.checkbox("Set Fe³⁺/ΣFe in the liquid", value=False, key="hyg_ol_setfe3",
+                       help="Overrides any Fe3Fet_Liq column. Kd uses Fe²⁺ only."):
+            fe3 = st.number_input("Fe³⁺/ΣFe", 0.0, 1.0, 0.15, step=0.01, key="hyg_ol_fe3")
+
+    def job():
+        data = import_phases(df, "Ol", "Liq")
+        ols, liqs = data["Ols"], data["Liqs"]
+        if eqH == "H_Pu2017" and not ((ols["NiO_Ol"] > 0).any() and (liqs["NiO_Liq"] > 0).any()):
+            raise ValueError("H_Pu2017 needs NiO_Ol and NiO_Liq columns in your file.")
+        out, msgs, printed = call(pt.calculate_ol_liq_hygr, liq_comps=liqs, ol_comps=ols, equationH=eqH,
+                                  eq_tests=tests, T=resolve(T, df), P=resolve(P, df), equationT=eqT, Fe3Fet_Liq=fe3)
+        if isinstance(out, pd.Series):
+            out = pd.concat([out.rename("H2O_calc").reset_index(drop=True), ols.reset_index(drop=True),
+                             liqs.reset_index(drop=True)], axis=1)
+        out = finish_hygr(out.reset_index(drop=True)).rename(columns={"Temp used for calcs": "T_K_input"})
+        key = [c for c in ("H2O_Liq_calc", "T_K_calc", "T_C_calc", "T_K_input", "Kd Meas", "Kd calc (Toplis)",
+                           "ΔKd, Toplis (M-P)", "ΔKd, Roeder (M-P)", "ΔKd, Matzen (M-P)") if c in out]
+        return out, msgs, printed, key, ("H2O_Liq_calc", "H₂O in the melt (wt%)")
+    return job
+
+
+CHEM_FORMS = {AMP_MELT: form_amp_melt}
+HYGR_FORMS = {AMP_H: form_amp_hygr, PLAG_H: form_plag_hygr, OL_H: form_ol_hygr}
+
+
+# %% ----------------------------------------------------------------
 # sidebar
 
 with st.sidebar:
     tool = st.selectbox("Calculation type", TOOLS)
 
+if tool == CHEM_TOOL:
+    function_page(CHEM, CHEM_FORMS, "Chemometer",
+                  "Melt compositions from mineral compositions (chemometry). Choose the chemometer and its inputs in "
+                  "the menu at left.")
+    st.stop()
+if tool == HYGR_TOOL:
+    function_page(HYGR, HYGR_FORMS, "Hygrometer",
+                  "H₂O contents of melts from amphibole, plagioclase-liquid and olivine-liquid compositions "
+                  "(hygrometry). Choose the hygrometer and its inputs in the menu at left.")
+    st.stop()
 if tool == OTHER_TOOL:
-    other_functions()  # draws its own sidebar and page
+    function_page(OTHER, OTHER_FORMS, "Function",
+                  "Other calculations in Thermobar: melt viscosity, redox conversions between fO₂, buffer position "
+                  "and Fe³⁺/ΣFe, pressure to depth, oxide to element wt%, and comparing your data with model "
+                  "calibration datasets. Choose the function and its inputs in the menu at left.")
     st.stop()
 
 with st.sidebar:
