@@ -15,6 +15,12 @@ https://thermobar.readthedocs.io/en/latest/Examples/Cpx_Cpx_Liq_Thermobarometry/
 
 Find more information in Volcanica - and please make sure you cite this work!!!
 https://www.jvolcanica.org/ojs/index.php/volcanica/article/view/161
+
+________________________________
+Want a WebApp/GUI?
+________________________________
+The streamlit app allows running of simple calculations (no melt matching as streamlit limits memory on free accounts). 
+https://thermobar.streamlit.app/
 ________________________________
 Want your model in Thermobar?
 ________________________________
