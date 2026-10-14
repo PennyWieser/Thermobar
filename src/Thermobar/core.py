@@ -4727,9 +4727,9 @@ def convert_fe_partition_to_fo2(*, liq_comps,  T_K, P_kbar,  model="Kress1991", 
     # We've simplified the equatoin down to Z= a ln fo2 + rightside
 
 
+    rightside=( (11492/T_K)-6.675+((-2.243*hyd_mol_frac_test['Al2O3_Liq_mol_frac_hyd'])+(-1.828*hyd_mol_frac_test['FeOt_Liq_mol_frac_hyd'])
+    +(3.201*hyd_mol_frac_test['CaO_Liq_mol_frac_hyd'])+(5.854*hyd_mol_frac_test['Na2O_Liq_mol_frac_hyd'])+(6.215*hyd_mol_frac_test['K2O_Liq_mol_frac_hyd']))
 
-    rightside=( (11492/T_K)-6.675+((-2.243*mol_frac_hyd_test['Al2O3_Liq_mol_frac_hyd'])+(-1.828*hyd_mol_frac_test['FeOt_Liq_mol_frac_hyd'])
-    +(3.201*mol_frac_hyd_test['CaO_Liq_mol_frac_hyd'])+(5.854*mol_frac_hyd_test['Na2O_Liq_mol_frac_hyd'])+(6.215*mol_frac_hyd_test['K2O_Liq_mol_frac_hyd']))
     -3.36*(1-(To/T_K) - np.log(T_K.astype(float)/To)) -0.000000701*((P_kbar*100000000)/T_K)
     + -0.000000000154*(((T_K-1673)*(P_kbar*100000000))/T_K) + 0.0000000000000000385*((P_kbar*100000000)**2/T_K)
     )
