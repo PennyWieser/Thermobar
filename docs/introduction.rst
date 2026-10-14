@@ -5,6 +5,11 @@ Introduction and Citation
 Welcome to Thermobar - An Open-Source python3 tool for performing mineral and mineral-melt thermobarometry, hygrometry and chemometry.
 
 This tool is published in volcanica: https://doi.org/10.30909/vol.05.02.349384
+
+There are numerous worked examples on this page, and we also have a web App!
+https://thermobar.streamlit.app/
+
+
 Please make sure you cite if it you use it! Software development takes time, and academia doesnt always realize the effort it takes. However, they do understand citations
 
 Please also reference the original paper for the equation you have choosen as well as Thermobar.
