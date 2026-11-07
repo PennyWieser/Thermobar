@@ -556,8 +556,7 @@ def calculate_ol_liq_temp_matching(*, liq_comps, ol_comps, eq_tests=False,
 equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
 
     '''
-    Evaluates all possible Ol-liq pairs for temperature, and calculates
-    equilibrium tests
+    Returns calculated temperatures and components for all possible Ol-liq pairs.
 
     Parameters
     ----------------
@@ -568,6 +567,10 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
     liq_comps: pandas.DataFrame
         Panda DataFrame of liq compositions with column headings SiO2_Liq etc.
 
+    eq_tests: bool, default False
+        Include the existing equilibrium-test results when True. Both modes
+        return calculated temperatures and measured olivine Fo.
+
     equationT: str
         T_Beatt93_ol (P-dependent, H2O_independent)
         T_Beatt93_ol_HerzCorr (P-dependent, H2O_independent)
@@ -577,15 +580,19 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
         T_Pu2017 (P-independent, H2O_independent)
         T_Pu2021 (P-dependent, H2O_independent)
 
-    P: float, int, pandas.Series, str  ("Solve")
-        Pressure in kbar
-        Only needed for P-sensitive thermometers.
-        If enter P="Solve", returns a partial function
-        Else, enter an integer, float, or panda series
+    P: float or int
+        Scalar pressure in kbar for pressure-sensitive thermometers in the
+        documented matching workflow. Existing non-scalar and "Solve" handling
+        is outside the result contract described here.
 
     H2O_Liq: optional.
-        If None, uses H2O_Liq column from input.
-        If int, float, pandas.Series, uses this instead of H2O_Liq Column
+        Leave as None and supply per-liquid water in the H2O_Liq input column
+        for the documented workflow. Existing override handling is unchanged.
+
+    Fe3Fet_Liq: optional.
+        Leave as None and supply the ferric/total iron ratio in the Fe3Fet_Liq
+        input column for the documented workflow. Override/broadcasting
+        behavior is not changed by the result-assembly correction.
 
 
     iterations: int
@@ -594,9 +601,48 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
     Returns
     -------
     pandas.DataFrame
-        Temp (K) for all posible ol-liq matches, along with equilibrium
-        tests, components and input mineral compositions. At the moment, doesnt average per olivine.. But could upon request.
+        One row per pair in the existing olivine-major order, with input
+        compositions, prepared components and post-calculation intermediates.
+        Both modes contain T_K_calc (kelvin) and Ol_Fo_Meas. When eq_tests=False,
+        also returns Kd (Fe-Mg) Meas. When eq_tests=True, returns Kd Meas,
+        Kd calc (Toplis), ΔKd, Toplis (M-P), ΔKd, Roeder (M-P),
+        ΔKd, Matzen (M-P) and ΔKd, Shea (M-P) instead.
+
+    Raises
+    ------
+    ValueError
+        If either input contains a name calculated in the selected mode.
+        Rename conflicting metadata columns before matching. Other metadata
+        and existing sample-ID naming are not normalized by this function.
+
+    Examples
+    --------
+    For input DataFrames with per-liquid water and ferric ratios in columns::
+
+        liquids = liq_comps.copy()
+        # H2O_Liq and Fe3Fet_Liq already contain the per-liquid values.
+        matches = calculate_ol_liq_temp_matching(
+            liq_comps=liquids, ol_comps=ol_comps,
+            equationT="T_Put2008_eq22", P=1.0, eq_tests=True)
+        temperatures = matches['T_K_calc']  # kelvin
+
+    This result contract does not change the underlying equations, input
+    preparation or override/"Solve" behavior, and does not average per olivine.
     '''
+
+    calculated_columns = {'T_K_calc', 'Ol_Fo_Meas'}
+    if eq_tests:
+        calculated_columns.update([
+            'Kd Meas', 'Kd calc (Toplis)', 'ΔKd, Toplis (M-P)',
+            'ΔKd, Roeder (M-P)', 'ΔKd, Matzen (M-P)', 'ΔKd, Shea (M-P)'])
+    else:
+        calculated_columns.add('Kd (Fe-Mg) Meas')
+    conflicts = (calculated_columns.intersection(liq_comps.columns) |
+                 calculated_columns.intersection(ol_comps.columns))
+    if conflicts:
+        names = ', '.join(repr(name) for name in sorted(conflicts))
+        raise ValueError('Input columns conflict with calculated output names: ' + names +
+                         '. Rename these metadata columns before matching.')
 
     ol_comps_c=ol_comps.copy()
     liq_comps_c=liq_comps.copy()
@@ -651,9 +697,6 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
     # Combines these merged liquids and liq dataframes
     Combo_Ol_liqs = pd.concat([Dupliqs, DupOls], axis=1)
 
-    Combo_Ol_liqs_1 = Combo_Ol_liqs.copy()
-    # Combo_Ols_liqs_1['K_Barth'] = Combo_Ols_liqs_1['Ab_liq'] / \
-    #     Combo_Ols_liqs_1['Ab_Ol']
     LenCombo = str(np.shape(Combo_Ol_liqs)[0])
 
     LenOl=len(ol_comps)
@@ -671,9 +714,9 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
 
     CalcT.insert(1, 'Ol_Fo_Meas', Fo)
 
-    df_out=pd.concat([CalcT, Combo_Ol_liqs_1], axis=1)
-
-    return Combo_Ol_liqs
+    if eq_tests:
+        return CalcT
+    return pd.concat([CalcT, Combo_Ol_liqs], axis=1)
 
 
 
