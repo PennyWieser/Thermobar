@@ -1,7 +1,7 @@
 import numpy as np
 import os, sys
 import matplotlib.pyplot as plt
-
+import pandas as pd
 def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked, adiabat, **kwargs):
 
 	'''
@@ -250,7 +250,7 @@ def calculate_hasterok2011_geotherm(SHF, BDL_T, T_0, max_depth, moho, kinked, ad
 	if out_format == 'Array':
 
 		return T, depth, p, idx_geotherm_nearest
-		
+
 	elif out_format == 'DataFrame':
 
 		out = pd.DataFrame(

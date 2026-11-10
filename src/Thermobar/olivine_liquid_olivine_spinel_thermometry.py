@@ -73,8 +73,43 @@ def H_Pu2017(*, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, MgO_Liq_mo
     return MinH2O
 
 
+def H_Pu2021(*, NiO_Ol_mol_frac, FeOt_Liq_mol_frac, MnO_Liq_mol_frac, MgO_Liq_mol_frac,
+             CaO_Liq_mol_frac, NiO_Liq_mol_frac, Al2O3_Liq_mol_frac, TiO2_Liq_mol_frac, SiO2_Liq_mol_frac,MgO_Ol_mol_frac):
+    """ uses the pressure correction of Pu et al. 2021, should only be used from 1-3 GPa"""
 
-Liquid_olivine_hygr_funcs = {H_Gavr2016, H_Pu2017}
+    T_Pu2021_calc = T_Pu2021(
+        NiO_Ol_mol_frac=NiO_Ol_mol_frac,
+        FeOt_Liq_mol_frac=FeOt_Liq_mol_frac,
+        MnO_Liq_mol_frac=MnO_Liq_mol_frac,
+        MgO_Liq_mol_frac=MgO_Liq_mol_frac,
+        CaO_Liq_mol_frac=CaO_Liq_mol_frac,
+        NiO_Liq_mol_frac=NiO_Liq_mol_frac,
+        Al2O3_Liq_mol_frac=Al2O3_Liq_mol_frac,
+        TiO2_Liq_mol_frac=TiO2_Liq_mol_frac,
+        SiO2_Liq_mol_frac=SiO2_Liq_mol_frac)
+
+
+    T_Pu2017_Mg_calc = T_Pu2017_Mg(
+        MgO_Ol_mol_frac=MgO_Ol_mol_frac,
+        FeOt_Liq_mol_frac=FeOt_Liq_mol_frac,
+        MnO_Liq_mol_frac=MnO_Liq_mol_frac,
+        NiO_Liq_mol_frac=NiO_Liq_mol_frac,
+        CaO_Liq_mol_frac=CaO_Liq_mol_frac,
+        MgO_Liq_mol_frac=MgO_Liq_mol_frac,
+        Al2O3_Liq_mol_frac=Al2O3_Liq_mol_frac,
+        TiO2_Liq_mol_frac=TiO2_Liq_mol_frac,
+        SiO2_Liq_mol_frac=SiO2_Liq_mol_frac
+    )
+
+
+
+    deltaT=T_Pu2017_Mg_calc-T_Pu2021_calc
+    MinH2O=0.000069171*(deltaT**2)+0.02615*deltaT
+
+    return MinH2O
+
+
+Liquid_olivine_hygr_funcs = {H_Gavr2016, H_Pu2017, H_Pu2021}
 Liquid_olivine_hygr_funcs_by_name = {p.__name__: p for p in Liquid_olivine_hygr_funcs}
 
 
@@ -100,6 +135,7 @@ P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
     equationH: str
         H_Gavr2016 (P-independent, H2O_independent)
         H_Pu2017 (uses the difference between Tmg and Tni to calculate a minimum H2O content. requires NiO in liquid and olivine to be entered).
+        H_Pu2021 (uses the difference between Tmg and Tni to calculate a minimum H2O content. requires NiO in liquid and olivine to be entered. Uses the P correction from the 2021 Pu et al paper, should only be used from 1-3 GPa).
 
 
     eq_tests: bool
@@ -139,7 +175,7 @@ P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
         ol_comps_c=ol_comps.copy()
         liq_comps_c=liq_comps.copy()
 
-        if equationH == "H_Pu2017":
+        if equationH == "H_Pu2017" or equationH == "H_Pu2021":
 
             anhyd_mol_frac_Ni = calculate_anhydrous_mol_fractions_liquid_Ni(
                 liq_comps=liq_comps_c)
@@ -587,6 +623,13 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
         If None, uses H2O_Liq column from input.
         If int, float, pandas.Series, uses this instead of H2O_Liq Column
 
+   eq_tests: bool, default False
+       If True, also returns Kd equilibrium tests (Toplis calc Kd and ΔKd vs
+       Toplis, Roeder, Matzen and Shea).
+
+   Fe3Fet_Liq: optional, float, int or pandas.Series
+       If None, uses Fe3Fet_Liq column from input; otherwise overwrites it.
+
 
     iterations: int
         number of times to iterate temperature and H2O. Default 30.
@@ -671,9 +714,9 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
 
     CalcT.insert(1, 'Ol_Fo_Meas', Fo)
 
-    df_out=pd.concat([CalcT, Combo_Ol_liqs_1], axis=1)
-
-    return Combo_Ol_liqs
+    if eq_tests:
+        return CalcT
+    return pd.concat([CalcT, Combo_Ol_liqs], axis=1)
 
 
 
@@ -860,8 +903,7 @@ def calculate_ol_liq_temp(*, equationT, liq_comps=None, ol_comps=None, meltmatch
             ((Liq_Ols['FeOt_Liq'] * (1 - Liq_Ols['Fe3Fet_Liq']
                                          ) / 71.844) / (Liq_Ols['MgO_Liq'] / 40.3044))
         )
-        Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'], Na2O_mol=Liq_Ols[
-                          'Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], P=P, H2O=Liq_Ols['H2O_Liq'], T=T_K)
+        Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'], Na2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['K2O_Liq_mol_frac'], P=P, H2O=Liq_Ols['H2O_Liq'], T=T_K)
         Kd_Toplis_calc = Kd_func(ol_fo)
 
         DeltaKd_Toplis = KdFeMg_Meas - Kd_Toplis_calc
@@ -942,3 +984,5 @@ def calculate_ol_sp_temp(ol_comps, sp_comps, equationT, P=None):
     df_T_K = pd.DataFrame(data={'T_K_calc' + str(equationT.strip('T_')): T_K})
 
     return T_K
+
+## Olivine - Cpx thermobarometry (i.e. for xenoliths).
