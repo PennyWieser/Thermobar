@@ -585,7 +585,14 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
 
     H2O_Liq: optional.
         If None, uses H2O_Liq column from input.
-        If int, float, pandas.Series, uses this instead of H2O_Liq Column
+        If int or float, uses this water content (wt%) for every liquid.
+        A pandas.Series aligns with the original liq_comps index before
+        pairing.
+
+    Fe3Fet_Liq: optional.
+        Ferric iron as a fraction of total iron, not a percentage.
+        If None, uses the Fe3Fet_Liq column from input. Scalars apply to every
+        liquid; a pandas.Series aligns with the original liq_comps index.
 
 
     iterations: int
@@ -607,6 +614,12 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
     except KeyError:
         raise ValueError(f'{equationT} is not a valid equation for Ol-Liquid Hygrometry') from None
     sig=inspect.signature(func)
+
+    # Apply per-liquid overrides before components and pair expansion.
+    if H2O_Liq is not None:
+        liq_comps_c['H2O_Liq'] = H2O_Liq
+    if Fe3Fet_Liq is not None:
+        liq_comps_c['Fe3Fet_Liq'] = Fe3Fet_Liq
 
     # This is a duplication step, to pair up all possible mathes. First we give a unique identifier
 
