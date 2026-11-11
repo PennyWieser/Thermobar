@@ -91,6 +91,16 @@ def calculate_Thorn2026_kd_eq1(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, Fe3FeT_Liq)
 
     return Eq1_Thorn2026
 
+def calculate_Thorn2026_kd_eq1(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, Fet_cat_frac):
+    """ Equation 1 from Thorn et al, for Fe2"""
+
+    Eq1_Thorn2026=(0.338
+                + 0.355*Fet_cat_frac
+                -0.538*(Na2O_mol+K2O_mol)/SiO2_mol
+                -0.216*X_fo)
+
+    return Eq1_Thorn2026
+
 
 
 def calculate_Thorn2026_kd_eq2(X_fo, *, SiO2_mol, Na2O_mol, K2O_mol, Fe3FeT_Liq):
@@ -129,7 +139,7 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
 
         "Toplis2005": calculates Kd based on melt SiO2, Na2O, K2O, P, T, H2O, Ol Fo content.
 
-        "Thorn2026_Fe2" Calculates Kd using Eq 1 of Thorn et al. (2026).
+        "Thorn2026_Fe2" Calculates Kd using Eq 1 of Thorn et al. (2026). - in progress, waiting for benchmarking
 
         Users can specify a ol_fo content, or the function iterates Kd and Fo and returns both.
 
@@ -238,75 +248,52 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
             'Eq Fo (Putirka 8a Fe2, Kd=0.33)': Eq_ol_8a,
             'Eq Fo (Putirka 8a Fe2, Kd=0.33-0.044)': Eq_ol_8a_m_1sigma,
             'Eq Fo (Putirka 8a Fe2, Kd=0.33+0.044)': Eq_ol_8a_p_1sigma,
-            'Eq Fo (Putirka 8a Fe2, Kd=0.33+0.044)': Eq_ol_8a_p_1sigma,
+
 
             'Calc Kd (Putirka 8c, Fe2)': Kd_8c,
             'Eq Fo (Putirka 8c Fe2)': Eq_ol_8c,
             'Eq Fo (Putirka 9a Fet, Kd=0.29)': Eq_ol_9a,
             'Eq Fo (Putirka 9a Fet, Kd=0.29-0.051)': Eq_ol_9a_m_1sigma,
-            'Eq Fo (Putirka 9a Fet, Kd=0.29+0.051)': Eq_ol_9a_m_1sigma})
+            'Eq Fo (Putirka 9a Fet, Kd=0.29+0.051)': Eq_ol_9a_p_1sigma})
 
-            # New Thorn ones
-            if Kd_model =="Thorn2026" or Kd_model == "All":
+        if Kd_model == "Thorn2026":
+            mol_perc = calculate_anhydrous_mol_fractions_liquid(liq_comps_c)
+            SiO2_mol = mol_perc['SiO2_Liq_mol_frac']
+            Na2O_mol = mol_perc['Na2O_Liq_mol_frac']
+            K2O_mol = mol_perc['K2O_Liq_mol_frac']
+            Fe3FeT = liq_comps_c['Fe3Fet_Liq']
 
+            Kd_funcT26_eq1 = partial(calculate_Thorn2026_kd_eq1, SiO2_mol=SiO2_mol,
+                                     Na2O_mol=Na2O_mol, K2O_mol=K2O_mol, Fe3FeT_Liq=Fe3FeT)
+            Kd_funcT26_eq2 = partial(calculate_Thorn2026_kd_eq2, SiO2_mol=SiO2_mol,
+                                     Na2O_mol=Na2O_mol, K2O_mol=K2O_mol, Fe3FeT_Liq=Fe3FeT)
+            Mgno_eq1 = Mgno          # Fe2-based Kd
+            Mgno_eq2 = Mgno          # change to Mgno_noFe3 if Eq2 Kd is defined with FeT
 
-
-                mol_perc = calculate_anhydrous_mol_fractions_liquid(liq_comps_c)
-                SiO2_mol = mol_perc['SiO2_Liq_mol_frac']
-                Na2O_mol = mol_perc['Na2O_Liq_mol_frac']
-                K2O_mol = mol_perc['K2O_Liq_mol_frac']
-                H2O_Liq = liq_comps_c['H2O_Liq']
-                Fe3FeT=liq_comps_c['Fe3FeT_Liq']
-
-
-                Kd_funcT26_eq2 = partial(calculate_Thorn2026_kd_eq2, SiO2_mol=SiO2_mol, Na2O_mol=Na2O_mol, K2O_mol=K2O_mol, Fe3FeT_Liq=Fe3FeT_Liq)
-                Kd_funcT26_eq1 = partial(calculate_Thorn2026_kd_eq1, SiO2_mol=SiO2_mol, Na2O_mol=Na2O_mol, K2O_mol=K2O_mol)
-
-                if ol_fo is not None or ol_comps is not None:
-                    if ol_fo is not None and ol_comps is None:
-                        Kd_calc_eq1 = Kd_funcT26_eq1(ol_fo)
-                        Ol_calc_eq1 = 1 / ((Kd_calc_eq1 / Mgno) + (1 - Kd_calc_eq1))
-                        Kd_calc_eq2 = Kd_funcT26_eq2(ol_fo)
-                        Ol_calc_eq2 = 1 / ((Kd_calc_eq2 / Mgno) + (1 - Kd_calc_eq2))
-                    if ol_comps is not None:
-                        Kd_calc_eq1 = Kd_funcT26_eq1(ol_comps['Fo_meas'])
-                        Ol_calc_eq1 = 1 / ((Kd_calc_eq1/ Mgno) + (1 - Kd_calc_eq1))
-                        Kd_calc_eq2 = Kd_funcT26_eq2(ol_comps['Fo_meas'])
-                        Ol_calc_eq2 = 1 / ((Kd_calc_eq2/ Mgno) + (1 - Kd_calc_eq2))
-                    Kd_out_top = pd.DataFrame(
-                            data={
-                            'Kd (Thorn2026 Eq1, input Fo)': Kd_calc_eq1,
-                            'Eq Fo (T26 Eq1, input Fo)': Ol_calc_eq1,
-                            'Kd (Thorn2026 Eq2, input Fo)': Kd_calc_eq2,
-                            'Eq Fo (T26 Eq2, input Fo)': Ol_calc_eq2,
-                            })
-
-
-                else:
-                    iterations = 20
-                    Eq_ol_guess0 = 0.95
-                    # Eq1
-                    Eq_ol_func_eq1 = partial(calculate_Thorn2026_kd_eq1, Liq_Mgno=Mgno)
-                    Eq_ol_guess_eq1 = Eq_ol_guess0
-                    for _ in range(iterations):
-                        Kd_Guess_eq1 = Kd_func(Eq_ol_guess_eq1)
-                        Eq_ol_guess_eq1 = Eq_ol_func_eq1(Kd_Guess_eq1)
-
-                    # Eq 2
-                    Eq_ol_func_eq2 = partial(calculate_Thorn2026_kd_eq2, Liq_Mgno=Mgno)
-                    Eq_ol_guess_eq2 = Eq_ol_guess0
-                    for _ in range(iterations):
-                        Kd_Guess_eq2 = Kd_func(Eq_ol_guess_eq2)
-                        Eq_ol_guess_eq2 = Eq_ol_func_eq2(Kd_Guess_eq2)
-
-                    Kd_out_top = pd.DataFrame(
-                        data={
-                            'Kd (Thorn2026_eq1)': Kd_Guess_eq1,
-                            'Eq Fo (Thorn2026_eq1, Iter)': Eq_ol_guess_eq1,
-                            'Kd (Thorn2026_eq2)': Kd_Guess_eq2,
-                            'Eq Fo (Thorn2026_eq2, Iter)': Eq_ol_guess_eq2,
-                        }
-                    )
+            if ol_fo is not None or ol_comps is not None:
+                Fo_in = ol_comps['Fo_meas'] if ol_comps is not None else ol_fo
+                Kd_calc_eq1 = Kd_funcT26_eq1(Fo_in)
+                Kd_calc_eq2 = Kd_funcT26_eq2(Fo_in)
+                Kd_out_Thorn = pd.DataFrame(data={
+                    'Kd (Thorn2026 Eq1, input Fo)': Kd_calc_eq1,
+                    'Eq Fo (Thorn2026 Eq1, input Fo)': calculate_eq_olivine(Kd_calc_eq1, Liq_Mgno=Mgno_eq1),
+                    'Kd (Thorn2026 Eq2, input Fo)': Kd_calc_eq2,
+                    'Eq Fo (Thorn2026 Eq2, input Fo)': calculate_eq_olivine(Kd_calc_eq2, Liq_Mgno=Mgno_eq2),
+                })
+            else:
+                Fo_eq1 = 0.95
+                Fo_eq2 = 0.95
+                for _ in range(20):
+                    Kd_eq1 = Kd_funcT26_eq1(Fo_eq1)
+                    Fo_eq1 = calculate_eq_olivine(Kd_eq1, Liq_Mgno=Mgno_eq1)
+                    Kd_eq2 = Kd_funcT26_eq2(Fo_eq2)
+                    Fo_eq2 = calculate_eq_olivine(Kd_eq2, Liq_Mgno=Mgno_eq2)
+                Kd_out_Thorn = pd.DataFrame(data={
+                    'Kd (Thorn2026 Eq1, Iter)': Kd_eq1,
+                    'Eq Fo (Thorn2026 Eq1, Iter)': Fo_eq1,
+                    'Kd (Thorn2026 Eq2, Iter)': Kd_eq2,
+                    'Eq Fo (Thorn2026 Eq2, Iter)': Fo_eq2,
+                })
 
 
             if P is None:
@@ -370,7 +357,7 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
                         data={'Kd (Toplis, Iter)': Kd_Guess, 'Eq Fo (Toplis, Iter)': Eq_ol_guess})
 
         if Kd_model == "All":
-            Kd_out = pd.concat([Kd_out_shea, Kd_out_ro, Kd_out_mat, Kd_out_top, Kd_out_Put, Kd_out_Thorn], axis=1)
+            Kd_out = pd.concat([Kd_out_shea, Kd_out_ro, Kd_out_mat, Kd_out_top, Kd_out_Put], axis=1)
         if Kd_model == "Roeder1970":
             Kd_out=Kd_out_ro
         if Kd_model == "Matzen2011":

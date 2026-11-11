@@ -1,6 +1,10 @@
 ================================================
 Change Log
 ================================================
+Version 1.0.76 - Nov 11th, 2026
+=====================================
+Fixed bug in Ol-Liq melt matching (thanks Zack-Dev), fixed error in toplis where K2O calling Na2O column
+
 
 Version 1.0.73 - June 10th, 2026
 =====================================
