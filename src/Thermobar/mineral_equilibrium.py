@@ -248,13 +248,13 @@ Fe3Fet_Liq=None, ol_fo=None, H2O_Liq=None, logfo2=None):
             'Eq Fo (Putirka 8a Fe2, Kd=0.33)': Eq_ol_8a,
             'Eq Fo (Putirka 8a Fe2, Kd=0.33-0.044)': Eq_ol_8a_m_1sigma,
             'Eq Fo (Putirka 8a Fe2, Kd=0.33+0.044)': Eq_ol_8a_p_1sigma,
-            'Eq Fo (Putirka 8a Fe2, Kd=0.33+0.044)': Eq_ol_8a_p_1sigma,
+
 
             'Calc Kd (Putirka 8c, Fe2)': Kd_8c,
             'Eq Fo (Putirka 8c Fe2)': Eq_ol_8c,
             'Eq Fo (Putirka 9a Fet, Kd=0.29)': Eq_ol_9a,
             'Eq Fo (Putirka 9a Fet, Kd=0.29-0.051)': Eq_ol_9a_m_1sigma,
-            'Eq Fo (Putirka 9a Fet, Kd=0.29+0.051)': Eq_ol_9a_m_1sigma})
+            'Eq Fo (Putirka 9a Fet, Kd=0.29+0.051)': Eq_ol_9a_p_1sigma})
 
         if Kd_model == "Thorn2026":
             mol_perc = calculate_anhydrous_mol_fractions_liquid(liq_comps_c)

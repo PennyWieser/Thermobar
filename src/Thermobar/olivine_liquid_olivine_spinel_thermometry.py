@@ -268,7 +268,7 @@ P=None, T=None, meltmatch=None, equationT=None, Fe3Fet_Liq=None):
 
         )
         Kd_func = partial(calculate_toplis2005_kd, SiO2_mol=Liq_Ols['SiO2_Liq_mol_frac'],
-        Na2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['Na2O_Liq_mol_frac'],
+        Na2O_mol=Liq_Ols['Na2O_Liq_mol_frac'], K2O_mol=Liq_Ols['K2O_Liq_mol_frac'],
         P=P, H2O=Liq_Ols['H2O_Liq'], T=T)
 
         Kd_Toplis_calc = Kd_func(ol_fo)
