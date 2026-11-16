@@ -611,6 +611,7 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
         T_Put2008_eq22 (P-dependent, H2O-dependent)
         T_Sisson1992 (P-dependent, H2O_independent)
         T_Pu2017 (P-independent, H2O_independent)
+        T_Pu2017_Mg (P-independent, H2O_independent)
         T_Pu2021 (P-dependent, H2O_independent)
 
     P: float, int, pandas.Series, str  ("Solve")
@@ -663,7 +664,7 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
         liq_comps_c['Sample_ID_liq'] = liq_comps.index.astype('float64')
 
     # Uses mole fractions, not cation fractions
-    if equationT == "T_Pu2017" or equationT == "T_Pu2021":
+    if equationT in ("T_Pu2017", "T_Pu2021", "T_Pu2017_Mg"):
         # For liquid
         anhyd_mol_frac_Ni = calculate_anhydrous_mol_fractions_liquid_Ni(
                 liq_comps=liq_comps_c)
@@ -744,6 +745,7 @@ def calculate_ol_liq_temp(*, equationT, liq_comps=None, ol_comps=None, meltmatch
         T_Put2008_eq22 (P-dependent, H2O-dependent)
         T_Sisson1992 (P-dependent, H2O_independent)
         T_Pu2017 (P-independent, H2O_independent) Eq 1
+        T_Pu2017_Mg (P-independent, H2O_independent)
         T_Pu2021 (P-dependent, H2O_independent) - only applies P corr for 10-30 GPa
 
     P: float, int, pandas.Series, str  ("Solve")
