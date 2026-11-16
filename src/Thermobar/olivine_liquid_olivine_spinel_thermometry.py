@@ -338,8 +338,8 @@ T=None, equationT=None, P=None,  Fe3Fet_Liq=None, iterations=30):
 
     if "Sample_ID_Ol" not in ol_comps:
         ol_comps_c['Sample_ID_Ol'] = ol_comps.index.astype('float64')
-    if "Sample_ID_liq" not in liq_comps:
-        liq_comps_c['Sample_ID_liq'] = liq_comps.index.astype('float64')
+    if "Sample_ID_Liq" not in liq_comps:
+        liq_comps_c['Sample_ID_Liq'] = liq_comps.index.astype('float64')
 
 
     # This calculates components proir to duplication (more computationally efficient)
@@ -659,8 +659,8 @@ equationT=None, P=None, H2O_Liq=None, Fe3Fet_Liq=None, iterations=30):
     if "Sample_ID_Ol" not in ol_comps.columns:
         ol_comps_c['Sample_ID_Ol'] = ol_comps.index.astype('float64')
 
-    if 'Sample_ID_liq' not in liq_comps.columns:
-        liq_comps_c['Sample_ID_liq'] = liq_comps.index.astype('float64')
+    if 'Sample_ID_Liq' not in liq_comps.columns:
+        liq_comps_c['Sample_ID_Liq'] = liq_comps.index.astype('float64')
 
     # Uses mole fractions, not cation fractions
     if equationT == "T_Pu2017" or equationT == "T_Pu2021":

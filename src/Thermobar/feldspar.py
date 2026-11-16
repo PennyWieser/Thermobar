@@ -1351,8 +1351,8 @@ def calculate_fspar_liq_temp_hygr_matching(liq_comps, plag_comps, equationT, equ
 
     if "Sample_ID_Plag" not in plag_comps:
         plag_comps_c['Sample_ID_Plag'] = plag_comps.index.astype('float64')
-    if "Sample_ID_liq" not in liq_comps:
-        liq_comps_c['Sample_ID_liq'] = liq_comps.index.astype('float64')
+    if "Sample_ID_Liq" not in liq_comps:
+        liq_comps_c['Sample_ID_Liq'] = liq_comps.index.astype('float64')
 
 
 
@@ -1597,8 +1597,8 @@ P=None, Ab_An_P2008=False):
     cat_liqs['ID_liq'] = cat_liqs.index.astype('float64')
     if "Sample_ID_Plag" not in cat_fspar:
         cat_fspar['Sample_ID_Plag'] = cat_fspar.index.astype('float64')
-    if "Sample_ID_liq" not in cat_liqs:
-        cat_liqs['Sample_ID_liq'] = cat_liqs.index.astype('float64')
+    if "Sample_ID_Liq" not in cat_liqs:
+        cat_liqs['Sample_ID_Liq'] = cat_liqs.index.astype('float64')
     # Duplicate liqs and liquids so end up with panda of all possible liq-liq
     # matches
 
